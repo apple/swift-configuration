@@ -1,0 +1,79 @@
+{
+    "string": "Hello",
+    "int": 42,
+    "double": 3.14,
+    "bool": true,
+    "bytes": "bWFnaWM=",
+
+    "other": {
+        "string": "Other Hello",
+        "int": 24,
+        "double": 2.72,
+        "bool": false,
+        "bytes": "bWFnaWMy",
+
+        "stringy": {
+            "array": [
+                "Hello",
+                "Swift"
+            ]
+        },
+        "inty": {
+            "array": [
+                16,
+                32
+            ]
+        },
+        "doubly": {
+            "array": [
+                0.9,
+                1.8
+            ]
+        },
+        "booly": {
+            "array": [
+                false,
+                true,
+                true
+            ]
+        },
+        "byteChunky": {
+            "array": [
+                "bWFnaWM=",
+                "bWFnaWMy",
+                "bWFnaWM="
+            ]
+        }
+    },
+
+    "stringy": {
+        "array": [
+            "Hello",
+            "World"
+        ]
+    },
+    "inty": {
+        "array": [
+            42,
+            24
+        ]
+    },
+    "doubly": {
+        "array": [
+            3.14,
+            2.72
+        ]
+    },
+    "booly": {
+        "array": [
+            true,
+            false
+        ]
+    },
+    "byteChunky": {
+        "array": [
+            "bWFnaWM=",
+            "bWFnaWMy"
+        ]
+    }
+}
