@@ -60,7 +60,7 @@ let previewDocs = ProcessInfo.processInfo.environment["SWIFT_PREVIEW_DOCS"] != n
 let enableAllTraitsExplicit = ProcessInfo.processInfo.environment["ENABLE_ALL_TRAITS"] != nil
 
 let enableAllTraits = spiGenerateDocs || previewDocs || enableAllTraitsExplicit
-let addDoccPlugin = previewDocs
+let addDoccPlugin = previewDocs || spiGenerateDocs
 
 traits.insert(
     .default(
