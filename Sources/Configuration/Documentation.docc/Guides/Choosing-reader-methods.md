@@ -169,25 +169,6 @@ Use required variants when:
 - **Critical functionality**: Configuration that must be present for core features to work.
 - **Fail-fast behavior**: You want immediate errors for missing critical configuration.
 
-#### Error types
-
-Required variants throw specific errors for different failure scenarios:
-
-```swift
-do {
-    let port = try config.requiredInt(forKey: "server.port")
-} catch ConfigError.missingRequiredConfigValue(let key) {
-    // The configuration key wasn't found in any provider
-    print("Missing required config: \(key)")
-} catch ConfigError.configValueNotConvertible(let name, let type) {
-    // The value exists but can't be converted to the expected type
-    print("Config '\(name)' can't convert to \(type)")
-} catch {
-    // Provider-specific errors (network issues, file not found, etc.)
-    print("Provider error: \(error)")
-}
-```
-
 ### Choosing the right variant
 
 Use this decision tree to select the appropriate variant:
