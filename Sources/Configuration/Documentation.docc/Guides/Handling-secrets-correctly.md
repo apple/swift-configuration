@@ -96,8 +96,8 @@ let provider = JSONProvider(
 The following example asserts that none of the values returned from the provider are considered secret:
 
 ```swift
-let provider = InMemoryProvider(
-    values: ["app.name": "MyApp", "log.level": "info"],
+let provider = JSONProvider(
+    filePath: "/etc/config.json",
     secretsSpecifier: .none
 )
 ```
