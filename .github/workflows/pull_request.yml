@@ -46,7 +46,7 @@ jobs:
     uses: apple/swift-nio/.github/workflows/macos_tests.yml@main
     with:
       env_vars: '{"ENABLE_ALL_TRAITS":"1"}'
-      runner_pool: nightly
+      runner_pool: general
       build_scheme: swift-configuration-Package
       xcode_16_2_enabled: false
 
