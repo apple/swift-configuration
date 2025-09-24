@@ -136,7 +136,7 @@ You can also implement a custom [`ConfigProvider`](https://swiftpackageindex.com
 - [Debugging and troubleshooting](https://swiftpackageindex.com/apple/swift-configuration/documentation/configuration#Debugging-and-troubleshooting)
 - [Redaction of secrets](https://swiftpackageindex.com/apple/swift-configuration/documentation/configuration/handling-secrets-correctly)
 - [Consistent snapshots](https://swiftpackageindex.com/apple/swift-configuration/documentation/configuration#Consistent-snapshots)
-- [Custom key syntax](https://swiftpackageindex.com/apple/swift-configuration/documentation/documentation/configuration#Custom-key-syntax)
+- [Custom key syntax](https://swiftpackageindex.com/apple/swift-configuration/documentation/configuration#Custom-key-syntax)
 
 ## Documentation
 
