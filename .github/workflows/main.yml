@@ -26,13 +26,13 @@ jobs:
       windows_nightly_6_1_arguments_override: "--enable-all-traits --explicit-target-dependency-import-check error"
       windows_nightly_main_arguments_override: "--enable-all-traits --explicit-target-dependency-import-check error"
 
-  # Static SDK build blocked on the fact that ConfigurationTesting depends on Swift Testing,
-  # which doesn't build for Musl. We need a way to only build the Configuration target for Musl.
-  # Waiting on: https://github.com/apple/swift-nio/pull/3377
-  # static-sdk:
-  #   name: Static SDK
-  #   # Workaround https://github.com/nektos/act/issues/1875
-  #   uses: apple/swift-nio/.github/workflows/static_sdk.yml@main
+  static-sdk:
+    name: Static SDK
+    # Workaround https://github.com/nektos/act/issues/1875
+    uses: apple/swift-nio/.github/workflows/static_sdk.yml@main
+    with:
+      env_vars: '{"ENABLE_ALL_TRAITS":"1"}'
+      command_arguments: '--product Configuration'
 
   macos-tests:
     name: macOS tests
