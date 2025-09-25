@@ -8,7 +8,7 @@ let package = Package(
         .macOS(.v15)
     ],
     dependencies: [
-        .package(path: "../..", traits: [.defaults, "CommandLineArgumentsSupport"])
+       .package(url: "https://github.com/apple/swift-configuration", .upToNextMinor(from: "0.1.0"), traits: [.defaults, "CommandLineArgumentsSupport"])
     ],
     targets: [
         .executableTarget(
