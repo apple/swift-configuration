@@ -109,7 +109,7 @@ extension KeyMappingProvider: ConfigProvider {
         try await upstream.watchSnapshot { sequence in
             try await updatesHandler(
                 ConfigUpdatesAsyncSequence(
-                    ConcreteAsyncSequence(sequence)
+                    sequence
                         .map { snapshot in
                             MappedKeySnapshot(mapKey: self.mapKey, upstream: self.upstream.snapshot())
                         }

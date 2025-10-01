@@ -363,7 +363,7 @@ extension ConfigReader {
         try await provider.watchSnapshot { updates in
             try await updatesHandler(
                 ConfigUpdatesAsyncSequence(
-                    ConcreteAsyncSequence(updates)
+                    updates
                         .map { multiSnapshot in
                             ConfigSnapshotReader(
                                 keyPrefix: keyPrefix,
