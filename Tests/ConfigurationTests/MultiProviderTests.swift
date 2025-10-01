@@ -95,7 +95,7 @@ struct MultiProviderTests {
             try await multiProvider.watchValue(forKey: key, type: type) { updates in
                 try await handler(
                     ConfigUpdatesAsyncSequence(
-                        ConcreteAsyncSequence(updates)
+                        updates
                             .map { update in
                                 update.1.map { .init(encodedKey: "<not tested>", value: $0) }
                             }
@@ -116,7 +116,7 @@ struct MultiProviderTests {
             try await multiProvider.watchSnapshot { updates in
                 try await updatesHandler(
                     ConfigUpdatesAsyncSequence(
-                        ConcreteAsyncSequence(updates).map { $0 }
+                        updates.map { $0 }
                     )
                 )
             }

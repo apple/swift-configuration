@@ -57,39 +57,6 @@ struct AsyncSequencesTests {
         #expect(results == [1, 2])
     }
 
-    // MARK: - ConcreteAsyncSequence tests
-
-    @Test func concreteAsyncSequenceWrapsExistentialSequence() async throws {
-        let values = [1, 2, 3, 4, 5]
-        let concreteSequence = ConcreteAsyncSequence(values.async)
-        let results = await concreteSequence.collect()
-        #expect(results == values)
-    }
-
-    @Test func concreteAsyncSequenceWithEmptySequence() async throws {
-        let concreteSequence = ConcreteAsyncSequence(([] as [Int]).async)
-        let results = await concreteSequence.collect()
-        #expect(results.isEmpty)
-    }
-
-    @Test func concreteAsyncSequencePropagatesErrors() async throws {
-        let throwingSequence = AsyncThrowingStream<Int, any Error> { continuation in
-            continuation.yield(1)
-            continuation.yield(2)
-            continuation.finish(throwing: TestError.upstreamFailed)
-        }
-        let concreteSequence = ConcreteAsyncSequence(throwingSequence)
-
-        var results: [Int] = []
-        let error = await #expect(throws: TestError.self) {
-            for try await value in concreteSequence {
-                results.append(value)
-            }
-        }
-        #expect(error == .upstreamFailed)
-        #expect(results == [1, 2])
-    }
-
     // MARK: - mapThrowing Tests
 
     @Test func mapThrowingSuccessfulTransformation() async throws {

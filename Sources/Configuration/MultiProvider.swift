@@ -205,7 +205,7 @@ extension MultiProvider {
             updatesHandler: { updateArrays in
                 try await body(
                     ConfigUpdatesAsyncSequence(
-                        ConcreteAsyncSequence(updateArrays)
+                        updateArrays
                             .map { array in
                                 MultiSnapshot(snapshots: array)
                             }
@@ -302,7 +302,7 @@ extension MultiProvider {
             updatesHandler: { updateArrays in
                 try await updatesHandler(
                     ConfigUpdatesAsyncSequence(
-                        ConcreteAsyncSequence(updateArrays)
+                        updateArrays
                             .map { array in
                                 var results: [AccessEvent.ProviderResult] = []
                                 for (providerIndex, lookupResult) in array.enumerated() {
