@@ -166,7 +166,7 @@ extension AbsoluteConfigKey? {
     /// Returns a new absolute configuration key by appending the given relative key.
     /// - Parameter relative: The relative configuration key to append to this key.
     /// - Returns: A new absolute configuration key with the relative key appended.
-    internal func appending(_ relative: ConfigKey) -> AbsoluteConfigKey {
+    public func appending(_ relative: ConfigKey) -> AbsoluteConfigKey {
         switch self {
         case .none:
             return .init(relative)
@@ -182,7 +182,7 @@ extension AbsoluteConfigKey {
     /// Returns a new absolute configuration key by prepending the given relative key.
     /// - Parameter prefix: The relative configuration key to prepend to this key.
     /// - Returns: A new absolute configuration key with the prefix prepended.
-    internal func prepending(_ prefix: ConfigKey) -> AbsoluteConfigKey {
+    public func prepending(_ prefix: ConfigKey) -> AbsoluteConfigKey {
         var prefixedComponents = prefix.components
         prefixedComponents.append(contentsOf: self.components)
         var mergedContext = prefix.context
