@@ -639,7 +639,8 @@ extension ConfigReader {
     ) async throws -> Return {
         let absoluteKey = keyPrefix.appending(key)
         return try await provider.watchValue(forKey: absoluteKey, type: type) { updates in
-            let mappedUpdates = updates
+            let mappedUpdates =
+                updates
                 .map { updateTuple in
                     let (providerResults, value) = mergingIsSecret(
                         isSecret,
@@ -715,7 +716,8 @@ extension ConfigReader {
     ) async throws -> Return {
         let absoluteKey = keyPrefix.appending(key)
         return try await provider.watchValue(forKey: absoluteKey, type: type) { updates in
-            let mappedUpdates = updates
+            let mappedUpdates =
+                updates
                 .map { updateTuple in
                     let (providerResults, value) = mergingIsSecret(
                         isSecret,
@@ -790,7 +792,8 @@ extension ConfigReader {
     ) async throws -> Return {
         let absoluteKey = keyPrefix.appending(key)
         return try await provider.watchValue(forKey: absoluteKey, type: type) { updates in
-            let mappedUpdates = updates
+            let mappedUpdates =
+                updates
                 .mapThrowing { updateTuple in
                     let (providerResults, value) = mergingIsSecret(
                         isSecret,
