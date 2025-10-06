@@ -28,7 +28,7 @@
 ///
 /// ## Example
 ///
-/// Use `MappedKeyProvider` when you want to map keys for specific providers in a multi-provider
+/// Use `KeyMappingProvider` when you want to map keys for specific providers in a multi-provider
 /// setup:
 ///
 /// ```swift
@@ -48,6 +48,18 @@
 ///
 /// // This reads from "MYAPP_PROD_DATABASE_HOST" env var or "database.host" in JSON
 /// let host = config.string(forKey: "database.host", default: "localhost")
+/// ```
+///
+/// ## Convenience method
+///
+/// You can also use the ``ConfigProvider/prefixKeys(with:)`` convenience method on
+/// configuration provider types to wrap one in a ``KeyMappingProvider``:
+///
+/// ```swift
+/// let envProvider = EnvironmentVariablesProvider()
+/// let keyMappedEnvProvider = envProvider.mapKeys { key in
+///     key.prepending(["myapp", "prod"])
+/// }
 /// ```
 public struct KeyMappingProvider<Upstream: ConfigProvider>: Sendable {
     /// The mapping function applied to each key before a lookup.
