@@ -19,9 +19,10 @@ import Foundation
 import ConfigurationTesting
 
 struct InMemoryProviderTests {
-    let provider: InMemoryProvider
-    init() {
-        provider = InMemoryProvider(
+
+    @available(Configuration 1.0, *)
+    var provider: InMemoryProvider {
+        InMemoryProvider(
             name: "test",
             values: [
                 "string": .init("Hello", isSecret: false),
@@ -48,6 +49,7 @@ struct InMemoryProviderTests {
         )
     }
 
+    @available(Configuration 1.0, *)
     @Test func printingDescription() throws {
         let expectedDescription = #"""
             InMemoryProvider[test, 20 values]
@@ -55,6 +57,7 @@ struct InMemoryProviderTests {
         #expect(provider.description == expectedDescription)
     }
 
+    @available(Configuration 1.0, *)
     @Test func printingDebugDescription() throws {
         let expectedDebugDescription = #"""
             InMemoryProvider[test, 20 values: bool=[bool: true], booly.array=[boolArray: true, false], byteChunky.array=[byteChunkArray: 5 bytes, prefix: 6d61676963, 6 bytes, prefix: 6d6167696332], bytes=[bytes: 5 bytes, prefix: 6d61676963], double=[double: 3.14], doubly.array=[doubleArray: 3.14, 2.72], int=[int: 42], inty.array=[intArray: 42, 24], other.bool=[bool: false], other.booly.array=[boolArray: false, true, true], other.byteChunky.array=[byteChunkArray: 5 bytes, prefix: 6d61676963, 6 bytes, prefix: 6d6167696332, 5 bytes, prefix: 6d61676963], other.bytes=[bytes: 6 bytes, prefix: 6d6167696332], other.double=[double: 2.72], other.doubly.array=[doubleArray: 0.9, 1.8], other.int=[int: 24], other.inty.array=[intArray: 16, 32], other.string=[string: Other Hello], other.stringy.array=[stringArray: Hello, Swift], string=[string: Hello], stringy.array=[stringArray: Hello, World]]
@@ -62,6 +65,7 @@ struct InMemoryProviderTests {
         #expect(provider.debugDescription == expectedDebugDescription)
     }
 
+    @available(Configuration 1.0, *)
     @Test func compat() async throws {
         try await ProviderCompatTest(provider: provider).run()
     }

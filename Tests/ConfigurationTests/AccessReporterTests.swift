@@ -22,6 +22,7 @@ struct AccessReporterTests {
         case info
     }
 
+    @available(Configuration 1.0, *)
     @Test func get() async throws {
         let accessReporter = TestAccessReporter()
         let provider = InMemoryProvider(
@@ -198,6 +199,7 @@ struct AccessReporterTests {
         )
     }
 
+    @available(Configuration 1.0, *)
     @Test func fetch() async throws {
         let accessReporter = TestAccessReporter()
         let provider = InMemoryProvider(
@@ -393,6 +395,7 @@ struct AccessReporterTests {
         )
     }
 
+    @available(Configuration 1.0, *)
     @Test func watch() async throws {
         let accessReporter = TestAccessReporter()
         let provider = InMemoryProvider(

@@ -17,12 +17,14 @@ import Testing
 import ConfigurationTestingInternal
 
 struct ConfigReaderTests {
+    @available(Configuration 1.0, *)
     @Test func create() throws {
         let config = ConfigReader(provider: InMemoryProvider(values: [:])).scoped(to: "foo")
         // This config has no providers, so every returned value will match the default.
         try #require(config.string(forKey: "bar", default: "test") == "test")
     }
 
+    @available(Configuration 1.0, *)
     @Test func scoping() throws {
         let provider = InMemoryProvider(
             name: "test",
@@ -36,6 +38,7 @@ struct ConfigReaderTests {
         #expect(scoped.string(forKey: "user-agent") == "Config/1.0 (Test)")
     }
 
+    @available(Configuration 1.0, *)
     @Test func scopingCustomDecoder() throws {
         let provider = InMemoryProvider(
             name: "test",
@@ -48,6 +51,7 @@ struct ConfigReaderTests {
         #expect(scoped.string(forKey: "client:user-agent") == "Config/1.0 (Test)")
     }
 
+    @available(Configuration 1.0, *)
     @Test func context() throws {
         let provider = InMemoryProvider(values: [
             AbsoluteConfigKey(["http", "client", "timeout"], context: ["upstream": "example1.org"]): 15.0,
@@ -116,6 +120,7 @@ struct ConfigReaderTests {
         static var otherStringConvertibleArray: [TestStringConvertible] { [.hello, .world, .hello] }
     }
 
+    @available(Configuration 1.0, *)
     static var provider: TestProvider {
         TestProvider(values: [
             "string": .success(ConfigValue(Defaults.string, isSecret: false)),
@@ -140,6 +145,7 @@ struct ConfigReaderTests {
         ])
     }
 
+    @available(Configuration 1.0, *)
     static var config: ConfigReader {
         ConfigReader(provider: provider)
     }

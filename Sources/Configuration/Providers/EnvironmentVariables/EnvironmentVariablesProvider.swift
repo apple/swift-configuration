@@ -116,6 +116,7 @@ import WASILibc
 /// ### Config context
 ///
 /// The environment variables provider ignores the context passed in ``AbsoluteConfigKey/context``.
+@available(Configuration 1.0, *)
 public struct EnvironmentVariablesProvider: Sendable {
 
     /// An environment variable value with a flag of whether it's secret.
@@ -302,6 +303,7 @@ public struct EnvironmentVariablesProvider: Sendable {
 /// A decoder of environment variable arrays.
 ///
 /// Parses a string by splitting by the specified character and trimming the components.
+@available(Configuration 1.0, *)
 internal struct EnvironmentValueArrayDecoder {
 
     /// The separator used to split the string into an array.
@@ -332,6 +334,7 @@ extension Error {
     }
 }
 
+@available(Configuration 1.0, *)
 extension EnvironmentVariablesProvider: CustomStringConvertible {
     // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
     public var description: String {
@@ -339,6 +342,7 @@ extension EnvironmentVariablesProvider: CustomStringConvertible {
     }
 }
 
+@available(Configuration 1.0, *)
 extension EnvironmentVariablesProvider: CustomDebugStringConvertible {
     // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
     public var debugDescription: String {
@@ -350,6 +354,7 @@ extension EnvironmentVariablesProvider: CustomDebugStringConvertible {
     }
 }
 
+@available(Configuration 1.0, *)
 extension EnvironmentVariablesProvider.Snapshot {
     /// Parses a config value from the provided raw string value.
     /// - Parameters:
@@ -436,6 +441,7 @@ extension EnvironmentVariablesProvider.Snapshot {
     }
 }
 
+@available(Configuration 1.0, *)
 extension EnvironmentVariablesProvider.Snapshot: ConfigSnapshotProtocol {
     func value(
         forKey key: AbsoluteConfigKey,
@@ -456,6 +462,7 @@ extension EnvironmentVariablesProvider.Snapshot: ConfigSnapshotProtocol {
     }
 }
 
+@available(Configuration 1.0, *)
 extension EnvironmentVariablesProvider: ConfigProvider {
     // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
     public var providerName: String {

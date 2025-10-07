@@ -68,6 +68,7 @@ import Foundation
 /// ```
 ///
 /// To learn more about the in-memory providers, check out <doc:Using-in-memory-providers>.
+@available(Configuration 1.0, *)
 public final class MutableInMemoryProvider: Sendable {
 
     /// The name of this instance of the provider.
@@ -143,6 +144,7 @@ public final class MutableInMemoryProvider: Sendable {
     }
 }
 
+@available(Configuration 1.0, *)
 extension MutableInMemoryProvider {
 
     /// Creates a new mutable in-memory provider from string keys and initial values.
@@ -270,6 +272,7 @@ extension MutableInMemoryProvider {
     }
 }
 
+@available(Configuration 1.0, *)
 extension MutableInMemoryProvider: CustomStringConvertible {
     // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
     public var description: String {
@@ -282,6 +285,7 @@ extension MutableInMemoryProvider: CustomStringConvertible {
     }
 }
 
+@available(Configuration 1.0, *)
 extension MutableInMemoryProvider: CustomDebugStringConvertible {
     // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
     public var debugDescription: String {
@@ -299,6 +303,7 @@ extension MutableInMemoryProvider: CustomDebugStringConvertible {
     }
 }
 
+@available(Configuration 1.0, *)
 extension MutableInMemoryProvider.Storage {
     /// Returns the number of current watchers, summing value and snapshot watchers.
     func watcherCount() -> Int {
@@ -306,6 +311,7 @@ extension MutableInMemoryProvider.Storage {
     }
 }
 
+@available(Configuration 1.0, *)
 extension MutableInMemoryProvider {
     /// Adds a continuation that gets notified of new values for the provided key.
     /// - Parameters:
@@ -366,6 +372,7 @@ extension MutableInMemoryProvider {
     }
 }
 
+@available(Configuration 1.0, *)
 extension MutableInMemoryProvider.Snapshot: ConfigSnapshotProtocol {
     func value(forKey key: AbsoluteConfigKey, type: ConfigType) throws -> LookupResult {
         try MutableInMemoryProvider.parseValue(
@@ -383,6 +390,7 @@ private func providerNameFromName(_ name: String?) -> String {
     "MutableInMemoryProvider\(name.map { "[\($0)]" } ?? "")"
 }
 
+@available(Configuration 1.0, *)
 extension MutableInMemoryProvider: ConfigProvider {
     // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
     public var providerName: String {

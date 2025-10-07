@@ -150,6 +150,7 @@ import Synchronization
 /// When reading from a snapshot, access events are reported to the access reporter from the
 /// original config reader. This helps debug which config values are accessed, even when
 /// reading from snapshots.
+@available(Configuration 1.0, *)
 public struct ConfigSnapshotReader: Sendable {
 
     /// The prefix of the key for accessing config values in the provider.
@@ -294,6 +295,7 @@ public struct ConfigSnapshotReader: Sendable {
     }
 }
 
+@available(Configuration 1.0, *)
 extension ConfigReader {
     /// Provides a snapshot of the current configuration state and passes it to the provided closure.
     ///
@@ -380,6 +382,7 @@ extension ConfigReader {
     }
 }
 
+@available(Configuration 1.0, *)
 extension ConfigSnapshotReader {
     /// Gets a value from the snapshot.
     ///

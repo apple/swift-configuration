@@ -70,6 +70,7 @@
 ///     secretsSpecifier: .dynamic { key, _ in key.contains("--secret") }
 /// )
 /// ```
+@available(Configuration 1.0, *)
 public struct CommandLineArgumentsProvider {
 
     /// The underlying snapshot containing the parsed CLI arguments.
@@ -105,6 +106,7 @@ public struct CommandLineArgumentsProvider {
     }
 }
 
+@available(Configuration 1.0, *)
 extension CommandLineArgumentsProvider: CustomStringConvertible {
     // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
     public var description: String {
@@ -112,6 +114,7 @@ extension CommandLineArgumentsProvider: CustomStringConvertible {
     }
 }
 
+@available(Configuration 1.0, *)
 extension CommandLineArgumentsProvider: CustomDebugStringConvertible {
     // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
     public var debugDescription: String {
@@ -126,6 +129,7 @@ extension CommandLineArgumentsProvider: CustomDebugStringConvertible {
     }
 }
 
+@available(Configuration 1.0, *)
 extension CommandLineArgumentsProvider: ConfigProvider {
     // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
     public var providerName: String {

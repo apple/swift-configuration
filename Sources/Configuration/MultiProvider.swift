@@ -53,6 +53,7 @@ import Synchronization
 ///
 /// When any nested provider throws an error, the error is immediately propagated to the caller rather than
 /// being ignored. This ensures predictable behavior and prevents silent failures that could mask configuration issues.
+@available(Configuration 1.0, *)
 internal struct MultiProvider: Sendable {
 
     /// The underlying storage.
@@ -72,6 +73,7 @@ internal struct MultiProvider: Sendable {
     }
 }
 
+@available(Configuration 1.0, *)
 extension MultiProvider: CustomStringConvertible {
     /// A text description of the multi provider.
     var description: String {
@@ -83,6 +85,7 @@ extension MultiProvider: CustomStringConvertible {
 ///
 /// This snapshot aggregates the individual snapshots from each nested provider, allowing for
 /// consistent value resolution across the entire provider hierarchy at a specific moment in time.
+@available(Configuration 1.0, *)
 struct MultiSnapshot {
 
     /// The individual snapshots from each nested provider, maintained in precedence order.
@@ -121,6 +124,7 @@ struct MultiSnapshot {
     }
 }
 
+@available(Configuration 1.0, *)
 extension MultiProvider {
 
     /// Synchronously resolves a configuration value from nested providers.

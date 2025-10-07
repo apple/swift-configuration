@@ -18,6 +18,7 @@
 // #                                                                           #
 // #############################################################################
 
+@available(Configuration 1.0, *)
 extension ConfigSnapshotReader {
 
     // MARK: - Get

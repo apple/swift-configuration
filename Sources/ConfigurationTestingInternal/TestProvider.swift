@@ -32,6 +32,7 @@ import Testing
 ///     "error.key": .failure(TestProvider.TestError())
 /// ])
 /// ```
+@available(Configuration 1.0, *)
 package struct TestProvider: Sendable {
 
     /// A generic error type for testing error scenarios.
@@ -53,6 +54,7 @@ package struct TestProvider: Sendable {
     }
 }
 
+@available(Configuration 1.0, *)
 extension TestProvider {
 
     /// Creates a new test provider with string-based key mappings.
@@ -80,6 +82,7 @@ extension TestProvider {
     }
 }
 
+@available(Configuration 1.0, *)
 extension TestProvider: ConfigProvider, ConfigSnapshotProtocol {
     package var providerName: String {
         "TestProvider"

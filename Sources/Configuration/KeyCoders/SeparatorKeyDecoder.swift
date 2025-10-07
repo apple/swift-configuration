@@ -34,6 +34,7 @@
 /// let dotDecoder = ConfigKeyDecoder.dotSeparated
 /// let colonDecoder = ConfigKeyDecoder.colonSeparated
 /// ```
+@available(Configuration 1.0, *)
 public struct SeparatorKeyDecoder: Sendable {
 
     /// The string used to separate key components.
@@ -56,6 +57,7 @@ public struct SeparatorKeyDecoder: Sendable {
     }
 }
 
+@available(Configuration 1.0, *)
 extension SeparatorKeyDecoder: ConfigKeyDecoder {
     // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
     public func decode(_ string: String, context: [String: ConfigContextValue]) -> ConfigKey {
@@ -63,6 +65,7 @@ extension SeparatorKeyDecoder: ConfigKeyDecoder {
     }
 }
 
+@available(Configuration 1.0, *)
 extension ConfigKeyDecoder where Self == SeparatorKeyDecoder {
     /// A decoder that uses dot notation for hierarchical keys.
     ///

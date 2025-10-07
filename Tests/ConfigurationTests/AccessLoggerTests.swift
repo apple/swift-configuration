@@ -21,6 +21,7 @@ import Synchronization
 import ConfigurationTestingInternal
 
 struct AccessLoggerTests {
+    @available(Configuration 1.0, *)
     @Test func test() throws {
         let collectingLogHandler = CollectingLogHandler()
         let logger = Logger(label: "Test", factory: { _ in collectingLogHandler })

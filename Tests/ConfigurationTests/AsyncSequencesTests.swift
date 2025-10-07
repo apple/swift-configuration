@@ -26,6 +26,7 @@ struct AsyncSequencesTests {
 
     // MARK: - ConfigUpdatesAsyncSequence tests
 
+    @available(Configuration 1.0, *)
     @Test func updatesAsyncSequenceWrapsExistentialSequence() async throws {
         let values = [1, 2, 3, 4, 5]
         let updatesSequence = ConfigUpdatesAsyncSequence(values.async)
@@ -33,12 +34,14 @@ struct AsyncSequencesTests {
         #expect(results == values)
     }
 
+    @available(Configuration 1.0, *)
     @Test func updatesAsyncSequenceWithEmptySequence() async throws {
         let updatesSequence = ConfigUpdatesAsyncSequence(([] as [Int]).async)
         let results = await updatesSequence.collect()
         #expect(results.isEmpty)
     }
 
+    @available(Configuration 1.0, *)
     @Test func updatesAsyncSequencePropagatesErrors() async throws {
         let throwingSequence = AsyncThrowingStream<Int, any Error> { continuation in
             continuation.yield(1)
@@ -59,6 +62,7 @@ struct AsyncSequencesTests {
 
     // MARK: - mapThrowing Tests
 
+    @available(Configuration 1.0, *)
     @Test func mapThrowingSuccessfulTransformation() async throws {
         let values = [1, 2, 3]
         let asyncSequence = values.async
@@ -71,6 +75,7 @@ struct AsyncSequencesTests {
         #expect(results == expected)
     }
 
+    @available(Configuration 1.0, *)
     @Test func mapThrowingWithEmptySequence() async throws {
         let emptySequence = ([] as [Int]).async
         let mappedSequence = emptySequence.mapThrowing { value -> String in
@@ -81,6 +86,7 @@ struct AsyncSequencesTests {
         #expect(results.isEmpty)
     }
 
+    @available(Configuration 1.0, *)
     @Test func mapThrowingPropagatesTransformErrors() async throws {
         let asyncSequence = [1, 2, 3, 4, 5].async
         let mappedSequence = asyncSequence.mapThrowing { value -> String in
@@ -103,6 +109,7 @@ struct AsyncSequencesTests {
 
 // MARK: - Test Utilities
 
+@available(Configuration 1.0, *)
 extension AsyncSequence where Failure == Never {
     /// Collects all elements from the async sequence into an array.
     ///
@@ -121,6 +128,7 @@ extension AsyncSequence where Failure == Never {
     }
 }
 
+@available(Configuration 1.0, *)
 extension AsyncSequence {
     /// Collects all elements from the async sequence into an array.
     ///

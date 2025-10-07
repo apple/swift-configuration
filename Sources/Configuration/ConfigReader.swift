@@ -235,6 +235,7 @@ import Foundation
 ///
 /// The library reports all provider errors to the access reporter through the `providerResults` array,
 /// even when handled gracefully.
+@available(Configuration 1.0, *)
 public struct ConfigReader: Sendable {
 
     /// The key prefix prepended to all configuration lookups.
@@ -324,6 +325,7 @@ public struct ConfigReader: Sendable {
     }
 }
 
+@available(Configuration 1.0, *)
 extension ConfigReader {
 
     /// Creates a config reader with a single provider.
@@ -411,6 +413,7 @@ extension ConfigReader {
 
 // MARK: - Internal conveniences
 
+@available(Configuration 1.0, *)
 extension ConfigReader {
 
     /// The decoder the library uses to convert string keys into config keys.
@@ -434,6 +437,7 @@ extension ConfigReader {
 /// An error thrown by Configuration module types.
 ///
 /// These errors indicate issues with configuration value retrieval or conversion.
+@available(Configuration 1.0, *)
 package enum ConfigError: Error, CustomStringConvertible, Equatable {
 
     /// A required configuration value was not found in any provider.

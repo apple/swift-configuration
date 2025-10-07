@@ -12,6 +12,7 @@
 //
 //===----------------------------------------------------------------------===//
 
+@available(Configuration 1.0, *)
 extension AsyncSequence where Failure == Never {
     /// Returns the first element of the async sequence, or nil if the sequence completes before emitting an element.
     package var first: Element? {
@@ -21,6 +22,7 @@ extension AsyncSequence where Failure == Never {
     }
 }
 
+@available(Configuration 1.0, *)
 extension AsyncSequence {
     /// Returns the first element of the async sequence, or nil if the sequence completes before emitting an element.
     package var first: Element? {
@@ -33,6 +35,7 @@ extension AsyncSequence {
 /// Returns the first element of the async sequence, or nil if the sequence completes before emitting an element.
 /// - Parameter updates: The async sequence to get the first element from.
 /// - Returns: The first element, or nil if empty.
+@available(Configuration 1.0, *)
 package func awaitFirst<Value: Sendable>(updates: any AsyncSequence<Value, Never>) async -> Value? {
     await updates.first
 }
@@ -41,6 +44,7 @@ package func awaitFirst<Value: Sendable>(updates: any AsyncSequence<Value, Never
 /// - Parameter updates: The async sequence to get the first element from.
 /// - Returns: The first element, or nil if empty.
 /// - Throws: Any error thrown by the async sequence.
+@available(Configuration 1.0, *)
 package func awaitFirst<Value: Sendable>(updates: any AsyncSequence<Value, any Error>) async throws -> Value? {
     try await updates.first
 }

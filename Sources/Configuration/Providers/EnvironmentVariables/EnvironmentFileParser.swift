@@ -45,6 +45,7 @@ import Foundation
 /// - Lines where the key is empty (starts with `=`) are ignored
 /// - When duplicate keys are found, the last occurrence takes precedence
 /// - Values can contain `=` characters (only the first `=` is used as separator)
+@available(Configuration 1.0, *)
 struct EnvironmentFileParser {
     /// Parses environment file contents into a dictionary of key-value pairs.
     ///

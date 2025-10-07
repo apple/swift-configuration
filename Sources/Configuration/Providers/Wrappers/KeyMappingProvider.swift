@@ -61,6 +61,7 @@
 ///     key.prepending(["myapp", "prod"])
 /// }
 /// ```
+@available(Configuration 1.0, *)
 public struct KeyMappingProvider<Upstream: ConfigProvider>: Sendable {
     /// The mapping function applied to each key before a lookup.
     private let mapKey: @Sendable (AbsoluteConfigKey) -> AbsoluteConfigKey
@@ -82,6 +83,7 @@ public struct KeyMappingProvider<Upstream: ConfigProvider>: Sendable {
     }
 }
 
+@available(Configuration 1.0, *)
 extension KeyMappingProvider: ConfigProvider {
     // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
     public var providerName: String {
@@ -132,6 +134,7 @@ extension KeyMappingProvider: ConfigProvider {
 }
 
 /// A configuration snapshot that maps all keys before delegating to an upstream snapshot.
+@available(Configuration 1.0, *)
 private struct MappedKeySnapshot: ConfigSnapshotProtocol {
 
     /// The prefix key to prepend to all configuration keys.
@@ -149,6 +152,7 @@ private struct MappedKeySnapshot: ConfigSnapshotProtocol {
     }
 }
 
+@available(Configuration 1.0, *)
 extension KeyMappingProvider: CustomStringConvertible {
     // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
     public var description: String {
@@ -156,6 +160,7 @@ extension KeyMappingProvider: CustomStringConvertible {
     }
 }
 
+@available(Configuration 1.0, *)
 extension KeyMappingProvider: CustomDebugStringConvertible {
     // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
     public var debugDescription: String {

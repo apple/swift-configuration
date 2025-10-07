@@ -83,6 +83,7 @@ import Foundation
 ///
 /// This provider ignores the context passed in ``AbsoluteConfigKey/context``.
 /// All keys are resolved using only their component path.
+@available(Configuration 1.0, *)
 public struct JSONProvider: Sendable {
 
     /// A snapshot of the internal state.
@@ -181,6 +182,7 @@ public struct JSONProvider: Sendable {
     }
 }
 
+@available(Configuration 1.0, *)
 extension JSONProvider: CustomStringConvertible {
     // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
     public var description: String {
@@ -188,6 +190,7 @@ extension JSONProvider: CustomStringConvertible {
     }
 }
 
+@available(Configuration 1.0, *)
 extension JSONProvider: CustomDebugStringConvertible {
     // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
     public var debugDescription: String {
@@ -199,6 +202,7 @@ extension JSONProvider: CustomDebugStringConvertible {
     }
 }
 
+@available(Configuration 1.0, *)
 extension JSONProvider: ConfigProvider {
     // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
     public var providerName: String {

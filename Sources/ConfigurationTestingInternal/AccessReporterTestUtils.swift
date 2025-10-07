@@ -22,6 +22,7 @@ import Foundation
 import Testing
 
 /// A test-only access reporter that records events for later inspection.
+@available(Configuration 1.0, *)
 package final class TestAccessReporter: Sendable {
 
     /// The internal storage.
@@ -45,6 +46,7 @@ package final class TestAccessReporter: Sendable {
     }
 }
 
+@available(Configuration 1.0, *)
 extension TestAccessReporter: AccessReporter {
     package func report(_ event: AccessEvent) {
         storage.withLock { $0.events.append(event) }

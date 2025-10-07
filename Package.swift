@@ -70,9 +70,6 @@ traits.insert(
 
 let package = Package(
     name: "swift-configuration",
-    platforms: [
-        .macOS(.v15), .iOS(.v18), .macCatalyst(.v18), .tvOS(.v18), .watchOS(.v11), .visionOS(.v2),
-    ],
     products: [
         .library(name: "Configuration", targets: ["Configuration"]),
         .library(name: "ConfigurationTesting", targets: ["ConfigurationTesting"]),
@@ -170,21 +167,21 @@ let package = Package(
 )
 
 for target in package.targets {
-    if target.type != .plugin {
-        var settings = target.swiftSettings ?? []
+    var settings = target.swiftSettings ?? []
 
-        // https://github.com/apple/swift-evolution/blob/main/proposals/0335-existential-any.md
-        // Require `any` for existential types.
-        settings.append(.enableUpcomingFeature("ExistentialAny"))
+    // https://github.com/apple/swift-evolution/blob/main/proposals/0335-existential-any.md
+    // Require `any` for existential types.
+    settings.append(.enableUpcomingFeature("ExistentialAny"))
 
-        // https://github.com/swiftlang/swift-evolution/blob/main/proposals/0444-member-import-visibility.md
-        settings.append(.enableUpcomingFeature("MemberImportVisibility"))
+    // https://github.com/swiftlang/swift-evolution/blob/main/proposals/0444-member-import-visibility.md
+    settings.append(.enableUpcomingFeature("MemberImportVisibility"))
 
-        // https://github.com/swiftlang/swift-evolution/blob/main/proposals/0409-access-level-on-imports.md
-        settings.append(.enableUpcomingFeature("InternalImportsByDefault"))
+    // https://github.com/swiftlang/swift-evolution/blob/main/proposals/0409-access-level-on-imports.md
+    settings.append(.enableUpcomingFeature("InternalImportsByDefault"))
 
-        target.swiftSettings = settings
-    }
+    settings.append(.enableExperimentalFeature("AvailabilityMacro=Configuration 1.0:macOS 15.0, iOS 18.0, watchOS 11.0, tvOS 18.0, visionOS 2.0"))
+
+    target.swiftSettings = settings
 }
 
 if addDoccPlugin {

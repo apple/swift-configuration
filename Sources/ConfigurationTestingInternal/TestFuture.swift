@@ -37,6 +37,7 @@ import Foundation
 /// // In test code
 /// let result = await future.value
 /// ```
+@available(Configuration 1.0, *)
 package final class TestFuture<T: Sendable>: @unchecked Sendable /* lock + locked_state */ {
 
     /// The internal state of the future.

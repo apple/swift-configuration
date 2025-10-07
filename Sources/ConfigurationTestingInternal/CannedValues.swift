@@ -33,6 +33,7 @@ import Testing
 ///
 /// print(cannedResponses.values) // ["third"]
 /// ```
+@available(Configuration 1.0, *)
 package final class CannedValues<T: Sendable>: Sendable {
 
     /// Thread-safe storage for the remaining values.

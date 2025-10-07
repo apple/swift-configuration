@@ -79,6 +79,7 @@ package struct LocalCommonProviderFileSystem: Sendable {
     }
 }
 
+@available(Configuration 1.0, *)
 extension LocalCommonProviderFileSystem: CommonProviderFileSystem {
     package func fileContents(atPath filePath: FilePath) async throws -> Data {
         do {

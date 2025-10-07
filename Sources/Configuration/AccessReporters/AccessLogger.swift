@@ -53,6 +53,7 @@ import Synchronization
 /// - `value`: The resolved configuration value (redacted for secrets)
 /// - `counter`: An incrementing counter for tracking access frequency
 /// - Provider-specific information for each provider in the hierarchy
+@available(Configuration 1.0, *)
 public final class AccessLogger: Sendable {
 
     /// The logger used to emit configuration access events.
@@ -94,6 +95,7 @@ public final class AccessLogger: Sendable {
     }
 }
 
+@available(Configuration 1.0, *)
 extension AccessLogger: AccessReporter {
     // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
     public func report(_ event: AccessEvent) {
@@ -109,6 +111,7 @@ extension AccessLogger: AccessReporter {
     }
 }
 
+@available(Configuration 1.0, *)
 extension AccessEvent.Metadata {
     /// Add log metadata.
     /// - Parameter metadata: The metadata to which to add values.
@@ -119,6 +122,7 @@ extension AccessEvent.Metadata {
     }
 }
 
+@available(Configuration 1.0, *)
 extension AccessEvent.ProviderResult {
     /// Add log metadata.
     /// - Parameters:
@@ -136,6 +140,7 @@ extension AccessEvent.ProviderResult {
     }
 }
 
+@available(Configuration 1.0, *)
 extension AccessEvent {
     /// Add log metadata.
     /// - Parameter metadata: The metadata to which to add values.
@@ -151,6 +156,7 @@ extension AccessEvent {
     }
 }
 
+@available(Configuration 1.0, *)
 extension Result<ConfigValue?, any Error> {
     /// Add log metadata.
     /// - Parameter metadata: The metadata to which to add values.

@@ -18,6 +18,7 @@ package import Logging
 import Synchronization
 
 /// A  single logged entry with level, message, and metadata.
+@available(Configuration 1.0, *)
 package struct Entry: Sendable, Equatable {
 
     /// The log level.
@@ -42,6 +43,7 @@ package struct Entry: Sendable, Equatable {
 }
 
 /// A log handler that collects log entries in memory for inspection.
+@available(Configuration 1.0, *)
 package struct CollectingLogHandler: LogHandler {
 
     /// The metadata applied to all log messages from this handler.

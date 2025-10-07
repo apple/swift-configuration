@@ -20,6 +20,7 @@ import ConfigurationTesting
 
 struct KeyMappingProviderTests {
 
+    @available(Configuration 1.0, *)
     @Test func getValueWithMappedKey() throws {
         let upstream = InMemoryProvider(values: ["app.foo": "bar", "app.bar": "baz"])
         let mapper = KeyMappingProvider(upstream: upstream) { key in
@@ -40,6 +41,7 @@ struct KeyMappingProviderTests {
         #expect(barResult.encodedKey == "app.bar")
     }
 
+    @available(Configuration 1.0, *)
     @Test func fetchValueWithMappedKey() async throws {
         let upstream = InMemoryProvider(values: ["app.foo": "bar", "app.bar": "baz"])
         let mapper = KeyMappingProvider(upstream: upstream) { key in
@@ -56,6 +58,7 @@ struct KeyMappingProviderTests {
         #expect(fooResult.encodedKey == "app.foo")
     }
 
+    @available(Configuration 1.0, *)
     @Test func watchValueWithMappedKey() async throws {
         let upstream = InMemoryProvider(values: ["app.foo": "bar", "app.bar": "baz"])
         let mapper = KeyMappingProvider(upstream: upstream) { key in
@@ -80,6 +83,7 @@ struct KeyMappingProviderTests {
         #expect(result.encodedKey == "app.foo")
     }
 
+    @available(Configuration 1.0, *)
     @Test func snapshotWithMappedKey() throws {
         let upstream = InMemoryProvider(values: ["app.foo": "bar", "app.bar": "baz"])
         let mapper = KeyMappingProvider(upstream: upstream) { key in
@@ -101,6 +105,7 @@ struct KeyMappingProviderTests {
         #expect(otherResult.encodedKey == "other")
     }
 
+    @available(Configuration 1.0, *)
     @Test func watchSnapshotWithMappedPrefix() async throws {
         let upstream = InMemoryProvider(values: ["app.foo": "bar", "app.bar": "baz"])
         let mapper = KeyMappingProvider(upstream: upstream) { key in
@@ -126,6 +131,7 @@ struct KeyMappingProviderTests {
         #expect(result.encodedKey == "app.foo")
     }
 
+    @available(Configuration 1.0, *)
     @Test func providerName() {
         let upstream = InMemoryProvider(name: "test-upstream", values: [:])
         let mapper = KeyMappingProvider(upstream: upstream) { key in key }
@@ -133,6 +139,7 @@ struct KeyMappingProviderTests {
         #expect(mapper.providerName == expectedName)
     }
 
+    @available(Configuration 1.0, *)
     @Test func description() {
         let upstream = InMemoryProvider(name: "test-upstream", values: [:])
         let mapper = KeyMappingProvider(upstream: upstream) { key in key }
@@ -141,6 +148,7 @@ struct KeyMappingProviderTests {
         #expect(mapper.description == expectedDescription)
     }
 
+    @available(Configuration 1.0, *)
     @Test func compat() async throws {
         let upstream = InMemoryProvider(
             name: "test",

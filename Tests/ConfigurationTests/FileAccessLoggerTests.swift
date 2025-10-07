@@ -19,6 +19,7 @@ import SystemPackage
 import ConfigurationTestingInternal
 
 struct FileAccessLoggerTests {
+    @available(Configuration 1.0, *)
     @Test func test() throws {
 
         let readString: String

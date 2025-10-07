@@ -24,6 +24,7 @@ import ServiceLifecycle
 import Synchronization
 import SystemPackage
 
+@available(Configuration 1.0, *)
 private struct TestSnapshot: ConfigSnapshotProtocol {
     var values: [String: ConfigValue]
 
@@ -54,54 +55,58 @@ private struct TestSnapshot: ConfigSnapshotProtocol {
     }
 }
 
+@available(Configuration 1.0, *)
 extension InMemoryFileSystem.FileData {
     static func file(contents: String) -> Self {
         .file(Data(contents.utf8))
     }
 }
 
+@available(Configuration 1.0, *)
 extension InMemoryFileSystem.FileInfo {
     static func file(timestamp: Date, contents: String) -> Self {
         .init(lastModifiedTimestamp: timestamp, data: .file(contents: contents))
     }
 }
 
-struct ReloadingFileProviderCoreTests {
-    private func withTestProvider<R>(
-        body: (
-            ReloadingFileProviderCore<TestSnapshot>,
-            InMemoryFileSystem,
-            FilePath,
-            Date
-        ) async throws -> R
-    ) async throws -> R {
-        let filePath = FilePath("/test/config.txt")
-        let originalTimestamp = Date(timeIntervalSince1970: 1_750_688_537)
-        let fileSystem = InMemoryFileSystem(
-            files: [
-                filePath: .file(
-                    timestamp: originalTimestamp,
-                    contents: """
-                        key1=value1
-                        key2=value2
-                        """
-                )
-            ]
-        )
-        let core = try await ReloadingFileProviderCore<TestSnapshot>(
-            filePath: filePath,
-            pollInterval: .seconds(1),
-            providerName: "TestProvider",
-            fileSystem: fileSystem,
-            logger: .noop,
-            metrics: nil,
-            createSnapshot: { data in
-                try TestSnapshot(contents: String(decoding: data, as: UTF8.self))
-            }
-        )
-        return try await body(core, fileSystem, filePath, originalTimestamp)
-    }
+@available(Configuration 1.0, *)
+private func withTestProvider<R>(
+    body: (
+        ReloadingFileProviderCore<TestSnapshot>,
+        InMemoryFileSystem,
+        FilePath,
+        Date
+    ) async throws -> R
+) async throws -> R {
+    let filePath = FilePath("/test/config.txt")
+    let originalTimestamp = Date(timeIntervalSince1970: 1_750_688_537)
+    let fileSystem = InMemoryFileSystem(
+        files: [
+            filePath: .file(
+                timestamp: originalTimestamp,
+                contents: """
+                    key1=value1
+                    key2=value2
+                    """
+            )
+        ]
+    )
+    let core = try await ReloadingFileProviderCore<TestSnapshot>(
+        filePath: filePath,
+        pollInterval: .seconds(1),
+        providerName: "TestProvider",
+        fileSystem: fileSystem,
+        logger: .noop,
+        metrics: nil,
+        createSnapshot: { data in
+            try TestSnapshot(contents: String(decoding: data, as: UTF8.self))
+        }
+    )
+    return try await body(core, fileSystem, filePath, originalTimestamp)
+}
 
+struct CoreTests {
+    @available(Configuration 1.0, *)
     @Test func testBasicManualReload() async throws {
         try await withTestProvider { core, fileSystem, filePath, originalTimestamp in
             // Check initial values
@@ -129,6 +134,7 @@ struct ReloadingFileProviderCoreTests {
         }
     }
 
+    @available(Configuration 1.0, *)
     @Test func testBasicTimedReload() async throws {
         let filePath = FilePath("/test/config.txt")
         let originalTimestamp = Date(timeIntervalSince1970: 1_750_688_537)
@@ -190,6 +196,7 @@ struct ReloadingFileProviderCoreTests {
         }
     }
 
+    @available(Configuration 1.0, *)
     @Test func testSymlink_targetPathChanged() async throws {
         try await withTestProvider { core, fileSystem, filePath, originalTimestamp in
             let targetPath1 = FilePath("/test/config1.txt")
@@ -244,6 +251,7 @@ struct ReloadingFileProviderCoreTests {
         }
     }
 
+    @available(Configuration 1.0, *)
     @Test func testSymlink_timestampChanged() async throws {
         try await withTestProvider { core, fileSystem, filePath, originalTimestamp in
             let targetPath = FilePath("/test/config1.txt")
@@ -292,6 +300,7 @@ struct ReloadingFileProviderCoreTests {
         }
     }
 
+    @available(Configuration 1.0, *)
     @Test func testWatchValue() async throws {
         try await withTestProvider { core, fileSystem, filePath, originalTimestamp in
             let firstValueConsumed = TestFuture<Void>(name: "First value consumed")

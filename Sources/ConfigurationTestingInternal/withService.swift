@@ -40,6 +40,7 @@ package import ServiceLifecycle
 ///   - work: The test work to perform with the running service.
 /// - Returns: The result produced by the work closure.
 /// - Throws: Rethrows errors from service creation, service execution, or test work.
+@available(Configuration 1.0, *)
 package func withService<S: Service, R>(createService: () async throws -> S, work: (S) async throws -> R) async throws
     -> R
 {

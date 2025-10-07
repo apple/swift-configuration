@@ -57,6 +57,7 @@ public import SystemPackage
 /// - `Foundation.URL` - Converts from URL strings.
 /// - `Foundation.UUID` - Converts from UUID strings.
 /// - `Foundation.Date` - Converts from ISO8601 date strings.
+@available(Configuration 1.0, *)
 public protocol ExpressibleByConfigString: CustomStringConvertible {
 
     /// Creates an instance from a configuration string value.
@@ -65,6 +66,7 @@ public protocol ExpressibleByConfigString: CustomStringConvertible {
     init?(configString: String)
 }
 
+@available(Configuration 1.0, *)
 extension URL: ExpressibleByConfigString {
     // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
     public init?(configString: String) {
@@ -72,6 +74,7 @@ extension URL: ExpressibleByConfigString {
     }
 }
 
+@available(Configuration 1.0, *)
 extension FilePath: ExpressibleByConfigString {
     // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
     public init?(configString: String) {
@@ -79,6 +82,7 @@ extension FilePath: ExpressibleByConfigString {
     }
 }
 
+@available(Configuration 1.0, *)
 extension UUID: ExpressibleByConfigString {
     // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
     public init?(configString: String) {
@@ -86,6 +90,7 @@ extension UUID: ExpressibleByConfigString {
     }
 }
 
+@available(Configuration 1.0, *)
 extension Date: ExpressibleByConfigString {
     // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
     public init?(configString: String) {

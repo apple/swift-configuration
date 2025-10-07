@@ -24,6 +24,7 @@ extension [UInt8] {
     }
 }
 
+@available(Configuration 1.0, *)
 extension ConfigValue {
     package static var magic: Self {
         ConfigValue(.bytes(.magic), isSecret: false)
@@ -34,6 +35,7 @@ extension ConfigValue {
     }
 }
 
+@available(Configuration 1.0, *)
 extension ConfigValue {
 
     /// Creates a new string configuration value.
