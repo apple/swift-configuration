@@ -20,6 +20,7 @@ package import Foundation
 package import SystemPackage
 
 /// A file system abstraction used by some of the providers in Configuration.
+@available(Configuration 1.0, *)
 package protocol CommonProviderFileSystem: Sendable {
     /// Loads the file contents at the specified file path.
     /// - Parameter filePath: The path to the file.
@@ -49,6 +50,7 @@ package protocol CommonProviderFileSystem: Sendable {
 }
 
 /// A file system implementation that uses the local file system.
+@available(Configuration 1.0, *)
 package struct LocalCommonProviderFileSystem: Sendable {
     /// The error thrown by the file system.
     package enum FileSystemError: Error, CustomStringConvertible {
