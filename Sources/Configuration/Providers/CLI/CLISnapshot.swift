@@ -42,6 +42,7 @@ import Foundation
 /// // CLI: --hosts server1 server2 server3
 /// snapshot.value(forKey: hostsKey, type: .stringArray) // -> ["server1", "server2", "server3"]
 /// ```
+@available(Configuration 1.0, *)
 internal struct CLISnapshot {
 
     /// The name of the provider that created this snapshot.
@@ -153,6 +154,7 @@ internal struct CLISnapshot {
     }
 }
 
+@available(Configuration 1.0, *)
 extension CLISnapshot: ConfigSnapshotProtocol {
     // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
     func value(forKey key: AbsoluteConfigKey, type: ConfigType) throws -> LookupResult {

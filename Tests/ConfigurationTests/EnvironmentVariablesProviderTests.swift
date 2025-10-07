@@ -20,9 +20,10 @@ import ConfigurationTesting
 import SystemPackage
 
 struct EnvironmentVariablesProviderTests {
-    let provider: EnvironmentVariablesProvider
-    init() {
-        provider = EnvironmentVariablesProvider(
+
+    @available(Configuration 1.0, *)
+    var provider: EnvironmentVariablesProvider {
+        EnvironmentVariablesProvider(
             environmentVariables: [
                 "STRING": "Hello",
                 "OTHER_STRING": "Other Hello",
@@ -51,6 +52,7 @@ struct EnvironmentVariablesProviderTests {
         )
     }
 
+    @available(Configuration 1.0, *)
     @Test func printingDescription() throws {
         let expectedDescription = #"""
             EnvironmentVariablesProvider[20 values]
@@ -58,6 +60,7 @@ struct EnvironmentVariablesProviderTests {
         #expect(provider.description == expectedDescription)
     }
 
+    @available(Configuration 1.0, *)
     @Test func printingDebugDescription() throws {
         let expectedDebugDescription = #"""
             EnvironmentVariablesProvider[20 values: BOOL=true, BOOLY_ARRAY=true,false, BYTES=bWFnaWM=, BYTE_CHUNKY_ARRAY=bWFnaWM=,bWFnaWMy, DOUBLE=3.14, DOUBLY_ARRAY=3.14,2.72, INT=42, INTY_ARRAY=42,24, OTHER_BOOL=false, OTHER_BOOLY_ARRAY=false,true,true, OTHER_BYTES=bWFnaWMy, OTHER_BYTE_CHUNKY_ARRAY=bWFnaWM=,bWFnaWMy,bWFnaWM=, OTHER_DOUBLE=2.72, OTHER_DOUBLY_ARRAY=0.9,1.8, OTHER_INT=24, OTHER_INTY_ARRAY=16,32, OTHER_STRING=Other Hello, OTHER_STRINGY_ARRAY=Hello,Swift, STRING=<REDACTED>, STRINGY_ARRAY=Hello,World]
@@ -65,15 +68,18 @@ struct EnvironmentVariablesProviderTests {
         #expect(provider.debugDescription == expectedDebugDescription)
     }
 
+    @available(Configuration 1.0, *)
     @Test func compat() async throws {
         try await ProviderCompatTest(provider: provider).run()
     }
 
+    @available(Configuration 1.0, *)
     @Test func secretSpecifier() throws {
         #expect(try provider.value(forKey: ["string"], type: .string).value?.isSecret == true)
         #expect(try provider.value(forKey: ["other.string"], type: .string).value?.isSecret == false)
     }
 
+    @available(Configuration 1.0, *)
     @Test func parseEnvironmentFile() throws {
         let values = EnvironmentFileParser.parsed(
             #"""
@@ -102,6 +108,7 @@ struct EnvironmentVariablesProviderTests {
         #expect(values == expected)
     }
 
+    @available(Configuration 1.0, *)
     @Test func loadEnvironmentFile() async throws {
         let envFilePath = try #require(Bundle.module.path(forResource: "Resources", ofType: nil)?.appending("/.env"))
         let provider = try await EnvironmentVariablesProvider(
@@ -115,6 +122,7 @@ struct EnvironmentVariablesProviderTests {
         #expect(config.string(forKey: "http.secret") == "s3cret")
     }
 
+    @available(Configuration 1.0, *)
     @Test func loadEnvironmentFileError() async throws {
         let envFilePath: FilePath = "/tmp/definitelyNotAnEnvFile"
         do {
@@ -137,6 +145,7 @@ struct EnvironmentVariablesProviderTests {
 
 struct EnvironmentKeyEncoderTests {
 
+    @available(Configuration 1.0, *)
     @Test func test() {
         let encoder = EnvironmentKeyEncoder()
 

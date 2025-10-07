@@ -19,8 +19,9 @@ import ConfigurationTestingInternal
 import ConfigurationTesting
 
 struct MultiProviderTests {
-    let providers: [any ConfigProvider]
-    init() {
+
+    @available(Configuration 1.0, *)
+    var providers: [any ConfigProvider] {
         let first = InMemoryProvider(
             name: "first",
             values: [
@@ -51,7 +52,7 @@ struct MultiProviderTests {
                 "other.byteChunky.array": .init([.magic, .magic2, .magic], isSecret: false),
             ]
         )
-        providers = [
+        return [
             first,
             second,
         ]
@@ -62,6 +63,7 @@ struct MultiProviderTests {
     /// This is not a generally useful wrapper - the multi provider is an internal implementation detail.
     ///
     /// Here in tests, it's just helpful to be able to run ProviderCompatTests on it.
+    @available(Configuration 1.0, *)
     struct MultiProviderTestShims: ConfigProvider {
 
         /// The underlying multi provider.
@@ -123,11 +125,13 @@ struct MultiProviderTests {
         }
     }
 
+    @available(Configuration 1.0, *)
     @Test func compat() async throws {
         let multiProvider = MultiProvider(providers: providers)
         try await ProviderCompatTest(provider: MultiProviderTestShims(multiProvider: multiProvider)).run()
     }
 
+    @available(Configuration 1.0, *)
     @Test func watchingTwoUpstreams() async throws {
         let first = MutableInMemoryProvider(
             name: "first",
@@ -172,6 +176,7 @@ struct MultiProviderTests {
     }
 }
 
+@available(Configuration 1.0, *)
 extension MultiSnapshot: ConfigSnapshotProtocol {
     var providerName: String {
         "MultiProvider"

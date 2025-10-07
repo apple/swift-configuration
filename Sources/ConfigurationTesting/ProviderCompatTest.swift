@@ -61,6 +61,7 @@ import ConfigurationTestingInternal
 ///     "other.byteChunky.array": [[UInt8]]([.magic, .magic2, .magic]),
 /// ]
 /// ```
+@available(Configuration 1.0, *)
 public struct ProviderCompatTest: Sendable {
 
     /// Configuration options for customizing test behavior.
@@ -147,6 +148,7 @@ public struct ProviderCompatTest: Sendable {
     ]
 }
 
+@available(Configuration 1.0, *)
 extension ProviderCompatTest {
 
     private func value() throws {

@@ -24,6 +24,7 @@ import Synchronization
 /// Access reporters track when configuration values are read, fetched, or watched,
 /// to provide visibility into configuration usage patterns. This is useful for
 /// debugging, auditing, and understanding configuration dependencies.
+@available(Configuration 1.0, *)
 public protocol AccessReporter: Sendable {
 
     /// Processes a configuration access event.
@@ -41,6 +42,7 @@ public protocol AccessReporter: Sendable {
 /// Access events are generated whenever configuration values are accessed through
 /// ``ConfigReader`` and ``ConfigSnapshotReader`` methods. They contain metadata about
 /// the access, results from individual providers, and the final outcome of the operation.
+@available(Configuration 1.0, *)
 public struct AccessEvent: Sendable {
 
     /// Metadata describing the configuration access operation.
@@ -184,6 +186,7 @@ public struct AccessEvent: Sendable {
 /// Use this reporter to send configuration access events to multiple destinations
 /// simultaneously. Each upstream reporter receives a copy of every event in the
 /// order they were provided during initialization.
+@available(Configuration 1.0, *)
 public struct BroadcastingAccessReporter: Sendable {
 
     /// The reporters that receive forwarded events.
@@ -198,6 +201,7 @@ public struct BroadcastingAccessReporter: Sendable {
     }
 }
 
+@available(Configuration 1.0, *)
 extension BroadcastingAccessReporter: AccessReporter {
     // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
     public func report(_ event: AccessEvent) {

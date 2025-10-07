@@ -31,6 +31,7 @@ import SystemPackage
 /// This internal type handles all the common reloading logic, state management,
 /// and service lifecycle for reloading file-based providers. It allows different provider types
 /// (JSON, YAML, and so on) to reuse the same logic while providing their own format-specific deserialization.
+@available(Configuration 1.0, *)
 internal final class ReloadingFileProviderCore<SnapshotType: ConfigSnapshotProtocol>: Sendable {
 
     /// The internal storage structure for the provider state.
@@ -312,6 +313,7 @@ internal final class ReloadingFileProviderCore<SnapshotType: ConfigSnapshotProto
     }
 }
 
+@available(Configuration 1.0, *)
 extension ReloadingFileProviderCore: Service {
     internal func run() async throws {
         logger.debug("File polling starting")
@@ -350,6 +352,7 @@ extension ReloadingFileProviderCore: Service {
 
 // MARK: - ConfigProvider-like implementation
 
+@available(Configuration 1.0, *)
 extension ReloadingFileProviderCore: ConfigProvider {
 
     internal func value(forKey key: AbsoluteConfigKey, type: ConfigType) throws -> LookupResult {

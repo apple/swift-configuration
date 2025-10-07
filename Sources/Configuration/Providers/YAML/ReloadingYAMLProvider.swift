@@ -64,6 +64,7 @@ import Foundation
 /// Check out ``YAMLProvider`` to learn more about using YAML for configuration. ``ReloadingYAMLProvider`` is
 /// a reloading variant of ``YAMLProvider`` that otherwise follows the same behavior for handling secrets,
 /// key and context mapping, and so on.
+@available(Configuration 1.0, *)
 public final class ReloadingYAMLProvider: Sendable {
 
     /// The core implementation that handles all reloading logic.
@@ -207,6 +208,7 @@ public final class ReloadingYAMLProvider: Sendable {
     }
 }
 
+@available(Configuration 1.0, *)
 extension ReloadingYAMLProvider: CustomStringConvertible {
     // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
     public var description: String {
@@ -217,6 +219,7 @@ extension ReloadingYAMLProvider: CustomStringConvertible {
     }
 }
 
+@available(Configuration 1.0, *)
 extension ReloadingYAMLProvider: CustomDebugStringConvertible {
     // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
     public var debugDescription: String {
@@ -232,6 +235,7 @@ extension ReloadingYAMLProvider: CustomDebugStringConvertible {
     }
 }
 
+@available(Configuration 1.0, *)
 extension ReloadingYAMLProvider: ConfigProvider {
     // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
     public var providerName: String {
@@ -270,6 +274,7 @@ extension ReloadingYAMLProvider: ConfigProvider {
     }
 }
 
+@available(Configuration 1.0, *)
 extension ReloadingYAMLProvider: Service {
     // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
     public func run() async throws {

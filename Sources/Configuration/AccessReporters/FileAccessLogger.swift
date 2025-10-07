@@ -64,6 +64,7 @@ import Synchronization
 /// - Resolved value (redacted for secrets)
 /// - Provider that supplied the value or error information
 /// - Access metadata (operation type, value type, source location, timestamp)
+@available(Configuration 1.0, *)
 public final class FileAccessLogger: Sendable {
 
     /// The file descriptor used for writing access events to the log file.
@@ -199,6 +200,7 @@ public final class FileAccessLogger: Sendable {
     }
 }
 
+@available(Configuration 1.0, *)
 extension FileAccessLogger: AccessReporter {
     // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
     public func report(_ event: AccessEvent) {
@@ -213,6 +215,7 @@ extension FileAccessLogger: AccessReporter {
     }
 }
 
+@available(Configuration 1.0, *)
 extension FileAccessLogger {
     /// Renders a string summary for the event.
     /// - Parameter event: The event to render.
@@ -222,6 +225,7 @@ extension FileAccessLogger {
     }
 }
 
+@available(Configuration 1.0, *)
 extension AccessEvent {
     /// Returns a human-readable single line string summarizing the access event.
     /// - Parameter dateFormatStyle: The format style used for rendering dates.
@@ -280,6 +284,7 @@ extension AccessEvent {
     }
 }
 
+@available(Configuration 1.0, *)
 extension ConfigContent {
     /// Returns a string representation of the config value, formatting complex types appropriately.
     ///

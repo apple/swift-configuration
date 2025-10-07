@@ -23,6 +23,7 @@ import Foundation
 ///
 /// This structure represents a point-in-time view of configuration values. It handles
 /// the conversion from JSON types to configuration value types.
+@available(Configuration 1.0, *)
 internal struct JSONProviderSnapshot {
     /// The key encoder for JSON.
     static let keyEncoder: SeparatorKeyEncoder = .dotSeparated
@@ -300,6 +301,7 @@ internal struct JSONProviderSnapshot {
     }
 }
 
+@available(Configuration 1.0, *)
 extension JSONProviderSnapshot: ConfigSnapshotProtocol {
     var providerName: String {
         "JSONProvider"
@@ -324,6 +326,7 @@ extension JSONProviderSnapshot: ConfigSnapshotProtocol {
 ///   - secretsSpecifier: The secrets specifier.
 /// - Throws: When parsing fails.
 /// - Returns: The parsed and validated JSON config values.
+@available(Configuration 1.0, *)
 internal func parseValues(
     _ parsedDictionary: [String: any Sendable],
     keyEncoder: some ConfigKeyEncoder,

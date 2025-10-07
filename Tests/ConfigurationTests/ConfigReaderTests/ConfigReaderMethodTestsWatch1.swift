@@ -30,6 +30,7 @@ struct ConfigReaderMethodTestsWatch1 {
     typealias TestEnum = ConfigReaderTests.TestEnum
     typealias TestStringConvertible = ConfigReaderTests.TestStringConvertible
 
+    @available(Configuration 1.0, *)
     @Test func watch() async throws {
         let config = ConfigReaderTests.config
 

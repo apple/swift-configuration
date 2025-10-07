@@ -45,6 +45,7 @@
 ///
 /// **Dynamic providers**: Implement `watch` methods to emit real-time updates from
 /// polling, file system monitoring, or other change detection mechanisms.
+@available(Configuration 1.0, *)
 public protocol ConfigProvider: Sendable {
 
     /// The human-readable name of the configuration provider.
@@ -137,6 +138,7 @@ public protocol ConfigProvider: Sendable {
 /// Snapshots enable consistent reads of multiple related configuration keys by
 /// capturing the provider's state at a specific moment. This prevents the underlying
 /// data from changing between individual key lookups.
+@available(Configuration 1.0, *)
 public protocol ConfigSnapshotProtocol: Sendable {
 
     /// The human-readable name of the configuration provider that created this snapshot.
@@ -159,6 +161,7 @@ public protocol ConfigSnapshotProtocol: Sendable {
 }
 
 /// The result of looking up a configuration value in a provider.
+@available(Configuration 1.0, *)
 public struct LookupResult: Sendable, Equatable, Hashable {
 
     /// The provider-specific encoding of the configuration key.
@@ -181,6 +184,7 @@ public struct LookupResult: Sendable, Equatable, Hashable {
 }
 
 /// The supported configuration value types.
+@available(Configuration 1.0, *)
 @frozen public enum ConfigType: String, Sendable, Equatable, Hashable {
 
     /// A string value.
@@ -215,6 +219,7 @@ public struct LookupResult: Sendable, Equatable, Hashable {
 }
 
 /// The raw content of a configuration value.
+@available(Configuration 1.0, *)
 @frozen public enum ConfigContent: Sendable, Equatable, Hashable {
 
     /// A string value.
@@ -433,6 +438,7 @@ public struct LookupResult: Sendable, Equatable, Hashable {
 /// Configuration values include the actual content and a flag indicating whether
 /// the value contains sensitive information. Secret values are protected from
 /// accidental disclosure in logs and debug output.
+@available(Configuration 1.0, *)
 public struct ConfigValue: Sendable, Equatable, Hashable {
 
     /// The configuration content.
@@ -451,6 +457,7 @@ public struct ConfigValue: Sendable, Equatable, Hashable {
     }
 }
 
+@available(Configuration 1.0, *)
 extension ConfigValue: CustomStringConvertible {
     // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
     public var description: String {
@@ -462,6 +469,7 @@ extension ConfigValue: CustomStringConvertible {
     }
 }
 
+@available(Configuration 1.0, *)
 extension ConfigValue: ExpressibleByStringLiteral {
     // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
     public init(stringLiteral value: String) {
@@ -469,6 +477,7 @@ extension ConfigValue: ExpressibleByStringLiteral {
     }
 }
 
+@available(Configuration 1.0, *)
 extension ConfigContent: ExpressibleByStringLiteral {
     // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
     public init(stringLiteral value: String) {
@@ -476,6 +485,7 @@ extension ConfigContent: ExpressibleByStringLiteral {
     }
 }
 
+@available(Configuration 1.0, *)
 extension ConfigValue: ExpressibleByIntegerLiteral {
     // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
     public init(integerLiteral value: Int) {
@@ -483,6 +493,7 @@ extension ConfigValue: ExpressibleByIntegerLiteral {
     }
 }
 
+@available(Configuration 1.0, *)
 extension ConfigContent: ExpressibleByIntegerLiteral {
     // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
     public init(integerLiteral value: Int) {
@@ -490,6 +501,7 @@ extension ConfigContent: ExpressibleByIntegerLiteral {
     }
 }
 
+@available(Configuration 1.0, *)
 extension ConfigValue: ExpressibleByFloatLiteral {
     // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
     public init(floatLiteral value: Double) {
@@ -497,6 +509,7 @@ extension ConfigValue: ExpressibleByFloatLiteral {
     }
 }
 
+@available(Configuration 1.0, *)
 extension ConfigContent: ExpressibleByFloatLiteral {
     // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
     public init(floatLiteral value: Double) {
@@ -504,6 +517,7 @@ extension ConfigContent: ExpressibleByFloatLiteral {
     }
 }
 
+@available(Configuration 1.0, *)
 extension ConfigValue: ExpressibleByBooleanLiteral {
     // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
     public init(booleanLiteral value: Bool) {
@@ -511,6 +525,7 @@ extension ConfigValue: ExpressibleByBooleanLiteral {
     }
 }
 
+@available(Configuration 1.0, *)
 extension ConfigContent: ExpressibleByBooleanLiteral {
     // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
     public init(booleanLiteral value: Bool) {

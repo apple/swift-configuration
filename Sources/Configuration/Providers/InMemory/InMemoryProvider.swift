@@ -55,6 +55,7 @@
 /// ```
 ///
 /// To learn more about the in-memory providers, check out <doc:Using-in-memory-providers>.
+@available(Configuration 1.0, *)
 public struct InMemoryProvider: Sendable {
 
     /// The underlying snapshot of the internal state of the provider.
@@ -106,6 +107,7 @@ public struct InMemoryProvider: Sendable {
     }
 }
 
+@available(Configuration 1.0, *)
 extension InMemoryProvider {
 
     /// Creates a new in-memory provider from string keys and configuration values.
@@ -150,6 +152,7 @@ extension InMemoryProvider {
     }
 }
 
+@available(Configuration 1.0, *)
 extension InMemoryProvider: CustomStringConvertible {
     // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
     public var description: String {
@@ -157,6 +160,7 @@ extension InMemoryProvider: CustomStringConvertible {
     }
 }
 
+@available(Configuration 1.0, *)
 extension InMemoryProvider: CustomDebugStringConvertible {
     // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
     public var debugDescription: String {
@@ -169,6 +173,7 @@ extension InMemoryProvider: CustomDebugStringConvertible {
     }
 }
 
+@available(Configuration 1.0, *)
 extension InMemoryProvider.Snapshot: ConfigSnapshotProtocol {
     func value(
         forKey key: AbsoluteConfigKey,
@@ -186,6 +191,7 @@ extension InMemoryProvider.Snapshot: ConfigSnapshotProtocol {
     }
 }
 
+@available(Configuration 1.0, *)
 extension InMemoryProvider: ConfigProvider {
     // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
     public var providerName: String {

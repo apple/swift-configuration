@@ -23,6 +23,7 @@ import Logging
 import SystemPackage
 
 struct ReloadingJSONProviderTests {
+    @available(Configuration 1.0, *)
     @Test func printingDescription() async throws {
         let provider = try await ReloadingJSONProvider(filePath: jsonConfigFile)
         let expectedDescription = #"""
@@ -31,6 +32,7 @@ struct ReloadingJSONProviderTests {
         #expect(provider.description == expectedDescription)
     }
 
+    @available(Configuration 1.0, *)
     @Test func printingDebugDescription() async throws {
         let provider = try await ReloadingJSONProvider(filePath: jsonConfigFile)
         let expectedDebugDescription = #"""
@@ -39,11 +41,13 @@ struct ReloadingJSONProviderTests {
         #expect(provider.debugDescription == expectedDebugDescription)
     }
 
+    @available(Configuration 1.0, *)
     @Test func compat() async throws {
         let provider = try await ReloadingJSONProvider(filePath: jsonConfigFile)
         try await ProviderCompatTest(provider: provider).run()
     }
 
+    @available(Configuration 1.0, *)
     @Test func initializationWithConfig() async throws {
         // Test initialization using config reader
         let envProvider = InMemoryProvider(values: [

@@ -18,9 +18,9 @@ import Foundation
 
 struct CLIKeyEncoderTests {
 
-    let encoder = CLIKeyEncoder()
-
+    @available(Configuration 1.0, *)
     @Test func encoding() {
+        let encoder = CLIKeyEncoder()
         #expect(encoder.encode(["host"]) == "--host")
         #expect(encoder.encode(["app", "database", "host"]) == "--app-database-host")
         #expect(encoder.encode(["maxRetryCount"]) == "--max-retry-count")

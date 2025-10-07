@@ -18,6 +18,7 @@ import ConfigurationTestingInternal
 
 struct SecretMarkingTests {
 
+    @available(Configuration 1.0, *)
     @Test func secretHandling() throws {
         let provider = InMemoryProvider(values: [
             "public.key": ConfigValue("public-value", isSecret: false),
@@ -37,6 +38,7 @@ struct SecretMarkingTests {
         #expect(try events[1].result.get()?.isSecret == true)
     }
 
+    @available(Configuration 1.0, *)
     @Test func get() throws {
         let accessReporter = TestAccessReporter()
         let provider = InMemoryProvider(
@@ -81,6 +83,7 @@ struct SecretMarkingTests {
         try #expect(events[3].result.get() == ConfigValue("s3cret", isSecret: true))
     }
 
+    @available(Configuration 1.0, *)
     @Test func fetch() async throws {
         let accessReporter = TestAccessReporter()
         let provider = InMemoryProvider(
@@ -126,6 +129,7 @@ struct SecretMarkingTests {
         try #expect(events[3].result.get() == ConfigValue("s3cret", isSecret: true))
     }
 
+    @available(Configuration 1.0, *)
     @Test func watch() async throws {
         let accessReporter = TestAccessReporter()
         let provider = InMemoryProvider(

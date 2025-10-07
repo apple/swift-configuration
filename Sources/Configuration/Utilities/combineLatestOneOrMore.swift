@@ -19,6 +19,7 @@ import Synchronization
 /// This class coordinates the "combine latest" operation by storing the most recent
 /// value from each source sequence and emitting combined arrays only when all sources
 /// have produced at least one value.
+@available(Configuration 1.0, *)
 private final class Combiner<Element: Sendable>: Sendable {
 
     /// The internal state.
@@ -101,6 +102,7 @@ private final class Combiner<Element: Sendable>: Sendable {
 /// - Throws: When any source throws, when the handler throws, or when cancelled.
 /// - Returns: The value returned by the handler.
 /// - Precondition: `sources` must not be empty.
+@available(Configuration 1.0, *)
 func combineLatestOneOrMore<Element: Sendable, Return>(
     elementType: Element.Type = Element.self,
     sources: [@Sendable ((ConfigUpdatesAsyncSequence<Element, Never>) async throws -> Void) async throws -> Void],

@@ -18,6 +18,7 @@ import FoundationEssentials
 import Foundation
 #endif
 
+@available(Configuration 1.0, *)
 extension ConfigValue {
     /// Returns a copy of the config value marked as secret.
     ///
@@ -29,6 +30,7 @@ extension ConfigValue {
     }
 }
 
+@available(Configuration 1.0, *)
 extension Result<ConfigValue?, any Error> {
     /// Returns a copy of the result with the value marked as secret.
     ///
@@ -38,6 +40,7 @@ extension Result<ConfigValue?, any Error> {
     }
 }
 
+@available(Configuration 1.0, *)
 extension LookupResult {
     /// Returns a copy of the config value marked as secret.
     ///
@@ -49,6 +52,7 @@ extension LookupResult {
     }
 }
 
+@available(Configuration 1.0, *)
 extension Result<LookupResult, any Error> {
     /// Returns a copy of the result with the value marked as secret.
     ///
@@ -58,6 +62,7 @@ extension Result<LookupResult, any Error> {
     }
 }
 
+@available(Configuration 1.0, *)
 extension AccessEvent.ProviderResult {
     /// Returns a copy of the result marked as secret.
     ///
@@ -80,6 +85,7 @@ extension AccessEvent.ProviderResult {
 ///   - isSecret: Whether to mark the values as secret.
 ///   - tuple: A tuple containing provider results and a configuration value result.
 /// - Returns: The tuple with values marked as secret if the flag is true, otherwise unchanged.
+@available(Configuration 1.0, *)
 private func mergingIsSecret(
     _ isSecret: Bool,
     _ tuple: ([AccessEvent.ProviderResult], Result<ConfigValue?, any Error>)
@@ -121,6 +127,7 @@ private func mergingIsSecret(
 ///   - fileID: Source file identifier for access event metadata.
 ///   - line: Source line number for access event metadata.
 /// - Returns: The converted configuration value, or `nil` if not found or conversion fails.
+@available(Configuration 1.0, *)
 internal func valueFromReader<Value>(
     forKey key: ConfigKey,
     type: ConfigType,
@@ -193,6 +200,7 @@ internal func valueFromReader<Value>(
 ///   - fileID: Source file identifier used for event reporting.
 ///   - line: Source line number used for event reporting.
 /// - Returns: The configuration value converted to the requested type.
+@available(Configuration 1.0, *)
 internal func valueFromReader<Value>(
     forKey key: ConfigKey,
     type: ConfigType,
@@ -269,6 +277,7 @@ internal func valueFromReader<Value>(
 /// - Throws: `ConfigError.missingRequiredConfigValue` if the configuration value is not found, or any error thrown
 ///   by the `unwrap` closure if conversion fails.
 /// - Returns: The configuration value converted to the requested type.
+@available(Configuration 1.0, *)
 internal func requiredValueFromReader<Value>(
     forKey key: ConfigKey,
     type: ConfigType,
@@ -324,6 +333,7 @@ internal func requiredValueFromReader<Value>(
     return try finalResult.get().0
 }
 
+@available(Configuration 1.0, *)
 extension ConfigReader {
 
     /// Gets a config value synchronously.

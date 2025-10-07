@@ -22,6 +22,7 @@ package import SystemPackage
 import Synchronization
 
 /// A simple in-memory file system used for testing.
+@available(Configuration 1.0, *)
 package final class InMemoryFileSystem: Sendable {
 
     /// Represents the type of data stored in the in-memory file system.
@@ -97,6 +98,7 @@ package final class InMemoryFileSystem: Sendable {
     }
 }
 
+@available(Configuration 1.0, *)
 extension InMemoryFileSystem: CommonProviderFileSystem {
     func listFileNames(atPath directoryPath: FilePath) async throws -> [String] {
         let prefixComponents = directoryPath.components

@@ -28,6 +28,7 @@ struct ConfigReaderMethodTestsFetch3 {
     typealias TestEnum = ConfigReaderTests.TestEnum
     typealias TestStringConvertible = ConfigReaderTests.TestStringConvertible
 
+    @available(Configuration 1.0, *)
     @Test func fetch() async throws {
         let config = ConfigReaderTests.config
 

@@ -18,6 +18,7 @@ import ConfigurationTestingInternal
 
 struct ConfigSnapshotReaderTests {
 
+    @available(Configuration 1.0, *)
     @Test func get() throws {
         let provider = InMemoryProvider(
             name: "test",
@@ -32,6 +33,7 @@ struct ConfigSnapshotReaderTests {
         }
     }
 
+    @available(Configuration 1.0, *)
     @Test func watch() async throws {
         let provider = InMemoryProvider(
             name: "test",
@@ -49,6 +51,7 @@ struct ConfigSnapshotReaderTests {
         }
     }
 
+    @available(Configuration 1.0, *)
     @Test func scoping() throws {
         let provider = InMemoryProvider(
             name: "test",
@@ -64,6 +67,7 @@ struct ConfigSnapshotReaderTests {
         }
     }
 
+    @available(Configuration 1.0, *)
     @Test func scopingCustomDecoder() throws {
         let provider = InMemoryProvider(
             name: "test",

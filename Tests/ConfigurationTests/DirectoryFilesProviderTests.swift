@@ -22,6 +22,7 @@ import SystemPackage
 struct DirectoryFilesProviderTests {
 
     /// Creates test files for the provider.
+    @available(Configuration 1.0, *)
     static var testFiles: [FilePath: InMemoryFileSystem.FileInfo] {
         let stringValues: [String: String] = [
             "string": "Hello",
@@ -59,6 +60,7 @@ struct DirectoryFilesProviderTests {
         return Dictionary(uniqueKeysWithValues: tuples)
     }
 
+    @available(Configuration 1.0, *)
     @Test func printingDescription() async throws {
         let fileSystem = InMemoryFileSystem(files: Self.testFiles)
         let provider = try await DirectoryFilesProvider(
@@ -69,6 +71,7 @@ struct DirectoryFilesProviderTests {
         #expect(provider.description == "DirectoryFilesProvider[21 files]")
     }
 
+    @available(Configuration 1.0, *)
     @Test func printingDebugDescription() async throws {
         let fileSystem = InMemoryFileSystem(files: Self.testFiles)
         let provider = try await DirectoryFilesProvider(
@@ -83,6 +86,7 @@ struct DirectoryFilesProviderTests {
         #expect(provider.debugDescription == expectedDebugDescription)
     }
 
+    @available(Configuration 1.0, *)
     @Test func compat() async throws {
         let fileSystem = InMemoryFileSystem(files: Self.testFiles)
         let provider = try await DirectoryFilesProvider(

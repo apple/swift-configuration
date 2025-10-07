@@ -16,6 +16,7 @@ import Configuration
 import Testing
 
 struct SeparatorKeyEncoderTests {
+    @available(Configuration 1.0, *)
     @Test func dotEncoding() {
         let encoder: any ConfigKeyEncoder = .dotSeparated
         #expect(encoder.encode(.init(["foo"])) == "foo")
@@ -24,6 +25,7 @@ struct SeparatorKeyEncoderTests {
         #expect(encoder.encode(.init(["foo.bar"])) == "foo.bar")
     }
 
+    @available(Configuration 1.0, *)
     @Test func dashEncoding() {
         let encoder: any ConfigKeyEncoder = .dashSeparated
         #expect(encoder.encode(.init(["foo"])) == "foo")

@@ -12,6 +12,7 @@
 //
 //===----------------------------------------------------------------------===//
 
+@available(Configuration 1.0, *)
 extension ConfigProvider {
 
     /// Implements `watchValue` by getting the current value and emitting it immediately.
@@ -116,6 +117,7 @@ extension ConfigProvider {
 ///   - work: A closure that performs the value lookup and returns the result.
 /// - Returns: A lookup result containing the encoded key and the value from the closure.
 /// - Throws: Rethrows any errors thrown by the provided closure.
+@available(Configuration 1.0, *)
 package func withConfigValueLookup<Failure: Error>(
     encodedKey: String,
     work: () throws(Failure) -> ConfigValue?
@@ -147,6 +149,7 @@ package func withConfigValueLookup<Failure: Error>(
 ///   - work: An async closure that performs the value lookup and returns the result.
 /// - Returns: A lookup result containing the encoded key and the value from the closure.
 /// - Throws: Rethrows any errors thrown by the provided closure.
+@available(Configuration 1.0, *)
 package func withConfigValueLookup<Failure: Error>(
     encodedKey: String,
     work: () async throws(Failure) -> ConfigValue?

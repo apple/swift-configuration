@@ -12,6 +12,7 @@
 //
 //===----------------------------------------------------------------------===//
 
+@available(Configuration 1.0, *)
 extension ConfigProvider {
     /// Creates a new prefixed configuration provider.
     ///

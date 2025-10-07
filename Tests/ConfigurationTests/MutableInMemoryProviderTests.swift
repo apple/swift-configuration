@@ -18,9 +18,10 @@ import ConfigurationTestingInternal
 import ConfigurationTesting
 
 struct MutableInMemoryProviderTests {
-    let provider: MutableInMemoryProvider
-    init() {
-        provider = MutableInMemoryProvider(
+
+    @available(Configuration 1.0, *)
+    func makeProvider() -> MutableInMemoryProvider {
+        MutableInMemoryProvider(
             name: "test",
             initialValues: [
                 "string": .init("Hello", isSecret: false),
@@ -47,25 +48,33 @@ struct MutableInMemoryProviderTests {
         )
     }
 
+    @available(Configuration 1.0, *)
     @Test func printingDescription() throws {
         let expectedDescription = #"""
             MutableInMemoryProvider[test, 0 watchers, 20 values]
             """#
+        let provider = makeProvider()
         #expect(provider.description == expectedDescription)
     }
 
+    @available(Configuration 1.0, *)
     @Test func printingDebugDescription() throws {
         let expectedDebugDescription = #"""
             MutableInMemoryProvider[test, 0 watchers, 20 values: bool=[bool: true], booly.array=[boolArray: true, false], byteChunky.array=[byteChunkArray: 5 bytes, prefix: 6d61676963, 6 bytes, prefix: 6d6167696332], bytes=[bytes: 5 bytes, prefix: 6d61676963], double=[double: 3.14], doubly.array=[doubleArray: 3.14, 2.72], int=[int: 42], inty.array=[intArray: 42, 24], other.bool=[bool: false], other.booly.array=[boolArray: false, true, true], other.byteChunky.array=[byteChunkArray: 5 bytes, prefix: 6d61676963, 6 bytes, prefix: 6d6167696332, 5 bytes, prefix: 6d61676963], other.bytes=[bytes: 6 bytes, prefix: 6d6167696332], other.double=[double: 2.72], other.doubly.array=[doubleArray: 0.9, 1.8], other.int=[int: 24], other.inty.array=[intArray: 16, 32], other.string=[string: Other Hello], other.stringy.array=[stringArray: Hello, Swift], string=[string: Hello], stringy.array=[stringArray: Hello, World]]
             """#
+        let provider = makeProvider()
         #expect(provider.debugDescription == expectedDebugDescription)
     }
 
+    @available(Configuration 1.0, *)
     @Test func compat() async throws {
+        let provider = makeProvider()
         try await ProviderCompatTest(provider: provider).run()
     }
 
+    @available(Configuration 1.0, *)
     @Test func mutatingGet() throws {
+        let provider = makeProvider()
         let config = ConfigReader(provider: provider)
 
         #expect(config.bool(forKey: "bool") == true)
@@ -73,7 +82,9 @@ struct MutableInMemoryProviderTests {
         #expect(config.bool(forKey: "bool") == false)
     }
 
+    @available(Configuration 1.0, *)
     @Test func mutatingFetch() async throws {
+        let provider = makeProvider()
         let config = ConfigReader(provider: provider)
 
         try await #expect(config.fetchBool(forKey: "bool") == true)
@@ -81,7 +92,9 @@ struct MutableInMemoryProviderTests {
         try await #expect(config.fetchBool(forKey: "bool") == false)
     }
 
+    @available(Configuration 1.0, *)
     @Test func mutatingWatch() async throws {
+        let provider = makeProvider()
         let config = ConfigReader(provider: provider)
 
         #expect(
@@ -114,7 +127,9 @@ struct MutableInMemoryProviderTests {
         }
     }
 
+    @available(Configuration 1.0, *)
     @Test func mutatingGetSnapshot() throws {
+        let provider = makeProvider()
         let config = ConfigReader(provider: provider)
 
         config.withSnapshot { snapshot in
@@ -125,7 +140,9 @@ struct MutableInMemoryProviderTests {
         #expect(config.bool(forKey: "bool") == false)
     }
 
+    @available(Configuration 1.0, *)
     @Test func mutatingWatchSnapshot() async throws {
+        let provider = makeProvider()
         let config = ConfigReader(provider: provider)
 
         let firstValueFuture = TestFuture<Bool??>(name: "firstValue")

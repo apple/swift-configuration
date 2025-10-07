@@ -13,6 +13,7 @@
 //===----------------------------------------------------------------------===//
 
 /// A concrete async sequence for delivering updated configuration values.
+@available(Configuration 1.0, *)
 public struct ConfigUpdatesAsyncSequence<Element: Sendable, Failure: Error> {
 
     /// The upstream async sequence that this concrete sequence wraps.
@@ -29,6 +30,7 @@ public struct ConfigUpdatesAsyncSequence<Element: Sendable, Failure: Error> {
     }
 }
 
+@available(Configuration 1.0, *)
 extension ConfigUpdatesAsyncSequence: AsyncSequence {
 
     /// An async iterator that wraps an existential async iterator.
@@ -57,6 +59,7 @@ extension ConfigUpdatesAsyncSequence: AsyncSequence {
 
 // MARK: - AsyncSequence extensions
 
+@available(Configuration 1.0, *)
 extension AsyncSequence where Failure == Never {
 
     /// Maps each element of the sequence using a throwing transform, introducing a failure type.
@@ -106,6 +109,7 @@ extension AsyncSequence where Failure == Never {
 /// - `Failure`: The error type that the transform function can throw.
 /// - `Value`: The input element type from the upstream sequence.
 /// - `Upstream`: The upstream async sequence type that never throws.
+@available(Configuration 1.0, *)
 private struct MapThrowingAsyncSequence<Element, Failure: Error, Value, Upstream: AsyncSequence<Value, Never>> {
 
     /// The upstream async sequence to transform.
@@ -115,6 +119,7 @@ private struct MapThrowingAsyncSequence<Element, Failure: Error, Value, Upstream
     var transform: (Value) throws(Failure) -> Element
 }
 
+@available(Configuration 1.0, *)
 extension MapThrowingAsyncSequence: AsyncSequence {
 
     // swift-format-ignore: AllPublicDeclarationsHaveDocumentation

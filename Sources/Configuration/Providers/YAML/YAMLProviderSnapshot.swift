@@ -27,6 +27,7 @@ import SystemPackage
 ///
 /// This class represents a point-in-time view of configuration values. It handles
 /// the conversion from YAML types to configuration value types.
+@available(Configuration 1.0, *)
 final class YAMLProviderSnapshot: Sendable {
     /// The key encoder for YAML.
     private static let keyEncoder: SeparatorKeyEncoder = .dotSeparated
@@ -238,6 +239,7 @@ final class YAMLProviderSnapshot: Sendable {
     }
 }
 
+@available(Configuration 1.0, *)
 extension YAMLProviderSnapshot: ConfigSnapshotProtocol {
     var providerName: String {
         "YAMLProvider"
@@ -268,6 +270,7 @@ extension YAMLProviderSnapshot: ConfigSnapshotProtocol {
 ///   - secretsSpecifier: The secrets specifier.
 /// - Throws: When parsing fails.
 /// - Returns: The parsed and validated YAML config values.
+@available(Configuration 1.0, *)
 internal func parseValues(
     _ parsedDictionary: Yams.Node.Mapping,
     keyEncoder: some ConfigKeyEncoder,

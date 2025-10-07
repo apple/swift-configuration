@@ -59,6 +59,7 @@ import Foundation
 /// Check out ``JSONProvider`` to learn more about using JSON for configuration. ``ReloadingJSONProvider`` is
 /// a reloading variant of ``JSONProvider`` that otherwise follows the same behavior for handling secrets,
 /// key and context mapping, and so on.
+@available(Configuration 1.0, *)
 public final class ReloadingJSONProvider: Sendable {
 
     /// The core implementation that handles all reloading logic.
@@ -203,6 +204,7 @@ public final class ReloadingJSONProvider: Sendable {
     }
 }
 
+@available(Configuration 1.0, *)
 extension ReloadingJSONProvider: CustomStringConvertible {
     // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
     public var description: String {
@@ -211,6 +213,7 @@ extension ReloadingJSONProvider: CustomStringConvertible {
     }
 }
 
+@available(Configuration 1.0, *)
 extension ReloadingJSONProvider: CustomDebugStringConvertible {
     // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
     public var debugDescription: String {
@@ -223,6 +226,7 @@ extension ReloadingJSONProvider: CustomDebugStringConvertible {
     }
 }
 
+@available(Configuration 1.0, *)
 extension ReloadingJSONProvider: ConfigProvider {
     // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
     public var providerName: String {
@@ -261,6 +265,7 @@ extension ReloadingJSONProvider: ConfigProvider {
     }
 }
 
+@available(Configuration 1.0, *)
 extension ReloadingJSONProvider: Service {
     // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
     public func run() async throws {

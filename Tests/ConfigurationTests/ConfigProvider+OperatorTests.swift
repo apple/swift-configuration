@@ -17,6 +17,7 @@ import ConfigurationTestingInternal
 @testable import Configuration
 
 struct ConfigProviderOperatorTests {
+    @available(Configuration 1.0, *)
     @Test func prefixWithConfigKey() throws {
         let prefixed = InMemoryProvider(values: [["app", "foo"]: "bar"]).prefixKeys(with: ["app"])
         let result = try prefixed.value(forKey: ["foo"], type: .string)
@@ -24,6 +25,7 @@ struct ConfigProviderOperatorTests {
         #expect(result.encodedKey == "app.foo")
     }
 
+    @available(Configuration 1.0, *)
     @Test func prefixWithString() throws {
         let prefixed = InMemoryProvider(values: [["app", "prod", "foo"]: "bar"]).prefixKeys(with: "app.prod")
         let result = try prefixed.value(forKey: ["foo"], type: .string)
@@ -31,6 +33,7 @@ struct ConfigProviderOperatorTests {
         #expect(result.encodedKey == "app.prod.foo")
     }
 
+    @available(Configuration 1.0, *)
     @Test func mapKeys() throws {
         let mapped = InMemoryProvider(values: [["foo"]: "bar"])
             .mapKeys { key in

@@ -19,8 +19,12 @@ import Testing
 
 struct CLIArgumentParserTests {
 
-    let parser = CLIArgumentParser()
+    @available(Configuration 1.0, *)
+    var parser: CLIArgumentParser {
+        .init()
+    }
 
+    @available(Configuration 1.0, *)
     @Test func parsing() {
         #expect(parser.parse([]).isEmpty)
         #expect(parser.parse(["program"]).isEmpty)

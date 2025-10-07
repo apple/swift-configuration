@@ -22,6 +22,7 @@ func printToStderr(_ string: String) {
     _ = try? FileDescriptor.standardError.writeAll(message.utf8)
 }
 
+@available(Configuration 1.0, *)
 extension StringProtocol {
     /// Returns the contents of the string with any whitespace prefix and suffix trimmed.
     /// - Returns: The trimmed string.

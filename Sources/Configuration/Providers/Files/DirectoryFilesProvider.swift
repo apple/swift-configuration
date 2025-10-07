@@ -125,6 +125,7 @@ public import SystemPackage
 ///
 /// This provider ignores the context passed in ``AbsoluteConfigKey/context``.
 /// All keys are resolved using only their component path.
+@available(Configuration 1.0, *)
 public struct DirectoryFilesProvider: Sendable {
 
     /// A file value with metadata.
@@ -254,6 +255,7 @@ public struct DirectoryFilesProvider: Sendable {
 /// A decoder of file content arrays.
 ///
 /// Parses a string by splitting by the specified character and trimming the components.
+@available(Configuration 1.0, *)
 internal struct DirectoryFilesValueArrayDecoder {
 
     /// The separator used to split the string into an array.
@@ -267,6 +269,7 @@ internal struct DirectoryFilesValueArrayDecoder {
     }
 }
 
+@available(Configuration 1.0, *)
 extension DirectoryFilesProvider: CustomStringConvertible {
     // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
     public var description: String {
@@ -274,6 +277,7 @@ extension DirectoryFilesProvider: CustomStringConvertible {
     }
 }
 
+@available(Configuration 1.0, *)
 extension DirectoryFilesProvider: CustomDebugStringConvertible {
     // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
     public var debugDescription: String {
@@ -294,6 +298,7 @@ extension DirectoryFilesProvider: CustomDebugStringConvertible {
     }
 }
 
+@available(Configuration 1.0, *)
 extension DirectoryFilesProvider.Snapshot {
     /// Parses a config value from the provided file value.
     /// - Parameters:
@@ -375,6 +380,7 @@ extension DirectoryFilesProvider.Snapshot {
     }
 }
 
+@available(Configuration 1.0, *)
 extension DirectoryFilesProvider.Snapshot: ConfigSnapshotProtocol {
     func value(
         forKey key: AbsoluteConfigKey,
@@ -394,6 +400,7 @@ extension DirectoryFilesProvider.Snapshot: ConfigSnapshotProtocol {
     }
 }
 
+@available(Configuration 1.0, *)
 extension DirectoryFilesProvider: ConfigProvider {
     // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
     public var providerName: String {
@@ -443,11 +450,13 @@ extension DirectoryFilesProvider: ConfigProvider {
 /// Configuration keys are transformed into file names using these rules:
 /// - Components are joined with dashes
 /// - Non-alphanumeric characters (except dashes) are replaced with underscores
+@available(Configuration 1.0, *)
 public struct DirectoryFileKeyEncoder {
     /// Creates a default directory key encoder that follows standard file naming conventions.
     public init() {}
 }
 
+@available(Configuration 1.0, *)
 extension DirectoryFileKeyEncoder: ConfigKeyEncoder {
     // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
     public func encode(_ key: AbsoluteConfigKey) -> String {
@@ -468,6 +477,7 @@ extension DirectoryFileKeyEncoder: ConfigKeyEncoder {
     }
 }
 
+@available(Configuration 1.0, *)
 extension ConfigKeyEncoder where Self == DirectoryFileKeyEncoder {
     /// An encoder that uses directory paths for hierarachical key encoder.
     ///

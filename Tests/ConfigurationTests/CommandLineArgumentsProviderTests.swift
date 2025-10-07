@@ -21,14 +21,15 @@ import Foundation
 import ConfigurationTesting
 
 struct CommandLineArgumentsProviderTests {
-    let provider: CommandLineArgumentsProvider
-    init() {
+
+    @available(Configuration 1.0, *)
+    var provider: CommandLineArgumentsProvider {
         // Convert magic byte arrays to base64
         let magicBase64 = "bWFnaWM="
         let magic2Base64 = "bWFnaWMy"
 
         // Create a provider with the expected test data format for ProviderCompatTest
-        provider = CommandLineArgumentsProvider(arguments: [
+        return CommandLineArgumentsProvider(arguments: [
             "program",
             "--string", "Hello",
             "--other-string", "Other Hello",
@@ -53,6 +54,7 @@ struct CommandLineArgumentsProviderTests {
         ])
     }
 
+    @available(Configuration 1.0, *)
     @Test func printingDescription() throws {
         let expectedDescription = #"""
             CommandLineArgumentsProvider[20 values]
@@ -60,6 +62,7 @@ struct CommandLineArgumentsProviderTests {
         #expect(provider.description == expectedDescription)
     }
 
+    @available(Configuration 1.0, *)
     @Test func printingDebugDescription() throws {
         let expectedDebugDescription = #"""
             CommandLineArgumentsProvider[20 values: --bool=true, --booly-array=true,false, --byte-chunky-array=bWFnaWM=,bWFnaWMy, --bytes=bWFnaWM=, --double=3.14, --doubly-array=3.14,2.72, --int=42, --inty-array=42,24, --other-bool=false, --other-booly-array=false,true,true, --other-byte-chunky-array=bWFnaWM=,bWFnaWMy,bWFnaWM=, --other-bytes=bWFnaWMy, --other-double=2.72, --other-doubly-array=0.9,1.8, --other-int=24, --other-inty-array=16,32, --other-string=Other Hello, --other-stringy-array=Hello,Swift, --string=Hello, --stringy-array=Hello,World]
@@ -67,10 +70,12 @@ struct CommandLineArgumentsProviderTests {
         #expect(provider.debugDescription == expectedDebugDescription)
     }
 
+    @available(Configuration 1.0, *)
     @Test func compat() async throws {
         try await ProviderCompatTest(provider: provider).run()
     }
 
+    @available(Configuration 1.0, *)
     @Test func secretSpecifier() throws {
         let provider = CommandLineArgumentsProvider(
             arguments: ["program", "--api-token", "s3cret", "--hostname", "localhost"],
