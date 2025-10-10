@@ -77,6 +77,7 @@ jobs:
         env:
           MATRIX_LINUX_SETUP_COMMAND: git config --global --add safe.directory /swift-configuration
           MATRIX_LINUX_COMMAND: ./Scripts/test-examples.sh
+          MATRIX_LINUX_5_10_ENABLED: false
           MATRIX_LINUX_NIGHTLY_MAIN_ENABLED: false
 
   example-packages:
