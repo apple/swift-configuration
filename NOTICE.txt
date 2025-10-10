@@ -34,3 +34,12 @@ This repository contains the gyb script from the swiftlang/swift repository.
     * https://github.com/swiftlang/swift
 
 ---
+
+This repository contains a modified copy of the test-examples.sh script the apple/swift-openapi-generator repository.
+
+  * LICENSE (Apache License 2.0):
+    * https://www.apache.org/licenses/LICENSE-2.0
+  * HOMEPAGE:
+    * https://github.com/apple/swift-openapi-generator
+
+---
