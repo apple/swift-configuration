@@ -20,6 +20,7 @@ import ConfigurationTestingInternal
 import Foundation
 import ConfigurationTesting
 import Logging
+import Metrics
 import ServiceLifecycle
 import Synchronization
 import SystemPackage
@@ -97,7 +98,7 @@ private func withTestProvider<R>(
         providerName: "TestProvider",
         fileSystem: fileSystem,
         logger: .noop,
-        metrics: nil,
+        metrics: NOOPMetricsHandler.instance,
         createSnapshot: { data in
             try TestSnapshot(contents: String(decoding: data, as: UTF8.self))
         }
@@ -155,7 +156,7 @@ struct CoreTests {
             providerName: "TestProvider",
             fileSystem: fileSystem,
             logger: .noop,
-            metrics: nil,
+            metrics: NOOPMetricsHandler.instance,
             createSnapshot: { data in
                 try TestSnapshot(contents: String(decoding: data, as: UTF8.self))
             }

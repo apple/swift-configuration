@@ -92,16 +92,16 @@ public final class ReloadingYAMLProvider: Sendable {
     ///   - pollInterval: The interval between file modification checks. Defaults to 15 seconds.
     ///   - bytesDecoder: The decoder used to convert string values to byte arrays.
     ///   - secretsSpecifier: Specifies which configuration values should be treated as secrets.
-    ///   - logger: The logger instance to use, or nil to create a default one.
-    ///   - metrics: The metrics factory to use, or nil to use a no-op implementation.
+    ///   - logger: The logger instance to use.
+    ///   - metrics: The metrics factory to use.
     /// - Throws: If the file cannot be read or parsed, or if the YAML structure is invalid.
     public convenience init(
         filePath: FilePath,
         pollInterval: Duration = .seconds(15),
         bytesDecoder: some ConfigBytesFromStringDecoder = .base64,
         secretsSpecifier: SecretsSpecifier<String, Void> = .none,
-        logger: Logger? = nil,
-        metrics: (any MetricsFactory)? = nil
+        logger: Logger = Logger(label: "ReloadingYAMLProvider"),
+        metrics: any MetricsFactory = MetricsSystem.factory
     ) async throws {
         try await self.init(
             filePath: filePath,
@@ -121,8 +121,8 @@ public final class ReloadingYAMLProvider: Sendable {
     ///   - bytesDecoder: A decoder of bytes from a string.
     ///   - secretsSpecifier: A secrets specifier in case some of the values should be treated as secret.
     ///   - fileSystem: The underlying file system.
-    ///   - logger: The logger instance to use, or nil to create a default one.
-    ///   - metrics: The metrics factory to use, or nil to use a no-op implementation.
+    ///   - logger: The logger instance to use.
+    ///   - metrics: The metrics factory to use.
     /// - Throws: If the file cannot be read or parsed, or if the YAML structure is invalid.
     internal init(
         filePath: FilePath,
@@ -130,8 +130,8 @@ public final class ReloadingYAMLProvider: Sendable {
         bytesDecoder: some ConfigBytesFromStringDecoder,
         secretsSpecifier: SecretsSpecifier<String, Void>,
         fileSystem: some CommonProviderFileSystem,
-        logger: Logger?,
-        metrics: (any MetricsFactory)?
+        logger: Logger,
+        metrics: any MetricsFactory
     ) async throws {
         self.core = try await ReloadingFileProviderCore(
             filePath: filePath,
@@ -186,15 +186,15 @@ public final class ReloadingYAMLProvider: Sendable {
     ///   - config: The configuration reader containing the file path.
     ///   - bytesDecoder: The decoder used to convert string values to byte arrays.
     ///   - secretsSpecifier: Specifies which configuration values should be treated as secrets.
-    ///   - logger: The logger instance to use, or nil to create a default one.
-    ///   - metrics: The metrics factory to use, or nil to use a no-op implementation.
+    ///   - logger: The logger instance to use.
+    ///   - metrics: The metrics factory to use.
     /// - Throws: If the file path is missing, or if the file cannot be read or parsed.
     public convenience init(
         config: ConfigReader,
         bytesDecoder: some ConfigBytesFromStringDecoder = .base64,
         secretsSpecifier: SecretsSpecifier<String, Void> = .none,
-        logger: Logger? = nil,
-        metrics: (any MetricsFactory)? = nil
+        logger: Logger = Logger(label: "ReloadingYAMLProvider"),
+        metrics: any MetricsFactory = MetricsSystem.factory
     ) async throws {
         try await self.init(
             filePath: config.requiredString(forKey: "filePath", as: FilePath.self),
