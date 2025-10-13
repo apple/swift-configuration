@@ -44,7 +44,7 @@ struct ReloadingYAMLProviderTests {
     @available(Configuration 1.0, *)
     @Test func compat() async throws {
         let provider = try await ReloadingYAMLProvider(filePath: yamlConfigFile)
-        try await ProviderCompatTest(provider: provider).run()
+        try await ProviderCompatTest(provider: provider).runTest()
     }
 
     @available(Configuration 1.0, *)
