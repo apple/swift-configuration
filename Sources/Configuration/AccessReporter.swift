@@ -12,11 +12,11 @@
 //
 //===----------------------------------------------------------------------===//
 
-// #if canImport(FoundationEssentials)
-// public import FoundationEssentials
-// #else
+#if canImport(FoundationEssentials)
+public import FoundationEssentials
+#else
 public import Foundation
-// #endif
+#endif
 import Synchronization
 
 /// A type that receives and processes configuration access events.
