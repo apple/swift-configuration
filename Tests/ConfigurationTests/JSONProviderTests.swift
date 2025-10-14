@@ -49,6 +49,6 @@ struct JSONProviderTests {
 
     @available(Configuration 1.0, *)
     @Test func compat() async throws {
-        try await ProviderCompatTest(provider: provider).run()
+        try await ProviderCompatTest(provider: provider).runTest()
     }
 }

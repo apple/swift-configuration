@@ -29,7 +29,7 @@ import ConfigurationTestingInternal
 /// ```swift
 /// let provider = MyCustomProvider()
 /// let test = ProviderCompatTest(provider: provider)
-/// try await test.run()
+/// try await test.runTest()
 /// ```
 ///
 /// ## Required Test Data
@@ -105,7 +105,7 @@ public struct ProviderCompatTest: Sendable {
     /// - Snapshot watching (`watchSnapshot()`)
     ///
     /// - Throws: Test failures or provider errors encountered during testing.
-    public func run() async throws {
+    public func runTest() async throws {
         try value()
         try await fetchValue()
         try await watchValue()

@@ -178,6 +178,6 @@ struct KeyMappingProviderTests {
 
         // Use a passtrhough mapper so the compat test can find the expected values
         let mapper = KeyMappingProvider(upstream: upstream) { $0 }
-        try await ProviderCompatTest(provider: mapper).run()
+        try await ProviderCompatTest(provider: mapper).runTest()
     }
 }

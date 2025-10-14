@@ -100,6 +100,6 @@ struct DirectoryFilesProviderTests {
                 "other.byteChunky.array": .byteChunkArray([.magic2]),
             ])
         )
-        .run()
+        .runTest()
     }
 }
