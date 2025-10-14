@@ -456,8 +456,8 @@ Any package can implement a ``ConfigProvider``, making the ecosystem extensible 
 ### Value conversion
 - ``ExpressibleByConfigString``
 - ``ConfigBytesFromStringDecoder``
-- ``BytesFromBase64StringDecoder``
-- ``BytesFromHexStringDecoder``
+- ``ConfigBytesFromBase64StringDecoder``
+- ``ConfigBytesFromHexStringDecoder``
 
 ### Contributing
 - <doc:Development>
