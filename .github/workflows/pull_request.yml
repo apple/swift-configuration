@@ -88,3 +88,30 @@ jobs:
     with:
       name: "Integration test"
       matrix_string: '${{ needs.construct-linkage-test-matrix.outputs.integration-test-matrix }}'
+
+  construct-example-packages-matrix:
+    name: Construct example packages matrix
+    runs-on: ubuntu-latest
+    outputs:
+      example-packages-matrix: '${{ steps.generate-matrix.outputs.example-packages-matrix }}'
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - id: generate-matrix
+        run: echo "example-packages-matrix=$(curl -s https://raw.githubusercontent.com/apple/swift-nio/main/scripts/generate_matrix.sh | bash)" >> "$GITHUB_OUTPUT"
+        env:
+          MATRIX_LINUX_SETUP_COMMAND: git config --global --add safe.directory /swift-configuration
+          MATRIX_LINUX_COMMAND: ./Scripts/test-examples.sh
+          MATRIX_LINUX_5_10_ENABLED: false
+          MATRIX_LINUX_6_0_ENABLED: false
+          MATRIX_LINUX_NIGHTLY_MAIN_ENABLED: false
+
+  example-packages:
+    name: Example packages
+    needs: construct-example-packages-matrix
+    uses: apple/swift-nio/.github/workflows/swift_test_matrix.yml@main
+    with:
+      name: "Example packages"
+      matrix_string: '${{ needs.construct-example-packages-matrix.outputs.example-packages-matrix }}'
