@@ -44,7 +44,7 @@ struct ReloadingJSONProviderTests {
     @available(Configuration 1.0, *)
     @Test func compat() async throws {
         let provider = try await ReloadingJSONProvider(filePath: jsonConfigFile)
-        try await ProviderCompatTest(provider: provider).run()
+        try await ProviderCompatTest(provider: provider).runTest()
     }
 
     @available(Configuration 1.0, *)

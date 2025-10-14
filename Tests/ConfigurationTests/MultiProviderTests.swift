@@ -128,7 +128,7 @@ struct MultiProviderTests {
     @available(Configuration 1.0, *)
     @Test func compat() async throws {
         let multiProvider = MultiProvider(providers: providers)
-        try await ProviderCompatTest(provider: MultiProviderTestShims(multiProvider: multiProvider)).run()
+        try await ProviderCompatTest(provider: MultiProviderTestShims(multiProvider: multiProvider)).runTest()
     }
 
     @available(Configuration 1.0, *)

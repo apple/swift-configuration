@@ -94,8 +94,8 @@ internal final class ReloadingFileProviderCore<SnapshotType: ConfigSnapshotProto
     ///   - pollInterval: The interval between timestamp checks.
     ///   - providerName: The human-readable name of the provider.
     ///   - fileSystem: The file system to use.
-    ///   - logger: The logger instance, or nil to create a default one.
-    ///   - metrics: The metrics factory, or nil to use a no-op implementation.
+    ///   - logger: The logger instance.
+    ///   - metrics: The metrics factory.
     ///   - createSnapshot: A closure that creates a snapshot from file data.
     /// - Throws: If the initial file load or snapshot creation fails.
     internal init(
@@ -103,8 +103,8 @@ internal final class ReloadingFileProviderCore<SnapshotType: ConfigSnapshotProto
         pollInterval: Duration,
         providerName: String,
         fileSystem: any CommonProviderFileSystem,
-        logger: Logger?,
-        metrics: (any MetricsFactory)?,
+        logger: Logger,
+        metrics: any MetricsFactory,
         createSnapshot: @Sendable @escaping (Data) async throws -> SnapshotType
     ) async throws {
         self.filePath = filePath
@@ -114,7 +114,7 @@ internal final class ReloadingFileProviderCore<SnapshotType: ConfigSnapshotProto
         self.createSnapshot = createSnapshot
 
         // Set up the logger with metadata
-        var logger = logger ?? Logger(label: providerName)
+        var logger = logger
         logger[metadataKey: "\(providerName).filePath"] = .string(filePath.lastComponent?.string ?? "<nil>")
         logger[metadataKey: "\(providerName).pollInterval.seconds"] = .string(
             pollInterval.components.seconds.description
@@ -123,7 +123,7 @@ internal final class ReloadingFileProviderCore<SnapshotType: ConfigSnapshotProto
 
         // Set up metrics
         self.metrics = ReloadingFileProviderMetrics(
-            factory: metrics ?? NOOPMetricsHandler.instance,
+            factory: metrics,
             providerName: providerName
         )
 

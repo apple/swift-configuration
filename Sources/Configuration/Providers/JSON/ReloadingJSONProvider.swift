@@ -95,8 +95,8 @@ public final class ReloadingJSONProvider: Sendable {
         pollInterval: Duration = .seconds(15),
         bytesDecoder: some ConfigBytesFromStringDecoder = .base64,
         secretsSpecifier: SecretsSpecifier<String, any Sendable> = .none,
-        logger: Logger? = nil,
-        metrics: (any MetricsFactory)? = nil
+        logger: Logger = Logger(label: "ReloadingJSONProvider"),
+        metrics: any MetricsFactory = MetricsSystem.factory
     ) async throws {
         try await self.init(
             filePath: filePath,
@@ -116,8 +116,8 @@ public final class ReloadingJSONProvider: Sendable {
     ///   - bytesDecoder: A decoder of bytes from a string.
     ///   - secretsSpecifier: A secrets specifier in case some of the values should be treated as secret.
     ///   - fileSystem: The underlying file system.
-    ///   - logger: The logger instance to use, or nil to create a default one.
-    ///   - metrics: The metrics factory to use, or nil to use a no-op implementation.
+    ///   - logger: The logger instance to use.
+    ///   - metrics: The metrics factory to use.
     /// - Throws: If the file cannot be read or parsed, or if the JSON structure is invalid.
     internal init(
         filePath: FilePath,
@@ -125,8 +125,8 @@ public final class ReloadingJSONProvider: Sendable {
         bytesDecoder: some ConfigBytesFromStringDecoder,
         secretsSpecifier: SecretsSpecifier<String, any Sendable>,
         fileSystem: some CommonProviderFileSystem,
-        logger: Logger?,
-        metrics: (any MetricsFactory)?
+        logger: Logger,
+        metrics: any MetricsFactory
     ) async throws {
         self.core = try await ReloadingFileProviderCore(
             filePath: filePath,
@@ -189,8 +189,8 @@ public final class ReloadingJSONProvider: Sendable {
         config: ConfigReader,
         bytesDecoder: some ConfigBytesFromStringDecoder = .base64,
         secretsSpecifier: SecretsSpecifier<String, any Sendable> = .none,
-        logger: Logger? = nil,
-        metrics: (any MetricsFactory)? = nil
+        logger: Logger = Logger(label: "ReloadingJSONProvider"),
+        metrics: any MetricsFactory = MetricsSystem.factory
     ) async throws {
         try await self.init(
             filePath: config.requiredString(forKey: "filePath", as: FilePath.self),
