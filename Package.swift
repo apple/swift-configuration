@@ -61,6 +61,7 @@ let enableAllTraitsExplicit = ProcessInfo.processInfo.environment["ENABLE_ALL_TR
 
 let enableAllTraits = spiGenerateDocs || previewDocs || enableAllTraitsExplicit
 let addDoccPlugin = previewDocs || spiGenerateDocs
+let enableCIFlags = enableAllTraitsExplicit
 
 traits.insert(
     .default(
@@ -179,7 +180,13 @@ for target in package.targets {
     // https://github.com/swiftlang/swift-evolution/blob/main/proposals/0409-access-level-on-imports.md
     settings.append(.enableUpcomingFeature("InternalImportsByDefault"))
 
+    // Availability macro
     settings.append(.enableExperimentalFeature("AvailabilityMacro=Configuration 1.0:macOS 15.0, iOS 18.0, watchOS 11.0, tvOS 18.0, visionOS 2.0"))
+
+    if enableCIFlags {
+        // Ensure all public types are explicitly annotated as Sendable or not Sendable.
+        settings.append(.unsafeFlags(["-Xfrontend", "-require-explicit-sendable"]))
+    }
 
     target.swiftSettings = settings
 }
