@@ -154,7 +154,7 @@ These providers can be combined to form a hierarchy, for details check out <doc:
 Add the dependency to your `Package.swift`:
 
 ```swift
-.package(url: "https://github.com/apple/swift-configuration", .upToNextMinor(from: "0.1.0"))
+.package(url: "https://github.com/apple/swift-configuration", .upToNextMinor(from: "0.2.0"))
 ```
 
 Add the library dependency to your target:

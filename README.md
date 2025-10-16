@@ -61,7 +61,7 @@ If both sources are unavailable, the fallback default of `60` is returned.
 Add the dependency to your `Package.swift`:
 
 ```swift
-.package(url: "https://github.com/apple/swift-configuration", .upToNextMinor(from: "0.1.0"))
+.package(url: "https://github.com/apple/swift-configuration", .upToNextMinor(from: "0.2.0"))
 ```
 
 Add the library dependency to your target:
@@ -94,7 +94,7 @@ To enable an additional trait on the package, update the package dependency:
 ```diff
 .package(
     url: "https://github.com/apple/swift-configuration",
-    .upToNextMinor(from: "0.1.0"),
+    .upToNextMinor(from: "0.2.0"),
 +   traits: [.defaults, "OtherFeatureSupport"]
 )
 ```
