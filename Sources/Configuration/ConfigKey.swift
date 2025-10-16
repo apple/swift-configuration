@@ -182,12 +182,22 @@ extension AbsoluteConfigKey {
     /// Returns a new absolute configuration key by prepending the given relative key.
     /// - Parameter prefix: The relative configuration key to prepend to this key.
     /// - Returns: A new absolute configuration key with the prefix prepended.
-    internal func prepending(_ prefix: ConfigKey) -> AbsoluteConfigKey {
+    public func prepending(_ prefix: ConfigKey) -> AbsoluteConfigKey {
         var prefixedComponents = prefix.components
         prefixedComponents.append(contentsOf: self.components)
         var mergedContext = prefix.context
         mergedContext.merge(self.context) { $1 }
         return AbsoluteConfigKey(prefixedComponents, context: mergedContext)
+    }
+
+    /// Returns a new absolute configuration key by appending the given relative key.
+    /// - Parameter relative: The relative configuration key to append to this key.
+    /// - Returns: A new absolute configuration key with the relative key appended.
+    public func appending(_ relative: ConfigKey) -> AbsoluteConfigKey {
+        var appended = self
+        appended.components.append(contentsOf: relative.components)
+        appended.context.merge(relative.context) { $1 }
+        return appended
     }
 }
 
