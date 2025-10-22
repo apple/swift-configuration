@@ -22,33 +22,40 @@ import SystemPackage
 private let resourcesPath = FilePath(try! #require(Bundle.module.path(forResource: "Resources", ofType: nil)))
 let jsonConfigFile = resourcesPath.appending("/config.json")
 
-struct JSONProviderTests {
+struct JSONFileProviderTests {
 
     @available(Configuration 1.0, *)
-    var provider: JSONProvider {
-        get async throws {
-            try await JSONProvider(filePath: jsonConfigFile)
+    var provider: JSONSnapshot {
+        get throws {
+            try JSONSnapshot(
+                data: Data(contentsOf: URL(filePath: jsonConfigFile.string)),
+                providerName: "TestProvider",
+                parsingOptions: .default
+            )
         }
     }
 
     @available(Configuration 1.0, *)
     @Test func printingDescription() async throws {
         let expectedDescription = #"""
-            JSONProvider[20 values]
+            TestProvider[20 values]
             """#
-        try await #expect(provider.description == expectedDescription)
+        try #expect(provider.description == expectedDescription)
     }
 
     @available(Configuration 1.0, *)
     @Test func printingDebugDescription() async throws {
         let expectedDebugDescription = #"""
-            JSONProvider[20 values: bool=1, booly.array=1,0, byteChunky.array=bWFnaWM=,bWFnaWMy, bytes=bWFnaWM=, double=3.14, doubly.array=3.14,2.72, int=42, inty.array=42,24, other.bool=0, other.booly.array=0,1,1, other.byteChunky.array=bWFnaWM=,bWFnaWMy,bWFnaWM=, other.bytes=bWFnaWMy, other.double=2.72, other.doubly.array=0.9,1.8, other.int=24, other.inty.array=16,32, other.string=Other Hello, other.stringy.array=Hello,Swift, string=Hello, stringy.array=Hello,World]
+            TestProvider[20 values: bool=1, booly.array=1,0, byteChunky.array=bWFnaWM=,bWFnaWMy, bytes=bWFnaWM=, double=3.14, doubly.array=3.14,2.72, int=42, inty.array=42,24, other.bool=0, other.booly.array=0,1,1, other.byteChunky.array=bWFnaWM=,bWFnaWMy,bWFnaWM=, other.bytes=bWFnaWMy, other.double=2.72, other.doubly.array=0.9,1.8, other.int=24, other.inty.array=16,32, other.string=Other Hello, other.stringy.array=Hello,Swift, string=Hello, stringy.array=Hello,World]
             """#
-        try await #expect(provider.debugDescription == expectedDebugDescription)
+        try #expect(provider.debugDescription == expectedDebugDescription)
     }
 
     @available(Configuration 1.0, *)
     @Test func compat() async throws {
-        try await ProviderCompatTest(provider: provider).runTest()
+        try await ProviderCompatTest(
+            provider: FileProvider<JSONSnapshot>(filePath: jsonConfigFile)
+        )
+        .runTest()
     }
 }

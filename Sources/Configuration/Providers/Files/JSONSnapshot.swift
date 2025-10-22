@@ -17,14 +17,49 @@
 import SystemPackage
 
 // Needs full Foundation for JSONSerialization.
-import Foundation
+public import Foundation
 
 /// A snapshot of configuration values parsed from JSON data.
 ///
 /// This structure represents a point-in-time view of configuration values. It handles
 /// the conversion from JSON types to configuration value types.
+///
+/// Commonly used with ``FileProvider`` and ``ReloadingFileProvider``.
 @available(Configuration 1.0, *)
-internal struct JSONProviderSnapshot {
+public struct JSONSnapshot {
+
+    /// Parsing options for JSON snapshot creation.
+    ///
+    /// This struct provides configuration options for parsing JSON data into configuration snapshots,
+    /// including byte decoding and secrets specification.
+    public struct ParsingOptions: FileParsingOptionsProtocol {
+        /// A decoder of bytes from a string.
+        public var bytesDecoder: any ConfigBytesFromStringDecoder
+
+        /// A specifier for determining which configuration values should be treated as secrets.
+        public var secretsSpecifier: SecretsSpecifier<String, any Sendable>
+
+        /// Creates parsing options for JSON snapshots.
+        ///
+        /// - Parameters:
+        ///   - bytesDecoder: The decoder to use for converting string values to byte arrays.
+        ///   - secretsSpecifier: The specifier for identifying secret values.
+        public init(
+            bytesDecoder: some ConfigBytesFromStringDecoder = .base64,
+            secretsSpecifier: SecretsSpecifier<String, any Sendable> = .none
+        ) {
+            self.bytesDecoder = bytesDecoder
+            self.secretsSpecifier = secretsSpecifier
+        }
+
+        /// The default parsing options.
+        ///
+        /// Uses base64 byte decoding and treats no values as secrets.
+        public static var `default`: Self {
+            .init()
+        }
+    }
+
     /// The key encoder for JSON.
     static let keyEncoder: SeparatorKeyEncoder = .dotSeparated
 
@@ -109,7 +144,7 @@ internal struct JSONProviderSnapshot {
     internal enum JSONConfigError: Error, CustomStringConvertible {
 
         /// The top level JSON value was not an object.
-        case topLevelJSONValueIsNotObject(FilePath)
+        case topLevelJSONValueIsNotObject
 
         /// The primitive type returned by JSONSerialization is not supported.
         case unsupportedPrimitiveValue([String], String)
@@ -119,8 +154,8 @@ internal struct JSONProviderSnapshot {
 
         var description: String {
             switch self {
-            case .topLevelJSONValueIsNotObject(let path):
-                return "The top-level value of the JSON file must be an object. File: \(path)"
+            case .topLevelJSONValueIsNotObject:
+                return "The top-level value of the JSON file must be an object."
             case .unsupportedPrimitiveValue(let keyPath, let typeName):
                 return "Unsupported primitive value type: \(typeName) at \(keyPath.joined(separator: "."))"
             case .unexpectedValueInArray(let keyPath, let typeName):
@@ -129,59 +164,14 @@ internal struct JSONProviderSnapshot {
         }
     }
 
-    /// A decoder of bytes from a string.
-    var bytesDecoder: any ConfigBytesFromStringDecoder
-
     /// The underlying config values.
     var values: [String: ValueWrapper]
 
-    /// Creates a snapshot with pre-parsed values.
-    ///
-    /// - Parameters:
-    ///   - values: The configuration values.
-    ///   - bytesDecoder: The decoder for converting string values to bytes.
-    init(
-        values: [String: ValueWrapper],
-        bytesDecoder: some ConfigBytesFromStringDecoder,
-    ) {
-        self.values = values
-        self.bytesDecoder = bytesDecoder
-    }
+    /// The name of the provider that created this snapshot.
+    public let providerName: String
 
-    /// Creates a snapshot by parsing JSON data from a file.
-    ///
-    /// This initializer reads JSON data from the specified file, parses it using
-    /// `JSONSerialization`, and converts the parsed values into the internal
-    /// configuration format. The top-level JSON value must be an object.
-    ///
-    /// - Parameters:
-    ///   - filePath: The path of the JSON file to read.
-    ///   - fileSystem: The file system interface for reading the file.
-    ///   - bytesDecoder: The decoder for converting string values to bytes.
-    ///   - secretsSpecifier: The specifier for identifying secret values.
-    /// - Throws: An error if the JSON root is not an object, or any error from
-    ///   file reading or JSON parsing.
-    init(
-        filePath: FilePath,
-        fileSystem: some CommonProviderFileSystem,
-        bytesDecoder: some ConfigBytesFromStringDecoder,
-        secretsSpecifier: SecretsSpecifier<String, any Sendable>
-    ) async throws {
-        let fileContents = try await fileSystem.fileContents(atPath: filePath)
-        guard let parsedDictionary = try JSONSerialization.jsonObject(with: fileContents) as? [String: any Sendable]
-        else {
-            throw JSONProviderSnapshot.JSONConfigError.topLevelJSONValueIsNotObject(filePath)
-        }
-        let values = try parseValues(
-            parsedDictionary,
-            keyEncoder: Self.keyEncoder,
-            secretsSpecifier: secretsSpecifier
-        )
-        self.init(
-            values: values,
-            bytesDecoder: bytesDecoder,
-        )
-    }
+    /// A decoder of bytes from a string.
+    var bytesDecoder: any ConfigBytesFromStringDecoder
 
     /// Parses config content from the provided JSON value.
     /// - Parameters:
@@ -302,13 +292,30 @@ internal struct JSONProviderSnapshot {
 }
 
 @available(Configuration 1.0, *)
-extension JSONProviderSnapshot: ConfigSnapshotProtocol {
-    var providerName: String {
-        "JSONProvider"
-    }
-
+extension JSONSnapshot: FileConfigSnapshotProtocol {
     // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
-    func value(forKey key: AbsoluteConfigKey, type: ConfigType) throws -> LookupResult {
+    public init(data: Data, providerName: String, parsingOptions: ParsingOptions) throws {
+        guard let parsedDictionary = try JSONSerialization.jsonObject(with: data) as? [String: any Sendable]
+        else {
+            throw JSONSnapshot.JSONConfigError.topLevelJSONValueIsNotObject
+        }
+        let values = try parseValues(
+            parsedDictionary,
+            keyEncoder: Self.keyEncoder,
+            secretsSpecifier: parsingOptions.secretsSpecifier
+        )
+        self.init(
+            values: values,
+            providerName: providerName,
+            bytesDecoder: parsingOptions.bytesDecoder
+        )
+    }
+}
+
+@available(Configuration 1.0, *)
+extension JSONSnapshot: ConfigSnapshotProtocol {
+    // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
+    public func value(forKey key: AbsoluteConfigKey, type: ConfigType) throws -> LookupResult {
         let encodedKey = Self.keyEncoder.encode(key)
         return try withConfigValueLookup(encodedKey: encodedKey) {
             guard let value = values[encodedKey] else {
@@ -316,6 +323,27 @@ extension JSONProviderSnapshot: ConfigSnapshotProtocol {
             }
             return try parseValue(value, key: key, type: type)
         }
+    }
+}
+
+@available(Configuration 1.0, *)
+extension JSONSnapshot: CustomStringConvertible {
+    // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
+    public var description: String {
+        "\(providerName)[\(values.count) values]"
+    }
+}
+
+@available(Configuration 1.0, *)
+extension JSONSnapshot: CustomDebugStringConvertible {
+    // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
+    public var debugDescription: String {
+        let prettyValues =
+            values
+            .sorted { $0.key < $1.key }
+            .map { "\($0.key)=\($0.value)" }
+            .joined(separator: ", ")
+        return "\(providerName)[\(values.count) values: \(prettyValues)]"
     }
 }
 
@@ -331,15 +359,15 @@ internal func parseValues(
     _ parsedDictionary: [String: any Sendable],
     keyEncoder: some ConfigKeyEncoder,
     secretsSpecifier: SecretsSpecifier<String, any Sendable>
-) throws -> [String: JSONProviderSnapshot.ValueWrapper] {
-    var values: [String: JSONProviderSnapshot.ValueWrapper] = [:]
+) throws -> [String: JSONSnapshot.ValueWrapper] {
+    var values: [String: JSONSnapshot.ValueWrapper] = [:]
     var valuesToIterate: [([String], any Sendable)] = parsedDictionary.map { ([$0], $1) }
     while !valuesToIterate.isEmpty {
         let (keyComponents, value) = valuesToIterate.removeFirst()
         if let dictionary = value as? [String: any Sendable] {
             valuesToIterate.append(contentsOf: dictionary.map { (keyComponents + [$0], $1) })
         } else {
-            let primitiveValue: JSONProviderSnapshot.JSONValue?
+            let primitiveValue: JSONSnapshot.JSONValue?
             if let array = value as? [any Sendable] {
                 if array.isEmpty {
                     primitiveValue = .emptyArray
@@ -350,7 +378,7 @@ internal func parseValues(
                             try array.enumerated()
                                 .map { index, value in
                                     guard let string = value as? String else {
-                                        throw JSONProviderSnapshot.JSONConfigError.unexpectedValueInArray(
+                                        throw JSONSnapshot.JSONConfigError.unexpectedValueInArray(
                                             keyComponents + ["\(index)"],
                                             "\(type(of: value))"
                                         )
@@ -369,7 +397,7 @@ internal func parseValues(
                                     } else if let bool = value as? Bool {
                                         return .bool(bool)
                                     } else {
-                                        throw JSONProviderSnapshot.JSONConfigError.unexpectedValueInArray(
+                                        throw JSONSnapshot.JSONConfigError.unexpectedValueInArray(
                                             keyComponents + ["\(index)"],
                                             "\(type(of: value))"
                                         )
@@ -377,7 +405,7 @@ internal func parseValues(
                                 }
                         )
                     } else {
-                        throw JSONProviderSnapshot.JSONConfigError.unsupportedPrimitiveValue(
+                        throw JSONSnapshot.JSONConfigError.unsupportedPrimitiveValue(
                             keyComponents + ["0"],
                             "\(type(of: firstValue))"
                         )
@@ -395,7 +423,7 @@ internal func parseValues(
                 } else if value is NSNull {
                     primitiveValue = nil
                 } else {
-                    throw JSONProviderSnapshot.JSONConfigError.unsupportedPrimitiveValue(
+                    throw JSONSnapshot.JSONConfigError.unsupportedPrimitiveValue(
                         keyComponents,
                         "\(type(of: value))"
                     )

@@ -29,7 +29,7 @@ var traits: Set<Trait> = [
     .trait(
         name: "ReloadingSupport",
         description:
-            "Adds support for reloading built-in provider variants, such as ReloadingJSONProvider and ReloadingYAMLProvider (when their respective traits are enabled).",
+            "Adds support for reloading built-in provider variants, such as ReloadingFileProvider.",
         enabledTraits: [
             "LoggingSupport"
         ]

@@ -69,7 +69,7 @@ internal struct ReloadingFileProviderMetrics {
     ///
     /// - Parameters:
     ///   - factory: The metrics factory to use for creating metric instances.
-    ///   - providerName: The name of the provider. For example: "ReloadingJSONProvider".
+    ///   - providerName: The name of the provider. For example: "ReloadingFileProvider".
     init(factory: any MetricsFactory, providerName: String) {
         let prefix = providerName.lowercased()
         self.pollTickCounter = Counter(label: "\(prefix)_poll_ticks_total", factory: factory)

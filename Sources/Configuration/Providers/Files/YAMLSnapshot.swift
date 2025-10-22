@@ -15,9 +15,9 @@
 #if YAMLSupport
 
 #if canImport(FoundationEssentials)
-import FoundationEssentials
+public import FoundationEssentials
 #else
-import Foundation
+public import Foundation
 #endif
 import Yams
 import Synchronization
@@ -27,8 +27,43 @@ import SystemPackage
 ///
 /// This class represents a point-in-time view of configuration values. It handles
 /// the conversion from YAML types to configuration value types.
+///
+/// Commonly used with ``FileProvider`` and ``ReloadingFileProvider``.
 @available(Configuration 1.0, *)
-final class YAMLProviderSnapshot: Sendable {
+public final class YAMLSnapshot: Sendable {
+
+    /// Custom input configuration for YAML snapshot creation.
+    ///
+    /// This struct provides configuration options for parsing YAML data into configuration snapshots,
+    /// including byte decoding and secrets specification.
+    public struct ParsingOptions: FileParsingOptionsProtocol {
+        /// A decoder of bytes from a string.
+        public var bytesDecoder: any ConfigBytesFromStringDecoder
+
+        /// A specifier for determining which configuration values should be treated as secrets.
+        public var secretsSpecifier: SecretsSpecifier<String, Void>
+
+        /// Creates custom input configuration for YAML snapshots.
+        ///
+        /// - Parameters:
+        ///   - bytesDecoder: The decoder to use for converting string values to byte arrays.
+        ///   - secretsSpecifier: The specifier for identifying secret values.
+        public init(
+            bytesDecoder: some ConfigBytesFromStringDecoder = .base64,
+            secretsSpecifier: SecretsSpecifier<String, Void> = .none
+        ) {
+            self.bytesDecoder = bytesDecoder
+            self.secretsSpecifier = secretsSpecifier
+        }
+
+        /// The default custom input configuration.
+        ///
+        /// Uses base64 byte decoding and treats no values as secrets.
+        public static var `default`: Self {
+            .init()
+        }
+    }
+
     /// The key encoder for YAML.
     private static let keyEncoder: SeparatorKeyEncoder = .dotSeparated
 
@@ -72,7 +107,7 @@ final class YAMLProviderSnapshot: Sendable {
     internal enum YAMLConfigError: Error, CustomStringConvertible {
 
         /// The top level YAML value was not a mapping.
-        case topLevelYAMLValueIsNotMapping(FilePath)
+        case topLevelYAMLValueIsNotMapping
 
         /// A YAML key is not convertible to string.
         case keyNotConvertibleToString([String])
@@ -88,8 +123,8 @@ final class YAMLProviderSnapshot: Sendable {
 
         var description: String {
             switch self {
-            case .topLevelYAMLValueIsNotMapping(let path):
-                return "Top level YAML value is not a mapping. File: \(path)"
+            case .topLevelYAMLValueIsNotMapping:
+                return "Top level YAML value is not a mapping."
             case .keyNotConvertibleToString(let keyPath):
                 return "YAML key is not convertible to string: \(keyPath.joined(separator: "."))"
             case .unsupportedPrimitiveValue(let keyPath):
@@ -102,6 +137,9 @@ final class YAMLProviderSnapshot: Sendable {
         }
     }
 
+    /// The name of the provider that created this snapshot.
+    public let providerName: String
+
     /// A decoder of bytes from a string.
     let bytesDecoder: any ConfigBytesFromStringDecoder
 
@@ -110,48 +148,14 @@ final class YAMLProviderSnapshot: Sendable {
     /// Using a Mutex since the Yams types aren't Sendable.
     let values: Mutex<[String: ValueWrapper]>
 
-    /// Creates a snapshot with pre-parsed values.
-    ///
-    /// - Parameters:
-    ///   - bytesDecoder: The decoder for converting string values to bytes.
-    ///   - values: The configuration values.
-    init(bytesDecoder: some ConfigBytesFromStringDecoder, values: sending [String: ValueWrapper]) {
-        self.bytesDecoder = bytesDecoder
+    init(
+        values: sending [String: ValueWrapper],
+        providerName: String,
+        bytesDecoder: any ConfigBytesFromStringDecoder
+    ) {
         self.values = .init(values)
-    }
-
-    /// Creates a snapshot by parsing YAML data from a file.
-    ///
-    /// This initializer reads YAML data from the specified file, parses it using
-    /// the Yams library, and converts the parsed values into the internal
-    /// configuration format. The top-level YAML value must be a mapping.
-    ///
-    /// - Parameters:
-    ///   - filePath: The path of the YAML file to read.
-    ///   - fileSystem: The file system interface for reading the file.
-    ///   - bytesDecoder: The decoder for converting string values to bytes.
-    ///   - secretsSpecifier: The specifier for identifying secret values.
-    /// - Throws: An error if the YAML root is not a mapping, or any error from
-    ///   file reading or YAML parsing.
-    convenience init(
-        filePath: FilePath,
-        fileSystem: some CommonProviderFileSystem,
-        bytesDecoder: some ConfigBytesFromStringDecoder,
-        secretsSpecifier: SecretsSpecifier<String, Void>
-    ) async throws {
-        let fileContents = try await fileSystem.fileContents(atPath: filePath)
-        guard let mapping = try Yams.Parser(yaml: fileContents).singleRoot()?.mapping else {
-            throw YAMLProviderSnapshot.YAMLConfigError.topLevelYAMLValueIsNotMapping(filePath)
-        }
-        let values = try parseValues(
-            mapping,
-            keyEncoder: Self.keyEncoder,
-            secretsSpecifier: secretsSpecifier
-        )
-        self.init(
-            bytesDecoder: bytesDecoder,
-            values: values
-        )
+        self.providerName = providerName
+        self.bytesDecoder = bytesDecoder
     }
 
     /// Parses config content from the provided YAML value.
@@ -240,13 +244,29 @@ final class YAMLProviderSnapshot: Sendable {
 }
 
 @available(Configuration 1.0, *)
-extension YAMLProviderSnapshot: ConfigSnapshotProtocol {
-    var providerName: String {
-        "YAMLProvider"
-    }
-
+extension YAMLSnapshot: FileConfigSnapshotProtocol {
     // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
-    func value(forKey key: AbsoluteConfigKey, type: ConfigType) throws -> LookupResult {
+    public convenience init(data: Data, providerName: String, parsingOptions: ParsingOptions) throws {
+        guard let mapping = try Yams.Parser(yaml: data).singleRoot()?.mapping else {
+            throw YAMLConfigError.topLevelYAMLValueIsNotMapping
+        }
+        let values = try parseValues(
+            mapping,
+            keyEncoder: Self.keyEncoder,
+            secretsSpecifier: parsingOptions.secretsSpecifier
+        )
+        self.init(
+            values: values,
+            providerName: providerName,
+            bytesDecoder: parsingOptions.bytesDecoder
+        )
+    }
+}
+
+@available(Configuration 1.0, *)
+extension YAMLSnapshot: ConfigSnapshotProtocol {
+    // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
+    public func value(forKey key: AbsoluteConfigKey, type: ConfigType) throws -> LookupResult {
         let encodedKey = Self.keyEncoder.encode(key)
         return try withConfigValueLookup(encodedKey: encodedKey) {
             try values.withLock { (values) -> ConfigValue? in
@@ -263,6 +283,31 @@ extension YAMLProviderSnapshot: ConfigSnapshotProtocol {
     }
 }
 
+@available(Configuration 1.0, *)
+extension YAMLSnapshot: CustomStringConvertible {
+    // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
+    public var description: String {
+        values.withLock { values in
+            "\(providerName)[\(values.count) values]"
+        }
+    }
+}
+
+@available(Configuration 1.0, *)
+extension YAMLSnapshot: CustomDebugStringConvertible {
+    // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
+    public var debugDescription: String {
+        values.withLock { values in
+            let prettyValues =
+                values
+                .sorted { $0.key < $1.key }
+                .map { "\($0.key)=\($0.value)" }
+                .joined(separator: ", ")
+            return "\(providerName)[\(values.count) values: \(prettyValues)]"
+        }
+    }
+}
+
 /// Parses the root emitted by Yams.
 /// - Parameters:
 ///   - parsedDictionary: The parsed YAML mapping from Yams.
@@ -275,24 +320,24 @@ internal func parseValues(
     _ parsedDictionary: Yams.Node.Mapping,
     keyEncoder: some ConfigKeyEncoder,
     secretsSpecifier: SecretsSpecifier<String, Void>
-) throws -> [String: YAMLProviderSnapshot.ValueWrapper] {
-    var values: [String: YAMLProviderSnapshot.ValueWrapper] = [:]
+) throws -> [String: YAMLSnapshot.ValueWrapper] {
+    var values: [String: YAMLSnapshot.ValueWrapper] = [:]
     var valuesToIterate: [([String], Yams.Node, Yams.Node)] = parsedDictionary.map { ([], $0, $1) }
     while !valuesToIterate.isEmpty {
         let (prefix, nodeKey, value) = valuesToIterate.removeFirst()
         guard let stringKey = nodeKey.string else {
-            throw YAMLProviderSnapshot.YAMLConfigError.keyNotConvertibleToString(prefix)
+            throw YAMLSnapshot.YAMLConfigError.keyNotConvertibleToString(prefix)
         }
         let keyComponents = prefix + [stringKey]
         if let mapping = value.mapping {
             valuesToIterate.append(contentsOf: mapping.map { (keyComponents, $0, $1) })
         } else {
-            let yamlValue: YAMLProviderSnapshot.YAMLValue
+            let yamlValue: YAMLSnapshot.YAMLValue
             if let sequence = value.sequence {
                 let scalarArray = try sequence.enumerated()
                     .map { index, value in
                         guard let scalar = value.scalar else {
-                            throw YAMLProviderSnapshot.YAMLConfigError.nonScalarValueInArray(keyComponents, index)
+                            throw YAMLSnapshot.YAMLConfigError.nonScalarValueInArray(keyComponents, index)
                         }
                         return scalar
                     }
@@ -300,7 +345,7 @@ internal func parseValues(
             } else if let scalar = value.scalar {
                 yamlValue = .scalar(scalar)
             } else {
-                throw YAMLProviderSnapshot.YAMLConfigError.unsupportedPrimitiveValue(keyComponents)
+                throw YAMLSnapshot.YAMLConfigError.unsupportedPrimitiveValue(keyComponents)
             }
             let encodedKey = keyEncoder.encode(AbsoluteConfigKey(keyComponents))
             let isSecret = secretsSpecifier.isSecret(key: encodedKey, value: ())

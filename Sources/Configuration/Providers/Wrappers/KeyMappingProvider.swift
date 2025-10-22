@@ -34,7 +34,7 @@
 /// ```swift
 /// // Create providers
 /// let envProvider = EnvironmentVariablesProvider()
-/// let jsonProvider = try await JSONProvider(filePath: "/etc/config.json")
+/// let jsonProvider = try await FileProvider<JSONSnapshot>(filePath: "/etc/config.json")
 ///
 /// // Only remap the environment variables, not the JSON config
 /// let keyMappedEnvProvider = KeyMappingProvider(upstream: envProvider) { key in

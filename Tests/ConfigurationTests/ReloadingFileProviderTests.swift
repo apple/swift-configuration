@@ -26,21 +26,29 @@ import Synchronization
 import SystemPackage
 
 @available(Configuration 1.0, *)
-private struct TestSnapshot: ConfigSnapshotProtocol {
+private struct TestSnapshot: FileConfigSnapshotProtocol {
+
+    struct Input: FileParsingOptionsProtocol {
+        static var `default`: TestSnapshot.Input {
+            .init()
+        }
+    }
+
     var values: [String: ConfigValue]
 
-    var providerName: String { "TestProvider" }
+    var providerName: String
 
     func value(forKey key: AbsoluteConfigKey, type: ConfigType) throws -> LookupResult {
         let encodedKey = SeparatorKeyEncoder.dotSeparated.encode(key)
         return LookupResult(encodedKey: encodedKey, value: values[encodedKey])
     }
 
-    init(values: [String: ConfigValue]) {
+    init(values: [String: ConfigValue], providerName: String) {
         self.values = values
+        self.providerName = providerName
     }
 
-    init(contents: String) throws {
+    init(contents: String, providerName: String) throws {
         var values: [String: ConfigValue] = [:]
 
         // Simple key=value parser for testing
@@ -52,7 +60,19 @@ private struct TestSnapshot: ConfigSnapshotProtocol {
                 values[key] = .init(.string(value), isSecret: false)
             }
         }
-        self.init(values: values)
+        self.init(values: values, providerName: providerName)
+    }
+
+    init(data: Data, providerName: String, parsingOptions: Input) throws {
+        try self.init(contents: String(decoding: data, as: UTF8.self), providerName: providerName)
+    }
+
+    var description: String {
+        "TestSnapshot"
+    }
+
+    var debugDescription: String {
+        description
     }
 }
 
@@ -73,7 +93,7 @@ extension InMemoryFileSystem.FileInfo {
 @available(Configuration 1.0, *)
 private func withTestProvider<R>(
     body: (
-        ReloadingFileProviderCore<TestSnapshot>,
+        ReloadingFileProvider<TestSnapshot>,
         InMemoryFileSystem,
         FilePath,
         Date
@@ -92,26 +112,23 @@ private func withTestProvider<R>(
             )
         ]
     )
-    let core = try await ReloadingFileProviderCore<TestSnapshot>(
+    let provider = try await ReloadingFileProvider<TestSnapshot>(
+        parsingOptions: .default,
         filePath: filePath,
         pollInterval: .seconds(1),
-        providerName: "TestProvider",
         fileSystem: fileSystem,
         logger: .noop,
-        metrics: NOOPMetricsHandler.instance,
-        createSnapshot: { data in
-            try TestSnapshot(contents: String(decoding: data, as: UTF8.self))
-        }
+        metrics: NOOPMetricsHandler.instance
     )
-    return try await body(core, fileSystem, filePath, originalTimestamp)
+    return try await body(provider, fileSystem, filePath, originalTimestamp)
 }
 
-struct CoreTests {
+struct ReloadingFileProviderTests {
     @available(Configuration 1.0, *)
     @Test func testBasicManualReload() async throws {
-        try await withTestProvider { core, fileSystem, filePath, originalTimestamp in
+        try await withTestProvider { provider, fileSystem, filePath, originalTimestamp in
             // Check initial values
-            let result1 = try core.value(forKey: ["key1"], type: .string)
+            let result1 = try provider.value(forKey: ["key1"], type: .string)
             #expect(try result1.value?.content.asString == "value1")
 
             // Update file content
@@ -127,10 +144,10 @@ struct CoreTests {
             )
 
             // Trigger reload
-            try await core.reloadIfNeeded(logger: .noop)
+            try await provider.reloadIfNeeded(logger: .noop)
 
             // Check updated value
-            let result2 = try core.value(forKey: ["key1"], type: .string)
+            let result2 = try provider.value(forKey: ["key1"], type: .string)
             #expect(try result2.value?.content.asString == "newValue1")
         }
     }
@@ -150,20 +167,17 @@ struct CoreTests {
                 )
             ]
         )
-        let core = try await ReloadingFileProviderCore<TestSnapshot>(
+        let provider = try await ReloadingFileProvider<TestSnapshot>(
+            parsingOptions: .default,
             filePath: filePath,
             pollInterval: .milliseconds(1),
-            providerName: "TestProvider",
             fileSystem: fileSystem,
             logger: .noop,
-            metrics: NOOPMetricsHandler.instance,
-            createSnapshot: { data in
-                try TestSnapshot(contents: String(decoding: data, as: UTF8.self))
-            }
+            metrics: NOOPMetricsHandler.instance
         )
 
         // Check initial values
-        let result1 = try core.value(forKey: ["key1"], type: .string)
+        let result1 = try provider.value(forKey: ["key1"], type: .string)
         #expect(try result1.value?.content.asString == "value1")
 
         // Update file content
@@ -181,10 +195,10 @@ struct CoreTests {
         // Run the service and actively poll until we see the change
         try await withThrowingTaskGroup { group in
             group.addTask {
-                try await core.run()
+                try await provider.run()
             }
             for _ in 1..<1000 {
-                let result2 = try core.value(forKey: ["key1"], type: .string)
+                let result2 = try provider.value(forKey: ["key1"], type: .string)
                 guard try result2.value?.content.asString == "newValue1" else {
                     try await Task.sleep(for: .milliseconds(1))
                     continue
@@ -199,7 +213,7 @@ struct CoreTests {
 
     @available(Configuration 1.0, *)
     @Test func testSymlink_targetPathChanged() async throws {
-        try await withTestProvider { core, fileSystem, filePath, originalTimestamp in
+        try await withTestProvider { provider, fileSystem, filePath, originalTimestamp in
             let targetPath1 = FilePath("/test/config1.txt")
             let targetPath2 = FilePath("/test/config2.txt")
 
@@ -230,10 +244,10 @@ struct CoreTests {
                 timestamp: originalTimestamp,
                 contents: .symlink(targetPath1)
             )
-            try await core.reloadIfNeeded(logger: .noop)
+            try await provider.reloadIfNeeded(logger: .noop)
 
             // Check initial value (from target1)
-            let result1 = try core.value(forKey: ["key"], type: .string)
+            let result1 = try provider.value(forKey: ["key"], type: .string)
             #expect(try result1.value?.content.asString == "target1")
 
             // Change symlink to point to second target (with same timestamp)
@@ -244,17 +258,17 @@ struct CoreTests {
             )
 
             // Trigger reload - should detect the change even though timestamp is the same
-            try await core.reloadIfNeeded(logger: .noop)
+            try await provider.reloadIfNeeded(logger: .noop)
 
             // Check updated value (from target2)
-            let result2 = try core.value(forKey: ["key"], type: .string)
+            let result2 = try provider.value(forKey: ["key"], type: .string)
             #expect(try result2.value?.content.asString == "target2")
         }
     }
 
     @available(Configuration 1.0, *)
     @Test func testSymlink_timestampChanged() async throws {
-        try await withTestProvider { core, fileSystem, filePath, originalTimestamp in
+        try await withTestProvider { provider, fileSystem, filePath, originalTimestamp in
             let targetPath = FilePath("/test/config1.txt")
 
             // Create two target files with the same timestamp
@@ -275,10 +289,10 @@ struct CoreTests {
                 timestamp: originalTimestamp,
                 contents: .symlink(targetPath)
             )
-            try await core.reloadIfNeeded(logger: .noop)
+            try await provider.reloadIfNeeded(logger: .noop)
 
             // Check initial value (from target1)
-            let result1 = try core.value(forKey: ["key"], type: .string)
+            let result1 = try provider.value(forKey: ["key"], type: .string)
             #expect(try result1.value?.content.asString == "target1")
 
             // Change symlink to point to second target (with same timestamp)
@@ -293,23 +307,23 @@ struct CoreTests {
             )
 
             // Trigger reload
-            try await core.reloadIfNeeded(logger: .noop)
+            try await provider.reloadIfNeeded(logger: .noop)
 
             // Check updated value (from target2)
-            let result2 = try core.value(forKey: ["key"], type: .string)
+            let result2 = try provider.value(forKey: ["key"], type: .string)
             #expect(try result2.value?.content.asString == "target2")
         }
     }
 
     @available(Configuration 1.0, *)
     @Test func testWatchValue() async throws {
-        try await withTestProvider { core, fileSystem, filePath, originalTimestamp in
+        try await withTestProvider { provider, fileSystem, filePath, originalTimestamp in
             let firstValueConsumed = TestFuture<Void>(name: "First value consumed")
             let updateReceived = TestFuture<String?>(name: "Update")
 
             try await withThrowingTaskGroup(of: Void.self) { group in
                 group.addTask {
-                    try await core.watchValue(forKey: ["key1"], type: .string) { updates in
+                    try await provider.watchValue(forKey: ["key1"], type: .string) { updates in
                         var iterator = updates.makeAsyncIterator()
 
                         // First value (initial)
@@ -338,7 +352,7 @@ struct CoreTests {
                 )
 
                 // Trigger reload
-                try await core.reloadIfNeeded(logger: .noop)
+                try await provider.reloadIfNeeded(logger: .noop)
 
                 // Wait for update
                 let receivedValue = await updateReceived.value

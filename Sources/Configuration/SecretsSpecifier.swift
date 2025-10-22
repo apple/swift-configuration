@@ -49,7 +49,7 @@
 /// Use this for complex logic that determines secrecy based on key patterns or values:
 ///
 /// ```swift
-/// let provider = JSONProvider(
+/// let provider = FileProvider<JSONSnapshot>(
 ///     filePath: "/etc/config.json",
 ///     secretsSpecifier: .dynamic { key, value in
 ///         // Mark keys containing "password",
