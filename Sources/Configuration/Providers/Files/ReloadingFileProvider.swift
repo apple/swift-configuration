@@ -75,7 +75,7 @@ import Synchronization
 /// ```
 ///
 /// This expects a `filePath` key in the configuration that specifies the path to the file.
-/// For a full list of read configuration keys, check out ``FileProvider/init(snapshotType:parsingOptions:config:)``.
+/// For a full list of configuration keys, check out ``FileProvider/init(snapshotType:parsingOptions:config:)``.
 ///
 /// ## File monitoring
 ///
