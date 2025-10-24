@@ -1,4 +1,4 @@
-// swift-tools-version: 6.1
+// swift-tools-version: 6.2
 
 import PackageDescription
 #if canImport(FoundationEssentials)
@@ -61,6 +61,7 @@ let enableAllTraitsExplicit = ProcessInfo.processInfo.environment["ENABLE_ALL_TR
 
 let enableAllTraits = spiGenerateDocs || previewDocs || enableAllTraitsExplicit
 let addDoccPlugin = previewDocs || spiGenerateDocs
+let enableAllCIFlags = enableAllTraitsExplicit
 
 traits.insert(
     .default(
@@ -77,6 +78,7 @@ let package = Package(
     traits: traits,
     dependencies: [
         .package(url: "https://github.com/apple/swift-system", from: "1.5.0"),
+        .package(url: "https://github.com/apple/swift-collections", from: "1.3.0"),
         .package(url: "https://github.com/swift-server/swift-service-lifecycle", from: "2.7.0"),
         .package(url: "https://github.com/apple/swift-log", from: "1.6.3"),
         .package(url: "https://github.com/apple/swift-metrics", from: "2.7.0"),
@@ -91,6 +93,10 @@ let package = Package(
                 .product(
                     name: "SystemPackage",
                     package: "swift-system"
+                ),
+                .product(
+                    name: "DequeModule",
+                    package: "swift-collections"
                 ),
                 .product(
                     name: "Logging",
@@ -179,7 +185,15 @@ for target in package.targets {
     // https://github.com/swiftlang/swift-evolution/blob/main/proposals/0409-access-level-on-imports.md
     settings.append(.enableUpcomingFeature("InternalImportsByDefault"))
 
+    // https://docs.swift.org/compiler/documentation/diagnostics/nonisolated-nonsending-by-default/
+    settings.append(.enableUpcomingFeature("NonisolatedNonsendingByDefault"))
+
     settings.append(.enableExperimentalFeature("AvailabilityMacro=Configuration 1.0:macOS 15.0, iOS 18.0, watchOS 11.0, tvOS 18.0, visionOS 2.0"))
+
+    if enableAllCIFlags {
+        // Ensure all public types are explicitly annotated as Sendable or not Sendable.
+        settings.append(.unsafeFlags(["-Xfrontend", "-require-explicit-sendable"]))
+    }
 
     target.swiftSettings = settings
 }
