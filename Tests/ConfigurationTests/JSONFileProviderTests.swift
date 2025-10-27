@@ -28,7 +28,7 @@ struct JSONFileProviderTests {
     var provider: JSONSnapshot {
         get throws {
             try JSONSnapshot(
-                data: Data(contentsOf: URL(filePath: jsonConfigFile.string)),
+                data: Data(contentsOf: URL(filePath: jsonConfigFile.string)).bytes,
                 providerName: "TestProvider",
                 parsingOptions: .default
             )

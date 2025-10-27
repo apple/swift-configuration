@@ -130,7 +130,7 @@ public struct FileProvider<SnapshotType: FileConfigSnapshotProtocol>: Sendable {
     ) async throws {
         let fileContents = try await fileSystem.fileContents(atPath: filePath)
         self._snapshot = try snapshotType.init(
-            data: fileContents,
+            data: fileContents.bytes,
             providerName: "FileProvider<\(SnapshotType.self)>",
             parsingOptions: parsingOptions
         )

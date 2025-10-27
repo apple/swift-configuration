@@ -63,8 +63,8 @@ private struct TestSnapshot: FileConfigSnapshotProtocol {
         self.init(values: values, providerName: providerName)
     }
 
-    init(data: Data, providerName: String, parsingOptions: Input) throws {
-        try self.init(contents: String(decoding: data, as: UTF8.self), providerName: providerName)
+    init(data: RawSpan, providerName: String, parsingOptions: Input) throws {
+        try self.init(contents: String(decoding: Data(data), as: UTF8.self), providerName: providerName)
     }
 
     var description: String {

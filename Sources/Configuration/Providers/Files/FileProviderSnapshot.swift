@@ -13,11 +13,6 @@
 //===----------------------------------------------------------------------===//
 
 import SystemPackage
-#if canImport(FoundationEssentials)
-public import FoundationEssentials
-#else
-public import Foundation
-#endif
 
 /// A type that provides parsing options for file configuration snapshots.
 ///
@@ -69,7 +64,7 @@ public protocol FileParsingOptionsProtocol: Sendable {
 ///     let values: [String: ConfigValue]
 ///     let providerName: String
 ///
-///     init(data: Data, providerName: String, parsingOptions: MyParsingOptions) throws {
+///     init(data: RawSpan, providerName: String, parsingOptions: MyParsingOptions) throws {
 ///         self.providerName = providerName
 ///         // Parse the data according to your format
 ///         self.values = try parseMyFormat(data, using: parsingOptions)
@@ -96,5 +91,5 @@ public protocol FileConfigSnapshotProtocol: ConfigSnapshotProtocol, CustomString
     ///   - providerName: The name of the provider creating this snapshot.
     ///   - parsingOptions: Parsing options that affect parsing behavior.
     /// - Throws: If the file data cannot be parsed or contains invalid configuration.
-    init(data: Data, providerName: String, parsingOptions: ParsingOptions) throws
+    init(data: RawSpan, providerName: String, parsingOptions: ParsingOptions) throws
 }

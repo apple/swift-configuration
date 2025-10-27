@@ -17,7 +17,7 @@
 import SystemPackage
 
 // Needs full Foundation for JSONSerialization.
-public import Foundation
+import Foundation
 
 /// A snapshot of configuration values parsed from JSON data.
 ///
@@ -294,8 +294,8 @@ public struct JSONSnapshot {
 @available(Configuration 1.0, *)
 extension JSONSnapshot: FileConfigSnapshotProtocol {
     // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
-    public init(data: Data, providerName: String, parsingOptions: ParsingOptions) throws {
-        guard let parsedDictionary = try JSONSerialization.jsonObject(with: data) as? [String: any Sendable]
+    public init(data: RawSpan, providerName: String, parsingOptions: ParsingOptions) throws {
+        guard let parsedDictionary = try JSONSerialization.jsonObject(with: Data(data)) as? [String: any Sendable]
         else {
             throw JSONSnapshot.JSONConfigError.topLevelJSONValueIsNotObject
         }

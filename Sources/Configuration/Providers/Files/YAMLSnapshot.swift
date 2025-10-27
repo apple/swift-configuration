@@ -15,9 +15,9 @@
 #if YAMLSupport
 
 #if canImport(FoundationEssentials)
-public import FoundationEssentials
+import FoundationEssentials
 #else
-public import Foundation
+import Foundation
 #endif
 import Yams
 import Synchronization
@@ -246,8 +246,8 @@ public final class YAMLSnapshot: Sendable {
 @available(Configuration 1.0, *)
 extension YAMLSnapshot: FileConfigSnapshotProtocol {
     // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
-    public convenience init(data: Data, providerName: String, parsingOptions: ParsingOptions) throws {
-        guard let mapping = try Yams.Parser(yaml: data).singleRoot()?.mapping else {
+    public convenience init(data: RawSpan, providerName: String, parsingOptions: ParsingOptions) throws {
+        guard let mapping = try Yams.Parser(yaml: Data(data)).singleRoot()?.mapping else {
             throw YAMLConfigError.topLevelYAMLValueIsNotMapping
         }
         let values = try parseValues(

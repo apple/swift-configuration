@@ -170,7 +170,7 @@ public final class ReloadingFileProvider<SnapshotType: FileConfigSnapshotProtoco
         let timestamp = try await fileSystem.lastModifiedTimestamp(atPath: realPath)
         let data = try await fileSystem.fileContents(atPath: realPath)
         let initialSnapshot = try snapshotType.init(
-            data: data,
+            data: data.bytes,
             providerName: providerName,
             parsingOptions: parsingOptions
         )
@@ -315,7 +315,7 @@ public final class ReloadingFileProvider<SnapshotType: FileConfigSnapshotProtoco
         // Load new data outside the lock
         let data = try await fileSystem.fileContents(atPath: candidateRealPath)
         let newSnapshot = try SnapshotType.init(
-            data: data,
+            data: data.bytes,
             providerName: providerName,
             parsingOptions: parsingOptions
         )

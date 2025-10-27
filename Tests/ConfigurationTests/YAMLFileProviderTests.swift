@@ -30,7 +30,7 @@ struct YAMLFileProviderTests {
     var provider: YAMLSnapshot {
         get throws {
             try YAMLSnapshot(
-                data: Data(contentsOf: URL(filePath: yamlConfigFile.string)),
+                data: Data(contentsOf: URL(filePath: yamlConfigFile.string)).bytes,
                 providerName: "TestProvider",
                 parsingOptions: .default
             )
