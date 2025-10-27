@@ -23,7 +23,7 @@ import Foundation
 /// A configuration provider that reads from a file on disk using a configurable snapshot type.
 ///
 /// `FileProvider` is a generic file-based configuration provider that works with different
-/// file formats by using different snapshot types that conform to ``FileConfigSnapshotProtocol``.
+/// file formats by using different snapshot types that conform to ``FileConfigSnapshot``.
 /// This allows for a unified interface for reading JSON, YAML, or other structured configuration files.
 ///
 /// ## Usage
@@ -58,10 +58,10 @@ import Foundation
 /// This expects a `filePath` key in the configuration that specifies the path to the file.
 /// For a full list of configuration keys, check out ``FileProvider/init(snapshotType:parsingOptions:config:)``.
 @available(Configuration 1.0, *)
-public struct FileProvider<SnapshotType: FileConfigSnapshotProtocol>: Sendable {
+public struct FileProvider<Snapshot: FileConfigSnapshot>: Sendable {
 
     /// A snapshot of the internal state.
-    private let _snapshot: SnapshotType
+    private let _snapshot: Snapshot
 
     /// Creates a file provider that reads from the specified file path.
     ///
@@ -74,8 +74,8 @@ public struct FileProvider<SnapshotType: FileConfigSnapshotProtocol>: Sendable {
     ///   - filePath: The path to the configuration file to read.
     /// - Throws: If the file cannot be read or if snapshot creation fails.
     public init(
-        snapshotType: SnapshotType.Type = SnapshotType.self,
-        parsingOptions: SnapshotType.ParsingOptions = .default,
+        snapshotType: Snapshot.Type = Snapshot.self,
+        parsingOptions: Snapshot.ParsingOptions = .default,
         filePath: FilePath
     ) async throws {
         try await self.init(
@@ -100,8 +100,8 @@ public struct FileProvider<SnapshotType: FileConfigSnapshotProtocol>: Sendable {
     ///   - config: A configuration reader that contains the required configuration keys.
     /// - Throws: If the `filePath` key is missing, if the file cannot be read, or if snapshot creation fails.
     public init(
-        snapshotType: SnapshotType.Type = SnapshotType.self,
-        parsingOptions: SnapshotType.ParsingOptions = .default,
+        snapshotType: Snapshot.Type = Snapshot.self,
+        parsingOptions: Snapshot.ParsingOptions = .default,
         config: ConfigReader
     ) async throws {
         try await self.init(
@@ -123,15 +123,15 @@ public struct FileProvider<SnapshotType: FileConfigSnapshotProtocol>: Sendable {
     ///   - fileSystem: The file system implementation to use for reading the file.
     /// - Throws: If the file cannot be read or if snapshot creation fails.
     internal init(
-        snapshotType: SnapshotType.Type,
-        parsingOptions: SnapshotType.ParsingOptions,
+        snapshotType: Snapshot.Type,
+        parsingOptions: Snapshot.ParsingOptions,
         filePath: FilePath,
         fileSystem: some CommonProviderFileSystem
     ) async throws {
         let fileContents = try await fileSystem.fileContents(atPath: filePath)
         self._snapshot = try snapshotType.init(
             data: fileContents.bytes,
-            providerName: "FileProvider<\(SnapshotType.self)>",
+            providerName: "FileProvider<\(Snapshot.self)>",
             parsingOptions: parsingOptions
         )
     }

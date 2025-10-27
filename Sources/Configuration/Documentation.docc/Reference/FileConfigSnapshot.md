@@ -1,4 +1,4 @@
-# ``Configuration/FileConfigSnapshotProtocol``
+# ``Configuration/FileConfigSnapshot``
 
 ## Topics
 

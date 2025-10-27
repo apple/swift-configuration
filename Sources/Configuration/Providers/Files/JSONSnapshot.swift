@@ -32,7 +32,7 @@ public struct JSONSnapshot {
     ///
     /// This struct provides configuration options for parsing JSON data into configuration snapshots,
     /// including byte decoding and secrets specification.
-    public struct ParsingOptions: FileParsingOptionsProtocol {
+    public struct ParsingOptions: FileParsingOptions {
         /// A decoder of bytes from a string.
         public var bytesDecoder: any ConfigBytesFromStringDecoder
 
@@ -292,7 +292,7 @@ public struct JSONSnapshot {
 }
 
 @available(Configuration 1.0, *)
-extension JSONSnapshot: FileConfigSnapshotProtocol {
+extension JSONSnapshot: FileConfigSnapshot {
     // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
     public init(data: RawSpan, providerName: String, parsingOptions: ParsingOptions) throws {
         guard let parsedDictionary = try JSONSerialization.jsonObject(with: Data(data)) as? [String: any Sendable]

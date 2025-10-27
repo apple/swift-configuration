@@ -26,7 +26,7 @@ import SystemPackage
 /// Implement this protocol to provide parsing options:
 ///
 /// ```swift
-/// struct MyParsingOptions: FileParsingOptionsProtocol {
+/// struct MyParsingOptions: FileParsingOptions {
 ///     let encoding: String.Encoding
 ///     let dateFormat: String?
 ///
@@ -37,7 +37,7 @@ import SystemPackage
 /// }
 /// ```
 @available(Configuration 1.0, *)
-public protocol FileParsingOptionsProtocol: Sendable {
+public protocol FileParsingOptions: Sendable {
     /// The default instance of this options type.
     ///
     /// This property provides a default configuration that can be used when
@@ -58,7 +58,7 @@ public protocol FileParsingOptionsProtocol: Sendable {
 /// To create a custom file configuration snapshot:
 ///
 /// ```swift
-/// struct MyFormatSnapshot: FileConfigSnapshotProtocol {
+/// struct MyFormatSnapshot: FileConfigSnapshot {
 ///     typealias ParsingOptions = MyParsingOptions
 ///
 ///     let values: [String: ConfigValue]
@@ -75,11 +75,11 @@ public protocol FileParsingOptionsProtocol: Sendable {
 /// The snapshot is responsible for parsing the file data and converting it into a
 /// representation of configuration values that can be queried by the configuration system.
 @available(Configuration 1.0, *)
-public protocol FileConfigSnapshotProtocol: ConfigSnapshotProtocol, CustomStringConvertible,
+public protocol FileConfigSnapshot: ConfigSnapshotProtocol, CustomStringConvertible,
     CustomDebugStringConvertible
 {
     /// The parsing options type used for parsing this snapshot.
-    associatedtype ParsingOptions: FileParsingOptionsProtocol
+    associatedtype ParsingOptions: FileParsingOptions
 
     /// Creates a new snapshot from file data.
     ///

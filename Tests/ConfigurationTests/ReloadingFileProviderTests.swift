@@ -26,9 +26,9 @@ import Synchronization
 import SystemPackage
 
 @available(Configuration 1.0, *)
-private struct TestSnapshot: FileConfigSnapshotProtocol {
+private struct TestSnapshot: FileConfigSnapshot {
 
-    struct Input: FileParsingOptionsProtocol {
+    struct Input: FileParsingOptions {
         static var `default`: TestSnapshot.Input {
             .init()
         }

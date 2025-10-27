@@ -36,7 +36,7 @@ public final class YAMLSnapshot: Sendable {
     ///
     /// This struct provides configuration options for parsing YAML data into configuration snapshots,
     /// including byte decoding and secrets specification.
-    public struct ParsingOptions: FileParsingOptionsProtocol {
+    public struct ParsingOptions: FileParsingOptions {
         /// A decoder of bytes from a string.
         public var bytesDecoder: any ConfigBytesFromStringDecoder
 
@@ -244,7 +244,7 @@ public final class YAMLSnapshot: Sendable {
 }
 
 @available(Configuration 1.0, *)
-extension YAMLSnapshot: FileConfigSnapshotProtocol {
+extension YAMLSnapshot: FileConfigSnapshot {
     // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
     public convenience init(data: RawSpan, providerName: String, parsingOptions: ParsingOptions) throws {
         guard let mapping = try Yams.Parser(yaml: Data(data)).singleRoot()?.mapping else {

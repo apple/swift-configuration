@@ -32,7 +32,7 @@ import Synchronization
 /// `ReloadingFileProvider` is a generic file-based configuration provider that monitors
 /// a configuration file for changes and automatically reloads the data when
 /// the file is modified. This provider works with different file formats by using
-/// different snapshot types that conform to ``FileConfigSnapshotProtocol``.
+/// different snapshot types that conform to ``FileConfigSnapshot``.
 ///
 /// ## Usage
 ///
@@ -83,13 +83,13 @@ import Synchronization
 /// When a change is detected, it reloads the file and notifies all active watchers of the
 /// updated configuration values.
 @available(Configuration 1.0, *)
-public final class ReloadingFileProvider<SnapshotType: FileConfigSnapshotProtocol>: Sendable {
+public final class ReloadingFileProvider<Snapshot: FileConfigSnapshot>: Sendable {
 
     /// The internal storage structure for the provider state.
     private struct Storage {
 
         /// The current configuration snapshot.
-        var snapshot: SnapshotType
+        var snapshot: Snapshot
 
         /// Last modified timestamp of the resolved file.
         var lastModifiedTimestamp: Date
@@ -101,7 +101,7 @@ public final class ReloadingFileProvider<SnapshotType: FileConfigSnapshotProtoco
         var valueWatchers: [AbsoluteConfigKey: [UUID: AsyncStream<Result<LookupResult, any Error>>.Continuation]]
 
         /// Active watchers for configuration snapshots.
-        var snapshotWatchers: [UUID: AsyncStream<SnapshotType>.Continuation]
+        var snapshotWatchers: [UUID: AsyncStream<Snapshot>.Continuation]
 
         /// Returns the total number of active watchers.
         var totalWatcherCount: Int {
@@ -115,7 +115,7 @@ public final class ReloadingFileProvider<SnapshotType: FileConfigSnapshotProtoco
     private let storage: Mutex<Storage>
 
     /// The options used for parsing the data.
-    private let parsingOptions: SnapshotType.ParsingOptions
+    private let parsingOptions: Snapshot.ParsingOptions
 
     /// The file system interface for reading files and timestamps.
     private let fileSystem: any CommonProviderFileSystem
@@ -136,8 +136,8 @@ public final class ReloadingFileProvider<SnapshotType: FileConfigSnapshotProtoco
     private let metrics: ReloadingFileProviderMetrics
 
     internal init(
-        snapshotType: SnapshotType.Type = SnapshotType.self,
-        parsingOptions: SnapshotType.ParsingOptions,
+        snapshotType: Snapshot.Type = Snapshot.self,
+        parsingOptions: Snapshot.ParsingOptions,
         filePath: FilePath,
         pollInterval: Duration,
         fileSystem: any CommonProviderFileSystem,
@@ -147,7 +147,7 @@ public final class ReloadingFileProvider<SnapshotType: FileConfigSnapshotProtoco
         self.parsingOptions = parsingOptions
         self.filePath = filePath
         self.pollInterval = pollInterval
-        self.providerName = "ReloadingFileProvider<\(SnapshotType.self)>"
+        self.providerName = "ReloadingFileProvider<\(Snapshot.self)>"
         self.fileSystem = fileSystem
 
         // Set up the logger with metadata
@@ -210,8 +210,8 @@ public final class ReloadingFileProvider<SnapshotType: FileConfigSnapshotProtoco
     ///   - metrics: The metrics factory to use for monitoring provider performance.
     /// - Throws: If the file cannot be read or if snapshot creation fails.
     public convenience init(
-        snapshotType: SnapshotType.Type = SnapshotType.self,
-        parsingOptions: SnapshotType.ParsingOptions = .default,
+        snapshotType: Snapshot.Type = Snapshot.self,
+        parsingOptions: Snapshot.ParsingOptions = .default,
         filePath: FilePath,
         pollInterval: Duration = .seconds(15),
         logger: Logger = Logger(label: "ReloadingFileProvider"),
@@ -242,8 +242,8 @@ public final class ReloadingFileProvider<SnapshotType: FileConfigSnapshotProtoco
     ///   - metrics: The metrics factory to use for monitoring provider performance.
     /// - Throws: If required configuration keys are missing, if the file cannot be read, or if snapshot creation fails.
     public convenience init(
-        snapshotType: SnapshotType.Type = SnapshotType.self,
-        parsingOptions: SnapshotType.ParsingOptions = .default,
+        snapshotType: Snapshot.Type = Snapshot.self,
+        parsingOptions: Snapshot.ParsingOptions = .default,
         config: ConfigReader,
         logger: Logger = Logger(label: "ReloadingFileProvider"),
         metrics: any MetricsFactory = MetricsSystem.factory
@@ -314,7 +314,7 @@ public final class ReloadingFileProvider<SnapshotType: FileConfigSnapshotProtoco
 
         // Load new data outside the lock
         let data = try await fileSystem.fileContents(atPath: candidateRealPath)
-        let newSnapshot = try SnapshotType.init(
+        let newSnapshot = try Snapshot.init(
             data: data.bytes,
             providerName: providerName,
             parsingOptions: parsingOptions
@@ -325,7 +325,7 @@ public final class ReloadingFileProvider<SnapshotType: FileConfigSnapshotProtoco
             Result<LookupResult, any Error>,
             [AsyncStream<Result<LookupResult, any Error>>.Continuation]
         )]
-        typealias SnapshotWatchers = (SnapshotType, [AsyncStream<SnapshotType>.Continuation])
+        typealias SnapshotWatchers = (Snapshot, [AsyncStream<Snapshot>.Continuation])
         guard
             let (valueWatchersToNotify, snapshotWatchersToNotify) =
                 storage
@@ -497,7 +497,7 @@ extension ReloadingFileProvider: ConfigProvider {
     public func watchSnapshot<Return>(
         updatesHandler: (ConfigUpdatesAsyncSequence<any ConfigSnapshotProtocol, Never>) async throws -> Return
     ) async throws -> Return {
-        let (stream, continuation) = AsyncStream<SnapshotType>.makeStream(bufferingPolicy: .bufferingNewest(1))
+        let (stream, continuation) = AsyncStream<Snapshot>.makeStream(bufferingPolicy: .bufferingNewest(1))
         let id = UUID()
 
         // Add watcher and get initial snapshot

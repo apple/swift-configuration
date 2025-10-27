@@ -9,6 +9,6 @@
 
 ### Reading configuration files
 
-- ``FileConfigSnapshotProtocol``
+- ``FileConfigSnapshot``
 - ``JSONSnapshot``
 - ``YAMLSnapshot``

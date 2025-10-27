@@ -13,6 +13,6 @@
 
 ### Monitoring file changes
 
-- ``FileConfigSnapshotProtocol``
+- ``FileConfigSnapshot``
 - ``JSONSnapshot``
 - ``YAMLSnapshot``

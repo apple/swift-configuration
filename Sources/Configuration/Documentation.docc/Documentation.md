@@ -427,7 +427,7 @@ Any package can implement a ``ConfigProvider``, making the ecosystem extensible 
 
 ### Creating a custom provider
 - ``ConfigSnapshotProtocol``
-- ``FileParsingOptionsProtocol``
+- ``FileParsingOptions``
 - ``ConfigProvider``
 - ``ConfigContent``
 - ``ConfigValue``
