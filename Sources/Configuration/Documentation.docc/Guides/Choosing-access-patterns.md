@@ -122,7 +122,7 @@ Use the "watch" pattern when:
 
 - Immediately emits the initial value, then subsequent updates.
 - Continues monitoring until the task is cancelled.
-- Works with providers like ``ReloadingJSONProvider`` and ``ReloadingYAMLProvider``.
+- Works with providers like ``ReloadingFileProvider``.
 
 For details on reloading providers, check out <doc:Using-reloading-providers>.
 

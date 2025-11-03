@@ -99,12 +99,12 @@ Common ServiceGroup problems:
 
 ```swift
 // Incorrect: Provider not included in ServiceGroup
-let provider = try await ReloadingJSONProvider(filePath: "/etc/config.json")
+let provider = try await ReloadingFileProvider<JSONSnapshot>(filePath: "/etc/config.json")
 let config = ConfigReader(provider: provider)
 // File monitoring won't work
 
 // Correct: Provider runs in ServiceGroup
-let provider = try await ReloadingJSONProvider(filePath: "/etc/config.json")
+let provider = try await ReloadingFileProvider<JSONSnapshot>(filePath: "/etc/config.json")
 let serviceGroup = ServiceGroup(services: [provider], logger: logger)
 try await serviceGroup.run()
 ```

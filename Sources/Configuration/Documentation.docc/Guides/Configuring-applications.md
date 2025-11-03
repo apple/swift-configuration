@@ -35,8 +35,8 @@ let logger: Logger = ...
 
 let config = ConfigReader(
     providers: [
-        EnvironmentVariablesProvider(), 
-        try await JSONProvider(filePath: "/etc/myapp/config.json"), 
+        EnvironmentVariablesProvider(),
+        try await FileProvider<JSONSnapshot>(filePath: "/etc/myapp/config.json"),
         InMemoryProvider(values: [
             "http.server.port": 8080,
             "http.server.host": "127.0.0.1",

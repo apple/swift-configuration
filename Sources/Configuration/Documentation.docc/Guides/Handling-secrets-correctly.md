@@ -81,7 +81,7 @@ The following example marks keys as secret based on the closure you provide.
 In this case, keys that contain `password`, `secret`, or `token` are all marked as secret:
 
 ```swift
-let provider = JSONProvider(
+let provider = FileProvider<JSONSnapshot>(
     filePath: "/etc/config.json",
     secretsSpecifier: .dynamic { key, value in
         key.lowercased().contains("password") ||
@@ -96,7 +96,7 @@ let provider = JSONProvider(
 The following example asserts that none of the values returned from the provider are considered secret:
 
 ```swift
-let provider = JSONProvider(
+let provider = FileProvider<JSONSnapshot>(
     filePath: "/etc/config.json",
     secretsSpecifier: .none
 )
