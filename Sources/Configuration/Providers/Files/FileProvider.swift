@@ -123,7 +123,7 @@ public struct FileProvider<Snapshot: FileConfigSnapshot>: Sendable {
     ///   - fileSystem: The file system implementation to use for reading the file.
     /// - Throws: If the file cannot be read or if snapshot creation fails.
     internal init(
-        snapshotType: Snapshot.Type,
+        snapshotType: Snapshot.Type = Snapshot.self,
         parsingOptions: Snapshot.ParsingOptions,
         filePath: FilePath,
         fileSystem: some CommonProviderFileSystem

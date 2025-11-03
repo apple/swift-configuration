@@ -12,6 +12,8 @@
 //
 //===----------------------------------------------------------------------===//
 
+#if JSONSupport
+
 import Testing
 import ConfigurationTestingInternal
 @testable import Configuration
@@ -59,3 +61,5 @@ struct JSONFileProviderTests {
         .runTest()
     }
 }
+
+#endif
