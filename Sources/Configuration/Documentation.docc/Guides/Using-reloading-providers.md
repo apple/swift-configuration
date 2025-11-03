@@ -6,8 +6,8 @@ Automatically reload configuration from files when they change.
 
 A reloading provider monitors configuration files for changes and automatically updates your application's configuration without requiring restarts. Swift Configuration provides:
 
-- ``ReloadingJSONProvider`` for JSON configuration files.
-- ``ReloadingYAMLProvider`` for YAML configuration files.
+- ``ReloadingFileProvider`` with ``JSONSnapshot`` for JSON configuration files.
+- ``ReloadingFileProvider`` with ``YAMLSnapshot`` for YAML configuration files.
 
 ### Basic usage
 
@@ -18,7 +18,7 @@ Reloading providers run in a [`ServiceGroup`](https://swiftpackageindex.com/swif
 ```swift
 import ServiceLifecycle
 
-let provider = try await ReloadingJSONProvider(
+let provider = try await ReloadingFileProvider<JSONSnapshot>(
     filePath: "/etc/config.json",
     pollInterval: .seconds(15)
 )
@@ -109,8 +109,8 @@ and interval to watch for a JSON file that contains the configuration for your a
 let envProvider = EnvironmentVariablesProvider()
 let envConfig = ConfigReader(provider: envProvider)
 
-let jsonProvider = try await ReloadingJSONProvider(
-    config: envConfig.scoped(to: "json")  
+let jsonProvider = try await ReloadingFileProvider<JSONSnapshot>(
+    config: envConfig.scoped(to: "json")
     // Reads JSON_FILE_PATH and JSON_POLL_INTERVAL_SECONDS
 )
 ```
@@ -120,10 +120,10 @@ let jsonProvider = try await ReloadingJSONProvider(
 1. **Replace initialization**:
    ```swift
    // Before
-   let provider = try await JSONProvider(filePath: "/etc/config.json")
+   let provider = try await FileProvider<JSONSnapshot>(filePath: "/etc/config.json")
 
    // After
-   let provider = try await ReloadingJSONProvider(filePath: "/etc/config.json")
+   let provider = try await ReloadingFileProvider<JSONSnapshot>(filePath: "/etc/config.json")
    ```
 
 2. **Add the provider to a ServiceGroup**:

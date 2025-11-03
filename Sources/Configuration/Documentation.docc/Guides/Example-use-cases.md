@@ -24,7 +24,7 @@ variable name above `SERVER_PORT`.
 
 ### Reading from a JSON configuration file
 
-You can store multiple configuration values together in a JSON file and read them from the fileystem using ``JSONProvider``.
+You can store multiple configuration values together in a JSON file and read them from the fileystem using ``FileProvider`` with ``JSONSnapshot``.
 The following example creates a ``ConfigReader`` for a JSON file at the path `/etc/config.json`, and reads a url and port
 number collected as properties of the `database` JSON object:
 
@@ -32,7 +32,7 @@ number collected as properties of the `database` JSON object:
 import Configuration
 
 let config = ConfigReader(
-    provider: try await JSONProvider(filePath: "/etc/config.json")
+    provider: try await FileProvider<JSONSnapshot>(filePath: "/etc/config.json")
 )
 
 // Access nested values using dot notation.
@@ -92,7 +92,7 @@ let config = ConfigReader(providers: [
     // First check environment variables.
     EnvironmentVariablesProvider(),
     // Then check the config file.
-    try await JSONProvider(filePath: "/etc/config.json"),
+    try await FileProvider<JSONSnapshot>(filePath: "/etc/config.json"),
     // Finally, use hardcoded defaults.
     InMemoryProvider(values: [
         "app.name": "MyApp",
@@ -131,7 +131,7 @@ import Configuration
 import ServiceLifecycle
 
 // Create a reloading YAML provider
-let provider = try await ReloadingYAMLProvider(
+let provider = try await ReloadingFileProvider<YAMLSnapshot>(
     filePath: "/etc/app-config.yaml",
     pollInterval: .seconds(30)
 )
