@@ -195,9 +195,11 @@ extension MultiProvider {
     /// - Parameter body: A closure that receives an async sequence of ``MultiSnapshot`` updates.
     /// - Returns: The value returned by the body closure.
     /// - Throws: Any error thrown by the nested providers or the body closure.
-    func watchSnapshot<Return>(
-        _ body: (ConfigUpdatesAsyncSequence<MultiSnapshot, Never>) async throws -> Return
-    ) async throws -> Return {
+    nonisolated(nonsending)
+        func watchSnapshot<Return>(
+            _ body: (ConfigUpdatesAsyncSequence<MultiSnapshot, Never>) async throws -> Return
+        ) async throws -> Return
+    {
         let providers = storage.providers
         typealias UpdatesSequence = any (AsyncSequence<any ConfigSnapshotProtocol, Never> & Sendable)
         var updateSequences: [UpdatesSequence] = []
@@ -284,13 +286,15 @@ extension MultiProvider {
     ///   - updatesHandler: A closure that receives an async sequence of combined updates from all providers.
     /// - Throws: Any error thrown by the nested providers or the handler closure.
     /// - Returns: The value returned by the handler.
-    func watchValue<Return>(
-        forKey key: AbsoluteConfigKey,
-        type: ConfigType,
-        updatesHandler: (
-            ConfigUpdatesAsyncSequence<([AccessEvent.ProviderResult], Result<ConfigValue?, any Error>), Never>
+    nonisolated(nonsending)
+        func watchValue<Return>(
+            forKey key: AbsoluteConfigKey,
+            type: ConfigType,
+            updatesHandler: (
+                ConfigUpdatesAsyncSequence<([AccessEvent.ProviderResult], Result<ConfigValue?, any Error>), Never>
+            ) async throws -> Return
         ) async throws -> Return
-    ) async throws -> Return {
+    {
         let providers = storage.providers
         let providerNames = providers.map(\.providerName)
         typealias UpdatesSequence = any (AsyncSequence<Result<LookupResult, any Error>, Never> & Sendable)
