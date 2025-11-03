@@ -22,27 +22,29 @@
 //
 //===----------------------------------------------------------------------===//
 
+// swift-format-ignore-file
+
 import Synchronization
 
 @available(Configuration 1.0, *)
 public struct GatedSequence<Element> {
-  public typealias Failure = Never
-  let elements: [Element]
-  let gates: [Gate]
-  var index = 0
+    public typealias Failure = Never
+    let elements: [Element]
+    let gates: [Gate]
+    var index = 0
 
-  public mutating func advance() {
-    defer { index += 1 }
-    guard index < gates.count else {
-      return
+    public mutating func advance() {
+        defer { index += 1 }
+        guard index < gates.count else {
+            return
+        }
+        gates[index].open()
     }
-    gates[index].open()
-  }
 
-  public init(_ elements: [Element]) {
-    self.elements = elements
-    self.gates = elements.map { _ in Gate() }
-  }
+    public init(_ elements: [Element]) {
+        self.elements = elements
+        self.gates = elements.map { _ in Gate() }
+    }
 }
 
 @available(*, unavailable)
@@ -50,35 +52,35 @@ extension GatedSequence.Iterator: Sendable {}
 
 @available(Configuration 1.0, *)
 extension GatedSequence: AsyncSequence {
-  public struct Iterator: AsyncIteratorProtocol {
-    var gatedElements: [(Element, Gate)]
+    public struct Iterator: AsyncIteratorProtocol {
+        var gatedElements: [(Element, Gate)]
 
-    init(elements: [Element], gates: [Gate]) {
-      gatedElements = Array(zip(elements, gates))
+        init(elements: [Element], gates: [Gate]) {
+            gatedElements = Array(zip(elements, gates))
+        }
+
+        public mutating func next() async -> Element? {
+            guard gatedElements.count > 0 else {
+                return nil
+            }
+            let (element, gate) = gatedElements.removeFirst()
+            await gate.enter()
+            return element
+        }
+
+        public mutating func next(isolation actor: isolated (any Actor)?) async throws(Never) -> Element? {
+            guard gatedElements.count > 0 else {
+                return nil
+            }
+            let (element, gate) = gatedElements.removeFirst()
+            await gate.enter()
+            return element
+        }
     }
 
-    public mutating func next() async -> Element? {
-      guard gatedElements.count > 0 else {
-        return nil
-      }
-      let (element, gate) = gatedElements.removeFirst()
-      await gate.enter()
-      return element
+    public func makeAsyncIterator() -> Iterator {
+        Iterator(elements: elements, gates: gates)
     }
-
-    public mutating func next(isolation actor: isolated (any Actor)?) async throws(Never) -> Element? {
-      guard gatedElements.count > 0 else {
-        return nil
-      }
-      let (element, gate) = gatedElements.removeFirst()
-      await gate.enter()
-      return element
-    }
-  }
-
-  public func makeAsyncIterator() -> Iterator {
-    Iterator(elements: elements, gates: gates)
-  }
 }
 
 @available(Configuration 1.0, *)
@@ -86,47 +88,49 @@ extension GatedSequence: Sendable where Element: Sendable {}
 
 @available(Configuration 1.0, *)
 public final class Gate: Sendable {
-  enum State {
-    case closed
-    case open
-    case pending(UnsafeContinuation<Void, Never>)
-  }
-
-  let state = Mutex(State.closed)
-
-  public func `open`() {
-    state.withLock { state -> UnsafeContinuation<Void, Never>? in
-      switch state {
-      case .closed:
-        state = .open
-        return nil
-      case .open:
-        return nil
-      case .pending(let continuation):
-        state = .closed
-        return continuation
-      }
-    }?.resume()
-  }
-
-  public func enter() async {
-    var other: UnsafeContinuation<Void, Never>?
-    await withUnsafeContinuation { (continuation: UnsafeContinuation<Void, Never>) in
-      state.withLock { state -> UnsafeContinuation<Void, Never>? in
-        switch state {
-        case .closed:
-          state = .pending(continuation)
-          return nil
-        case .open:
-          state = .closed
-          return continuation
-        case .pending(let existing):
-          other = existing
-          state = .pending(continuation)
-          return nil
-        }
-      }?.resume()
+    enum State {
+        case closed
+        case open
+        case pending(UnsafeContinuation<Void, Never>)
     }
-    other?.resume()
-  }
+
+    let state = Mutex(State.closed)
+
+    public func `open`() {
+        state.withLock { state -> UnsafeContinuation<Void, Never>? in
+            switch state {
+            case .closed:
+                state = .open
+                return nil
+            case .open:
+                return nil
+            case .pending(let continuation):
+                state = .closed
+                return continuation
+            }
+        }?
+        .resume()
+    }
+
+    public func enter() async {
+        var other: UnsafeContinuation<Void, Never>?
+        await withUnsafeContinuation { (continuation: UnsafeContinuation<Void, Never>) in
+            state.withLock { state -> UnsafeContinuation<Void, Never>? in
+                switch state {
+                case .closed:
+                    state = .pending(continuation)
+                    return nil
+                case .open:
+                    state = .closed
+                    return continuation
+                case .pending(let existing):
+                    other = existing
+                    state = .pending(continuation)
+                    return nil
+                }
+            }?
+            .resume()
+        }
+        other?.resume()
+    }
 }
