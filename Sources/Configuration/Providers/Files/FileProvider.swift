@@ -31,12 +31,12 @@ import Foundation
 /// Create a provider by specifying the snapshot type and file path:
 ///
 /// ```swift
-/// // Using with JSON snapshot
+/// // Using with a JSON snapshot
 /// let jsonProvider = try await FileProvider<JSONSnapshot>(
 ///     filePath: "/etc/config.json"
 /// )
 ///
-/// // Using with YAML snapshot
+/// // Using with a YAML snapshot
 /// let yamlProvider = try await FileProvider<YAMLSnapshot>(
 ///     filePath: "/etc/config.yaml"
 /// )

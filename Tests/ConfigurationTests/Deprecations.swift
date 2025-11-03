@@ -19,10 +19,12 @@ import SystemPackage
 @available(Configuration 1.0, *)
 @available(*, deprecated)
 struct Deprecations {
+    #if ReloadingSupport && JSONSupport && YAMLSupport
     func fileProviders() async throws {
         let _ = try await JSONProvider(filePath: "/dev/null")
         let _ = try await ReloadingJSONProvider(filePath: "/dev/null")
         let _ = try await YAMLProvider(filePath: "/dev/null")
         let _ = try await ReloadingYAMLProvider(filePath: "/dev/null")
     }
+    #endif
 }
