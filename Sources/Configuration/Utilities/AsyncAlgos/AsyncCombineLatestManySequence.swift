@@ -24,8 +24,9 @@
 
 // Vendored copy of https://github.com/apple/swift-async-algorithms/pull/360
 
-/// Creates an asynchronous sequence that combines the latest values from many `AsyncSequence` types
-/// by emitting a tuple of the values. ``combineLatestMany(_:)`` only emits a value whenever any of the base `AsyncSequence`s
+/// Creates an asynchronous sequence that combines the latest values from many async sequences.
+///
+/// ``combineLatestMany(_:)`` only emits a value whenever any of the base `AsyncSequence`s
 /// emit a value (so long as each of the bases have emitted at least one value).
 ///
 /// Finishes:
