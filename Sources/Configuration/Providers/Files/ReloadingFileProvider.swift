@@ -19,26 +19,77 @@ import FoundationEssentials
 #else
 import Foundation
 #endif
-import ServiceLifecycle
-import Logging
-import Metrics
-import Synchronization
-import AsyncAlgorithms
-import SystemPackage
 
-/// A generic common implementation of file-based reloading for configuration providers.
+public import SystemPackage
+public import ServiceLifecycle
+public import Logging
+public import Metrics
+import AsyncAlgorithms
+import Synchronization
+
+/// A configuration provider that reads configuration from a file on disk with automatic reloading capability.
 ///
-/// This internal type handles all the common reloading logic, state management,
-/// and service lifecycle for reloading file-based providers. It allows different provider types
-/// (JSON, YAML, and so on) to reuse the same logic while providing their own format-specific deserialization.
+/// `ReloadingFileProvider` is a generic file-based configuration provider that monitors
+/// a configuration file for changes and automatically reloads the data when
+/// the file is modified. This provider works with different file formats by using
+/// different snapshot types that conform to ``FileConfigSnapshot``.
+///
+/// ## Usage
+///
+/// Create a reloading provider by specifying the snapshot type and file path:
+///
+/// ```swift
+/// // Using with a JSON snapshot and a custom poll interval
+/// let jsonProvider = try await ReloadingFileProvider<JSONSnapshot>(
+///     filePath: "/etc/config.json",
+///     pollInterval: .seconds(30)
+/// )
+///
+/// // Using with a YAML snapshot
+/// let yamlProvider = try await ReloadingFileProvider<YAMLSnapshot>(
+///     filePath: "/etc/config.yaml"
+/// )
+/// ```
+///
+/// ## Service integration
+///
+/// This provider implements the `Service` protocol and must be run within a `ServiceGroup`
+/// to enable automatic reloading:
+///
+/// ```swift
+/// let provider = try await ReloadingFileProvider<JSONSnapshot>(filePath: "/etc/config.json")
+/// let serviceGroup = ServiceGroup(services: [provider], logger: logger)
+/// try await serviceGroup.run()
+/// ```
+///
+/// The provider monitors the file by polling at the specified interval (default: 15 seconds)
+/// and notifies any active watchers when changes are detected.
+///
+/// ## Configuration from a reader
+///
+/// You can also initialize the provider using a configuration reader:
+///
+/// ```swift
+/// let envConfig = ConfigReader(provider: EnvironmentVariablesProvider())
+/// let provider = try await ReloadingFileProvider<JSONSnapshot>(config: envConfig)
+/// ```
+///
+/// This expects a `filePath` key in the configuration that specifies the path to the file.
+/// For a full list of configuration keys, check out ``FileProvider/init(snapshotType:parsingOptions:config:)``.
+///
+/// ## File monitoring
+///
+/// The provider detects changes by monitoring both file timestamps and symlink target changes.
+/// When a change is detected, it reloads the file and notifies all active watchers of the
+/// updated configuration values.
 @available(Configuration 1.0, *)
-internal final class ReloadingFileProviderCore<SnapshotType: ConfigSnapshotProtocol>: Sendable {
+public final class ReloadingFileProvider<Snapshot: FileConfigSnapshot>: Sendable {
 
     /// The internal storage structure for the provider state.
     private struct Storage {
 
         /// The current configuration snapshot.
-        var snapshot: SnapshotType
+        var snapshot: Snapshot
 
         /// Last modified timestamp of the resolved file.
         var lastModifiedTimestamp: Date
@@ -50,7 +101,7 @@ internal final class ReloadingFileProviderCore<SnapshotType: ConfigSnapshotProto
         var valueWatchers: [AbsoluteConfigKey: [UUID: AsyncStream<Result<LookupResult, any Error>>.Continuation]]
 
         /// Active watchers for configuration snapshots.
-        var snapshotWatchers: [UUID: AsyncStream<SnapshotType>.Continuation]
+        var snapshotWatchers: [UUID: AsyncStream<Snapshot>.Continuation]
 
         /// Returns the total number of active watchers.
         var totalWatcherCount: Int {
@@ -63,6 +114,9 @@ internal final class ReloadingFileProviderCore<SnapshotType: ConfigSnapshotProto
     /// Internal provider storage.
     private let storage: Mutex<Storage>
 
+    /// The options used for parsing the data.
+    private let parsingOptions: Snapshot.ParsingOptions
+
     /// The file system interface for reading files and timestamps.
     private let fileSystem: any CommonProviderFileSystem
 
@@ -73,7 +127,7 @@ internal final class ReloadingFileProviderCore<SnapshotType: ConfigSnapshotProto
     private let pollInterval: Duration
 
     /// The human-readable name of the provider.
-    internal let providerName: String
+    public let providerName: String
 
     /// The logger for this provider instance.
     private let logger: Logger
@@ -81,37 +135,20 @@ internal final class ReloadingFileProviderCore<SnapshotType: ConfigSnapshotProto
     /// The metrics collector for this provider instance.
     private let metrics: ReloadingFileProviderMetrics
 
-    /// The closure that creates a new snapshot from file data.
-    private let createSnapshot: @Sendable (Data) async throws -> SnapshotType
-
-    /// Creates a new reloading file provider core.
-    ///
-    /// This initializer performs the initial file load and snapshot creation,
-    /// resolves any symlinks, and sets up the internal storage.
-    ///
-    /// - Parameters:
-    ///   - filePath: The path to the configuration file to monitor.
-    ///   - pollInterval: The interval between timestamp checks.
-    ///   - providerName: The human-readable name of the provider.
-    ///   - fileSystem: The file system to use.
-    ///   - logger: The logger instance.
-    ///   - metrics: The metrics factory.
-    ///   - createSnapshot: A closure that creates a snapshot from file data.
-    /// - Throws: If the initial file load or snapshot creation fails.
     internal init(
+        snapshotType: Snapshot.Type = Snapshot.self,
+        parsingOptions: Snapshot.ParsingOptions,
         filePath: FilePath,
         pollInterval: Duration,
-        providerName: String,
         fileSystem: any CommonProviderFileSystem,
         logger: Logger,
-        metrics: any MetricsFactory,
-        createSnapshot: @Sendable @escaping (Data) async throws -> SnapshotType
+        metrics: any MetricsFactory
     ) async throws {
+        self.parsingOptions = parsingOptions
         self.filePath = filePath
         self.pollInterval = pollInterval
-        self.providerName = providerName
+        self.providerName = "ReloadingFileProvider<\(Snapshot.self)>"
         self.fileSystem = fileSystem
-        self.createSnapshot = createSnapshot
 
         // Set up the logger with metadata
         var logger = logger
@@ -130,9 +167,13 @@ internal final class ReloadingFileProviderCore<SnapshotType: ConfigSnapshotProto
         // Perform initial load
         logger.debug("Performing initial file load")
         let realPath = try await fileSystem.resolveSymlinks(atPath: filePath)
-        let data = try await fileSystem.fileContents(atPath: realPath)
-        let initialSnapshot = try await createSnapshot(data)
         let timestamp = try await fileSystem.lastModifiedTimestamp(atPath: realPath)
+        let data = try await fileSystem.fileContents(atPath: realPath)
+        let initialSnapshot = try snapshotType.init(
+            data: data.bytes,
+            providerName: providerName,
+            parsingOptions: parsingOptions
+        )
 
         // Initialize storage
         self.storage = .init(
@@ -149,7 +190,7 @@ internal final class ReloadingFileProviderCore<SnapshotType: ConfigSnapshotProto
         self.metrics.fileSize.record(data.count)
 
         logger.debug(
-            "Successfully initialized reloading file provider core",
+            "Successfully initialized reloading file provider",
             metadata: [
                 "\(providerName).realFilePath": .string(realPath.string),
                 "\(providerName).initialTimestamp": .stringConvertible(timestamp.formatted(.iso8601)),
@@ -158,9 +199,75 @@ internal final class ReloadingFileProviderCore<SnapshotType: ConfigSnapshotProto
         )
     }
 
+    /// Creates a reloading file provider that monitors the specified file path.
+    ///
+    /// - Parameters:
+    ///   - snapshotType: The type of snapshot to create from the file contents.
+    ///   - parsingOptions: Options used by the snapshot to parse the file data.
+    ///   - filePath: The path to the configuration file to monitor.
+    ///   - pollInterval: How often to check for file changes.
+    ///   - logger: The logger instance to use for this provider.
+    ///   - metrics: The metrics factory to use for monitoring provider performance.
+    /// - Throws: If the file cannot be read or if snapshot creation fails.
+    public convenience init(
+        snapshotType: Snapshot.Type = Snapshot.self,
+        parsingOptions: Snapshot.ParsingOptions = .default,
+        filePath: FilePath,
+        pollInterval: Duration = .seconds(15),
+        logger: Logger = Logger(label: "ReloadingFileProvider"),
+        metrics: any MetricsFactory = MetricsSystem.factory
+    ) async throws {
+        try await self.init(
+            snapshotType: snapshotType,
+            parsingOptions: parsingOptions,
+            filePath: filePath,
+            pollInterval: pollInterval,
+            fileSystem: LocalCommonProviderFileSystem(),
+            logger: logger,
+            metrics: metrics
+        )
+    }
+
+    /// Creates a reloading file provider using configuration from a reader.
+    ///
+    /// ## Configuration keys
+    /// - `filePath` (string, required): The path to the configuration file to monitor.
+    /// - `pollIntervalSeconds` (int, optional, default: 15): How often to check for file changes in seconds.
+    ///
+    /// - Parameters:
+    ///   - snapshotType: The type of snapshot to create from the file contents.
+    ///   - parsingOptions: Options used by the snapshot to parse the file data.
+    ///   - config: A configuration reader that contains the required configuration keys.
+    ///   - logger: The logger instance to use for this provider.
+    ///   - metrics: The metrics factory to use for monitoring provider performance.
+    /// - Throws: If required configuration keys are missing, if the file cannot be read, or if snapshot creation fails.
+    public convenience init(
+        snapshotType: Snapshot.Type = Snapshot.self,
+        parsingOptions: Snapshot.ParsingOptions = .default,
+        config: ConfigReader,
+        logger: Logger = Logger(label: "ReloadingFileProvider"),
+        metrics: any MetricsFactory = MetricsSystem.factory
+    ) async throws {
+        try await self.init(
+            snapshotType: snapshotType,
+            parsingOptions: parsingOptions,
+            filePath: config.requiredString(forKey: "filePath", as: FilePath.self),
+            pollInterval: .seconds(config.int(forKey: "pollIntervalSeconds", default: 15)),
+            fileSystem: LocalCommonProviderFileSystem(),
+            logger: logger,
+            metrics: metrics
+        )
+    }
+
     /// Checks if the file has changed and reloads it if necessary.
+    ///
+    /// This method performs the core file monitoring logic by checking both the file's
+    /// last modified timestamp and its resolved path (in case of symlinks). If changes
+    /// are detected, it reloads the file contents, creates a new snapshot, and notifies
+    /// any active watchers of the changes.
+    ///
+    /// - Parameter logger: The logger to use during the reload operation.
     /// - Throws: File system errors or snapshot creation errors.
-    /// - Parameter logger: The logger to use during the reload.
     internal func reloadIfNeeded(logger: Logger) async throws {
         logger.debug("reloadIfNeeded started")
         defer {
@@ -207,14 +314,18 @@ internal final class ReloadingFileProviderCore<SnapshotType: ConfigSnapshotProto
 
         // Load new data outside the lock
         let data = try await fileSystem.fileContents(atPath: candidateRealPath)
-        let newSnapshot = try await createSnapshot(data)
+        let newSnapshot = try Snapshot.init(
+            data: data.bytes,
+            providerName: providerName,
+            parsingOptions: parsingOptions
+        )
 
         typealias ValueWatchers = [(
             AbsoluteConfigKey,
             Result<LookupResult, any Error>,
             [AsyncStream<Result<LookupResult, any Error>>.Continuation]
         )]
-        typealias SnapshotWatchers = (SnapshotType, [AsyncStream<SnapshotType>.Continuation])
+        typealias SnapshotWatchers = (Snapshot, [AsyncStream<Snapshot>.Continuation])
         guard
             let (valueWatchersToNotify, snapshotWatchersToNotify) =
                 storage
@@ -314,8 +425,105 @@ internal final class ReloadingFileProviderCore<SnapshotType: ConfigSnapshotProto
 }
 
 @available(Configuration 1.0, *)
-extension ReloadingFileProviderCore: Service {
-    internal func run() async throws {
+extension ReloadingFileProvider: CustomStringConvertible {
+    // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
+    public var description: String {
+        storage.withLock { $0.snapshot.description }
+    }
+}
+
+@available(Configuration 1.0, *)
+extension ReloadingFileProvider: CustomDebugStringConvertible {
+    // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
+    public var debugDescription: String {
+        storage.withLock { $0.snapshot.debugDescription }
+    }
+}
+
+@available(Configuration 1.0, *)
+extension ReloadingFileProvider: ConfigProvider {
+    // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
+    public func value(forKey key: AbsoluteConfigKey, type: ConfigType) throws -> LookupResult {
+        try storage.withLock { storage in
+            try storage.snapshot.value(forKey: key, type: type)
+        }
+    }
+
+    // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
+    public func fetchValue(
+        forKey key: AbsoluteConfigKey,
+        type: ConfigType
+    ) async throws -> LookupResult {
+        try await reloadIfNeeded(logger: logger)
+        return try value(forKey: key, type: type)
+    }
+
+    // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
+    public func watchValue<Return>(
+        forKey key: AbsoluteConfigKey,
+        type: ConfigType,
+        updatesHandler: (ConfigUpdatesAsyncSequence<Result<LookupResult, any Error>, Never>) async throws -> Return
+    ) async throws -> Return {
+        let (stream, continuation) = AsyncStream<Result<LookupResult, any Error>>
+            .makeStream(bufferingPolicy: .bufferingNewest(1))
+        let id = UUID()
+
+        // Add watcher and get initial value
+        let initialValue: Result<LookupResult, any Error> = storage.withLock { storage in
+            storage.valueWatchers[key, default: [:]][id] = continuation
+            metrics.watcherCount.record(storage.totalWatcherCount)
+            return .init {
+                try storage.snapshot.value(forKey: key, type: type)
+            }
+        }
+        defer {
+            storage.withLock { storage in
+                storage.valueWatchers[key, default: [:]][id] = nil
+                metrics.watcherCount.record(storage.totalWatcherCount)
+            }
+        }
+
+        // Send initial value
+        continuation.yield(initialValue)
+        return try await updatesHandler(.init(stream))
+    }
+
+    // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
+    public func snapshot() -> any ConfigSnapshotProtocol {
+        storage.withLock { $0.snapshot }
+    }
+
+    // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
+    public func watchSnapshot<Return>(
+        updatesHandler: (ConfigUpdatesAsyncSequence<any ConfigSnapshotProtocol, Never>) async throws -> Return
+    ) async throws -> Return {
+        let (stream, continuation) = AsyncStream<Snapshot>.makeStream(bufferingPolicy: .bufferingNewest(1))
+        let id = UUID()
+
+        // Add watcher and get initial snapshot
+        let initialSnapshot = storage.withLock { storage in
+            storage.snapshotWatchers[id] = continuation
+            metrics.watcherCount.record(storage.totalWatcherCount)
+            return storage.snapshot
+        }
+        defer {
+            // Clean up watcher
+            storage.withLock { storage in
+                storage.snapshotWatchers[id] = nil
+                metrics.watcherCount.record(storage.totalWatcherCount)
+            }
+        }
+
+        // Send initial snapshot
+        continuation.yield(initialSnapshot)
+        return try await updatesHandler(.init(stream.map { $0 }))
+    }
+}
+
+@available(Configuration 1.0, *)
+extension ReloadingFileProvider: Service {
+    // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
+    public func run() async throws {
         logger.debug("File polling starting")
         defer {
             logger.debug("File polling stopping")
@@ -347,81 +555,6 @@ extension ReloadingFileProviderCore: Service {
                 metrics.pollTickErrorCounter.increment(by: 1)
             }
         }
-    }
-}
-
-// MARK: - ConfigProvider-like implementation
-
-@available(Configuration 1.0, *)
-extension ReloadingFileProviderCore: ConfigProvider {
-
-    internal func value(forKey key: AbsoluteConfigKey, type: ConfigType) throws -> LookupResult {
-        try storage.withLock { storage in
-            try storage.snapshot.value(forKey: key, type: type)
-        }
-    }
-
-    internal func fetchValue(forKey key: AbsoluteConfigKey, type: ConfigType) async throws -> LookupResult {
-        try await reloadIfNeeded(logger: logger)
-        return try value(forKey: key, type: type)
-    }
-
-    internal func watchValue<Return>(
-        forKey key: AbsoluteConfigKey,
-        type: ConfigType,
-        updatesHandler: (ConfigUpdatesAsyncSequence<Result<LookupResult, any Error>, Never>) async throws -> Return
-    ) async throws -> Return {
-        let (stream, continuation) = AsyncStream<Result<LookupResult, any Error>>
-            .makeStream(bufferingPolicy: .bufferingNewest(1))
-        let id = UUID()
-
-        // Add watcher and get initial value
-        let initialValue: Result<LookupResult, any Error> = storage.withLock { storage in
-            storage.valueWatchers[key, default: [:]][id] = continuation
-            metrics.watcherCount.record(storage.totalWatcherCount)
-            return .init {
-                try storage.snapshot.value(forKey: key, type: type)
-            }
-        }
-        defer {
-            storage.withLock { storage in
-                storage.valueWatchers[key, default: [:]][id] = nil
-                metrics.watcherCount.record(storage.totalWatcherCount)
-            }
-        }
-
-        // Send initial value
-        continuation.yield(initialValue)
-        return try await updatesHandler(.init(stream))
-    }
-
-    internal func snapshot() -> any ConfigSnapshotProtocol {
-        storage.withLock { $0.snapshot }
-    }
-
-    internal func watchSnapshot<Return>(
-        updatesHandler: (ConfigUpdatesAsyncSequence<any ConfigSnapshotProtocol, Never>) async throws -> Return
-    ) async throws -> Return {
-        let (stream, continuation) = AsyncStream<SnapshotType>.makeStream(bufferingPolicy: .bufferingNewest(1))
-        let id = UUID()
-
-        // Add watcher and get initial snapshot
-        let initialSnapshot = storage.withLock { storage in
-            storage.snapshotWatchers[id] = continuation
-            metrics.watcherCount.record(storage.totalWatcherCount)
-            return storage.snapshot
-        }
-        defer {
-            // Clean up watcher
-            storage.withLock { storage in
-                storage.snapshotWatchers[id] = nil
-                metrics.watcherCount.record(storage.totalWatcherCount)
-            }
-        }
-
-        // Send initial snapshot
-        continuation.yield(initialSnapshot)
-        return try await updatesHandler(.init(stream.map { $0 }))
     }
 }
 

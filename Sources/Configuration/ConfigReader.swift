@@ -44,7 +44,7 @@ import Foundation
 ///         // First, check environment variables
 ///         EnvironmentVariablesProvider(),
 ///         // Then, check a JSON config file
-///         try await JSONProvider(filePath: "/etc/config.json"),
+///         try await FileProvider<JSONSnapshot>(filePath: "/etc/config.json"),
 ///         // Finally, fall back to in-memory defaults
 ///         InMemoryProvider(values: [
 ///             "http.timeout": 60,

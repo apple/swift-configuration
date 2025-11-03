@@ -44,7 +44,7 @@ For example, to read the timeout configuration value for an HTTP client, check o
         }
         ```
         ```swift
-        let provider = try await JSONProvider(
+        let provider = try await FileProvider<JSONSnapshot>(
             filePath: "/etc/config.json"
         )
         let config = ConfigReader(provider: provider)
@@ -61,7 +61,7 @@ For example, to read the timeout configuration value for an HTTP client, check o
         }
         ```
         ```swift
-        let provider = try await ReloadingJSONProvider(
+        let provider = try await ReloadingFileProvider<JSONSnapshot>(
             filePath: "/etc/config.json"
         )
         // Omitted: Add `provider` to a ServiceGroup
@@ -76,7 +76,7 @@ For example, to read the timeout configuration value for an HTTP client, check o
           timeout: 30
         ```
         ```swift
-        let provider = try await YAMLProvider(
+        let provider = try await FileProvider<YAMLSnapshot>(
             filePath: "/etc/config.yaml"
         )
         let config = ConfigReader(provider: provider)
@@ -90,7 +90,7 @@ For example, to read the timeout configuration value for an HTTP client, check o
           timeout: 30
         ```
         ```swift
-        let provider = try await ReloadingYAMLProvider(
+        let provider = try await ReloadingFileProvider<YAMLSnapshot>(
             filePath: "/etc/config.yaml"
         )
         // Omitted: Add `provider` to a ServiceGroup
@@ -187,11 +187,11 @@ To enable an additional trait on the package, update the package dependency:
 ```
 
 Available traits:
-- **`JSONSupport`** (default): Adds support for ``JSONProvider``, a ``ConfigProvider`` for reading JSON files.
+- **`JSONSupport`** (default): Adds support for ``JSONSnapshot``, which enables using ``FileProvider`` and ``ReloadingFileProvider`` with JSON files.
 - **`LoggingSupport`** (opt-in): Adds support for ``AccessLogger``, a way to emit access events into a `SwiftLog.Logger`.
-- **`ReloadingSupport`** (opt-in): Adds support for auto-reloading variants of file providers, such as ``ReloadingJSONProvider`` (when `JSONSupport` is enabled) and ``ReloadingYAMLProvider`` (when `YAMLSupport` is enabled).
+- **`ReloadingSupport`** (opt-in): Adds support for ``ReloadingFileProvider``, which provides auto-reloading capability for file-based configuration.
 - **`CommandLineArgumentsSupport`** (opt-in): Adds support for ``CommandLineArgumentsProvider`` for parsing command line arguments.
-- **`YAMLSupport`** (opt-in): Adds support for ``YAMLProvider``, a ``ConfigProvider`` for reading YAML files.
+- **`YAMLSupport`** (opt-in): Adds support for ``YAMLSnapshot``, which enables using ``FileProvider`` and ``ReloadingFileProvider`` with YAML files.
 
 ### Supported platforms and minimum versions
 
@@ -235,8 +235,8 @@ The library includes comprehensive built-in provider support:
 
 - Environment variables: ``EnvironmentVariablesProvider``
 - Command-line arguments: ``CommandLineArgumentsProvider``
-- JSON file: ``JSONProvider`` and ``ReloadingJSONProvider``
-- YAML file: ``YAMLProvider`` and ``ReloadingYAMLProvider``
+- JSON file: ``FileProvider`` and ``ReloadingFileProvider`` with ``JSONSnapshot``
+- YAML file: ``FileProvider`` and ``ReloadingFileProvider`` with ``YAMLSnapshot``
 - Directory of files: ``DirectoryFilesProvider``
 - In-memory: ``InMemoryProvider`` and ``MutableInMemoryProvider``
 - Key transforming: ``KeyMappingProvider``
@@ -259,7 +259,7 @@ let config = ConfigReader(providers: [
     // Then, check command-line options.
     CommandLineArgumentsProvider(),
     // Then, check a JSON config file.
-    try await JSONProvider(filePath: "/etc/config.json"),
+    try await FileProvider<JSONSnapshot>(filePath: "/etc/config.json"),
     // Finally, fall back to in-memory defaults.
     InMemoryProvider(values: [
         "http.timeout": 60,
@@ -272,10 +272,10 @@ let timeout = config.int(forKey: "http.timeout", default: 15)
 
 #### Hot reloading
 
-Long-running services can periodically reload configuration with ``ReloadingJSONProvider`` and ``ReloadingYAMLProvider``:
+Long-running services can periodically reload configuration with ``ReloadingFileProvider``:
 
 ```swift
-let provider = try await ReloadingJSONProvider(filePath: "/etc/config.json")
+let provider = try await ReloadingFileProvider<JSONSnapshot>(filePath: "/etc/config.json")
 // Omitted: add provider to a ServiceGroup
 let config = ConfigReader(provider: provider)
 
@@ -407,7 +407,6 @@ Any package can implement a ``ConfigProvider``, making the ecosystem extensible 
 - ``ConfigReader``
 - ``ConfigProvider``
 - ``ConfigSnapshotReader``
-- ``ConfigSnapshotProtocol``
 - <doc:Choosing-access-patterns>
 - <doc:Choosing-reader-methods>
 - <doc:Handling-secrets-correctly>
@@ -415,10 +414,10 @@ Any package can implement a ``ConfigProvider``, making the ecosystem extensible 
 ### Built-in providers
 - ``EnvironmentVariablesProvider``
 - ``CommandLineArgumentsProvider``
-- ``JSONProvider``
-- ``YAMLProvider``
-- ``ReloadingJSONProvider``
-- ``ReloadingYAMLProvider``
+- ``FileProvider``
+- ``ReloadingFileProvider``
+- ``JSONSnapshot``
+- ``YAMLSnapshot``
 - <doc:Using-reloading-providers>
 - ``DirectoryFilesProvider``
 - <doc:Using-in-memory-providers>
@@ -427,6 +426,8 @@ Any package can implement a ``ConfigProvider``, making the ecosystem extensible 
 - ``KeyMappingProvider``
 
 ### Creating a custom provider
+- ``ConfigSnapshotProtocol``
+- ``FileParsingOptions``
 - ``ConfigProvider``
 - ``ConfigContent``
 - ``ConfigValue``

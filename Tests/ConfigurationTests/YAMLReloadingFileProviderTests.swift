@@ -12,7 +12,7 @@
 //
 //===----------------------------------------------------------------------===//
 
-#if JSONSupport && ReloadingSupport
+#if YAMLSupport && ReloadingSupport
 
 import Testing
 import ConfigurationTestingInternal
@@ -22,28 +22,28 @@ import ConfigurationTesting
 import Logging
 import SystemPackage
 
-struct ReloadingJSONProviderTests {
+struct YAMLReloadingFileProviderTests {
     @available(Configuration 1.0, *)
     @Test func printingDescription() async throws {
-        let provider = try await ReloadingJSONProvider(filePath: jsonConfigFile)
+        let provider = try await ReloadingFileProvider<YAMLSnapshot>(filePath: yamlConfigFile)
         let expectedDescription = #"""
-            ReloadingJSONProvider[20 values]
+            ReloadingFileProvider<YAMLSnapshot>[20 values]
             """#
         #expect(provider.description == expectedDescription)
     }
 
     @available(Configuration 1.0, *)
     @Test func printingDebugDescription() async throws {
-        let provider = try await ReloadingJSONProvider(filePath: jsonConfigFile)
+        let provider = try await ReloadingFileProvider<YAMLSnapshot>(filePath: yamlConfigFile)
         let expectedDebugDescription = #"""
-            ReloadingJSONProvider[20 values: bool=1, booly.array=1,0, byteChunky.array=bWFnaWM=,bWFnaWMy, bytes=bWFnaWM=, double=3.14, doubly.array=3.14,2.72, int=42, inty.array=42,24, other.bool=0, other.booly.array=0,1,1, other.byteChunky.array=bWFnaWM=,bWFnaWMy,bWFnaWM=, other.bytes=bWFnaWMy, other.double=2.72, other.doubly.array=0.9,1.8, other.int=24, other.inty.array=16,32, other.string=Other Hello, other.stringy.array=Hello,Swift, string=Hello, stringy.array=Hello,World]
+            ReloadingFileProvider<YAMLSnapshot>[20 values: bool=true, booly.array=true,false, byteChunky.array=bWFnaWM=,bWFnaWMy, bytes=bWFnaWM=, double=3.14, doubly.array=3.14,2.72, int=42, inty.array=42,24, other.bool=false, other.booly.array=false,true,true, other.byteChunky.array=bWFnaWM=,bWFnaWMy,bWFnaWM=, other.bytes=bWFnaWMy, other.double=2.72, other.doubly.array=0.9,1.8, other.int=24, other.inty.array=16,32, other.string=Other Hello, other.stringy.array=Hello,Swift, string=Hello, stringy.array=Hello,World]
             """#
         #expect(provider.debugDescription == expectedDebugDescription)
     }
 
     @available(Configuration 1.0, *)
     @Test func compat() async throws {
-        let provider = try await ReloadingJSONProvider(filePath: jsonConfigFile)
+        let provider = try await ReloadingFileProvider<YAMLSnapshot>(filePath: yamlConfigFile)
         try await ProviderCompatTest(provider: provider).runTest()
     }
 
@@ -51,17 +51,17 @@ struct ReloadingJSONProviderTests {
     @Test func initializationWithConfig() async throws {
         // Test initialization using config reader
         let envProvider = InMemoryProvider(values: [
-            "json.filePath": ConfigValue(jsonConfigFile.string, isSecret: false),
-            "json.pollIntervalSeconds": 30,
+            "yaml.filePath": ConfigValue(yamlConfigFile.string, isSecret: false),
+            "yaml.pollIntervalSeconds": 30,
         ])
         let config = ConfigReader(provider: envProvider)
 
-        let reloadingProvider = try await ReloadingJSONProvider(
-            config: config.scoped(to: "json")
+        let reloadingProvider = try await ReloadingFileProvider<YAMLSnapshot>(
+            config: config.scoped(to: "yaml")
         )
 
-        #expect(reloadingProvider.providerName == "ReloadingJSONProvider")
-        #expect(reloadingProvider.description.contains("ReloadingJSONProvider[20 values]"))
+        #expect(reloadingProvider.providerName == "ReloadingFileProvider<YAMLSnapshot>")
+        #expect(reloadingProvider.description.contains("ReloadingFileProvider<YAMLSnapshot>[20 values]"))
     }
 }
 

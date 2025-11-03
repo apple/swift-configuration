@@ -1,7 +1,7 @@
 version: 1
 builder:
   configs:
-    - swift_version: '6.1'
+    - swift_version: '6.2'
       documentation_targets:
         - Configuration
         - ConfigurationTesting
