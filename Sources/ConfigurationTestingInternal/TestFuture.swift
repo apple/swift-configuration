@@ -12,8 +12,7 @@
 //
 //===----------------------------------------------------------------------===//
 
-// Needs full Foundation, NSLock is not available in FoundationEssentials.
-import Foundation
+import Synchronization
 
 /// A future implementation for testing asynchronous operations.
 ///
@@ -38,7 +37,7 @@ import Foundation
 /// let result = await future.value
 /// ```
 @available(Configuration 1.0, *)
-package final class TestFuture<T: Sendable>: @unchecked Sendable /* lock + locked_state */ {
+package final class TestFuture<T: Sendable>: @unchecked Sendable /* mutex */ {
 
     /// The internal state of the future.
     private enum State {
@@ -48,11 +47,8 @@ package final class TestFuture<T: Sendable>: @unchecked Sendable /* lock + locke
         case fulfilled(T)
     }
 
-    /// Synchronizes access to the internal state.
-    private let lock: NSLock
-
     /// The current state of the future.
-    private var locked_state: State
+    private let state: Mutex<State>
 
     /// Optional name for debugging and logging purposes.
     private let name: String?
@@ -82,9 +78,7 @@ package final class TestFuture<T: Sendable>: @unchecked Sendable /* lock + locke
         self.verbose = verbose
         self.file = file
         self.line = line
-        self.lock = NSLock()
-        self.lock.name = "TestFuture.lock"
-        self.locked_state = .waitingForFulfillment([])
+        self.state = .init(.waitingForFulfillment([]))
     }
 
     /// Fulfills the future with the provided value.
@@ -100,18 +94,26 @@ package final class TestFuture<T: Sendable>: @unchecked Sendable /* lock + locke
         if verbose {
             print("Fulfilling \(name ?? "unnamed") at \(file):\(line) with \(value)")
         }
-        let continuations: [CheckedContinuation<T, Never>]
-        lock.lock()
-        switch locked_state {
-        case .fulfilled:
-            fatalError("Fulfilled \(name ?? "unnamed") at \(file):\(line) twice")
-        case .waitingForFulfillment(let _continuations):
-            locked_state = .fulfilled(value)
-            continuations = _continuations
+        let continuations: [CheckedContinuation<T, Never>] = state.withLock { state in
+            switch state {
+            case .fulfilled:
+                fatalError("Fulfilled \(name ?? "unnamed") at \(file):\(line) twice")
+            case .waitingForFulfillment(let continuations):
+                if verbose {
+                    print("Found \(continuations.count) waiting continuations for \(name ?? "unnamed")")
+                }
+                state = .fulfilled(value)
+                return continuations
+            }
         }
-        lock.unlock()
+        if verbose {
+            print("Resuming \(continuations.count) continuations for \(name ?? "unnamed")")
+        }
         for continuation in continuations {
             continuation.resume(returning: value)
+        }
+        if verbose {
+            print("All continuations resumed for \(name ?? "unnamed")")
         }
     }
 
@@ -137,21 +139,32 @@ package final class TestFuture<T: Sendable>: @unchecked Sendable /* lock + locke
                 print("Getting value from \(name ?? "unnamed") at \(file):\(line)")
             }
             return await withCheckedContinuation { continuation in
-                let result: GetValueResult
-                lock.lock()
-                switch locked_state {
-                case .fulfilled(let value):
-                    result = .returnValue(value)
-                case .waitingForFulfillment(var continuations):
-                    continuations.append(continuation)
-                    locked_state = .waitingForFulfillment(continuations)
-                    result = .appendedContinuation
+                let result: GetValueResult = state.withLock { state in
+                    switch state {
+                    case .fulfilled(let value):
+                        if verbose {
+                            print("\(name ?? "unnamed") already fulfilled, returning immediately")
+                        }
+                        return .returnValue(value)
+                    case .waitingForFulfillment(var continuations):
+                        if verbose {
+                            print("\(name ?? "unnamed") not fulfilled, adding continuation (total: \(continuations.count + 1))")
+                        }
+                        continuations.append(continuation)
+                        state = .waitingForFulfillment(continuations)
+                        return .appendedContinuation
+                    }
                 }
-                lock.unlock()
                 switch result {
                 case .appendedContinuation:
+                    if verbose {
+                        print("\(name ?? "unnamed") continuation stored, waiting for fulfill")
+                    }
                     break
                 case .returnValue(let value):
+                    if verbose {
+                        print("\(name ?? "unnamed") resuming continuation immediately with \(value)")
+                    }
                     continuation.resume(returning: value)
                 }
             }
