@@ -9,4 +9,4 @@
 
 ### Protocol requirements
 
-- ``ConfigSnapshotProtocol``
+- ``ConfigSnapshot``

@@ -106,12 +106,12 @@ struct MultiProviderTests {
             }
         }
 
-        func snapshot() -> any ConfigSnapshotProtocol {
+        func snapshot() -> any ConfigSnapshot {
             multiProvider.snapshot()
         }
 
         func watchSnapshot<Return>(
-            updatesHandler: (ConfigUpdatesAsyncSequence<any ConfigSnapshotProtocol, Never>) async throws -> Return
+            updatesHandler: (ConfigUpdatesAsyncSequence<any ConfigSnapshot, Never>) async throws -> Return
         )
             async throws -> Return
         {
@@ -177,7 +177,7 @@ struct MultiProviderTests {
 }
 
 @available(Configuration 1.0, *)
-extension MultiSnapshot: ConfigSnapshotProtocol {
+extension MultiSnapshot: ConfigSnapshot {
     var providerName: String {
         "MultiProvider"
     }

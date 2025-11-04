@@ -115,7 +115,7 @@ public protocol ConfigProvider: Sendable {
     /// significant performance impact.
     ///
     /// - Returns: An immutable snapshot that represents the current provider state.
-    func snapshot() -> any ConfigSnapshotProtocol
+    func snapshot() -> any ConfigSnapshot
 
     /// Monitors the provider's state for changes by emitting snapshots.
     ///
@@ -129,7 +129,7 @@ public protocol ConfigProvider: Sendable {
     /// - Throws: Provider-specific errors or errors thrown by the handler closure.
     /// - Returns: The value returned by the closure.
     func watchSnapshot<Return>(
-        updatesHandler: (ConfigUpdatesAsyncSequence<any ConfigSnapshotProtocol, Never>) async throws -> Return
+        updatesHandler: (ConfigUpdatesAsyncSequence<any ConfigSnapshot, Never>) async throws -> Return
     ) async throws -> Return
 }
 
@@ -139,7 +139,7 @@ public protocol ConfigProvider: Sendable {
 /// capturing the provider's state at a specific moment. This prevents the underlying
 /// data from changing between individual key lookups.
 @available(Configuration 1.0, *)
-public protocol ConfigSnapshotProtocol: Sendable {
+public protocol ConfigSnapshot: Sendable {
 
     /// The human-readable name of the configuration provider that created this snapshot.
     ///

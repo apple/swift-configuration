@@ -10,4 +10,4 @@
 ### Snapshot configuration
 
 - ``FileConfigSnapshot``
-- ``ConfigSnapshotProtocol``
+- ``ConfigSnapshot``

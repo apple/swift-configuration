@@ -74,7 +74,7 @@ extension ConfigProvider {
     ///
     /// ```swift
     /// func watchSnapshot(
-    ///     updatesHandler: (ConfigUpdatesAsyncSequence<any ConfigSnapshotProtocol, Never>) async throws -> Void
+    ///     updatesHandler: (ConfigUpdatesAsyncSequence<any ConfigSnapshot, Never>) async throws -> Void
     /// ) async throws {
     ///     try await watchSnapshotFromSnapshot(updatesHandler)
     /// }
@@ -84,9 +84,9 @@ extension ConfigProvider {
     /// - Returns: The value returned by the handler closure.
     /// - Throws: Provider-specific errors or errors thrown by the handler.
     public func watchSnapshotFromSnapshot<Return>(
-        updatesHandler: (ConfigUpdatesAsyncSequence<any ConfigSnapshotProtocol, Never>) async throws -> Return
+        updatesHandler: (ConfigUpdatesAsyncSequence<any ConfigSnapshot, Never>) async throws -> Return
     ) async throws -> Return {
-        let (stream, continuation) = AsyncStream<any ConfigSnapshotProtocol>
+        let (stream, continuation) = AsyncStream<any ConfigSnapshot>
             .makeStream(bufferingPolicy: .bufferingNewest(1))
         let initialValue = snapshot()
         continuation.yield(initialValue)

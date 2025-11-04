@@ -264,7 +264,7 @@ extension YAMLSnapshot: FileConfigSnapshot {
 }
 
 @available(Configuration 1.0, *)
-extension YAMLSnapshot: ConfigSnapshotProtocol {
+extension YAMLSnapshot: ConfigSnapshot {
     // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
     public func value(forKey key: AbsoluteConfigKey, type: ConfigType) throws -> LookupResult {
         let encodedKey = Self.keyEncoder.encode(key)

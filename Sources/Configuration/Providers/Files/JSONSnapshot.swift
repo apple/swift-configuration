@@ -313,7 +313,7 @@ extension JSONSnapshot: FileConfigSnapshot {
 }
 
 @available(Configuration 1.0, *)
-extension JSONSnapshot: ConfigSnapshotProtocol {
+extension JSONSnapshot: ConfigSnapshot {
     // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
     public func value(forKey key: AbsoluteConfigKey, type: ConfigType) throws -> LookupResult {
         let encodedKey = Self.keyEncoder.encode(key)
