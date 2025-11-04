@@ -426,7 +426,7 @@ Any package can implement a ``ConfigProvider``, making the ecosystem extensible 
 - ``KeyMappingProvider``
 
 ### Creating a custom provider
-- ``ConfigSnapshotProtocol``
+- ``ConfigSnapshot``
 - ``FileParsingOptions``
 - ``ConfigProvider``
 - ``ConfigContent``

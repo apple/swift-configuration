@@ -47,7 +47,7 @@ public protocol FileParsingOptions: Sendable {
 
 /// A protocol for configuration snapshots created from file data.
 ///
-/// This protocol extends ``ConfigSnapshotProtocol`` to provide file-specific functionality
+/// This protocol extends ``ConfigSnapshot`` to provide file-specific functionality
 /// for creating configuration snapshots from raw file data. Types conforming to this protocol
 /// can parse various file formats (such as JSON and YAML) and convert them into configuration values.
 ///
@@ -75,7 +75,7 @@ public protocol FileParsingOptions: Sendable {
 /// The snapshot is responsible for parsing the file data and converting it into a
 /// representation of configuration values that can be queried by the configuration system.
 @available(Configuration 1.0, *)
-public protocol FileConfigSnapshot: ConfigSnapshotProtocol, CustomStringConvertible,
+public protocol FileConfigSnapshot: ConfigSnapshot, CustomStringConvertible,
     CustomDebugStringConvertible
 {
     /// The parsing options type used for parsing this snapshot.

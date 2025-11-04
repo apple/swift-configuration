@@ -117,7 +117,7 @@ struct KeyMappingProviderTests {
             }
         }
 
-        var receivedSnapshots: [any ConfigSnapshotProtocol] = []
+        var receivedSnapshots: [any ConfigSnapshot] = []
         try await mapper.watchSnapshot { sequence in
             for try await snapshot in sequence {
                 receivedSnapshots.append(snapshot)

@@ -155,7 +155,7 @@ internal struct CLISnapshot {
 }
 
 @available(Configuration 1.0, *)
-extension CLISnapshot: ConfigSnapshotProtocol {
+extension CLISnapshot: ConfigSnapshot {
     // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
     func value(forKey key: AbsoluteConfigKey, type: ConfigType) throws -> LookupResult {
         let encodedKey = keyEncoder.encode(key)

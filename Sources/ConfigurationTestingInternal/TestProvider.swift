@@ -83,7 +83,7 @@ extension TestProvider {
 }
 
 @available(Configuration 1.0, *)
-extension TestProvider: ConfigProvider, ConfigSnapshotProtocol {
+extension TestProvider: ConfigProvider, ConfigSnapshot {
     package var providerName: String {
         "TestProvider"
     }
@@ -103,12 +103,12 @@ extension TestProvider: ConfigProvider, ConfigSnapshotProtocol {
         }
     }
 
-    package func snapshot() -> any ConfigSnapshotProtocol {
+    package func snapshot() -> any ConfigSnapshot {
         self
     }
 
     package func watchSnapshot<Return>(
-        updatesHandler: (ConfigUpdatesAsyncSequence<any ConfigSnapshotProtocol, Never>) async throws -> Return
+        updatesHandler: (ConfigUpdatesAsyncSequence<any ConfigSnapshot, Never>) async throws -> Return
     )
         async throws -> Return
     {

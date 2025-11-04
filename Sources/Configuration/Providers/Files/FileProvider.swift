@@ -178,7 +178,7 @@ extension FileProvider: ConfigProvider {
 
     // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
     public func watchSnapshot<Return>(
-        updatesHandler: (ConfigUpdatesAsyncSequence<any ConfigSnapshotProtocol, Never>) async throws -> Return
+        updatesHandler: (ConfigUpdatesAsyncSequence<any ConfigSnapshot, Never>) async throws -> Return
     ) async throws -> Return {
         try await watchSnapshotFromSnapshot(updatesHandler: updatesHandler)
     }
@@ -195,7 +195,7 @@ extension FileProvider: ConfigProvider {
     }
 
     // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
-    public func snapshot() -> any ConfigSnapshotProtocol {
+    public func snapshot() -> any ConfigSnapshot {
         _snapshot
     }
 }

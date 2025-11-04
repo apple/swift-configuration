@@ -89,7 +89,7 @@ extension MultiProvider: CustomStringConvertible {
 struct MultiSnapshot {
 
     /// The individual snapshots from each nested provider, maintained in precedence order.
-    var snapshots: [any ConfigSnapshotProtocol]
+    var snapshots: [any ConfigSnapshot]
 
     /// Resolves a configuration value by querying nested provider snapshots in precedence order.
     /// - Parameters:
@@ -201,7 +201,7 @@ extension MultiProvider {
         ) async throws -> Return
     {
         let providers = storage.providers
-        typealias UpdatesSequence = any (AsyncSequence<any ConfigSnapshotProtocol, Never> & Sendable)
+        typealias UpdatesSequence = any (AsyncSequence<any ConfigSnapshot, Never> & Sendable)
         var updateSequences: [UpdatesSequence] = []
         updateSequences.reserveCapacity(providers.count)
         return try await withProvidersWatchingSnapshot(

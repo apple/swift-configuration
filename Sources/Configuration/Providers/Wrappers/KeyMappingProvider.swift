@@ -112,13 +112,13 @@ extension KeyMappingProvider: ConfigProvider {
     }
 
     // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
-    public func snapshot() -> any ConfigSnapshotProtocol {
+    public func snapshot() -> any ConfigSnapshot {
         MappedKeySnapshot(mapKey: self.mapKey, upstream: self.upstream.snapshot())
     }
 
     // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
     public func watchSnapshot<Return>(
-        updatesHandler: (ConfigUpdatesAsyncSequence<any ConfigSnapshotProtocol, Never>) async throws -> Return
+        updatesHandler: (ConfigUpdatesAsyncSequence<any ConfigSnapshot, Never>) async throws -> Return
     ) async throws -> Return {
         try await upstream.watchSnapshot { sequence in
             try await updatesHandler(
@@ -135,13 +135,13 @@ extension KeyMappingProvider: ConfigProvider {
 
 /// A configuration snapshot that maps all keys before delegating to an upstream snapshot.
 @available(Configuration 1.0, *)
-private struct MappedKeySnapshot: ConfigSnapshotProtocol {
+private struct MappedKeySnapshot: ConfigSnapshot {
 
     /// The prefix key to prepend to all configuration keys.
     let mapKey: @Sendable (AbsoluteConfigKey) -> AbsoluteConfigKey
 
     /// The upstream configuration snapshot to delegate to after prefixing keys.
-    var upstream: any ConfigSnapshotProtocol
+    var upstream: any ConfigSnapshot
 
     var providerName: String {
         "KeyMappingProvider[upstream: \(self.upstream.providerName)]"
