@@ -175,7 +175,7 @@ public final class Validator<Element: Sendable>: Sendable {
 
     public func test<S: AsyncSequence & SendableMetatype>(
         _ sequence: S,
-        onFinish: @Sendable @escaping (inout S.AsyncIterator) async -> Void
+        onFinish: sending @escaping (inout S.AsyncIterator) async -> Void
     ) where S.Element == Element {
         let envelope = Envelope(contents: sequence)
         Task {
