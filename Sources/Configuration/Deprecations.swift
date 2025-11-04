@@ -44,6 +44,7 @@ public typealias ReloadingYAMLProvider = ReloadingFileProvider<YAMLSnapshot>
 
 #endif
 
+/// An immutable snapshot of a configuration provider's state.
 @available(Configuration 1.0, *)
 @available(*, deprecated, renamed: "ConfigSnapshot")
 public typealias ConfigSnapshotProtocol = ConfigSnapshot
