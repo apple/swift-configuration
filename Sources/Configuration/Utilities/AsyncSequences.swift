@@ -14,18 +14,18 @@
 
 /// A concrete async sequence for delivering updated configuration values.
 @available(Configuration 1.0, *)
-public struct ConfigUpdatesAsyncSequence<Element: Sendable, Failure: Error> {
+public struct ConfigUpdatesAsyncSequence<Element: Sendable, Failure: Error>: Sendable {
 
     /// The upstream async sequence that this concrete sequence wraps.
     ///
     /// This property holds the async sequence that provides the actual elements.
     /// All operations on this concrete sequence are delegated to this upstream sequence.
-    private let upstream: any AsyncSequence<Element, Failure>
+    private let upstream: any AsyncSequence<Element, Failure> & Sendable
 
     /// Creates a new concrete async sequence wrapping the provided existential sequence.
     ///
     /// - Parameter upstream: The async sequence to wrap.
-    public init(_ upstream: some AsyncSequence<Element, Failure>) {
+    public init(_ upstream: some AsyncSequence<Element, Failure> & Sendable) {
         self.upstream = upstream
     }
 }
@@ -60,7 +60,7 @@ extension ConfigUpdatesAsyncSequence: AsyncSequence {
 // MARK: - AsyncSequence extensions
 
 @available(Configuration 1.0, *)
-extension AsyncSequence where Failure == Never {
+extension AsyncSequence where Failure == Never, Self: Sendable {
 
     /// Maps each element of the sequence using a throwing transform, introducing a failure type.
     ///
@@ -89,8 +89,8 @@ extension AsyncSequence where Failure == Never {
     /// }
     /// ```
     func mapThrowing<NewValue, Failure: Error>(
-        _ transform: @escaping (Element) throws(Failure) -> NewValue
-    ) -> some AsyncSequence<NewValue, Failure> {
+        _ transform: @escaping @Sendable (Element) throws(Failure) -> NewValue
+    ) -> some AsyncSequence<NewValue, Failure> & Sendable {
         MapThrowingAsyncSequence(upstream: self, transform: transform)
     }
 }
@@ -110,13 +110,18 @@ extension AsyncSequence where Failure == Never {
 /// - `Value`: The input element type from the upstream sequence.
 /// - `Upstream`: The upstream async sequence type that never throws.
 @available(Configuration 1.0, *)
-private struct MapThrowingAsyncSequence<Element, Failure: Error, Value, Upstream: AsyncSequence<Value, Never>> {
+private struct MapThrowingAsyncSequence<
+    Element,
+    Failure: Error,
+    Value,
+    Upstream: AsyncSequence<Value, Never> & Sendable
+>: Sendable {
 
     /// The upstream async sequence to transform.
     var upstream: Upstream
 
     /// The throwing transform function to apply to each element.
-    var transform: (Value) throws(Failure) -> Element
+    var transform: @Sendable (Value) throws(Failure) -> Element
 }
 
 @available(Configuration 1.0, *)

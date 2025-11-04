@@ -174,6 +174,64 @@ struct MultiProviderTests {
 
         #expect(accessReporter.events.count == 3)
     }
+
+    @available(Configuration 1.0, *)
+    @Test func watchingTwoUpstreams_handlerReturns() async throws {
+        let first = InMemoryProvider(
+            name: "first",
+            values: [
+                "value": "First"
+            ]
+        )
+        let second = InMemoryProvider(
+            name: "first",
+            values: [
+                "value": "Second"
+            ]
+        )
+        let accessReporter = TestAccessReporter()
+        let config = ConfigReader(providers: [first, second], accessReporter: accessReporter)
+
+        try await config.watchString(forKey: "value", default: "default") { updates in
+            var iterator = updates.makeAsyncIterator()
+            let firstValue = try await iterator.next()
+            #expect(firstValue == "First")
+            // Return immediately
+        }
+
+        #expect(accessReporter.events.count == 1)
+    }
+
+    @available(Configuration 1.0, *)
+    @Test func watchingTwoUpstreams_handlerThrowsError() async throws {
+        let first = InMemoryProvider(
+            name: "first",
+            values: [
+                "value": "First"
+            ]
+        )
+        let second = InMemoryProvider(
+            name: "first",
+            values: [
+                "value": "Second"
+            ]
+        )
+        let accessReporter = TestAccessReporter()
+        let config = ConfigReader(providers: [first, second], accessReporter: accessReporter)
+
+        struct HandlerError: Error {}
+        await #expect(throws: HandlerError.self) {
+            try await config.watchString(forKey: "value", default: "default") { updates in
+                var iterator = updates.makeAsyncIterator()
+                let firstValue = try await iterator.next()
+                #expect(firstValue == "First")
+                // Throws immediately
+                throw HandlerError()
+            }
+        }
+
+        #expect(accessReporter.events.count == 1)
+    }
 }
 
 @available(Configuration 1.0, *)
