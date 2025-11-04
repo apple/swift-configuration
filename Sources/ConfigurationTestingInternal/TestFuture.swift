@@ -148,7 +148,9 @@ package final class TestFuture<T: Sendable>: @unchecked Sendable /* mutex */ {
                         return .returnValue(value)
                     case .waitingForFulfillment(var continuations):
                         if verbose {
-                            print("\(name ?? "unnamed") not fulfilled, adding continuation (total: \(continuations.count + 1))")
+                            print(
+                                "\(name ?? "unnamed") not fulfilled, adding continuation (total: \(continuations.count + 1))"
+                            )
                         }
                         continuations.append(continuation)
                         state = .waitingForFulfillment(continuations)
