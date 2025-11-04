@@ -42,13 +42,15 @@ extension ConfigProvider {
     ///   - updatesHandler: The closure that processes the async sequence of value updates.
     /// - Returns: The value returned by the handler closure.
     /// - Throws: Provider-specific errors or errors thrown by the handler.
-    public func watchValueFromValue<Return>(
-        forKey key: AbsoluteConfigKey,
-        type: ConfigType,
-        updatesHandler: (
-            ConfigUpdatesAsyncSequence<Result<LookupResult, any Error>, Never>
+    nonisolated(nonsending)
+        public func watchValueFromValue<Return>(
+            forKey key: AbsoluteConfigKey,
+            type: ConfigType,
+            updatesHandler: (
+                ConfigUpdatesAsyncSequence<Result<LookupResult, any Error>, Never>
+            ) async throws -> Return
         ) async throws -> Return
-    ) async throws -> Return {
+    {
         let (stream, continuation) = AsyncStream<Result<LookupResult, any Error>>
             .makeStream(bufferingPolicy: .bufferingNewest(1))
         let initialValue: Result<LookupResult, any Error>
@@ -83,9 +85,11 @@ extension ConfigProvider {
     /// - Parameter updatesHandler: The closure that processes the async sequence of snapshot updates.
     /// - Returns: The value returned by the handler closure.
     /// - Throws: Provider-specific errors or errors thrown by the handler.
-    public func watchSnapshotFromSnapshot<Return>(
-        updatesHandler: (ConfigUpdatesAsyncSequence<any ConfigSnapshotProtocol, Never>) async throws -> Return
-    ) async throws -> Return {
+    nonisolated(nonsending)
+        public func watchSnapshotFromSnapshot<Return>(
+            updatesHandler: (ConfigUpdatesAsyncSequence<any ConfigSnapshotProtocol, Never>) async throws -> Return
+        ) async throws -> Return
+    {
         let (stream, continuation) = AsyncStream<any ConfigSnapshotProtocol>
             .makeStream(bufferingPolicy: .bufferingNewest(1))
         let initialValue = snapshot()
