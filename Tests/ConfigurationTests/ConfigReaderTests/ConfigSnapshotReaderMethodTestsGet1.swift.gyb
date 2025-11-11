@@ -36,41 +36,31 @@ struct ConfigSnapshotReaderMethodTestsGet1 {
         % lower_name = lower_first(name)
         try config.withSnapshot { snapshot in
             // Optional - success
-            #expect(snapshot.${lower_name}(forKey: ConfigKey(["${lower_name}"])) == Defaults.${lower_name})
             #expect(snapshot.${lower_name}(forKey: "${lower_name}") == Defaults.${lower_name})
 
             // Optional - missing
-            #expect(snapshot.${lower_name}(forKey: ConfigKey(["absent${name}"])) == nil)
             #expect(snapshot.${lower_name}(forKey: "absent${name}") == nil)
 
             // Optional - failing
-            #expect(snapshot.${lower_name}(forKey: ConfigKey(["failure"])) == nil)
             #expect(snapshot.${lower_name}(forKey: "failure") == nil)
 
             // Defaulted - success
-            #expect(snapshot.${lower_name}(forKey: ConfigKey(["${lower_name}"]), default: Defaults.other${name}) == Defaults.${lower_name})
             #expect(snapshot.${lower_name}(forKey: "${lower_name}", default: Defaults.other${name}) == Defaults.${lower_name})
 
             // Defaulted - missing
-            #expect(snapshot.${lower_name}(forKey: ConfigKey(["absent${name}"]), default: Defaults.other${name}) == Defaults.other${name})
             #expect(snapshot.${lower_name}(forKey: "absent${name}", default: Defaults.other${name}) == Defaults.other${name})
 
             // Defaulted - failing
-            #expect(snapshot.${lower_name}(forKey: ConfigKey(["failure"]), default: Defaults.other${name}) == Defaults.other${name})
             #expect(snapshot.${lower_name}(forKey: "failure", default: Defaults.other${name}) == Defaults.other${name})
 
             // Required - success
-            try #expect(snapshot.required${name}(forKey: ConfigKey(["${lower_name}"])) == Defaults.${lower_name})
             try #expect(snapshot.required${name}(forKey: "${lower_name}") == Defaults.${lower_name})
 
             // Required - missing
-            let error1 = #expect(throws: ConfigError.self) { try snapshot.required${name}(forKey: ConfigKey(["absent${name}"])) }
+            let error1 = #expect(throws: ConfigError.self) { try snapshot.required${name}(forKey: "absent${name}") }
             #expect(error1 == .missingRequiredConfigValue(AbsoluteConfigKey(["absent${name}"])))
-            let error2 = #expect(throws: ConfigError.self) { try snapshot.required${name}(forKey: "absent${name}") }
-            #expect(error2 == .missingRequiredConfigValue(AbsoluteConfigKey(["absent${name}"])))
 
             // Required - failing
-            #expect(throws: TestProvider.TestError.self) { try snapshot.required${name}(forKey: ConfigKey(["failure"])) }
             #expect(throws: TestProvider.TestError.self) { try snapshot.required${name}(forKey: "failure") }
         }
         % end

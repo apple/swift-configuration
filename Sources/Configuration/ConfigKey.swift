@@ -20,6 +20,7 @@
 ///
 /// Keys can include additional context information that some providers use to
 /// refine value lookups or provide more specific results.
+@available(Configuration 1.0, *)
 public struct ConfigKey: Sendable {
 
     /// The hierarchical components that make up this configuration key.
@@ -42,10 +43,23 @@ public struct ConfigKey: Sendable {
         self.components = components
         self.context = context
     }
+
+    /// Creates a new configuration key.
+    /// - Parameters:
+    ///   - string: The string represenation of the key path, for example `"http.timeout"`.
+    ///   - context: Additional context information for the key.
+    public init(_ string: String, context: [String: ConfigContextValue] = [:]) {
+        self = DotSeparatorKeyDecoder.decode(string, context: context)
+    }
 }
 
+@available(Configuration 1.0, *)
 extension ConfigKey: Equatable {}
+
+@available(Configuration 1.0, *)
 extension ConfigKey: Hashable {}
+
+@available(Configuration 1.0, *)
 extension ConfigKey: Comparable {
     // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
     public static func < (lhs: ConfigKey, rhs: ConfigKey) -> Bool {
@@ -67,6 +81,7 @@ extension ConfigKey: Comparable {
     }
 }
 
+@available(Configuration 1.0, *)
 extension ConfigKey: CustomStringConvertible {
     // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
     public var description: String {
@@ -79,6 +94,15 @@ extension ConfigKey: CustomStringConvertible {
     }
 }
 
+@available(Configuration 1.0, *)
+extension ConfigKey: ExpressibleByStringLiteral {
+    // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
+    public init(stringLiteral value: String) {
+        self = DotSeparatorKeyDecoder.decode(value, context: [:])
+    }
+}
+
+@available(Configuration 1.0, *)
 extension ConfigKey: ExpressibleByArrayLiteral {
     // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
     public init(arrayLiteral elements: String...) {
@@ -94,6 +118,7 @@ extension ConfigKey: ExpressibleByArrayLiteral {
 ///
 /// Like relative keys, absolute keys consist of hierarchical components and
 /// optional context information.
+@available(Configuration 1.0, *)
 public struct AbsoluteConfigKey: Sendable {
 
     /// The hierarchical components that make up this absolute configuration key.
@@ -118,8 +143,13 @@ public struct AbsoluteConfigKey: Sendable {
     }
 }
 
+@available(Configuration 1.0, *)
 extension AbsoluteConfigKey: Equatable {}
+
+@available(Configuration 1.0, *)
 extension AbsoluteConfigKey: Hashable {}
+
+@available(Configuration 1.0, *)
 extension AbsoluteConfigKey: Comparable {
     // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
     public static func < (lhs: AbsoluteConfigKey, rhs: AbsoluteConfigKey) -> Bool {
@@ -141,6 +171,7 @@ extension AbsoluteConfigKey: Comparable {
     }
 }
 
+@available(Configuration 1.0, *)
 extension AbsoluteConfigKey: CustomStringConvertible {
     // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
     public var description: String {
@@ -153,6 +184,7 @@ extension AbsoluteConfigKey: CustomStringConvertible {
     }
 }
 
+@available(Configuration 1.0, *)
 extension AbsoluteConfigKey {
 
     /// Creates a new absolute configuration key from a relative key.
@@ -162,6 +194,7 @@ extension AbsoluteConfigKey {
     }
 }
 
+@available(Configuration 1.0, *)
 extension AbsoluteConfigKey? {
     /// Returns a new absolute configuration key by appending the given relative key.
     /// - Parameter relative: The relative configuration key to append to this key.
@@ -178,6 +211,7 @@ extension AbsoluteConfigKey? {
     }
 }
 
+@available(Configuration 1.0, *)
 extension AbsoluteConfigKey {
     /// Returns a new absolute configuration key by prepending the given relative key.
     /// - Parameter prefix: The relative configuration key to prepend to this key.
@@ -201,6 +235,15 @@ extension AbsoluteConfigKey {
     }
 }
 
+@available(Configuration 1.0, *)
+extension AbsoluteConfigKey: ExpressibleByStringLiteral {
+    // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
+    public init(stringLiteral value: String) {
+        self = .init(DotSeparatorKeyDecoder.decode(value, context: [:]))
+    }
+}
+
+@available(Configuration 1.0, *)
 extension AbsoluteConfigKey: ExpressibleByArrayLiteral {
     // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
     public init(arrayLiteral elements: String...) {
