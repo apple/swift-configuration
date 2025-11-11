@@ -55,37 +55,6 @@ extension ConfigReader {
         )
     }
 
-    /// Synchronously gets a config value for the given string key.
-    ///
-    /// Use this method to retrieve optional configuration values using string-based keys.
-    /// If the value doesn't exist or can't be converted to the expected type, the method returns `nil`.
-    ///
-    /// ```swift
-    /// let dbUrl = config.string(forKey: "database.url")
-    /// ```
-    ///
-    /// - Parameters:
-    ///   - key: The string representation of the config key to look up.
-    ///   - context: Additional context used for key resolution.
-    ///   - isSecret: Whether the value should be treated as secret for logging and debugging purposes.
-    ///   - fileID: The file ID where this call originates. Used for access reporting.
-    ///   - line: The line number where this call originates. Used for access reporting.
-    /// - Returns: The value converted to the expected type if found and convertible, otherwise `nil`.
-    public func string(
-        forKey key: String,
-        context: [String: ConfigContextValue] = [:],
-        isSecret: Bool = false,
-        fileID: String = #fileID,
-        line: UInt = #line
-    ) -> String? {
-        string(
-            forKey: keyDecoder.decode(key, context: context),
-            isSecret: isSecret,
-            fileID: fileID,
-            line: line
-        )
-    }
-
     /// Synchronously gets a config value for the given config key, with a default fallback.
     ///
     /// Use this method when you need a guaranteed non-nil result. If the configuration
@@ -117,41 +86,6 @@ extension ConfigReader {
             default: defaultValue,
             unwrap: { try $0.asString },
             wrap: ConfigContent.string,
-            fileID: fileID,
-            line: line
-        )
-    }
-
-    /// Synchronously gets a config value for the given config key, providing a default fallback.
-    ///
-    /// Use this method when you need a guaranteed non-nil result. If the configuration
-    /// value is missing or can't be converted to the expected type, the default value
-    /// is returned instead.
-    ///
-    /// ```swift
-    /// let limit = config.int(forKey: "api.rateLimit", default: 1000)
-    /// ```
-    ///
-    /// - Parameters:
-    ///   - key: The string representation of the config key to look up.
-    ///   - context: Additional context used for key resolution.
-    ///   - isSecret: Whether the value should be treated as secret for logging and debugging purposes.
-    ///   - defaultValue: The fallback value returned when the config value is missing or invalid.
-    ///   - fileID: The file ID where this call originates. Used for access reporting.
-    ///   - line: The line number where this call originates. Used for access reporting.
-    /// - Returns: The config value if found and convertible, otherwise the default value.
-    public func string(
-        forKey key: String,
-        context: [String: ConfigContextValue] = [:],
-        isSecret: Bool = false,
-        default defaultValue: String,
-        fileID: String = #fileID,
-        line: UInt = #line
-    ) -> String {
-        string(
-            forKey: keyDecoder.decode(key, context: context),
-            isSecret: isSecret,
-            default: defaultValue,
             fileID: fileID,
             line: line
         )
@@ -190,38 +124,6 @@ extension ConfigReader {
         )
     }
 
-    /// Synchronously gets a required config value for the given string key, throwing an error if it's missing.
-    ///
-    /// Use this method when a configuration value is mandatory for your application to function.
-    /// The method throws an error if the value is missing or can't be converted to the expected type.
-    ///
-    /// ```swift
-    /// let endpoint = try config.requiredString(forKey: "service.endpoint")
-    /// ```
-    ///
-    /// - Parameters:
-    ///   - key: The string representation of the config key to look up.
-    ///   - context: Additional context used for key resolution.
-    ///   - isSecret: Whether the value should be treated as secret for logging and debugging purposes.
-    ///   - fileID: The file ID where this call originates. Used for access reporting.
-    ///   - line: The line number where this call originates. Used for access reporting.
-    /// - Returns: The config value converted to the expected type.
-    /// - Throws: If the value is missing, or a conversion error if the value can't be converted to the expected type.
-    public func requiredString(
-        forKey key: String,
-        context: [String: ConfigContextValue] = [:],
-        isSecret: Bool = false,
-        fileID: String = #fileID,
-        line: UInt = #line
-    ) throws -> String {
-        try requiredString(
-            forKey: keyDecoder.decode(key, context: context),
-            isSecret: isSecret,
-            fileID: fileID,
-            line: line
-        )
-    }
-
     /// Synchronously gets a config value for the given config key.
     ///
     /// Use this method to retrieve optional configuration values.
@@ -249,37 +151,6 @@ extension ConfigReader {
             isSecret: isSecret,
             unwrap: { try $0.asInt },
             wrap: ConfigContent.int,
-            fileID: fileID,
-            line: line
-        )
-    }
-
-    /// Synchronously gets a config value for the given string key.
-    ///
-    /// Use this method to retrieve optional configuration values using string-based keys.
-    /// If the value doesn't exist or can't be converted to the expected type, the method returns `nil`.
-    ///
-    /// ```swift
-    /// let dbUrl = config.string(forKey: "database.url")
-    /// ```
-    ///
-    /// - Parameters:
-    ///   - key: The string representation of the config key to look up.
-    ///   - context: Additional context used for key resolution.
-    ///   - isSecret: Whether the value should be treated as secret for logging and debugging purposes.
-    ///   - fileID: The file ID where this call originates. Used for access reporting.
-    ///   - line: The line number where this call originates. Used for access reporting.
-    /// - Returns: The value converted to the expected type if found and convertible, otherwise `nil`.
-    public func int(
-        forKey key: String,
-        context: [String: ConfigContextValue] = [:],
-        isSecret: Bool = false,
-        fileID: String = #fileID,
-        line: UInt = #line
-    ) -> Int? {
-        int(
-            forKey: keyDecoder.decode(key, context: context),
-            isSecret: isSecret,
             fileID: fileID,
             line: line
         )
@@ -321,41 +192,6 @@ extension ConfigReader {
         )
     }
 
-    /// Synchronously gets a config value for the given config key, providing a default fallback.
-    ///
-    /// Use this method when you need a guaranteed non-nil result. If the configuration
-    /// value is missing or can't be converted to the expected type, the default value
-    /// is returned instead.
-    ///
-    /// ```swift
-    /// let limit = config.int(forKey: "api.rateLimit", default: 1000)
-    /// ```
-    ///
-    /// - Parameters:
-    ///   - key: The string representation of the config key to look up.
-    ///   - context: Additional context used for key resolution.
-    ///   - isSecret: Whether the value should be treated as secret for logging and debugging purposes.
-    ///   - defaultValue: The fallback value returned when the config value is missing or invalid.
-    ///   - fileID: The file ID where this call originates. Used for access reporting.
-    ///   - line: The line number where this call originates. Used for access reporting.
-    /// - Returns: The config value if found and convertible, otherwise the default value.
-    public func int(
-        forKey key: String,
-        context: [String: ConfigContextValue] = [:],
-        isSecret: Bool = false,
-        default defaultValue: Int,
-        fileID: String = #fileID,
-        line: UInt = #line
-    ) -> Int {
-        int(
-            forKey: keyDecoder.decode(key, context: context),
-            isSecret: isSecret,
-            default: defaultValue,
-            fileID: fileID,
-            line: line
-        )
-    }
-
     /// Synchronously gets a required config value for the given config key, throwing an error if it's missing.
     ///
     /// Use this method when a configuration value is mandatory for your application to function.
@@ -389,38 +225,6 @@ extension ConfigReader {
         )
     }
 
-    /// Synchronously gets a required config value for the given string key, throwing an error if it's missing.
-    ///
-    /// Use this method when a configuration value is mandatory for your application to function.
-    /// The method throws an error if the value is missing or can't be converted to the expected type.
-    ///
-    /// ```swift
-    /// let endpoint = try config.requiredString(forKey: "service.endpoint")
-    /// ```
-    ///
-    /// - Parameters:
-    ///   - key: The string representation of the config key to look up.
-    ///   - context: Additional context used for key resolution.
-    ///   - isSecret: Whether the value should be treated as secret for logging and debugging purposes.
-    ///   - fileID: The file ID where this call originates. Used for access reporting.
-    ///   - line: The line number where this call originates. Used for access reporting.
-    /// - Returns: The config value converted to the expected type.
-    /// - Throws: If the value is missing, or a conversion error if the value can't be converted to the expected type.
-    public func requiredInt(
-        forKey key: String,
-        context: [String: ConfigContextValue] = [:],
-        isSecret: Bool = false,
-        fileID: String = #fileID,
-        line: UInt = #line
-    ) throws -> Int {
-        try requiredInt(
-            forKey: keyDecoder.decode(key, context: context),
-            isSecret: isSecret,
-            fileID: fileID,
-            line: line
-        )
-    }
-
     /// Synchronously gets a config value for the given config key.
     ///
     /// Use this method to retrieve optional configuration values.
@@ -448,37 +252,6 @@ extension ConfigReader {
             isSecret: isSecret,
             unwrap: { try $0.asDouble },
             wrap: ConfigContent.double,
-            fileID: fileID,
-            line: line
-        )
-    }
-
-    /// Synchronously gets a config value for the given string key.
-    ///
-    /// Use this method to retrieve optional configuration values using string-based keys.
-    /// If the value doesn't exist or can't be converted to the expected type, the method returns `nil`.
-    ///
-    /// ```swift
-    /// let dbUrl = config.string(forKey: "database.url")
-    /// ```
-    ///
-    /// - Parameters:
-    ///   - key: The string representation of the config key to look up.
-    ///   - context: Additional context used for key resolution.
-    ///   - isSecret: Whether the value should be treated as secret for logging and debugging purposes.
-    ///   - fileID: The file ID where this call originates. Used for access reporting.
-    ///   - line: The line number where this call originates. Used for access reporting.
-    /// - Returns: The value converted to the expected type if found and convertible, otherwise `nil`.
-    public func double(
-        forKey key: String,
-        context: [String: ConfigContextValue] = [:],
-        isSecret: Bool = false,
-        fileID: String = #fileID,
-        line: UInt = #line
-    ) -> Double? {
-        double(
-            forKey: keyDecoder.decode(key, context: context),
-            isSecret: isSecret,
             fileID: fileID,
             line: line
         )
@@ -520,41 +293,6 @@ extension ConfigReader {
         )
     }
 
-    /// Synchronously gets a config value for the given config key, providing a default fallback.
-    ///
-    /// Use this method when you need a guaranteed non-nil result. If the configuration
-    /// value is missing or can't be converted to the expected type, the default value
-    /// is returned instead.
-    ///
-    /// ```swift
-    /// let limit = config.int(forKey: "api.rateLimit", default: 1000)
-    /// ```
-    ///
-    /// - Parameters:
-    ///   - key: The string representation of the config key to look up.
-    ///   - context: Additional context used for key resolution.
-    ///   - isSecret: Whether the value should be treated as secret for logging and debugging purposes.
-    ///   - defaultValue: The fallback value returned when the config value is missing or invalid.
-    ///   - fileID: The file ID where this call originates. Used for access reporting.
-    ///   - line: The line number where this call originates. Used for access reporting.
-    /// - Returns: The config value if found and convertible, otherwise the default value.
-    public func double(
-        forKey key: String,
-        context: [String: ConfigContextValue] = [:],
-        isSecret: Bool = false,
-        default defaultValue: Double,
-        fileID: String = #fileID,
-        line: UInt = #line
-    ) -> Double {
-        double(
-            forKey: keyDecoder.decode(key, context: context),
-            isSecret: isSecret,
-            default: defaultValue,
-            fileID: fileID,
-            line: line
-        )
-    }
-
     /// Synchronously gets a required config value for the given config key, throwing an error if it's missing.
     ///
     /// Use this method when a configuration value is mandatory for your application to function.
@@ -588,38 +326,6 @@ extension ConfigReader {
         )
     }
 
-    /// Synchronously gets a required config value for the given string key, throwing an error if it's missing.
-    ///
-    /// Use this method when a configuration value is mandatory for your application to function.
-    /// The method throws an error if the value is missing or can't be converted to the expected type.
-    ///
-    /// ```swift
-    /// let endpoint = try config.requiredString(forKey: "service.endpoint")
-    /// ```
-    ///
-    /// - Parameters:
-    ///   - key: The string representation of the config key to look up.
-    ///   - context: Additional context used for key resolution.
-    ///   - isSecret: Whether the value should be treated as secret for logging and debugging purposes.
-    ///   - fileID: The file ID where this call originates. Used for access reporting.
-    ///   - line: The line number where this call originates. Used for access reporting.
-    /// - Returns: The config value converted to the expected type.
-    /// - Throws: If the value is missing, or a conversion error if the value can't be converted to the expected type.
-    public func requiredDouble(
-        forKey key: String,
-        context: [String: ConfigContextValue] = [:],
-        isSecret: Bool = false,
-        fileID: String = #fileID,
-        line: UInt = #line
-    ) throws -> Double {
-        try requiredDouble(
-            forKey: keyDecoder.decode(key, context: context),
-            isSecret: isSecret,
-            fileID: fileID,
-            line: line
-        )
-    }
-
     /// Synchronously gets a config value for the given config key.
     ///
     /// Use this method to retrieve optional configuration values.
@@ -647,37 +353,6 @@ extension ConfigReader {
             isSecret: isSecret,
             unwrap: { try $0.asBool },
             wrap: ConfigContent.bool,
-            fileID: fileID,
-            line: line
-        )
-    }
-
-    /// Synchronously gets a config value for the given string key.
-    ///
-    /// Use this method to retrieve optional configuration values using string-based keys.
-    /// If the value doesn't exist or can't be converted to the expected type, the method returns `nil`.
-    ///
-    /// ```swift
-    /// let dbUrl = config.string(forKey: "database.url")
-    /// ```
-    ///
-    /// - Parameters:
-    ///   - key: The string representation of the config key to look up.
-    ///   - context: Additional context used for key resolution.
-    ///   - isSecret: Whether the value should be treated as secret for logging and debugging purposes.
-    ///   - fileID: The file ID where this call originates. Used for access reporting.
-    ///   - line: The line number where this call originates. Used for access reporting.
-    /// - Returns: The value converted to the expected type if found and convertible, otherwise `nil`.
-    public func bool(
-        forKey key: String,
-        context: [String: ConfigContextValue] = [:],
-        isSecret: Bool = false,
-        fileID: String = #fileID,
-        line: UInt = #line
-    ) -> Bool? {
-        bool(
-            forKey: keyDecoder.decode(key, context: context),
-            isSecret: isSecret,
             fileID: fileID,
             line: line
         )
@@ -719,41 +394,6 @@ extension ConfigReader {
         )
     }
 
-    /// Synchronously gets a config value for the given config key, providing a default fallback.
-    ///
-    /// Use this method when you need a guaranteed non-nil result. If the configuration
-    /// value is missing or can't be converted to the expected type, the default value
-    /// is returned instead.
-    ///
-    /// ```swift
-    /// let limit = config.int(forKey: "api.rateLimit", default: 1000)
-    /// ```
-    ///
-    /// - Parameters:
-    ///   - key: The string representation of the config key to look up.
-    ///   - context: Additional context used for key resolution.
-    ///   - isSecret: Whether the value should be treated as secret for logging and debugging purposes.
-    ///   - defaultValue: The fallback value returned when the config value is missing or invalid.
-    ///   - fileID: The file ID where this call originates. Used for access reporting.
-    ///   - line: The line number where this call originates. Used for access reporting.
-    /// - Returns: The config value if found and convertible, otherwise the default value.
-    public func bool(
-        forKey key: String,
-        context: [String: ConfigContextValue] = [:],
-        isSecret: Bool = false,
-        default defaultValue: Bool,
-        fileID: String = #fileID,
-        line: UInt = #line
-    ) -> Bool {
-        bool(
-            forKey: keyDecoder.decode(key, context: context),
-            isSecret: isSecret,
-            default: defaultValue,
-            fileID: fileID,
-            line: line
-        )
-    }
-
     /// Synchronously gets a required config value for the given config key, throwing an error if it's missing.
     ///
     /// Use this method when a configuration value is mandatory for your application to function.
@@ -787,38 +427,6 @@ extension ConfigReader {
         )
     }
 
-    /// Synchronously gets a required config value for the given string key, throwing an error if it's missing.
-    ///
-    /// Use this method when a configuration value is mandatory for your application to function.
-    /// The method throws an error if the value is missing or can't be converted to the expected type.
-    ///
-    /// ```swift
-    /// let endpoint = try config.requiredString(forKey: "service.endpoint")
-    /// ```
-    ///
-    /// - Parameters:
-    ///   - key: The string representation of the config key to look up.
-    ///   - context: Additional context used for key resolution.
-    ///   - isSecret: Whether the value should be treated as secret for logging and debugging purposes.
-    ///   - fileID: The file ID where this call originates. Used for access reporting.
-    ///   - line: The line number where this call originates. Used for access reporting.
-    /// - Returns: The config value converted to the expected type.
-    /// - Throws: If the value is missing, or a conversion error if the value can't be converted to the expected type.
-    public func requiredBool(
-        forKey key: String,
-        context: [String: ConfigContextValue] = [:],
-        isSecret: Bool = false,
-        fileID: String = #fileID,
-        line: UInt = #line
-    ) throws -> Bool {
-        try requiredBool(
-            forKey: keyDecoder.decode(key, context: context),
-            isSecret: isSecret,
-            fileID: fileID,
-            line: line
-        )
-    }
-
     /// Synchronously gets a config value for the given config key.
     ///
     /// Use this method to retrieve optional configuration values.
@@ -846,37 +454,6 @@ extension ConfigReader {
             isSecret: isSecret,
             unwrap: { try $0.asBytes },
             wrap: ConfigContent.bytes,
-            fileID: fileID,
-            line: line
-        )
-    }
-
-    /// Synchronously gets a config value for the given string key.
-    ///
-    /// Use this method to retrieve optional configuration values using string-based keys.
-    /// If the value doesn't exist or can't be converted to the expected type, the method returns `nil`.
-    ///
-    /// ```swift
-    /// let dbUrl = config.string(forKey: "database.url")
-    /// ```
-    ///
-    /// - Parameters:
-    ///   - key: The string representation of the config key to look up.
-    ///   - context: Additional context used for key resolution.
-    ///   - isSecret: Whether the value should be treated as secret for logging and debugging purposes.
-    ///   - fileID: The file ID where this call originates. Used for access reporting.
-    ///   - line: The line number where this call originates. Used for access reporting.
-    /// - Returns: The value converted to the expected type if found and convertible, otherwise `nil`.
-    public func bytes(
-        forKey key: String,
-        context: [String: ConfigContextValue] = [:],
-        isSecret: Bool = false,
-        fileID: String = #fileID,
-        line: UInt = #line
-    ) -> [UInt8]? {
-        bytes(
-            forKey: keyDecoder.decode(key, context: context),
-            isSecret: isSecret,
             fileID: fileID,
             line: line
         )
@@ -918,41 +495,6 @@ extension ConfigReader {
         )
     }
 
-    /// Synchronously gets a config value for the given config key, providing a default fallback.
-    ///
-    /// Use this method when you need a guaranteed non-nil result. If the configuration
-    /// value is missing or can't be converted to the expected type, the default value
-    /// is returned instead.
-    ///
-    /// ```swift
-    /// let limit = config.int(forKey: "api.rateLimit", default: 1000)
-    /// ```
-    ///
-    /// - Parameters:
-    ///   - key: The string representation of the config key to look up.
-    ///   - context: Additional context used for key resolution.
-    ///   - isSecret: Whether the value should be treated as secret for logging and debugging purposes.
-    ///   - defaultValue: The fallback value returned when the config value is missing or invalid.
-    ///   - fileID: The file ID where this call originates. Used for access reporting.
-    ///   - line: The line number where this call originates. Used for access reporting.
-    /// - Returns: The config value if found and convertible, otherwise the default value.
-    public func bytes(
-        forKey key: String,
-        context: [String: ConfigContextValue] = [:],
-        isSecret: Bool = false,
-        default defaultValue: [UInt8],
-        fileID: String = #fileID,
-        line: UInt = #line
-    ) -> [UInt8] {
-        bytes(
-            forKey: keyDecoder.decode(key, context: context),
-            isSecret: isSecret,
-            default: defaultValue,
-            fileID: fileID,
-            line: line
-        )
-    }
-
     /// Synchronously gets a required config value for the given config key, throwing an error if it's missing.
     ///
     /// Use this method when a configuration value is mandatory for your application to function.
@@ -986,38 +528,6 @@ extension ConfigReader {
         )
     }
 
-    /// Synchronously gets a required config value for the given string key, throwing an error if it's missing.
-    ///
-    /// Use this method when a configuration value is mandatory for your application to function.
-    /// The method throws an error if the value is missing or can't be converted to the expected type.
-    ///
-    /// ```swift
-    /// let endpoint = try config.requiredString(forKey: "service.endpoint")
-    /// ```
-    ///
-    /// - Parameters:
-    ///   - key: The string representation of the config key to look up.
-    ///   - context: Additional context used for key resolution.
-    ///   - isSecret: Whether the value should be treated as secret for logging and debugging purposes.
-    ///   - fileID: The file ID where this call originates. Used for access reporting.
-    ///   - line: The line number where this call originates. Used for access reporting.
-    /// - Returns: The config value converted to the expected type.
-    /// - Throws: If the value is missing, or a conversion error if the value can't be converted to the expected type.
-    public func requiredBytes(
-        forKey key: String,
-        context: [String: ConfigContextValue] = [:],
-        isSecret: Bool = false,
-        fileID: String = #fileID,
-        line: UInt = #line
-    ) throws -> [UInt8] {
-        try requiredBytes(
-            forKey: keyDecoder.decode(key, context: context),
-            isSecret: isSecret,
-            fileID: fileID,
-            line: line
-        )
-    }
-
     /// Synchronously gets a config value for the given config key.
     ///
     /// Use this method to retrieve optional configuration values.
@@ -1045,37 +555,6 @@ extension ConfigReader {
             isSecret: isSecret,
             unwrap: { try $0.asStringArray },
             wrap: ConfigContent.stringArray,
-            fileID: fileID,
-            line: line
-        )
-    }
-
-    /// Synchronously gets a config value for the given string key.
-    ///
-    /// Use this method to retrieve optional configuration values using string-based keys.
-    /// If the value doesn't exist or can't be converted to the expected type, the method returns `nil`.
-    ///
-    /// ```swift
-    /// let dbUrl = config.string(forKey: "database.url")
-    /// ```
-    ///
-    /// - Parameters:
-    ///   - key: The string representation of the config key to look up.
-    ///   - context: Additional context used for key resolution.
-    ///   - isSecret: Whether the value should be treated as secret for logging and debugging purposes.
-    ///   - fileID: The file ID where this call originates. Used for access reporting.
-    ///   - line: The line number where this call originates. Used for access reporting.
-    /// - Returns: The value converted to the expected type if found and convertible, otherwise `nil`.
-    public func stringArray(
-        forKey key: String,
-        context: [String: ConfigContextValue] = [:],
-        isSecret: Bool = false,
-        fileID: String = #fileID,
-        line: UInt = #line
-    ) -> [String]? {
-        stringArray(
-            forKey: keyDecoder.decode(key, context: context),
-            isSecret: isSecret,
             fileID: fileID,
             line: line
         )
@@ -1117,41 +596,6 @@ extension ConfigReader {
         )
     }
 
-    /// Synchronously gets a config value for the given config key, providing a default fallback.
-    ///
-    /// Use this method when you need a guaranteed non-nil result. If the configuration
-    /// value is missing or can't be converted to the expected type, the default value
-    /// is returned instead.
-    ///
-    /// ```swift
-    /// let limit = config.int(forKey: "api.rateLimit", default: 1000)
-    /// ```
-    ///
-    /// - Parameters:
-    ///   - key: The string representation of the config key to look up.
-    ///   - context: Additional context used for key resolution.
-    ///   - isSecret: Whether the value should be treated as secret for logging and debugging purposes.
-    ///   - defaultValue: The fallback value returned when the config value is missing or invalid.
-    ///   - fileID: The file ID where this call originates. Used for access reporting.
-    ///   - line: The line number where this call originates. Used for access reporting.
-    /// - Returns: The config value if found and convertible, otherwise the default value.
-    public func stringArray(
-        forKey key: String,
-        context: [String: ConfigContextValue] = [:],
-        isSecret: Bool = false,
-        default defaultValue: [String],
-        fileID: String = #fileID,
-        line: UInt = #line
-    ) -> [String] {
-        stringArray(
-            forKey: keyDecoder.decode(key, context: context),
-            isSecret: isSecret,
-            default: defaultValue,
-            fileID: fileID,
-            line: line
-        )
-    }
-
     /// Synchronously gets a required config value for the given config key, throwing an error if it's missing.
     ///
     /// Use this method when a configuration value is mandatory for your application to function.
@@ -1185,38 +629,6 @@ extension ConfigReader {
         )
     }
 
-    /// Synchronously gets a required config value for the given string key, throwing an error if it's missing.
-    ///
-    /// Use this method when a configuration value is mandatory for your application to function.
-    /// The method throws an error if the value is missing or can't be converted to the expected type.
-    ///
-    /// ```swift
-    /// let endpoint = try config.requiredString(forKey: "service.endpoint")
-    /// ```
-    ///
-    /// - Parameters:
-    ///   - key: The string representation of the config key to look up.
-    ///   - context: Additional context used for key resolution.
-    ///   - isSecret: Whether the value should be treated as secret for logging and debugging purposes.
-    ///   - fileID: The file ID where this call originates. Used for access reporting.
-    ///   - line: The line number where this call originates. Used for access reporting.
-    /// - Returns: The config value converted to the expected type.
-    /// - Throws: If the value is missing, or a conversion error if the value can't be converted to the expected type.
-    public func requiredStringArray(
-        forKey key: String,
-        context: [String: ConfigContextValue] = [:],
-        isSecret: Bool = false,
-        fileID: String = #fileID,
-        line: UInt = #line
-    ) throws -> [String] {
-        try requiredStringArray(
-            forKey: keyDecoder.decode(key, context: context),
-            isSecret: isSecret,
-            fileID: fileID,
-            line: line
-        )
-    }
-
     /// Synchronously gets a config value for the given config key.
     ///
     /// Use this method to retrieve optional configuration values.
@@ -1244,37 +656,6 @@ extension ConfigReader {
             isSecret: isSecret,
             unwrap: { try $0.asIntArray },
             wrap: ConfigContent.intArray,
-            fileID: fileID,
-            line: line
-        )
-    }
-
-    /// Synchronously gets a config value for the given string key.
-    ///
-    /// Use this method to retrieve optional configuration values using string-based keys.
-    /// If the value doesn't exist or can't be converted to the expected type, the method returns `nil`.
-    ///
-    /// ```swift
-    /// let dbUrl = config.string(forKey: "database.url")
-    /// ```
-    ///
-    /// - Parameters:
-    ///   - key: The string representation of the config key to look up.
-    ///   - context: Additional context used for key resolution.
-    ///   - isSecret: Whether the value should be treated as secret for logging and debugging purposes.
-    ///   - fileID: The file ID where this call originates. Used for access reporting.
-    ///   - line: The line number where this call originates. Used for access reporting.
-    /// - Returns: The value converted to the expected type if found and convertible, otherwise `nil`.
-    public func intArray(
-        forKey key: String,
-        context: [String: ConfigContextValue] = [:],
-        isSecret: Bool = false,
-        fileID: String = #fileID,
-        line: UInt = #line
-    ) -> [Int]? {
-        intArray(
-            forKey: keyDecoder.decode(key, context: context),
-            isSecret: isSecret,
             fileID: fileID,
             line: line
         )
@@ -1316,41 +697,6 @@ extension ConfigReader {
         )
     }
 
-    /// Synchronously gets a config value for the given config key, providing a default fallback.
-    ///
-    /// Use this method when you need a guaranteed non-nil result. If the configuration
-    /// value is missing or can't be converted to the expected type, the default value
-    /// is returned instead.
-    ///
-    /// ```swift
-    /// let limit = config.int(forKey: "api.rateLimit", default: 1000)
-    /// ```
-    ///
-    /// - Parameters:
-    ///   - key: The string representation of the config key to look up.
-    ///   - context: Additional context used for key resolution.
-    ///   - isSecret: Whether the value should be treated as secret for logging and debugging purposes.
-    ///   - defaultValue: The fallback value returned when the config value is missing or invalid.
-    ///   - fileID: The file ID where this call originates. Used for access reporting.
-    ///   - line: The line number where this call originates. Used for access reporting.
-    /// - Returns: The config value if found and convertible, otherwise the default value.
-    public func intArray(
-        forKey key: String,
-        context: [String: ConfigContextValue] = [:],
-        isSecret: Bool = false,
-        default defaultValue: [Int],
-        fileID: String = #fileID,
-        line: UInt = #line
-    ) -> [Int] {
-        intArray(
-            forKey: keyDecoder.decode(key, context: context),
-            isSecret: isSecret,
-            default: defaultValue,
-            fileID: fileID,
-            line: line
-        )
-    }
-
     /// Synchronously gets a required config value for the given config key, throwing an error if it's missing.
     ///
     /// Use this method when a configuration value is mandatory for your application to function.
@@ -1384,38 +730,6 @@ extension ConfigReader {
         )
     }
 
-    /// Synchronously gets a required config value for the given string key, throwing an error if it's missing.
-    ///
-    /// Use this method when a configuration value is mandatory for your application to function.
-    /// The method throws an error if the value is missing or can't be converted to the expected type.
-    ///
-    /// ```swift
-    /// let endpoint = try config.requiredString(forKey: "service.endpoint")
-    /// ```
-    ///
-    /// - Parameters:
-    ///   - key: The string representation of the config key to look up.
-    ///   - context: Additional context used for key resolution.
-    ///   - isSecret: Whether the value should be treated as secret for logging and debugging purposes.
-    ///   - fileID: The file ID where this call originates. Used for access reporting.
-    ///   - line: The line number where this call originates. Used for access reporting.
-    /// - Returns: The config value converted to the expected type.
-    /// - Throws: If the value is missing, or a conversion error if the value can't be converted to the expected type.
-    public func requiredIntArray(
-        forKey key: String,
-        context: [String: ConfigContextValue] = [:],
-        isSecret: Bool = false,
-        fileID: String = #fileID,
-        line: UInt = #line
-    ) throws -> [Int] {
-        try requiredIntArray(
-            forKey: keyDecoder.decode(key, context: context),
-            isSecret: isSecret,
-            fileID: fileID,
-            line: line
-        )
-    }
-
     /// Synchronously gets a config value for the given config key.
     ///
     /// Use this method to retrieve optional configuration values.
@@ -1443,37 +757,6 @@ extension ConfigReader {
             isSecret: isSecret,
             unwrap: { try $0.asDoubleArray },
             wrap: ConfigContent.doubleArray,
-            fileID: fileID,
-            line: line
-        )
-    }
-
-    /// Synchronously gets a config value for the given string key.
-    ///
-    /// Use this method to retrieve optional configuration values using string-based keys.
-    /// If the value doesn't exist or can't be converted to the expected type, the method returns `nil`.
-    ///
-    /// ```swift
-    /// let dbUrl = config.string(forKey: "database.url")
-    /// ```
-    ///
-    /// - Parameters:
-    ///   - key: The string representation of the config key to look up.
-    ///   - context: Additional context used for key resolution.
-    ///   - isSecret: Whether the value should be treated as secret for logging and debugging purposes.
-    ///   - fileID: The file ID where this call originates. Used for access reporting.
-    ///   - line: The line number where this call originates. Used for access reporting.
-    /// - Returns: The value converted to the expected type if found and convertible, otherwise `nil`.
-    public func doubleArray(
-        forKey key: String,
-        context: [String: ConfigContextValue] = [:],
-        isSecret: Bool = false,
-        fileID: String = #fileID,
-        line: UInt = #line
-    ) -> [Double]? {
-        doubleArray(
-            forKey: keyDecoder.decode(key, context: context),
-            isSecret: isSecret,
             fileID: fileID,
             line: line
         )
@@ -1515,41 +798,6 @@ extension ConfigReader {
         )
     }
 
-    /// Synchronously gets a config value for the given config key, providing a default fallback.
-    ///
-    /// Use this method when you need a guaranteed non-nil result. If the configuration
-    /// value is missing or can't be converted to the expected type, the default value
-    /// is returned instead.
-    ///
-    /// ```swift
-    /// let limit = config.int(forKey: "api.rateLimit", default: 1000)
-    /// ```
-    ///
-    /// - Parameters:
-    ///   - key: The string representation of the config key to look up.
-    ///   - context: Additional context used for key resolution.
-    ///   - isSecret: Whether the value should be treated as secret for logging and debugging purposes.
-    ///   - defaultValue: The fallback value returned when the config value is missing or invalid.
-    ///   - fileID: The file ID where this call originates. Used for access reporting.
-    ///   - line: The line number where this call originates. Used for access reporting.
-    /// - Returns: The config value if found and convertible, otherwise the default value.
-    public func doubleArray(
-        forKey key: String,
-        context: [String: ConfigContextValue] = [:],
-        isSecret: Bool = false,
-        default defaultValue: [Double],
-        fileID: String = #fileID,
-        line: UInt = #line
-    ) -> [Double] {
-        doubleArray(
-            forKey: keyDecoder.decode(key, context: context),
-            isSecret: isSecret,
-            default: defaultValue,
-            fileID: fileID,
-            line: line
-        )
-    }
-
     /// Synchronously gets a required config value for the given config key, throwing an error if it's missing.
     ///
     /// Use this method when a configuration value is mandatory for your application to function.
@@ -1583,38 +831,6 @@ extension ConfigReader {
         )
     }
 
-    /// Synchronously gets a required config value for the given string key, throwing an error if it's missing.
-    ///
-    /// Use this method when a configuration value is mandatory for your application to function.
-    /// The method throws an error if the value is missing or can't be converted to the expected type.
-    ///
-    /// ```swift
-    /// let endpoint = try config.requiredString(forKey: "service.endpoint")
-    /// ```
-    ///
-    /// - Parameters:
-    ///   - key: The string representation of the config key to look up.
-    ///   - context: Additional context used for key resolution.
-    ///   - isSecret: Whether the value should be treated as secret for logging and debugging purposes.
-    ///   - fileID: The file ID where this call originates. Used for access reporting.
-    ///   - line: The line number where this call originates. Used for access reporting.
-    /// - Returns: The config value converted to the expected type.
-    /// - Throws: If the value is missing, or a conversion error if the value can't be converted to the expected type.
-    public func requiredDoubleArray(
-        forKey key: String,
-        context: [String: ConfigContextValue] = [:],
-        isSecret: Bool = false,
-        fileID: String = #fileID,
-        line: UInt = #line
-    ) throws -> [Double] {
-        try requiredDoubleArray(
-            forKey: keyDecoder.decode(key, context: context),
-            isSecret: isSecret,
-            fileID: fileID,
-            line: line
-        )
-    }
-
     /// Synchronously gets a config value for the given config key.
     ///
     /// Use this method to retrieve optional configuration values.
@@ -1642,37 +858,6 @@ extension ConfigReader {
             isSecret: isSecret,
             unwrap: { try $0.asBoolArray },
             wrap: ConfigContent.boolArray,
-            fileID: fileID,
-            line: line
-        )
-    }
-
-    /// Synchronously gets a config value for the given string key.
-    ///
-    /// Use this method to retrieve optional configuration values using string-based keys.
-    /// If the value doesn't exist or can't be converted to the expected type, the method returns `nil`.
-    ///
-    /// ```swift
-    /// let dbUrl = config.string(forKey: "database.url")
-    /// ```
-    ///
-    /// - Parameters:
-    ///   - key: The string representation of the config key to look up.
-    ///   - context: Additional context used for key resolution.
-    ///   - isSecret: Whether the value should be treated as secret for logging and debugging purposes.
-    ///   - fileID: The file ID where this call originates. Used for access reporting.
-    ///   - line: The line number where this call originates. Used for access reporting.
-    /// - Returns: The value converted to the expected type if found and convertible, otherwise `nil`.
-    public func boolArray(
-        forKey key: String,
-        context: [String: ConfigContextValue] = [:],
-        isSecret: Bool = false,
-        fileID: String = #fileID,
-        line: UInt = #line
-    ) -> [Bool]? {
-        boolArray(
-            forKey: keyDecoder.decode(key, context: context),
-            isSecret: isSecret,
             fileID: fileID,
             line: line
         )
@@ -1714,41 +899,6 @@ extension ConfigReader {
         )
     }
 
-    /// Synchronously gets a config value for the given config key, providing a default fallback.
-    ///
-    /// Use this method when you need a guaranteed non-nil result. If the configuration
-    /// value is missing or can't be converted to the expected type, the default value
-    /// is returned instead.
-    ///
-    /// ```swift
-    /// let limit = config.int(forKey: "api.rateLimit", default: 1000)
-    /// ```
-    ///
-    /// - Parameters:
-    ///   - key: The string representation of the config key to look up.
-    ///   - context: Additional context used for key resolution.
-    ///   - isSecret: Whether the value should be treated as secret for logging and debugging purposes.
-    ///   - defaultValue: The fallback value returned when the config value is missing or invalid.
-    ///   - fileID: The file ID where this call originates. Used for access reporting.
-    ///   - line: The line number where this call originates. Used for access reporting.
-    /// - Returns: The config value if found and convertible, otherwise the default value.
-    public func boolArray(
-        forKey key: String,
-        context: [String: ConfigContextValue] = [:],
-        isSecret: Bool = false,
-        default defaultValue: [Bool],
-        fileID: String = #fileID,
-        line: UInt = #line
-    ) -> [Bool] {
-        boolArray(
-            forKey: keyDecoder.decode(key, context: context),
-            isSecret: isSecret,
-            default: defaultValue,
-            fileID: fileID,
-            line: line
-        )
-    }
-
     /// Synchronously gets a required config value for the given config key, throwing an error if it's missing.
     ///
     /// Use this method when a configuration value is mandatory for your application to function.
@@ -1782,38 +932,6 @@ extension ConfigReader {
         )
     }
 
-    /// Synchronously gets a required config value for the given string key, throwing an error if it's missing.
-    ///
-    /// Use this method when a configuration value is mandatory for your application to function.
-    /// The method throws an error if the value is missing or can't be converted to the expected type.
-    ///
-    /// ```swift
-    /// let endpoint = try config.requiredString(forKey: "service.endpoint")
-    /// ```
-    ///
-    /// - Parameters:
-    ///   - key: The string representation of the config key to look up.
-    ///   - context: Additional context used for key resolution.
-    ///   - isSecret: Whether the value should be treated as secret for logging and debugging purposes.
-    ///   - fileID: The file ID where this call originates. Used for access reporting.
-    ///   - line: The line number where this call originates. Used for access reporting.
-    /// - Returns: The config value converted to the expected type.
-    /// - Throws: If the value is missing, or a conversion error if the value can't be converted to the expected type.
-    public func requiredBoolArray(
-        forKey key: String,
-        context: [String: ConfigContextValue] = [:],
-        isSecret: Bool = false,
-        fileID: String = #fileID,
-        line: UInt = #line
-    ) throws -> [Bool] {
-        try requiredBoolArray(
-            forKey: keyDecoder.decode(key, context: context),
-            isSecret: isSecret,
-            fileID: fileID,
-            line: line
-        )
-    }
-
     /// Synchronously gets a config value for the given config key.
     ///
     /// Use this method to retrieve optional configuration values.
@@ -1841,37 +959,6 @@ extension ConfigReader {
             isSecret: isSecret,
             unwrap: { try $0.asByteChunkArray },
             wrap: ConfigContent.byteChunkArray,
-            fileID: fileID,
-            line: line
-        )
-    }
-
-    /// Synchronously gets a config value for the given string key.
-    ///
-    /// Use this method to retrieve optional configuration values using string-based keys.
-    /// If the value doesn't exist or can't be converted to the expected type, the method returns `nil`.
-    ///
-    /// ```swift
-    /// let dbUrl = config.string(forKey: "database.url")
-    /// ```
-    ///
-    /// - Parameters:
-    ///   - key: The string representation of the config key to look up.
-    ///   - context: Additional context used for key resolution.
-    ///   - isSecret: Whether the value should be treated as secret for logging and debugging purposes.
-    ///   - fileID: The file ID where this call originates. Used for access reporting.
-    ///   - line: The line number where this call originates. Used for access reporting.
-    /// - Returns: The value converted to the expected type if found and convertible, otherwise `nil`.
-    public func byteChunkArray(
-        forKey key: String,
-        context: [String: ConfigContextValue] = [:],
-        isSecret: Bool = false,
-        fileID: String = #fileID,
-        line: UInt = #line
-    ) -> [[UInt8]]? {
-        byteChunkArray(
-            forKey: keyDecoder.decode(key, context: context),
-            isSecret: isSecret,
             fileID: fileID,
             line: line
         )
@@ -1913,41 +1000,6 @@ extension ConfigReader {
         )
     }
 
-    /// Synchronously gets a config value for the given config key, providing a default fallback.
-    ///
-    /// Use this method when you need a guaranteed non-nil result. If the configuration
-    /// value is missing or can't be converted to the expected type, the default value
-    /// is returned instead.
-    ///
-    /// ```swift
-    /// let limit = config.int(forKey: "api.rateLimit", default: 1000)
-    /// ```
-    ///
-    /// - Parameters:
-    ///   - key: The string representation of the config key to look up.
-    ///   - context: Additional context used for key resolution.
-    ///   - isSecret: Whether the value should be treated as secret for logging and debugging purposes.
-    ///   - defaultValue: The fallback value returned when the config value is missing or invalid.
-    ///   - fileID: The file ID where this call originates. Used for access reporting.
-    ///   - line: The line number where this call originates. Used for access reporting.
-    /// - Returns: The config value if found and convertible, otherwise the default value.
-    public func byteChunkArray(
-        forKey key: String,
-        context: [String: ConfigContextValue] = [:],
-        isSecret: Bool = false,
-        default defaultValue: [[UInt8]],
-        fileID: String = #fileID,
-        line: UInt = #line
-    ) -> [[UInt8]] {
-        byteChunkArray(
-            forKey: keyDecoder.decode(key, context: context),
-            isSecret: isSecret,
-            default: defaultValue,
-            fileID: fileID,
-            line: line
-        )
-    }
-
     /// Synchronously gets a required config value for the given config key, throwing an error if it's missing.
     ///
     /// Use this method when a configuration value is mandatory for your application to function.
@@ -1976,38 +1028,6 @@ extension ConfigReader {
             isSecret: isSecret,
             unwrap: { try $0.asByteChunkArray },
             wrap: ConfigContent.byteChunkArray,
-            fileID: fileID,
-            line: line
-        )
-    }
-
-    /// Synchronously gets a required config value for the given string key, throwing an error if it's missing.
-    ///
-    /// Use this method when a configuration value is mandatory for your application to function.
-    /// The method throws an error if the value is missing or can't be converted to the expected type.
-    ///
-    /// ```swift
-    /// let endpoint = try config.requiredString(forKey: "service.endpoint")
-    /// ```
-    ///
-    /// - Parameters:
-    ///   - key: The string representation of the config key to look up.
-    ///   - context: Additional context used for key resolution.
-    ///   - isSecret: Whether the value should be treated as secret for logging and debugging purposes.
-    ///   - fileID: The file ID where this call originates. Used for access reporting.
-    ///   - line: The line number where this call originates. Used for access reporting.
-    /// - Returns: The config value converted to the expected type.
-    /// - Throws: If the value is missing, or a conversion error if the value can't be converted to the expected type.
-    public func requiredByteChunkArray(
-        forKey key: String,
-        context: [String: ConfigContextValue] = [:],
-        isSecret: Bool = false,
-        fileID: String = #fileID,
-        line: UInt = #line
-    ) throws -> [[UInt8]] {
-        try requiredByteChunkArray(
-            forKey: keyDecoder.decode(key, context: context),
-            isSecret: isSecret,
             fileID: fileID,
             line: line
         )
@@ -2043,40 +1063,6 @@ extension ConfigReader {
             isSecret: isSecret,
             unwrap: { try cast($0.asString, type: Value.self, key: key) },
             wrap: { uncast($0) },
-            fileID: fileID,
-            line: line
-        )
-    }
-
-    /// Synchronously gets a config value for the given string key, converting from string.
-    ///
-    /// Use this method to retrieve configuration values that can be converted from strings.
-    /// If the value doesn't exist or can't be converted to the expected type, the method returns `nil`.
-    ///
-    /// ```swift
-    /// let serverMode = config.string(forKey: "server.mode", as: ServerMode.self)
-    /// ```
-    ///
-    /// - Parameters:
-    ///   - key: The string representation of the config key to look up.
-    ///   - context: Additional context used for key resolution.
-    ///   - type: The type to convert the string value to.
-    ///   - isSecret: Whether the value should be treated as secret for logging and debugging purposes.
-    ///   - fileID: The file ID where this call originates. Used for access reporting.
-    ///   - line: The line number where this call originates. Used for access reporting.
-    /// - Returns: The value converted to the expected type if found and convertible, otherwise `nil`.
-    public func string<Value: ExpressibleByConfigString>(
-        forKey key: String,
-        context: [String: ConfigContextValue] = [:],
-        as type: Value.Type = Value.self,
-        isSecret: Bool = false,
-        fileID: String = #fileID,
-        line: UInt = #line
-    ) -> Value? {
-        string(
-            forKey: keyDecoder.decode(key, context: context),
-            as: type,
-            isSecret: isSecret,
             fileID: fileID,
             line: line
         )
@@ -2120,44 +1106,6 @@ extension ConfigReader {
         )
     }
 
-    /// Synchronously gets a config value for the given string key with default fallback, converting from string.
-    ///
-    /// Use this method when you need a guaranteed non-nil result for string-convertible types.
-    /// If the configuration value is missing or can't be converted to the expected type,
-    /// the default value is returned instead.
-    ///
-    /// ```swift
-    /// let logLevel = config.string(forKey: "logging.level", as: LogLevel.self, default: .info)
-    /// ```
-    ///
-    /// - Parameters:
-    ///   - key: The string representation of the config key to look up.
-    ///   - context: Additional context used for key resolution.
-    ///   - type: The type to convert the string value to.
-    ///   - isSecret: Whether the value should be treated as secret for logging and debugging purposes.
-    ///   - defaultValue: The fallback value returned when the config value is missing or invalid.
-    ///   - fileID: The file ID where this call originates. Used for access reporting.
-    ///   - line: The line number where this call originates. Used for access reporting.
-    /// - Returns: The config value if found and convertible, otherwise the default value.
-    public func string<Value: ExpressibleByConfigString>(
-        forKey key: String,
-        context: [String: ConfigContextValue] = [:],
-        as type: Value.Type = Value.self,
-        isSecret: Bool = false,
-        default defaultValue: Value,
-        fileID: String = #fileID,
-        line: UInt = #line
-    ) -> Value {
-        string(
-            forKey: keyDecoder.decode(key, context: context),
-            as: type,
-            isSecret: isSecret,
-            default: defaultValue,
-            fileID: fileID,
-            line: line
-        )
-    }
-
     /// Synchronously gets a required config value for the given config key, converting from string.
     ///
     /// Use this method when a string-convertible configuration value is mandatory for your application to function.
@@ -2193,41 +1141,6 @@ extension ConfigReader {
         )
     }
 
-    /// Synchronously gets a required config value for the given string key, converting from string.
-    ///
-    /// Use this method when a string-convertible configuration value is mandatory for your application to function.
-    /// The method throws an error if the value is missing or can't be converted to the expected type.
-    ///
-    /// ```swift
-    /// let logLevel = try config.requiredString(forKey: "logging.level", as: LogLevel.self)
-    /// ```
-    ///
-    /// - Parameters:
-    ///   - key: The string representation of the config key to look up.
-    ///   - context: Additional context used for key resolution.
-    ///   - type: The type to convert the string value to.
-    ///   - isSecret: Whether the value should be treated as secret for logging and debugging purposes.
-    ///   - fileID: The file ID where this call originates. Used for access reporting.
-    ///   - line: The line number where this call originates. Used for access reporting.
-    /// - Returns: The config value converted to the expected type.
-    /// - Throws: If the value is missing, or a conversion error if the value can't be converted to the expected type.
-    public func requiredString<Value: ExpressibleByConfigString>(
-        forKey key: String,
-        context: [String: ConfigContextValue] = [:],
-        as type: Value.Type = Value.self,
-        isSecret: Bool = false,
-        fileID: String = #fileID,
-        line: UInt = #line
-    ) throws -> Value {
-        try requiredString(
-            forKey: keyDecoder.decode(key, context: context),
-            as: type,
-            isSecret: isSecret,
-            fileID: fileID,
-            line: line
-        )
-    }
-
     /// Synchronously gets an array of config values for the given config key, converting from strings.
     ///
     /// Use this method to retrieve configuration arrays where each element can be converted from strings.
@@ -2257,40 +1170,6 @@ extension ConfigReader {
             isSecret: isSecret,
             unwrap: { try $0.asStringArray.map { try cast($0, type: Value.self, key: key) } },
             wrap: { uncast($0) },
-            fileID: fileID,
-            line: line
-        )
-    }
-
-    /// Synchronously gets an array of config values for the given string key, converting from strings.
-    ///
-    /// Use this method to retrieve configuration arrays where each element can be converted from strings.
-    /// If the value doesn't exist or can't be converted to the expected type, the method returns `nil`.
-    ///
-    /// ```swift
-    /// let serverModes = config.stringArray(forKey: "server.allowedModes", as: ServerMode.self)
-    /// ```
-    ///
-    /// - Parameters:
-    ///   - key: The string representation of the config key to look up.
-    ///   - context: Additional context used for key resolution.
-    ///   - type: The element type to convert each string value to.
-    ///   - isSecret: Whether the value should be treated as secret for logging and debugging purposes.
-    ///   - fileID: The file ID where this call originates. Used for access reporting.
-    ///   - line: The line number where this call originates. Used for access reporting.
-    /// - Returns: An array of values converted to the expected type if found and convertible, otherwise `nil`.
-    public func stringArray<Value: ExpressibleByConfigString>(
-        forKey key: String,
-        context: [String: ConfigContextValue] = [:],
-        as type: Value.Type = Value.self,
-        isSecret: Bool = false,
-        fileID: String = #fileID,
-        line: UInt = #line
-    ) -> [Value]? {
-        stringArray(
-            forKey: keyDecoder.decode(key, context: context),
-            as: type,
-            isSecret: isSecret,
             fileID: fileID,
             line: line
         )
@@ -2334,44 +1213,6 @@ extension ConfigReader {
         )
     }
 
-    /// Synchronously gets an array of config values for the given string key with default fallback, converting from strings.
-    ///
-    /// Use this method when you need a guaranteed non-nil result for string-convertible array types.
-    /// If the configuration value is missing or can't be converted to the expected type,
-    /// the default value is returned instead.
-    ///
-    /// ```swift
-    /// let logLevels = config.stringArray(forKey: "logging.enabledLevels", as: LogLevel.self, default: [.info])
-    /// ```
-    ///
-    /// - Parameters:
-    ///   - key: The string representation of the config key to look up.
-    ///   - context: Additional context used for key resolution.
-    ///   - type: The element type to convert each string value to.
-    ///   - isSecret: Whether the value should be treated as secret for logging and debugging purposes.
-    ///   - defaultValue: The fallback array returned when the config value is missing or invalid.
-    ///   - fileID: The file ID where this call originates. Used for access reporting.
-    ///   - line: The line number where this call originates. Used for access reporting.
-    /// - Returns: The config array if found and convertible, otherwise the default array.
-    public func stringArray<Value: ExpressibleByConfigString>(
-        forKey key: String,
-        context: [String: ConfigContextValue] = [:],
-        as type: Value.Type = Value.self,
-        isSecret: Bool = false,
-        default defaultValue: [Value],
-        fileID: String = #fileID,
-        line: UInt = #line
-    ) -> [Value] {
-        stringArray(
-            forKey: keyDecoder.decode(key, context: context),
-            as: type,
-            isSecret: isSecret,
-            default: defaultValue,
-            fileID: fileID,
-            line: line
-        )
-    }
-
     /// Synchronously gets a required array of config values for the given config key, converting from strings.
     ///
     /// Use this method when a string-convertible array configuration value is mandatory for your application to function.
@@ -2407,41 +1248,6 @@ extension ConfigReader {
         )
     }
 
-    /// Synchronously gets a required array of config values for the given string key, converting from strings.
-    ///
-    /// Use this method when a string-convertible array configuration value is mandatory for your application to function.
-    /// The method throws an error if the value is missing or can't be converted to the expected type.
-    ///
-    /// ```swift
-    /// let requiredLevels = try config.requiredStringArray(forKey: "logging.enabledLevels", as: LogLevel.self)
-    /// ```
-    ///
-    /// - Parameters:
-    ///   - key: The string representation of the config key to look up.
-    ///   - context: Additional context used for key resolution.
-    ///   - type: The element type to convert each string value to.
-    ///   - isSecret: Whether the value should be treated as secret for logging and debugging purposes.
-    ///   - fileID: The file ID where this call originates. Used for access reporting.
-    ///   - line: The line number where this call originates. Used for access reporting.
-    /// - Returns: The config array converted to the expected type.
-    /// - Throws: If the value is missing, or a conversion error if the value can't be converted to the expected type.
-    public func requiredStringArray<Value: ExpressibleByConfigString>(
-        forKey key: String,
-        context: [String: ConfigContextValue] = [:],
-        as type: Value.Type = Value.self,
-        isSecret: Bool = false,
-        fileID: String = #fileID,
-        line: UInt = #line
-    ) throws -> [Value] {
-        try requiredStringArray(
-            forKey: keyDecoder.decode(key, context: context),
-            as: type,
-            isSecret: isSecret,
-            fileID: fileID,
-            line: line
-        )
-    }
-
     /// Synchronously gets a config value for the given config key, converting from string.
     ///
     /// Use this method to retrieve configuration values that can be converted from strings,
@@ -2472,40 +1278,6 @@ extension ConfigReader {
             isSecret: isSecret,
             unwrap: { try cast($0.asString, type: Value.self, key: key) },
             wrap: { uncast($0) },
-            fileID: fileID,
-            line: line
-        )
-    }
-
-    /// Synchronously gets a config value for the given string key, converting from string.
-    ///
-    /// Use this method to retrieve configuration values that can be converted from strings.
-    /// If the value doesn't exist or can't be converted to the expected type, the method returns `nil`.
-    ///
-    /// ```swift
-    /// let serverMode = config.string(forKey: "server.mode", as: ServerMode.self)
-    /// ```
-    ///
-    /// - Parameters:
-    ///   - key: The string representation of the config key to look up.
-    ///   - context: Additional context used for key resolution.
-    ///   - type: The type to convert the string value to.
-    ///   - isSecret: Whether the value should be treated as secret for logging and debugging purposes.
-    ///   - fileID: The file ID where this call originates. Used for access reporting.
-    ///   - line: The line number where this call originates. Used for access reporting.
-    /// - Returns: The value converted to the expected type if found and convertible, otherwise `nil`.
-    public func string<Value: RawRepresentable<String>>(
-        forKey key: String,
-        context: [String: ConfigContextValue] = [:],
-        as type: Value.Type = Value.self,
-        isSecret: Bool = false,
-        fileID: String = #fileID,
-        line: UInt = #line
-    ) -> Value? {
-        string(
-            forKey: keyDecoder.decode(key, context: context),
-            as: type,
-            isSecret: isSecret,
             fileID: fileID,
             line: line
         )
@@ -2549,44 +1321,6 @@ extension ConfigReader {
         )
     }
 
-    /// Synchronously gets a config value for the given string key with default fallback, converting from string.
-    ///
-    /// Use this method when you need a guaranteed non-nil result for string-convertible types.
-    /// If the configuration value is missing or can't be converted to the expected type,
-    /// the default value is returned instead.
-    ///
-    /// ```swift
-    /// let logLevel = config.string(forKey: "logging.level", as: LogLevel.self, default: .info)
-    /// ```
-    ///
-    /// - Parameters:
-    ///   - key: The string representation of the config key to look up.
-    ///   - context: Additional context used for key resolution.
-    ///   - type: The type to convert the string value to.
-    ///   - isSecret: Whether the value should be treated as secret for logging and debugging purposes.
-    ///   - defaultValue: The fallback value returned when the config value is missing or invalid.
-    ///   - fileID: The file ID where this call originates. Used for access reporting.
-    ///   - line: The line number where this call originates. Used for access reporting.
-    /// - Returns: The config value if found and convertible, otherwise the default value.
-    public func string<Value: RawRepresentable<String>>(
-        forKey key: String,
-        context: [String: ConfigContextValue] = [:],
-        as type: Value.Type = Value.self,
-        isSecret: Bool = false,
-        default defaultValue: Value,
-        fileID: String = #fileID,
-        line: UInt = #line
-    ) -> Value {
-        string(
-            forKey: keyDecoder.decode(key, context: context),
-            as: type,
-            isSecret: isSecret,
-            default: defaultValue,
-            fileID: fileID,
-            line: line
-        )
-    }
-
     /// Synchronously gets a required config value for the given config key, converting from string.
     ///
     /// Use this method when a string-convertible configuration value is mandatory for your application to function.
@@ -2622,41 +1356,6 @@ extension ConfigReader {
         )
     }
 
-    /// Synchronously gets a required config value for the given string key, converting from string.
-    ///
-    /// Use this method when a string-convertible configuration value is mandatory for your application to function.
-    /// The method throws an error if the value is missing or can't be converted to the expected type.
-    ///
-    /// ```swift
-    /// let logLevel = try config.requiredString(forKey: "logging.level", as: LogLevel.self)
-    /// ```
-    ///
-    /// - Parameters:
-    ///   - key: The string representation of the config key to look up.
-    ///   - context: Additional context used for key resolution.
-    ///   - type: The type to convert the string value to.
-    ///   - isSecret: Whether the value should be treated as secret for logging and debugging purposes.
-    ///   - fileID: The file ID where this call originates. Used for access reporting.
-    ///   - line: The line number where this call originates. Used for access reporting.
-    /// - Returns: The config value converted to the expected type.
-    /// - Throws: If the value is missing, or a conversion error if the value can't be converted to the expected type.
-    public func requiredString<Value: RawRepresentable<String>>(
-        forKey key: String,
-        context: [String: ConfigContextValue] = [:],
-        as type: Value.Type = Value.self,
-        isSecret: Bool = false,
-        fileID: String = #fileID,
-        line: UInt = #line
-    ) throws -> Value {
-        try requiredString(
-            forKey: keyDecoder.decode(key, context: context),
-            as: type,
-            isSecret: isSecret,
-            fileID: fileID,
-            line: line
-        )
-    }
-
     /// Synchronously gets an array of config values for the given config key, converting from strings.
     ///
     /// Use this method to retrieve configuration arrays where each element can be converted from strings.
@@ -2686,40 +1385,6 @@ extension ConfigReader {
             isSecret: isSecret,
             unwrap: { try $0.asStringArray.map { try cast($0, type: Value.self, key: key) } },
             wrap: { uncast($0) },
-            fileID: fileID,
-            line: line
-        )
-    }
-
-    /// Synchronously gets an array of config values for the given string key, converting from strings.
-    ///
-    /// Use this method to retrieve configuration arrays where each element can be converted from strings.
-    /// If the value doesn't exist or can't be converted to the expected type, the method returns `nil`.
-    ///
-    /// ```swift
-    /// let serverModes = config.stringArray(forKey: "server.allowedModes", as: ServerMode.self)
-    /// ```
-    ///
-    /// - Parameters:
-    ///   - key: The string representation of the config key to look up.
-    ///   - context: Additional context used for key resolution.
-    ///   - type: The element type to convert each string value to.
-    ///   - isSecret: Whether the value should be treated as secret for logging and debugging purposes.
-    ///   - fileID: The file ID where this call originates. Used for access reporting.
-    ///   - line: The line number where this call originates. Used for access reporting.
-    /// - Returns: An array of values converted to the expected type if found and convertible, otherwise `nil`.
-    public func stringArray<Value: RawRepresentable<String>>(
-        forKey key: String,
-        context: [String: ConfigContextValue] = [:],
-        as type: Value.Type = Value.self,
-        isSecret: Bool = false,
-        fileID: String = #fileID,
-        line: UInt = #line
-    ) -> [Value]? {
-        stringArray(
-            forKey: keyDecoder.decode(key, context: context),
-            as: type,
-            isSecret: isSecret,
             fileID: fileID,
             line: line
         )
@@ -2763,44 +1428,6 @@ extension ConfigReader {
         )
     }
 
-    /// Synchronously gets an array of config values for the given string key with default fallback, converting from strings.
-    ///
-    /// Use this method when you need a guaranteed non-nil result for string-convertible array types.
-    /// If the configuration value is missing or can't be converted to the expected type,
-    /// the default value is returned instead.
-    ///
-    /// ```swift
-    /// let logLevels = config.stringArray(forKey: "logging.enabledLevels", as: LogLevel.self, default: [.info])
-    /// ```
-    ///
-    /// - Parameters:
-    ///   - key: The string representation of the config key to look up.
-    ///   - context: Additional context used for key resolution.
-    ///   - type: The element type to convert each string value to.
-    ///   - isSecret: Whether the value should be treated as secret for logging and debugging purposes.
-    ///   - defaultValue: The fallback array returned when the config value is missing or invalid.
-    ///   - fileID: The file ID where this call originates. Used for access reporting.
-    ///   - line: The line number where this call originates. Used for access reporting.
-    /// - Returns: The config array if found and convertible, otherwise the default array.
-    public func stringArray<Value: RawRepresentable<String>>(
-        forKey key: String,
-        context: [String: ConfigContextValue] = [:],
-        as type: Value.Type = Value.self,
-        isSecret: Bool = false,
-        default defaultValue: [Value],
-        fileID: String = #fileID,
-        line: UInt = #line
-    ) -> [Value] {
-        stringArray(
-            forKey: keyDecoder.decode(key, context: context),
-            as: type,
-            isSecret: isSecret,
-            default: defaultValue,
-            fileID: fileID,
-            line: line
-        )
-    }
-
     /// Synchronously gets a required array of config values for the given config key, converting from strings.
     ///
     /// Use this method when a string-convertible array configuration value is mandatory for your application to function.
@@ -2831,41 +1458,6 @@ extension ConfigReader {
             isSecret: isSecret,
             unwrap: { try $0.asStringArray.map { try cast($0, type: Value.self, key: key) } },
             wrap: { uncast($0) },
-            fileID: fileID,
-            line: line
-        )
-    }
-
-    /// Synchronously gets a required array of config values for the given string key, converting from strings.
-    ///
-    /// Use this method when a string-convertible array configuration value is mandatory for your application to function.
-    /// The method throws an error if the value is missing or can't be converted to the expected type.
-    ///
-    /// ```swift
-    /// let requiredLevels = try config.requiredStringArray(forKey: "logging.enabledLevels", as: LogLevel.self)
-    /// ```
-    ///
-    /// - Parameters:
-    ///   - key: The string representation of the config key to look up.
-    ///   - context: Additional context used for key resolution.
-    ///   - type: The element type to convert each string value to.
-    ///   - isSecret: Whether the value should be treated as secret for logging and debugging purposes.
-    ///   - fileID: The file ID where this call originates. Used for access reporting.
-    ///   - line: The line number where this call originates. Used for access reporting.
-    /// - Returns: The config array converted to the expected type.
-    /// - Throws: If the value is missing, or a conversion error if the value can't be converted to the expected type.
-    public func requiredStringArray<Value: RawRepresentable<String>>(
-        forKey key: String,
-        context: [String: ConfigContextValue] = [:],
-        as type: Value.Type = Value.self,
-        isSecret: Bool = false,
-        fileID: String = #fileID,
-        line: UInt = #line
-    ) throws -> [Value] {
-        try requiredStringArray(
-            forKey: keyDecoder.decode(key, context: context),
-            as: type,
-            isSecret: isSecret,
             fileID: fileID,
             line: line
         )
@@ -2908,38 +1500,6 @@ extension ConfigReader {
         )
     }
 
-    /// Asynchronously fetches a config value for the given string key.
-    ///
-    /// Use this method to retrieve optional configuration values from async providers.
-    /// If the value doesn't exist, the method returns `nil`.
-    ///
-    /// ```swift
-    /// let dbUrl = try await config.fetchString(forKey: "database.url")
-    /// ```
-    ///
-    /// - Parameters:
-    ///   - key: The string representation of the config key to look up.
-    ///   - context: Additional context used for key resolution.
-    ///   - isSecret: Whether the value should be treated as secret for logging and debugging purposes.
-    ///   - fileID: The file ID where this call originates. Used for access reporting.
-    ///   - line: The line number where this call originates. Used for access reporting.
-    /// - Returns: The value converted to the expected type if found and convertible, otherwise `nil`.
-    /// - Throws: If the underlying provider throws, or if the value can't be converted to the expected type.
-    public func fetchString(
-        forKey key: String,
-        context: [String: ConfigContextValue] = [:],
-        isSecret: Bool = false,
-        fileID: String = #fileID,
-        line: UInt = #line
-    ) async throws -> String? {
-        try await fetchString(
-            forKey: keyDecoder.decode(key, context: context),
-            isSecret: isSecret,
-            fileID: fileID,
-            line: line
-        )
-    }
-
     /// Asynchronously fetches a config value for the given config key, with a default fallback.
     ///
     /// Use this method when you need a guaranteed non-nil result from an async provider.
@@ -2971,41 +1531,6 @@ extension ConfigReader {
             default: defaultValue,
             unwrap: { try $0.asString },
             wrap: ConfigContent.string,
-            fileID: fileID,
-            line: line
-        )
-    }
-
-    /// Asynchronously fetches a config value for the given config key, with a default fallback.
-    ///
-    /// Use this method when you need a guaranteed non-nil result from an async provider.
-    /// If the configuration value is missing, the default value is returned instead.
-    ///
-    /// ```swift
-    /// let maxRetries = try await config.fetchInt(forKey: "network.maxRetries", default: 3)
-    /// ```
-    ///
-    /// - Parameters:
-    ///   - key: The string representation of the config key to look up.
-    ///   - context: Additional context used for key resolution.
-    ///   - isSecret: Whether the value should be treated as secret for logging and debugging purposes.
-    ///   - defaultValue: The fallback value returned when the config value is missing or invalid.
-    ///   - fileID: The file ID where this call originates. Used for access reporting.
-    ///   - line: The line number where this call originates. Used for access reporting.
-    /// - Returns: The config value if found and convertible, otherwise the default value.
-    /// - Throws: If the underlying provider throws, or if the value can't be converted to the expected type.
-    public func fetchString(
-        forKey key: String,
-        context: [String: ConfigContextValue] = [:],
-        isSecret: Bool = false,
-        default defaultValue: String,
-        fileID: String = #fileID,
-        line: UInt = #line
-    ) async throws -> String {
-        try await fetchString(
-            forKey: keyDecoder.decode(key, context: context),
-            isSecret: isSecret,
-            default: defaultValue,
             fileID: fileID,
             line: line
         )
@@ -3045,39 +1570,6 @@ extension ConfigReader {
         )
     }
 
-    /// Asynchronously fetches a required config value for the given string key, throwing an error if it's missing.
-    ///
-    /// Use this method when a configuration value is mandatory for your application to function
-    /// and you're working with async providers. The method throws an error if the value is
-    /// missing or can't be converted to the expected type.
-    ///
-    /// ```swift
-    /// let endpoint = try await config.fetchRequiredString(forKey: "service.endpoint")
-    /// ```
-    ///
-    /// - Parameters:
-    ///   - key: The string representation of the config key to look up.
-    ///   - context: Additional context used for key resolution.
-    ///   - isSecret: Whether the value should be treated as secret for logging and debugging purposes.
-    ///   - fileID: The file ID where this call originates. Used for access reporting.
-    ///   - line: The line number where this call originates. Used for access reporting.
-    /// - Returns: The config value converted to the expected type.
-    /// - Throws: If the underlying provider throws, the value is missing, or can't be converted to the expected type.
-    public func fetchRequiredString(
-        forKey key: String,
-        context: [String: ConfigContextValue] = [:],
-        isSecret: Bool = false,
-        fileID: String = #fileID,
-        line: UInt = #line
-    ) async throws -> String {
-        try await fetchRequiredString(
-            forKey: keyDecoder.decode(key, context: context),
-            isSecret: isSecret,
-            fileID: fileID,
-            line: line
-        )
-    }
-
     /// Asynchronously fetches a config value for the given config key.
     ///
     /// Use this method when you need to retrieve configuration values from providers
@@ -3108,38 +1600,6 @@ extension ConfigReader {
             isSecret: isSecret,
             unwrap: { try $0.asInt },
             wrap: ConfigContent.int,
-            fileID: fileID,
-            line: line
-        )
-    }
-
-    /// Asynchronously fetches a config value for the given string key.
-    ///
-    /// Use this method to retrieve optional configuration values from async providers.
-    /// If the value doesn't exist, the method returns `nil`.
-    ///
-    /// ```swift
-    /// let dbUrl = try await config.fetchString(forKey: "database.url")
-    /// ```
-    ///
-    /// - Parameters:
-    ///   - key: The string representation of the config key to look up.
-    ///   - context: Additional context used for key resolution.
-    ///   - isSecret: Whether the value should be treated as secret for logging and debugging purposes.
-    ///   - fileID: The file ID where this call originates. Used for access reporting.
-    ///   - line: The line number where this call originates. Used for access reporting.
-    /// - Returns: The value converted to the expected type if found and convertible, otherwise `nil`.
-    /// - Throws: If the underlying provider throws, or if the value can't be converted to the expected type.
-    public func fetchInt(
-        forKey key: String,
-        context: [String: ConfigContextValue] = [:],
-        isSecret: Bool = false,
-        fileID: String = #fileID,
-        line: UInt = #line
-    ) async throws -> Int? {
-        try await fetchInt(
-            forKey: keyDecoder.decode(key, context: context),
-            isSecret: isSecret,
             fileID: fileID,
             line: line
         )
@@ -3181,41 +1641,6 @@ extension ConfigReader {
         )
     }
 
-    /// Asynchronously fetches a config value for the given config key, with a default fallback.
-    ///
-    /// Use this method when you need a guaranteed non-nil result from an async provider.
-    /// If the configuration value is missing, the default value is returned instead.
-    ///
-    /// ```swift
-    /// let maxRetries = try await config.fetchInt(forKey: "network.maxRetries", default: 3)
-    /// ```
-    ///
-    /// - Parameters:
-    ///   - key: The string representation of the config key to look up.
-    ///   - context: Additional context used for key resolution.
-    ///   - isSecret: Whether the value should be treated as secret for logging and debugging purposes.
-    ///   - defaultValue: The fallback value returned when the config value is missing or invalid.
-    ///   - fileID: The file ID where this call originates. Used for access reporting.
-    ///   - line: The line number where this call originates. Used for access reporting.
-    /// - Returns: The config value if found and convertible, otherwise the default value.
-    /// - Throws: If the underlying provider throws, or if the value can't be converted to the expected type.
-    public func fetchInt(
-        forKey key: String,
-        context: [String: ConfigContextValue] = [:],
-        isSecret: Bool = false,
-        default defaultValue: Int,
-        fileID: String = #fileID,
-        line: UInt = #line
-    ) async throws -> Int {
-        try await fetchInt(
-            forKey: keyDecoder.decode(key, context: context),
-            isSecret: isSecret,
-            default: defaultValue,
-            fileID: fileID,
-            line: line
-        )
-    }
-
     /// Asynchronously fetches a required config value for the given config key, throwing an error if it's missing.
     ///
     /// Use this method when a configuration value is mandatory for your application to function
@@ -3250,39 +1675,6 @@ extension ConfigReader {
         )
     }
 
-    /// Asynchronously fetches a required config value for the given string key, throwing an error if it's missing.
-    ///
-    /// Use this method when a configuration value is mandatory for your application to function
-    /// and you're working with async providers. The method throws an error if the value is
-    /// missing or can't be converted to the expected type.
-    ///
-    /// ```swift
-    /// let endpoint = try await config.fetchRequiredString(forKey: "service.endpoint")
-    /// ```
-    ///
-    /// - Parameters:
-    ///   - key: The string representation of the config key to look up.
-    ///   - context: Additional context used for key resolution.
-    ///   - isSecret: Whether the value should be treated as secret for logging and debugging purposes.
-    ///   - fileID: The file ID where this call originates. Used for access reporting.
-    ///   - line: The line number where this call originates. Used for access reporting.
-    /// - Returns: The config value converted to the expected type.
-    /// - Throws: If the underlying provider throws, the value is missing, or can't be converted to the expected type.
-    public func fetchRequiredInt(
-        forKey key: String,
-        context: [String: ConfigContextValue] = [:],
-        isSecret: Bool = false,
-        fileID: String = #fileID,
-        line: UInt = #line
-    ) async throws -> Int {
-        try await fetchRequiredInt(
-            forKey: keyDecoder.decode(key, context: context),
-            isSecret: isSecret,
-            fileID: fileID,
-            line: line
-        )
-    }
-
     /// Asynchronously fetches a config value for the given config key.
     ///
     /// Use this method when you need to retrieve configuration values from providers
@@ -3313,38 +1705,6 @@ extension ConfigReader {
             isSecret: isSecret,
             unwrap: { try $0.asDouble },
             wrap: ConfigContent.double,
-            fileID: fileID,
-            line: line
-        )
-    }
-
-    /// Asynchronously fetches a config value for the given string key.
-    ///
-    /// Use this method to retrieve optional configuration values from async providers.
-    /// If the value doesn't exist, the method returns `nil`.
-    ///
-    /// ```swift
-    /// let dbUrl = try await config.fetchString(forKey: "database.url")
-    /// ```
-    ///
-    /// - Parameters:
-    ///   - key: The string representation of the config key to look up.
-    ///   - context: Additional context used for key resolution.
-    ///   - isSecret: Whether the value should be treated as secret for logging and debugging purposes.
-    ///   - fileID: The file ID where this call originates. Used for access reporting.
-    ///   - line: The line number where this call originates. Used for access reporting.
-    /// - Returns: The value converted to the expected type if found and convertible, otherwise `nil`.
-    /// - Throws: If the underlying provider throws, or if the value can't be converted to the expected type.
-    public func fetchDouble(
-        forKey key: String,
-        context: [String: ConfigContextValue] = [:],
-        isSecret: Bool = false,
-        fileID: String = #fileID,
-        line: UInt = #line
-    ) async throws -> Double? {
-        try await fetchDouble(
-            forKey: keyDecoder.decode(key, context: context),
-            isSecret: isSecret,
             fileID: fileID,
             line: line
         )
@@ -3386,41 +1746,6 @@ extension ConfigReader {
         )
     }
 
-    /// Asynchronously fetches a config value for the given config key, with a default fallback.
-    ///
-    /// Use this method when you need a guaranteed non-nil result from an async provider.
-    /// If the configuration value is missing, the default value is returned instead.
-    ///
-    /// ```swift
-    /// let maxRetries = try await config.fetchInt(forKey: "network.maxRetries", default: 3)
-    /// ```
-    ///
-    /// - Parameters:
-    ///   - key: The string representation of the config key to look up.
-    ///   - context: Additional context used for key resolution.
-    ///   - isSecret: Whether the value should be treated as secret for logging and debugging purposes.
-    ///   - defaultValue: The fallback value returned when the config value is missing or invalid.
-    ///   - fileID: The file ID where this call originates. Used for access reporting.
-    ///   - line: The line number where this call originates. Used for access reporting.
-    /// - Returns: The config value if found and convertible, otherwise the default value.
-    /// - Throws: If the underlying provider throws, or if the value can't be converted to the expected type.
-    public func fetchDouble(
-        forKey key: String,
-        context: [String: ConfigContextValue] = [:],
-        isSecret: Bool = false,
-        default defaultValue: Double,
-        fileID: String = #fileID,
-        line: UInt = #line
-    ) async throws -> Double {
-        try await fetchDouble(
-            forKey: keyDecoder.decode(key, context: context),
-            isSecret: isSecret,
-            default: defaultValue,
-            fileID: fileID,
-            line: line
-        )
-    }
-
     /// Asynchronously fetches a required config value for the given config key, throwing an error if it's missing.
     ///
     /// Use this method when a configuration value is mandatory for your application to function
@@ -3455,39 +1780,6 @@ extension ConfigReader {
         )
     }
 
-    /// Asynchronously fetches a required config value for the given string key, throwing an error if it's missing.
-    ///
-    /// Use this method when a configuration value is mandatory for your application to function
-    /// and you're working with async providers. The method throws an error if the value is
-    /// missing or can't be converted to the expected type.
-    ///
-    /// ```swift
-    /// let endpoint = try await config.fetchRequiredString(forKey: "service.endpoint")
-    /// ```
-    ///
-    /// - Parameters:
-    ///   - key: The string representation of the config key to look up.
-    ///   - context: Additional context used for key resolution.
-    ///   - isSecret: Whether the value should be treated as secret for logging and debugging purposes.
-    ///   - fileID: The file ID where this call originates. Used for access reporting.
-    ///   - line: The line number where this call originates. Used for access reporting.
-    /// - Returns: The config value converted to the expected type.
-    /// - Throws: If the underlying provider throws, the value is missing, or can't be converted to the expected type.
-    public func fetchRequiredDouble(
-        forKey key: String,
-        context: [String: ConfigContextValue] = [:],
-        isSecret: Bool = false,
-        fileID: String = #fileID,
-        line: UInt = #line
-    ) async throws -> Double {
-        try await fetchRequiredDouble(
-            forKey: keyDecoder.decode(key, context: context),
-            isSecret: isSecret,
-            fileID: fileID,
-            line: line
-        )
-    }
-
     /// Asynchronously fetches a config value for the given config key.
     ///
     /// Use this method when you need to retrieve configuration values from providers
@@ -3518,38 +1810,6 @@ extension ConfigReader {
             isSecret: isSecret,
             unwrap: { try $0.asBool },
             wrap: ConfigContent.bool,
-            fileID: fileID,
-            line: line
-        )
-    }
-
-    /// Asynchronously fetches a config value for the given string key.
-    ///
-    /// Use this method to retrieve optional configuration values from async providers.
-    /// If the value doesn't exist, the method returns `nil`.
-    ///
-    /// ```swift
-    /// let dbUrl = try await config.fetchString(forKey: "database.url")
-    /// ```
-    ///
-    /// - Parameters:
-    ///   - key: The string representation of the config key to look up.
-    ///   - context: Additional context used for key resolution.
-    ///   - isSecret: Whether the value should be treated as secret for logging and debugging purposes.
-    ///   - fileID: The file ID where this call originates. Used for access reporting.
-    ///   - line: The line number where this call originates. Used for access reporting.
-    /// - Returns: The value converted to the expected type if found and convertible, otherwise `nil`.
-    /// - Throws: If the underlying provider throws, or if the value can't be converted to the expected type.
-    public func fetchBool(
-        forKey key: String,
-        context: [String: ConfigContextValue] = [:],
-        isSecret: Bool = false,
-        fileID: String = #fileID,
-        line: UInt = #line
-    ) async throws -> Bool? {
-        try await fetchBool(
-            forKey: keyDecoder.decode(key, context: context),
-            isSecret: isSecret,
             fileID: fileID,
             line: line
         )
@@ -3591,41 +1851,6 @@ extension ConfigReader {
         )
     }
 
-    /// Asynchronously fetches a config value for the given config key, with a default fallback.
-    ///
-    /// Use this method when you need a guaranteed non-nil result from an async provider.
-    /// If the configuration value is missing, the default value is returned instead.
-    ///
-    /// ```swift
-    /// let maxRetries = try await config.fetchInt(forKey: "network.maxRetries", default: 3)
-    /// ```
-    ///
-    /// - Parameters:
-    ///   - key: The string representation of the config key to look up.
-    ///   - context: Additional context used for key resolution.
-    ///   - isSecret: Whether the value should be treated as secret for logging and debugging purposes.
-    ///   - defaultValue: The fallback value returned when the config value is missing or invalid.
-    ///   - fileID: The file ID where this call originates. Used for access reporting.
-    ///   - line: The line number where this call originates. Used for access reporting.
-    /// - Returns: The config value if found and convertible, otherwise the default value.
-    /// - Throws: If the underlying provider throws, or if the value can't be converted to the expected type.
-    public func fetchBool(
-        forKey key: String,
-        context: [String: ConfigContextValue] = [:],
-        isSecret: Bool = false,
-        default defaultValue: Bool,
-        fileID: String = #fileID,
-        line: UInt = #line
-    ) async throws -> Bool {
-        try await fetchBool(
-            forKey: keyDecoder.decode(key, context: context),
-            isSecret: isSecret,
-            default: defaultValue,
-            fileID: fileID,
-            line: line
-        )
-    }
-
     /// Asynchronously fetches a required config value for the given config key, throwing an error if it's missing.
     ///
     /// Use this method when a configuration value is mandatory for your application to function
@@ -3660,39 +1885,6 @@ extension ConfigReader {
         )
     }
 
-    /// Asynchronously fetches a required config value for the given string key, throwing an error if it's missing.
-    ///
-    /// Use this method when a configuration value is mandatory for your application to function
-    /// and you're working with async providers. The method throws an error if the value is
-    /// missing or can't be converted to the expected type.
-    ///
-    /// ```swift
-    /// let endpoint = try await config.fetchRequiredString(forKey: "service.endpoint")
-    /// ```
-    ///
-    /// - Parameters:
-    ///   - key: The string representation of the config key to look up.
-    ///   - context: Additional context used for key resolution.
-    ///   - isSecret: Whether the value should be treated as secret for logging and debugging purposes.
-    ///   - fileID: The file ID where this call originates. Used for access reporting.
-    ///   - line: The line number where this call originates. Used for access reporting.
-    /// - Returns: The config value converted to the expected type.
-    /// - Throws: If the underlying provider throws, the value is missing, or can't be converted to the expected type.
-    public func fetchRequiredBool(
-        forKey key: String,
-        context: [String: ConfigContextValue] = [:],
-        isSecret: Bool = false,
-        fileID: String = #fileID,
-        line: UInt = #line
-    ) async throws -> Bool {
-        try await fetchRequiredBool(
-            forKey: keyDecoder.decode(key, context: context),
-            isSecret: isSecret,
-            fileID: fileID,
-            line: line
-        )
-    }
-
     /// Asynchronously fetches a config value for the given config key.
     ///
     /// Use this method when you need to retrieve configuration values from providers
@@ -3723,38 +1915,6 @@ extension ConfigReader {
             isSecret: isSecret,
             unwrap: { try $0.asBytes },
             wrap: ConfigContent.bytes,
-            fileID: fileID,
-            line: line
-        )
-    }
-
-    /// Asynchronously fetches a config value for the given string key.
-    ///
-    /// Use this method to retrieve optional configuration values from async providers.
-    /// If the value doesn't exist, the method returns `nil`.
-    ///
-    /// ```swift
-    /// let dbUrl = try await config.fetchString(forKey: "database.url")
-    /// ```
-    ///
-    /// - Parameters:
-    ///   - key: The string representation of the config key to look up.
-    ///   - context: Additional context used for key resolution.
-    ///   - isSecret: Whether the value should be treated as secret for logging and debugging purposes.
-    ///   - fileID: The file ID where this call originates. Used for access reporting.
-    ///   - line: The line number where this call originates. Used for access reporting.
-    /// - Returns: The value converted to the expected type if found and convertible, otherwise `nil`.
-    /// - Throws: If the underlying provider throws, or if the value can't be converted to the expected type.
-    public func fetchBytes(
-        forKey key: String,
-        context: [String: ConfigContextValue] = [:],
-        isSecret: Bool = false,
-        fileID: String = #fileID,
-        line: UInt = #line
-    ) async throws -> [UInt8]? {
-        try await fetchBytes(
-            forKey: keyDecoder.decode(key, context: context),
-            isSecret: isSecret,
             fileID: fileID,
             line: line
         )
@@ -3796,41 +1956,6 @@ extension ConfigReader {
         )
     }
 
-    /// Asynchronously fetches a config value for the given config key, with a default fallback.
-    ///
-    /// Use this method when you need a guaranteed non-nil result from an async provider.
-    /// If the configuration value is missing, the default value is returned instead.
-    ///
-    /// ```swift
-    /// let maxRetries = try await config.fetchInt(forKey: "network.maxRetries", default: 3)
-    /// ```
-    ///
-    /// - Parameters:
-    ///   - key: The string representation of the config key to look up.
-    ///   - context: Additional context used for key resolution.
-    ///   - isSecret: Whether the value should be treated as secret for logging and debugging purposes.
-    ///   - defaultValue: The fallback value returned when the config value is missing or invalid.
-    ///   - fileID: The file ID where this call originates. Used for access reporting.
-    ///   - line: The line number where this call originates. Used for access reporting.
-    /// - Returns: The config value if found and convertible, otherwise the default value.
-    /// - Throws: If the underlying provider throws, or if the value can't be converted to the expected type.
-    public func fetchBytes(
-        forKey key: String,
-        context: [String: ConfigContextValue] = [:],
-        isSecret: Bool = false,
-        default defaultValue: [UInt8],
-        fileID: String = #fileID,
-        line: UInt = #line
-    ) async throws -> [UInt8] {
-        try await fetchBytes(
-            forKey: keyDecoder.decode(key, context: context),
-            isSecret: isSecret,
-            default: defaultValue,
-            fileID: fileID,
-            line: line
-        )
-    }
-
     /// Asynchronously fetches a required config value for the given config key, throwing an error if it's missing.
     ///
     /// Use this method when a configuration value is mandatory for your application to function
@@ -3865,39 +1990,6 @@ extension ConfigReader {
         )
     }
 
-    /// Asynchronously fetches a required config value for the given string key, throwing an error if it's missing.
-    ///
-    /// Use this method when a configuration value is mandatory for your application to function
-    /// and you're working with async providers. The method throws an error if the value is
-    /// missing or can't be converted to the expected type.
-    ///
-    /// ```swift
-    /// let endpoint = try await config.fetchRequiredString(forKey: "service.endpoint")
-    /// ```
-    ///
-    /// - Parameters:
-    ///   - key: The string representation of the config key to look up.
-    ///   - context: Additional context used for key resolution.
-    ///   - isSecret: Whether the value should be treated as secret for logging and debugging purposes.
-    ///   - fileID: The file ID where this call originates. Used for access reporting.
-    ///   - line: The line number where this call originates. Used for access reporting.
-    /// - Returns: The config value converted to the expected type.
-    /// - Throws: If the underlying provider throws, the value is missing, or can't be converted to the expected type.
-    public func fetchRequiredBytes(
-        forKey key: String,
-        context: [String: ConfigContextValue] = [:],
-        isSecret: Bool = false,
-        fileID: String = #fileID,
-        line: UInt = #line
-    ) async throws -> [UInt8] {
-        try await fetchRequiredBytes(
-            forKey: keyDecoder.decode(key, context: context),
-            isSecret: isSecret,
-            fileID: fileID,
-            line: line
-        )
-    }
-
     /// Asynchronously fetches a config value for the given config key.
     ///
     /// Use this method when you need to retrieve configuration values from providers
@@ -3928,38 +2020,6 @@ extension ConfigReader {
             isSecret: isSecret,
             unwrap: { try $0.asStringArray },
             wrap: ConfigContent.stringArray,
-            fileID: fileID,
-            line: line
-        )
-    }
-
-    /// Asynchronously fetches a config value for the given string key.
-    ///
-    /// Use this method to retrieve optional configuration values from async providers.
-    /// If the value doesn't exist, the method returns `nil`.
-    ///
-    /// ```swift
-    /// let dbUrl = try await config.fetchString(forKey: "database.url")
-    /// ```
-    ///
-    /// - Parameters:
-    ///   - key: The string representation of the config key to look up.
-    ///   - context: Additional context used for key resolution.
-    ///   - isSecret: Whether the value should be treated as secret for logging and debugging purposes.
-    ///   - fileID: The file ID where this call originates. Used for access reporting.
-    ///   - line: The line number where this call originates. Used for access reporting.
-    /// - Returns: The value converted to the expected type if found and convertible, otherwise `nil`.
-    /// - Throws: If the underlying provider throws, or if the value can't be converted to the expected type.
-    public func fetchStringArray(
-        forKey key: String,
-        context: [String: ConfigContextValue] = [:],
-        isSecret: Bool = false,
-        fileID: String = #fileID,
-        line: UInt = #line
-    ) async throws -> [String]? {
-        try await fetchStringArray(
-            forKey: keyDecoder.decode(key, context: context),
-            isSecret: isSecret,
             fileID: fileID,
             line: line
         )
@@ -4001,41 +2061,6 @@ extension ConfigReader {
         )
     }
 
-    /// Asynchronously fetches a config value for the given config key, with a default fallback.
-    ///
-    /// Use this method when you need a guaranteed non-nil result from an async provider.
-    /// If the configuration value is missing, the default value is returned instead.
-    ///
-    /// ```swift
-    /// let maxRetries = try await config.fetchInt(forKey: "network.maxRetries", default: 3)
-    /// ```
-    ///
-    /// - Parameters:
-    ///   - key: The string representation of the config key to look up.
-    ///   - context: Additional context used for key resolution.
-    ///   - isSecret: Whether the value should be treated as secret for logging and debugging purposes.
-    ///   - defaultValue: The fallback value returned when the config value is missing or invalid.
-    ///   - fileID: The file ID where this call originates. Used for access reporting.
-    ///   - line: The line number where this call originates. Used for access reporting.
-    /// - Returns: The config value if found and convertible, otherwise the default value.
-    /// - Throws: If the underlying provider throws, or if the value can't be converted to the expected type.
-    public func fetchStringArray(
-        forKey key: String,
-        context: [String: ConfigContextValue] = [:],
-        isSecret: Bool = false,
-        default defaultValue: [String],
-        fileID: String = #fileID,
-        line: UInt = #line
-    ) async throws -> [String] {
-        try await fetchStringArray(
-            forKey: keyDecoder.decode(key, context: context),
-            isSecret: isSecret,
-            default: defaultValue,
-            fileID: fileID,
-            line: line
-        )
-    }
-
     /// Asynchronously fetches a required config value for the given config key, throwing an error if it's missing.
     ///
     /// Use this method when a configuration value is mandatory for your application to function
@@ -4070,39 +2095,6 @@ extension ConfigReader {
         )
     }
 
-    /// Asynchronously fetches a required config value for the given string key, throwing an error if it's missing.
-    ///
-    /// Use this method when a configuration value is mandatory for your application to function
-    /// and you're working with async providers. The method throws an error if the value is
-    /// missing or can't be converted to the expected type.
-    ///
-    /// ```swift
-    /// let endpoint = try await config.fetchRequiredString(forKey: "service.endpoint")
-    /// ```
-    ///
-    /// - Parameters:
-    ///   - key: The string representation of the config key to look up.
-    ///   - context: Additional context used for key resolution.
-    ///   - isSecret: Whether the value should be treated as secret for logging and debugging purposes.
-    ///   - fileID: The file ID where this call originates. Used for access reporting.
-    ///   - line: The line number where this call originates. Used for access reporting.
-    /// - Returns: The config value converted to the expected type.
-    /// - Throws: If the underlying provider throws, the value is missing, or can't be converted to the expected type.
-    public func fetchRequiredStringArray(
-        forKey key: String,
-        context: [String: ConfigContextValue] = [:],
-        isSecret: Bool = false,
-        fileID: String = #fileID,
-        line: UInt = #line
-    ) async throws -> [String] {
-        try await fetchRequiredStringArray(
-            forKey: keyDecoder.decode(key, context: context),
-            isSecret: isSecret,
-            fileID: fileID,
-            line: line
-        )
-    }
-
     /// Asynchronously fetches a config value for the given config key.
     ///
     /// Use this method when you need to retrieve configuration values from providers
@@ -4133,38 +2125,6 @@ extension ConfigReader {
             isSecret: isSecret,
             unwrap: { try $0.asIntArray },
             wrap: ConfigContent.intArray,
-            fileID: fileID,
-            line: line
-        )
-    }
-
-    /// Asynchronously fetches a config value for the given string key.
-    ///
-    /// Use this method to retrieve optional configuration values from async providers.
-    /// If the value doesn't exist, the method returns `nil`.
-    ///
-    /// ```swift
-    /// let dbUrl = try await config.fetchString(forKey: "database.url")
-    /// ```
-    ///
-    /// - Parameters:
-    ///   - key: The string representation of the config key to look up.
-    ///   - context: Additional context used for key resolution.
-    ///   - isSecret: Whether the value should be treated as secret for logging and debugging purposes.
-    ///   - fileID: The file ID where this call originates. Used for access reporting.
-    ///   - line: The line number where this call originates. Used for access reporting.
-    /// - Returns: The value converted to the expected type if found and convertible, otherwise `nil`.
-    /// - Throws: If the underlying provider throws, or if the value can't be converted to the expected type.
-    public func fetchIntArray(
-        forKey key: String,
-        context: [String: ConfigContextValue] = [:],
-        isSecret: Bool = false,
-        fileID: String = #fileID,
-        line: UInt = #line
-    ) async throws -> [Int]? {
-        try await fetchIntArray(
-            forKey: keyDecoder.decode(key, context: context),
-            isSecret: isSecret,
             fileID: fileID,
             line: line
         )
@@ -4206,41 +2166,6 @@ extension ConfigReader {
         )
     }
 
-    /// Asynchronously fetches a config value for the given config key, with a default fallback.
-    ///
-    /// Use this method when you need a guaranteed non-nil result from an async provider.
-    /// If the configuration value is missing, the default value is returned instead.
-    ///
-    /// ```swift
-    /// let maxRetries = try await config.fetchInt(forKey: "network.maxRetries", default: 3)
-    /// ```
-    ///
-    /// - Parameters:
-    ///   - key: The string representation of the config key to look up.
-    ///   - context: Additional context used for key resolution.
-    ///   - isSecret: Whether the value should be treated as secret for logging and debugging purposes.
-    ///   - defaultValue: The fallback value returned when the config value is missing or invalid.
-    ///   - fileID: The file ID where this call originates. Used for access reporting.
-    ///   - line: The line number where this call originates. Used for access reporting.
-    /// - Returns: The config value if found and convertible, otherwise the default value.
-    /// - Throws: If the underlying provider throws, or if the value can't be converted to the expected type.
-    public func fetchIntArray(
-        forKey key: String,
-        context: [String: ConfigContextValue] = [:],
-        isSecret: Bool = false,
-        default defaultValue: [Int],
-        fileID: String = #fileID,
-        line: UInt = #line
-    ) async throws -> [Int] {
-        try await fetchIntArray(
-            forKey: keyDecoder.decode(key, context: context),
-            isSecret: isSecret,
-            default: defaultValue,
-            fileID: fileID,
-            line: line
-        )
-    }
-
     /// Asynchronously fetches a required config value for the given config key, throwing an error if it's missing.
     ///
     /// Use this method when a configuration value is mandatory for your application to function
@@ -4275,39 +2200,6 @@ extension ConfigReader {
         )
     }
 
-    /// Asynchronously fetches a required config value for the given string key, throwing an error if it's missing.
-    ///
-    /// Use this method when a configuration value is mandatory for your application to function
-    /// and you're working with async providers. The method throws an error if the value is
-    /// missing or can't be converted to the expected type.
-    ///
-    /// ```swift
-    /// let endpoint = try await config.fetchRequiredString(forKey: "service.endpoint")
-    /// ```
-    ///
-    /// - Parameters:
-    ///   - key: The string representation of the config key to look up.
-    ///   - context: Additional context used for key resolution.
-    ///   - isSecret: Whether the value should be treated as secret for logging and debugging purposes.
-    ///   - fileID: The file ID where this call originates. Used for access reporting.
-    ///   - line: The line number where this call originates. Used for access reporting.
-    /// - Returns: The config value converted to the expected type.
-    /// - Throws: If the underlying provider throws, the value is missing, or can't be converted to the expected type.
-    public func fetchRequiredIntArray(
-        forKey key: String,
-        context: [String: ConfigContextValue] = [:],
-        isSecret: Bool = false,
-        fileID: String = #fileID,
-        line: UInt = #line
-    ) async throws -> [Int] {
-        try await fetchRequiredIntArray(
-            forKey: keyDecoder.decode(key, context: context),
-            isSecret: isSecret,
-            fileID: fileID,
-            line: line
-        )
-    }
-
     /// Asynchronously fetches a config value for the given config key.
     ///
     /// Use this method when you need to retrieve configuration values from providers
@@ -4338,38 +2230,6 @@ extension ConfigReader {
             isSecret: isSecret,
             unwrap: { try $0.asDoubleArray },
             wrap: ConfigContent.doubleArray,
-            fileID: fileID,
-            line: line
-        )
-    }
-
-    /// Asynchronously fetches a config value for the given string key.
-    ///
-    /// Use this method to retrieve optional configuration values from async providers.
-    /// If the value doesn't exist, the method returns `nil`.
-    ///
-    /// ```swift
-    /// let dbUrl = try await config.fetchString(forKey: "database.url")
-    /// ```
-    ///
-    /// - Parameters:
-    ///   - key: The string representation of the config key to look up.
-    ///   - context: Additional context used for key resolution.
-    ///   - isSecret: Whether the value should be treated as secret for logging and debugging purposes.
-    ///   - fileID: The file ID where this call originates. Used for access reporting.
-    ///   - line: The line number where this call originates. Used for access reporting.
-    /// - Returns: The value converted to the expected type if found and convertible, otherwise `nil`.
-    /// - Throws: If the underlying provider throws, or if the value can't be converted to the expected type.
-    public func fetchDoubleArray(
-        forKey key: String,
-        context: [String: ConfigContextValue] = [:],
-        isSecret: Bool = false,
-        fileID: String = #fileID,
-        line: UInt = #line
-    ) async throws -> [Double]? {
-        try await fetchDoubleArray(
-            forKey: keyDecoder.decode(key, context: context),
-            isSecret: isSecret,
             fileID: fileID,
             line: line
         )
@@ -4411,41 +2271,6 @@ extension ConfigReader {
         )
     }
 
-    /// Asynchronously fetches a config value for the given config key, with a default fallback.
-    ///
-    /// Use this method when you need a guaranteed non-nil result from an async provider.
-    /// If the configuration value is missing, the default value is returned instead.
-    ///
-    /// ```swift
-    /// let maxRetries = try await config.fetchInt(forKey: "network.maxRetries", default: 3)
-    /// ```
-    ///
-    /// - Parameters:
-    ///   - key: The string representation of the config key to look up.
-    ///   - context: Additional context used for key resolution.
-    ///   - isSecret: Whether the value should be treated as secret for logging and debugging purposes.
-    ///   - defaultValue: The fallback value returned when the config value is missing or invalid.
-    ///   - fileID: The file ID where this call originates. Used for access reporting.
-    ///   - line: The line number where this call originates. Used for access reporting.
-    /// - Returns: The config value if found and convertible, otherwise the default value.
-    /// - Throws: If the underlying provider throws, or if the value can't be converted to the expected type.
-    public func fetchDoubleArray(
-        forKey key: String,
-        context: [String: ConfigContextValue] = [:],
-        isSecret: Bool = false,
-        default defaultValue: [Double],
-        fileID: String = #fileID,
-        line: UInt = #line
-    ) async throws -> [Double] {
-        try await fetchDoubleArray(
-            forKey: keyDecoder.decode(key, context: context),
-            isSecret: isSecret,
-            default: defaultValue,
-            fileID: fileID,
-            line: line
-        )
-    }
-
     /// Asynchronously fetches a required config value for the given config key, throwing an error if it's missing.
     ///
     /// Use this method when a configuration value is mandatory for your application to function
@@ -4480,39 +2305,6 @@ extension ConfigReader {
         )
     }
 
-    /// Asynchronously fetches a required config value for the given string key, throwing an error if it's missing.
-    ///
-    /// Use this method when a configuration value is mandatory for your application to function
-    /// and you're working with async providers. The method throws an error if the value is
-    /// missing or can't be converted to the expected type.
-    ///
-    /// ```swift
-    /// let endpoint = try await config.fetchRequiredString(forKey: "service.endpoint")
-    /// ```
-    ///
-    /// - Parameters:
-    ///   - key: The string representation of the config key to look up.
-    ///   - context: Additional context used for key resolution.
-    ///   - isSecret: Whether the value should be treated as secret for logging and debugging purposes.
-    ///   - fileID: The file ID where this call originates. Used for access reporting.
-    ///   - line: The line number where this call originates. Used for access reporting.
-    /// - Returns: The config value converted to the expected type.
-    /// - Throws: If the underlying provider throws, the value is missing, or can't be converted to the expected type.
-    public func fetchRequiredDoubleArray(
-        forKey key: String,
-        context: [String: ConfigContextValue] = [:],
-        isSecret: Bool = false,
-        fileID: String = #fileID,
-        line: UInt = #line
-    ) async throws -> [Double] {
-        try await fetchRequiredDoubleArray(
-            forKey: keyDecoder.decode(key, context: context),
-            isSecret: isSecret,
-            fileID: fileID,
-            line: line
-        )
-    }
-
     /// Asynchronously fetches a config value for the given config key.
     ///
     /// Use this method when you need to retrieve configuration values from providers
@@ -4543,38 +2335,6 @@ extension ConfigReader {
             isSecret: isSecret,
             unwrap: { try $0.asBoolArray },
             wrap: ConfigContent.boolArray,
-            fileID: fileID,
-            line: line
-        )
-    }
-
-    /// Asynchronously fetches a config value for the given string key.
-    ///
-    /// Use this method to retrieve optional configuration values from async providers.
-    /// If the value doesn't exist, the method returns `nil`.
-    ///
-    /// ```swift
-    /// let dbUrl = try await config.fetchString(forKey: "database.url")
-    /// ```
-    ///
-    /// - Parameters:
-    ///   - key: The string representation of the config key to look up.
-    ///   - context: Additional context used for key resolution.
-    ///   - isSecret: Whether the value should be treated as secret for logging and debugging purposes.
-    ///   - fileID: The file ID where this call originates. Used for access reporting.
-    ///   - line: The line number where this call originates. Used for access reporting.
-    /// - Returns: The value converted to the expected type if found and convertible, otherwise `nil`.
-    /// - Throws: If the underlying provider throws, or if the value can't be converted to the expected type.
-    public func fetchBoolArray(
-        forKey key: String,
-        context: [String: ConfigContextValue] = [:],
-        isSecret: Bool = false,
-        fileID: String = #fileID,
-        line: UInt = #line
-    ) async throws -> [Bool]? {
-        try await fetchBoolArray(
-            forKey: keyDecoder.decode(key, context: context),
-            isSecret: isSecret,
             fileID: fileID,
             line: line
         )
@@ -4616,41 +2376,6 @@ extension ConfigReader {
         )
     }
 
-    /// Asynchronously fetches a config value for the given config key, with a default fallback.
-    ///
-    /// Use this method when you need a guaranteed non-nil result from an async provider.
-    /// If the configuration value is missing, the default value is returned instead.
-    ///
-    /// ```swift
-    /// let maxRetries = try await config.fetchInt(forKey: "network.maxRetries", default: 3)
-    /// ```
-    ///
-    /// - Parameters:
-    ///   - key: The string representation of the config key to look up.
-    ///   - context: Additional context used for key resolution.
-    ///   - isSecret: Whether the value should be treated as secret for logging and debugging purposes.
-    ///   - defaultValue: The fallback value returned when the config value is missing or invalid.
-    ///   - fileID: The file ID where this call originates. Used for access reporting.
-    ///   - line: The line number where this call originates. Used for access reporting.
-    /// - Returns: The config value if found and convertible, otherwise the default value.
-    /// - Throws: If the underlying provider throws, or if the value can't be converted to the expected type.
-    public func fetchBoolArray(
-        forKey key: String,
-        context: [String: ConfigContextValue] = [:],
-        isSecret: Bool = false,
-        default defaultValue: [Bool],
-        fileID: String = #fileID,
-        line: UInt = #line
-    ) async throws -> [Bool] {
-        try await fetchBoolArray(
-            forKey: keyDecoder.decode(key, context: context),
-            isSecret: isSecret,
-            default: defaultValue,
-            fileID: fileID,
-            line: line
-        )
-    }
-
     /// Asynchronously fetches a required config value for the given config key, throwing an error if it's missing.
     ///
     /// Use this method when a configuration value is mandatory for your application to function
@@ -4680,39 +2405,6 @@ extension ConfigReader {
             isSecret: isSecret,
             unwrap: { try $0.asBoolArray },
             wrap: ConfigContent.boolArray,
-            fileID: fileID,
-            line: line
-        )
-    }
-
-    /// Asynchronously fetches a required config value for the given string key, throwing an error if it's missing.
-    ///
-    /// Use this method when a configuration value is mandatory for your application to function
-    /// and you're working with async providers. The method throws an error if the value is
-    /// missing or can't be converted to the expected type.
-    ///
-    /// ```swift
-    /// let endpoint = try await config.fetchRequiredString(forKey: "service.endpoint")
-    /// ```
-    ///
-    /// - Parameters:
-    ///   - key: The string representation of the config key to look up.
-    ///   - context: Additional context used for key resolution.
-    ///   - isSecret: Whether the value should be treated as secret for logging and debugging purposes.
-    ///   - fileID: The file ID where this call originates. Used for access reporting.
-    ///   - line: The line number where this call originates. Used for access reporting.
-    /// - Returns: The config value converted to the expected type.
-    /// - Throws: If the underlying provider throws, the value is missing, or can't be converted to the expected type.
-    public func fetchRequiredBoolArray(
-        forKey key: String,
-        context: [String: ConfigContextValue] = [:],
-        isSecret: Bool = false,
-        fileID: String = #fileID,
-        line: UInt = #line
-    ) async throws -> [Bool] {
-        try await fetchRequiredBoolArray(
-            forKey: keyDecoder.decode(key, context: context),
-            isSecret: isSecret,
             fileID: fileID,
             line: line
         )
@@ -4748,38 +2440,6 @@ extension ConfigReader {
             isSecret: isSecret,
             unwrap: { try $0.asByteChunkArray },
             wrap: ConfigContent.byteChunkArray,
-            fileID: fileID,
-            line: line
-        )
-    }
-
-    /// Asynchronously fetches a config value for the given string key.
-    ///
-    /// Use this method to retrieve optional configuration values from async providers.
-    /// If the value doesn't exist, the method returns `nil`.
-    ///
-    /// ```swift
-    /// let dbUrl = try await config.fetchString(forKey: "database.url")
-    /// ```
-    ///
-    /// - Parameters:
-    ///   - key: The string representation of the config key to look up.
-    ///   - context: Additional context used for key resolution.
-    ///   - isSecret: Whether the value should be treated as secret for logging and debugging purposes.
-    ///   - fileID: The file ID where this call originates. Used for access reporting.
-    ///   - line: The line number where this call originates. Used for access reporting.
-    /// - Returns: The value converted to the expected type if found and convertible, otherwise `nil`.
-    /// - Throws: If the underlying provider throws, or if the value can't be converted to the expected type.
-    public func fetchByteChunkArray(
-        forKey key: String,
-        context: [String: ConfigContextValue] = [:],
-        isSecret: Bool = false,
-        fileID: String = #fileID,
-        line: UInt = #line
-    ) async throws -> [[UInt8]]? {
-        try await fetchByteChunkArray(
-            forKey: keyDecoder.decode(key, context: context),
-            isSecret: isSecret,
             fileID: fileID,
             line: line
         )
@@ -4821,41 +2481,6 @@ extension ConfigReader {
         )
     }
 
-    /// Asynchronously fetches a config value for the given config key, with a default fallback.
-    ///
-    /// Use this method when you need a guaranteed non-nil result from an async provider.
-    /// If the configuration value is missing, the default value is returned instead.
-    ///
-    /// ```swift
-    /// let maxRetries = try await config.fetchInt(forKey: "network.maxRetries", default: 3)
-    /// ```
-    ///
-    /// - Parameters:
-    ///   - key: The string representation of the config key to look up.
-    ///   - context: Additional context used for key resolution.
-    ///   - isSecret: Whether the value should be treated as secret for logging and debugging purposes.
-    ///   - defaultValue: The fallback value returned when the config value is missing or invalid.
-    ///   - fileID: The file ID where this call originates. Used for access reporting.
-    ///   - line: The line number where this call originates. Used for access reporting.
-    /// - Returns: The config value if found and convertible, otherwise the default value.
-    /// - Throws: If the underlying provider throws, or if the value can't be converted to the expected type.
-    public func fetchByteChunkArray(
-        forKey key: String,
-        context: [String: ConfigContextValue] = [:],
-        isSecret: Bool = false,
-        default defaultValue: [[UInt8]],
-        fileID: String = #fileID,
-        line: UInt = #line
-    ) async throws -> [[UInt8]] {
-        try await fetchByteChunkArray(
-            forKey: keyDecoder.decode(key, context: context),
-            isSecret: isSecret,
-            default: defaultValue,
-            fileID: fileID,
-            line: line
-        )
-    }
-
     /// Asynchronously fetches a required config value for the given config key, throwing an error if it's missing.
     ///
     /// Use this method when a configuration value is mandatory for your application to function
@@ -4885,39 +2510,6 @@ extension ConfigReader {
             isSecret: isSecret,
             unwrap: { try $0.asByteChunkArray },
             wrap: ConfigContent.byteChunkArray,
-            fileID: fileID,
-            line: line
-        )
-    }
-
-    /// Asynchronously fetches a required config value for the given string key, throwing an error if it's missing.
-    ///
-    /// Use this method when a configuration value is mandatory for your application to function
-    /// and you're working with async providers. The method throws an error if the value is
-    /// missing or can't be converted to the expected type.
-    ///
-    /// ```swift
-    /// let endpoint = try await config.fetchRequiredString(forKey: "service.endpoint")
-    /// ```
-    ///
-    /// - Parameters:
-    ///   - key: The string representation of the config key to look up.
-    ///   - context: Additional context used for key resolution.
-    ///   - isSecret: Whether the value should be treated as secret for logging and debugging purposes.
-    ///   - fileID: The file ID where this call originates. Used for access reporting.
-    ///   - line: The line number where this call originates. Used for access reporting.
-    /// - Returns: The config value converted to the expected type.
-    /// - Throws: If the underlying provider throws, the value is missing, or can't be converted to the expected type.
-    public func fetchRequiredByteChunkArray(
-        forKey key: String,
-        context: [String: ConfigContextValue] = [:],
-        isSecret: Bool = false,
-        fileID: String = #fileID,
-        line: UInt = #line
-    ) async throws -> [[UInt8]] {
-        try await fetchRequiredByteChunkArray(
-            forKey: keyDecoder.decode(key, context: context),
-            isSecret: isSecret,
             fileID: fileID,
             line: line
         )
@@ -4953,41 +2545,6 @@ extension ConfigReader {
             isSecret: isSecret,
             unwrap: { try cast($0.asString, type: Value.self, key: key) },
             wrap: { uncast($0) },
-            fileID: fileID,
-            line: line
-        )
-    }
-
-    /// Asynchronously fetches a config value for the given string key, converting from string.
-    ///
-    /// Use this method to retrieve string-convertible configuration values from async providers.
-    /// If the value doesn't exist, the method returns `nil`.
-    ///
-    /// ```swift
-    /// let serverMode = try await config.fetchString(forKey: "server.mode", as: ServerMode.self)
-    /// ```
-    ///
-    /// - Parameters:
-    ///   - key: The string representation of the config key to look up.
-    ///   - context: Additional context used for key resolution.
-    ///   - type: The type to convert the string value to.
-    ///   - isSecret: Whether the value should be treated as secret for logging and debugging purposes.
-    ///   - fileID: The file ID where this call originates. Used for access reporting.
-    ///   - line: The line number where this call originates. Used for access reporting.
-    /// - Returns: The value converted to the expected type if found and convertible, otherwise `nil`.
-    /// - Throws: If the underlying provider throws, or if the value can't be converted to the expected type.
-    public func fetchString<Value: ExpressibleByConfigString>(
-        forKey key: String,
-        context: [String: ConfigContextValue] = [:],
-        as type: Value.Type = Value.self,
-        isSecret: Bool = false,
-        fileID: String = #fileID,
-        line: UInt = #line
-    ) async throws -> Value? {
-        try await fetchString(
-            forKey: keyDecoder.decode(key, context: context),
-            as: type,
-            isSecret: isSecret,
             fileID: fileID,
             line: line
         )
@@ -5031,44 +2588,6 @@ extension ConfigReader {
         )
     }
 
-    /// Asynchronously fetches a config value for the given string key with default fallback, converting from string.
-    ///
-    /// Use this method when you need a guaranteed non-nil result from an async provider for string-convertible types.
-    /// If the configuration value is missing, the default value is returned instead.
-    ///
-    /// ```swift
-    /// let logLevel = try await config.fetchString(forKey: "logging.level", as: LogLevel.self, default: .info)
-    /// ```
-    ///
-    /// - Parameters:
-    ///   - key: The string representation of the config key to look up.
-    ///   - context: Additional context used for key resolution.
-    ///   - type: The type to convert the string value to.
-    ///   - isSecret: Whether the value should be treated as secret for logging and debugging purposes.
-    ///   - defaultValue: The fallback value returned when the config value is missing or invalid.
-    ///   - fileID: The file ID where this call originates. Used for access reporting.
-    ///   - line: The line number where this call originates. Used for access reporting.
-    /// - Returns: The config value if found and convertible, otherwise the default value.
-    /// - Throws: If the underlying provider throws, or if the value can't be converted to the expected type.
-    public func fetchString<Value: ExpressibleByConfigString>(
-        forKey key: String,
-        context: [String: ConfigContextValue] = [:],
-        as type: Value.Type = Value.self,
-        isSecret: Bool = false,
-        default defaultValue: Value,
-        fileID: String = #fileID,
-        line: UInt = #line
-    ) async throws -> Value {
-        try await fetchString(
-            forKey: keyDecoder.decode(key, context: context),
-            as: type,
-            isSecret: isSecret,
-            default: defaultValue,
-            fileID: fileID,
-            line: line
-        )
-    }
-
     /// Asynchronously fetches a required config value for the given config key, converting from string.
     ///
     /// Use this method when a string-convertible configuration value is mandatory for your application to function
@@ -5104,41 +2623,6 @@ extension ConfigReader {
         )
     }
 
-    /// Asynchronously fetches a required config value for the given string key, converting from string.
-    ///
-    /// Use this method when a string-convertible configuration value is mandatory for your application to function
-    /// and you're working with async providers. The method throws an error if the value is missing or can't be converted to the expected type.
-    ///
-    /// ```swift
-    /// let logLevel = try await config.fetchRequiredString(forKey: "logging.level", as: LogLevel.self)
-    /// ```
-    ///
-    /// - Parameters:
-    ///   - key: The string representation of the config key to look up.
-    ///   - context: Additional context used for key resolution.
-    ///   - type: The type to convert the string value to.
-    ///   - isSecret: Whether the value should be treated as secret for logging and debugging purposes.
-    ///   - fileID: The file ID where this call originates. Used for access reporting.
-    ///   - line: The line number where this call originates. Used for access reporting.
-    /// - Returns: The config value converted to the expected type.
-    /// - Throws: If the underlying provider throws, the value is missing, or can't be converted to the expected type.
-    public func fetchRequiredString<Value: ExpressibleByConfigString>(
-        forKey key: String,
-        context: [String: ConfigContextValue] = [:],
-        as type: Value.Type = Value.self,
-        isSecret: Bool = false,
-        fileID: String = #fileID,
-        line: UInt = #line
-    ) async throws -> Value {
-        try await fetchRequiredString(
-            forKey: keyDecoder.decode(key, context: context),
-            as: type,
-            isSecret: isSecret,
-            fileID: fileID,
-            line: line
-        )
-    }
-
     /// Asynchronously fetches an array of config values for the given config key, converting from strings.
     ///
     /// Use this method to retrieve configuration arrays where each element can be converted from strings
@@ -5169,41 +2653,6 @@ extension ConfigReader {
             isSecret: isSecret,
             unwrap: { try $0.asStringArray.map { try cast($0, type: Value.self, key: key) } },
             wrap: { uncast($0) },
-            fileID: fileID,
-            line: line
-        )
-    }
-
-    /// Asynchronously fetches an array of config values for the given string key, converting from strings.
-    ///
-    /// Use this method to retrieve configuration arrays where each element can be converted from strings
-    /// using async providers. If the value doesn't exist, the method returns `nil`.
-    ///
-    /// ```swift
-    /// let serverModes = try await config.fetchStringArray(forKey: "server.allowedModes", as: ServerMode.self)
-    /// ```
-    ///
-    /// - Parameters:
-    ///   - key: The string representation of the config key to look up.
-    ///   - context: Additional context used for key resolution.
-    ///   - type: The element type to convert each string value to.
-    ///   - isSecret: Whether the value should be treated as secret for logging and debugging purposes.
-    ///   - fileID: The file ID where this call originates. Used for access reporting.
-    ///   - line: The line number where this call originates. Used for access reporting.
-    /// - Returns: An array of values converted to the expected type if found and convertible, otherwise `nil`.
-    /// - Throws: If the underlying provider throws, or if the value can't be converted to the expected type.
-    public func fetchStringArray<Value: ExpressibleByConfigString>(
-        forKey key: String,
-        context: [String: ConfigContextValue] = [:],
-        as type: Value.Type = Value.self,
-        isSecret: Bool = false,
-        fileID: String = #fileID,
-        line: UInt = #line
-    ) async throws -> [Value]? {
-        try await fetchStringArray(
-            forKey: keyDecoder.decode(key, context: context),
-            as: type,
-            isSecret: isSecret,
             fileID: fileID,
             line: line
         )
@@ -5247,44 +2696,6 @@ extension ConfigReader {
         )
     }
 
-    /// Asynchronously fetches an array of config values for the given string key with default fallback, converting from strings.
-    ///
-    /// Use this method when you need a guaranteed non-nil result for string-convertible array types from async providers.
-    /// If the configuration value is missing, the default value is returned instead.
-    ///
-    /// ```swift
-    /// let logLevels = try await config.fetchStringArray(forKey: "logging.enabledLevels", as: LogLevel.self, default: [.info])
-    /// ```
-    ///
-    /// - Parameters:
-    ///   - key: The string representation of the config key to look up.
-    ///   - context: Additional context used for key resolution.
-    ///   - type: The element type to convert each string value to.
-    ///   - isSecret: Whether the value should be treated as secret for logging and debugging purposes.
-    ///   - defaultValue: The fallback array returned when the config value is missing or invalid.
-    ///   - fileID: The file ID where this call originates. Used for access reporting.
-    ///   - line: The line number where this call originates. Used for access reporting.
-    /// - Returns: The config array if found and convertible, otherwise the default array.
-    /// - Throws: If the underlying provider throws, or if the value can't be converted to the expected type.
-    public func fetchStringArray<Value: ExpressibleByConfigString>(
-        forKey key: String,
-        context: [String: ConfigContextValue] = [:],
-        as type: Value.Type = Value.self,
-        isSecret: Bool = false,
-        default defaultValue: [Value],
-        fileID: String = #fileID,
-        line: UInt = #line
-    ) async throws -> [Value] {
-        try await fetchStringArray(
-            forKey: keyDecoder.decode(key, context: context),
-            as: type,
-            isSecret: isSecret,
-            default: defaultValue,
-            fileID: fileID,
-            line: line
-        )
-    }
-
     /// Asynchronously fetches a required array of config values for the given config key, converting from strings.
     ///
     /// Use this method when a string-convertible array configuration value is mandatory for your application to function
@@ -5320,41 +2731,6 @@ extension ConfigReader {
         )
     }
 
-    /// Asynchronously fetches a required array of config values for the given string key, converting from strings.
-    ///
-    /// Use this method when a string-convertible array configuration value is mandatory for your application to function
-    /// and you're working with async providers. The method throws an error if the value is missing or can't be converted to the expected type.
-    ///
-    /// ```swift
-    /// let requiredLevels = try await config.fetchRequiredStringArray(forKey: "logging.enabledLevels", as: LogLevel.self)
-    /// ```
-    ///
-    /// - Parameters:
-    ///   - key: The string representation of the config key to look up.
-    ///   - context: Additional context used for key resolution.
-    ///   - type: The element type to convert each string value to.
-    ///   - isSecret: Whether the value should be treated as secret for logging and debugging purposes.
-    ///   - fileID: The file ID where this call originates. Used for access reporting.
-    ///   - line: The line number where this call originates. Used for access reporting.
-    /// - Returns: The config array converted to the expected type.
-    /// - Throws: If the underlying provider throws, the value is missing, or can't be converted to the expected type.
-    public func fetchRequiredStringArray<Value: ExpressibleByConfigString>(
-        forKey key: String,
-        context: [String: ConfigContextValue] = [:],
-        as type: Value.Type = Value.self,
-        isSecret: Bool = false,
-        fileID: String = #fileID,
-        line: UInt = #line
-    ) async throws -> [Value] {
-        try await fetchRequiredStringArray(
-            forKey: keyDecoder.decode(key, context: context),
-            as: type,
-            isSecret: isSecret,
-            fileID: fileID,
-            line: line
-        )
-    }
-
     /// Asynchronously fetches a config value for the given config key, converting from string.
     ///
     /// Use this method to retrieve string-convertible configuration values from async providers.
@@ -5385,41 +2761,6 @@ extension ConfigReader {
             isSecret: isSecret,
             unwrap: { try cast($0.asString, type: Value.self, key: key) },
             wrap: { uncast($0) },
-            fileID: fileID,
-            line: line
-        )
-    }
-
-    /// Asynchronously fetches a config value for the given string key, converting from string.
-    ///
-    /// Use this method to retrieve string-convertible configuration values from async providers.
-    /// If the value doesn't exist, the method returns `nil`.
-    ///
-    /// ```swift
-    /// let serverMode = try await config.fetchString(forKey: "server.mode", as: ServerMode.self)
-    /// ```
-    ///
-    /// - Parameters:
-    ///   - key: The string representation of the config key to look up.
-    ///   - context: Additional context used for key resolution.
-    ///   - type: The type to convert the string value to.
-    ///   - isSecret: Whether the value should be treated as secret for logging and debugging purposes.
-    ///   - fileID: The file ID where this call originates. Used for access reporting.
-    ///   - line: The line number where this call originates. Used for access reporting.
-    /// - Returns: The value converted to the expected type if found and convertible, otherwise `nil`.
-    /// - Throws: If the underlying provider throws, or if the value can't be converted to the expected type.
-    public func fetchString<Value: RawRepresentable<String>>(
-        forKey key: String,
-        context: [String: ConfigContextValue] = [:],
-        as type: Value.Type = Value.self,
-        isSecret: Bool = false,
-        fileID: String = #fileID,
-        line: UInt = #line
-    ) async throws -> Value? {
-        try await fetchString(
-            forKey: keyDecoder.decode(key, context: context),
-            as: type,
-            isSecret: isSecret,
             fileID: fileID,
             line: line
         )
@@ -5463,44 +2804,6 @@ extension ConfigReader {
         )
     }
 
-    /// Asynchronously fetches a config value for the given string key with default fallback, converting from string.
-    ///
-    /// Use this method when you need a guaranteed non-nil result from an async provider for string-convertible types.
-    /// If the configuration value is missing, the default value is returned instead.
-    ///
-    /// ```swift
-    /// let logLevel = try await config.fetchString(forKey: "logging.level", as: LogLevel.self, default: .info)
-    /// ```
-    ///
-    /// - Parameters:
-    ///   - key: The string representation of the config key to look up.
-    ///   - context: Additional context used for key resolution.
-    ///   - type: The type to convert the string value to.
-    ///   - isSecret: Whether the value should be treated as secret for logging and debugging purposes.
-    ///   - defaultValue: The fallback value returned when the config value is missing or invalid.
-    ///   - fileID: The file ID where this call originates. Used for access reporting.
-    ///   - line: The line number where this call originates. Used for access reporting.
-    /// - Returns: The config value if found and convertible, otherwise the default value.
-    /// - Throws: If the underlying provider throws, or if the value can't be converted to the expected type.
-    public func fetchString<Value: RawRepresentable<String>>(
-        forKey key: String,
-        context: [String: ConfigContextValue] = [:],
-        as type: Value.Type = Value.self,
-        isSecret: Bool = false,
-        default defaultValue: Value,
-        fileID: String = #fileID,
-        line: UInt = #line
-    ) async throws -> Value {
-        try await fetchString(
-            forKey: keyDecoder.decode(key, context: context),
-            as: type,
-            isSecret: isSecret,
-            default: defaultValue,
-            fileID: fileID,
-            line: line
-        )
-    }
-
     /// Asynchronously fetches a required config value for the given config key, converting from string.
     ///
     /// Use this method when a string-convertible configuration value is mandatory for your application to function
@@ -5536,41 +2839,6 @@ extension ConfigReader {
         )
     }
 
-    /// Asynchronously fetches a required config value for the given string key, converting from string.
-    ///
-    /// Use this method when a string-convertible configuration value is mandatory for your application to function
-    /// and you're working with async providers. The method throws an error if the value is missing or can't be converted to the expected type.
-    ///
-    /// ```swift
-    /// let logLevel = try await config.fetchRequiredString(forKey: "logging.level", as: LogLevel.self)
-    /// ```
-    ///
-    /// - Parameters:
-    ///   - key: The string representation of the config key to look up.
-    ///   - context: Additional context used for key resolution.
-    ///   - type: The type to convert the string value to.
-    ///   - isSecret: Whether the value should be treated as secret for logging and debugging purposes.
-    ///   - fileID: The file ID where this call originates. Used for access reporting.
-    ///   - line: The line number where this call originates. Used for access reporting.
-    /// - Returns: The config value converted to the expected type.
-    /// - Throws: If the underlying provider throws, the value is missing, or can't be converted to the expected type.
-    public func fetchRequiredString<Value: RawRepresentable<String>>(
-        forKey key: String,
-        context: [String: ConfigContextValue] = [:],
-        as type: Value.Type = Value.self,
-        isSecret: Bool = false,
-        fileID: String = #fileID,
-        line: UInt = #line
-    ) async throws -> Value {
-        try await fetchRequiredString(
-            forKey: keyDecoder.decode(key, context: context),
-            as: type,
-            isSecret: isSecret,
-            fileID: fileID,
-            line: line
-        )
-    }
-
     /// Asynchronously fetches an array of config values for the given config key, converting from strings.
     ///
     /// Use this method to retrieve configuration arrays where each element can be converted from strings
@@ -5601,41 +2869,6 @@ extension ConfigReader {
             isSecret: isSecret,
             unwrap: { try $0.asStringArray.map { try cast($0, type: Value.self, key: key) } },
             wrap: { uncast($0) },
-            fileID: fileID,
-            line: line
-        )
-    }
-
-    /// Asynchronously fetches an array of config values for the given string key, converting from strings.
-    ///
-    /// Use this method to retrieve configuration arrays where each element can be converted from strings
-    /// using async providers. If the value doesn't exist, the method returns `nil`.
-    ///
-    /// ```swift
-    /// let serverModes = try await config.fetchStringArray(forKey: "server.allowedModes", as: ServerMode.self)
-    /// ```
-    ///
-    /// - Parameters:
-    ///   - key: The string representation of the config key to look up.
-    ///   - context: Additional context used for key resolution.
-    ///   - type: The element type to convert each string value to.
-    ///   - isSecret: Whether the value should be treated as secret for logging and debugging purposes.
-    ///   - fileID: The file ID where this call originates. Used for access reporting.
-    ///   - line: The line number where this call originates. Used for access reporting.
-    /// - Returns: An array of values converted to the expected type if found and convertible, otherwise `nil`.
-    /// - Throws: If the underlying provider throws, or if the value can't be converted to the expected type.
-    public func fetchStringArray<Value: RawRepresentable<String>>(
-        forKey key: String,
-        context: [String: ConfigContextValue] = [:],
-        as type: Value.Type = Value.self,
-        isSecret: Bool = false,
-        fileID: String = #fileID,
-        line: UInt = #line
-    ) async throws -> [Value]? {
-        try await fetchStringArray(
-            forKey: keyDecoder.decode(key, context: context),
-            as: type,
-            isSecret: isSecret,
             fileID: fileID,
             line: line
         )
@@ -5679,44 +2912,6 @@ extension ConfigReader {
         )
     }
 
-    /// Asynchronously fetches an array of config values for the given string key with default fallback, converting from strings.
-    ///
-    /// Use this method when you need a guaranteed non-nil result for string-convertible array types from async providers.
-    /// If the configuration value is missing, the default value is returned instead.
-    ///
-    /// ```swift
-    /// let logLevels = try await config.fetchStringArray(forKey: "logging.enabledLevels", as: LogLevel.self, default: [.info])
-    /// ```
-    ///
-    /// - Parameters:
-    ///   - key: The string representation of the config key to look up.
-    ///   - context: Additional context used for key resolution.
-    ///   - type: The element type to convert each string value to.
-    ///   - isSecret: Whether the value should be treated as secret for logging and debugging purposes.
-    ///   - defaultValue: The fallback array returned when the config value is missing or invalid.
-    ///   - fileID: The file ID where this call originates. Used for access reporting.
-    ///   - line: The line number where this call originates. Used for access reporting.
-    /// - Returns: The config array if found and convertible, otherwise the default array.
-    /// - Throws: If the underlying provider throws, or if the value can't be converted to the expected type.
-    public func fetchStringArray<Value: RawRepresentable<String>>(
-        forKey key: String,
-        context: [String: ConfigContextValue] = [:],
-        as type: Value.Type = Value.self,
-        isSecret: Bool = false,
-        default defaultValue: [Value],
-        fileID: String = #fileID,
-        line: UInt = #line
-    ) async throws -> [Value] {
-        try await fetchStringArray(
-            forKey: keyDecoder.decode(key, context: context),
-            as: type,
-            isSecret: isSecret,
-            default: defaultValue,
-            fileID: fileID,
-            line: line
-        )
-    }
-
     /// Asynchronously fetches a required array of config values for the given config key, converting from strings.
     ///
     /// Use this method when a string-convertible array configuration value is mandatory for your application to function
@@ -5747,41 +2942,6 @@ extension ConfigReader {
             isSecret: isSecret,
             unwrap: { try $0.asStringArray.map { try cast($0, type: Value.self, key: key) } },
             wrap: { uncast($0) },
-            fileID: fileID,
-            line: line
-        )
-    }
-
-    /// Asynchronously fetches a required array of config values for the given string key, converting from strings.
-    ///
-    /// Use this method when a string-convertible array configuration value is mandatory for your application to function
-    /// and you're working with async providers. The method throws an error if the value is missing or can't be converted to the expected type.
-    ///
-    /// ```swift
-    /// let requiredLevels = try await config.fetchRequiredStringArray(forKey: "logging.enabledLevels", as: LogLevel.self)
-    /// ```
-    ///
-    /// - Parameters:
-    ///   - key: The string representation of the config key to look up.
-    ///   - context: Additional context used for key resolution.
-    ///   - type: The element type to convert each string value to.
-    ///   - isSecret: Whether the value should be treated as secret for logging and debugging purposes.
-    ///   - fileID: The file ID where this call originates. Used for access reporting.
-    ///   - line: The line number where this call originates. Used for access reporting.
-    /// - Returns: The config array converted to the expected type.
-    /// - Throws: If the underlying provider throws, the value is missing, or can't be converted to the expected type.
-    public func fetchRequiredStringArray<Value: RawRepresentable<String>>(
-        forKey key: String,
-        context: [String: ConfigContextValue] = [:],
-        as type: Value.Type = Value.self,
-        isSecret: Bool = false,
-        fileID: String = #fileID,
-        line: UInt = #line
-    ) async throws -> [Value] {
-        try await fetchRequiredStringArray(
-            forKey: keyDecoder.decode(key, context: context),
-            as: type,
-            isSecret: isSecret,
             fileID: fileID,
             line: line
         )
@@ -5835,51 +2995,6 @@ extension ConfigReader {
         )
     }
 
-    /// Watches for updates to a config value for the given string key.
-    ///
-    /// Use this method to observe changes to optional configuration values over time.
-    /// The handler receives an async sequence that produces the current value whenever it changes,
-    /// or `nil` if the value is missing or can't be converted.
-    ///
-    /// ```swift
-    /// try await config.watchInt(forKey: "server.port") { updates in
-    ///     for await port in updates {
-    ///         if let port = port {
-    ///             print("Server port is: \(port)")
-    ///         } else {
-    ///             print("No server port configured")
-    ///         }
-    ///     }
-    /// }
-    /// ```
-    ///
-    /// - Parameters:
-    ///   - key: The string representation of the config key to watch.
-    ///   - context: Additional context used for key resolution.
-    ///   - isSecret: Whether the value should be treated as secret for logging and debugging purposes.
-    ///   - fileID: The file ID where this call originates. Used for access reporting.
-    ///   - line: The line number where this call originates. Used for access reporting.
-    ///   - updatesHandler: A closure that handles an async sequence of updates to the value. The sequence
-    ///     produces `nil` if the value is missing or can't be converted.
-    /// - Returns: The result produced by the handler.
-    /// - Throws: Rethrows any error thrown by the handler or the underlying watch operation.
-    public func watchString<Return>(
-        forKey key: String,
-        context: [String: ConfigContextValue] = [:],
-        isSecret: Bool = false,
-        fileID: String = #fileID,
-        line: UInt = #line,
-        updatesHandler: (ConfigUpdatesAsyncSequence<String?, Never>) async throws -> Return
-    ) async throws -> Return {
-        try await watchString(
-            forKey: keyDecoder.decode(key, context: context),
-            isSecret: isSecret,
-            fileID: fileID,
-            line: line,
-            updatesHandler: updatesHandler
-        )
-    }
-
     /// Watches for updates to a config value for the given config key with default fallback.
     ///
     /// Use this method to observe changes to configuration values over time with a guaranteed fallback.
@@ -5925,50 +3040,6 @@ extension ConfigReader {
         )
     }
 
-    /// Watches for updates to a config value for the given string key with default fallback.
-    ///
-    /// Use this method to observe changes to configuration values over time with a guaranteed fallback.
-    /// The handler receives an async sequence that produces the current value whenever it changes,
-    /// or the default value if the configuration value is missing or can't be converted.
-    ///
-    /// ```swift
-    /// try await config.watchInt(forKey: "server.port", default: 8080) { updates in
-    ///     for await port in updates {
-    ///         print("Server port is: \(port)")
-    ///     }
-    /// }
-    /// ```
-    ///
-    /// - Parameters:
-    ///   - key: The string representation of the config key to watch.
-    ///   - context: Additional context used for key resolution.
-    ///   - isSecret: Whether the value should be treated as secret for logging and debugging purposes.
-    ///   - defaultValue: The fallback value used when the config value is missing or invalid.
-    ///   - fileID: The file ID where this call originates. Used for access reporting.
-    ///   - line: The line number where this call originates. Used for access reporting.
-    ///   - updatesHandler: A closure that handles an async sequence of updates to the value. The sequence
-    ///     produces the default value if the provider returned a `nil` value or conversion failed.
-    /// - Returns: The result produced by the handler.
-    /// - Throws: Rethrows any error thrown by the handler or the underlying watch operation.
-    public func watchString<Return>(
-        forKey key: String,
-        context: [String: ConfigContextValue] = [:],
-        isSecret: Bool = false,
-        default defaultValue: String,
-        fileID: String = #fileID,
-        line: UInt = #line,
-        updatesHandler: (ConfigUpdatesAsyncSequence<String, Never>) async throws -> Return
-    ) async throws -> Return {
-        try await watchString(
-            forKey: keyDecoder.decode(key, context: context),
-            isSecret: isSecret,
-            default: defaultValue,
-            fileID: fileID,
-            line: line,
-            updatesHandler: updatesHandler
-        )
-    }
-
     /// Watches for updates to a required config value for the given config key.
     ///
     /// Use this method to observe changes to configuration values that must be present.
@@ -6005,47 +3076,6 @@ extension ConfigReader {
             isSecret: isSecret,
             unwrap: { try $0.asString },
             wrap: ConfigContent.string,
-            fileID: fileID,
-            line: line,
-            updatesHandler: updatesHandler
-        )
-    }
-
-    /// Watches for updates to a required config value for the given string key.
-    ///
-    /// Use this method to observe changes to configuration values that must be present.
-    /// The handler receives an async sequence that produces the current value whenever it changes,
-    /// or an error if the configuration value is missing or can't be converted.
-    ///
-    /// ```swift
-    /// try await config.watchRequiredInt(forKey: "server.port") { updates in
-    ///     for try await port in updates {
-    ///         print("Server port is: \(port)")
-    ///     }
-    /// }
-    /// ```
-    ///
-    /// - Parameters:
-    ///   - key: The string representation of the config key to watch.
-    ///   - context: Additional context used for key resolution.
-    ///   - isSecret: Whether the value should be treated as secret for logging and debugging purposes.
-    ///   - fileID: The file ID where this call originates. Used for access reporting.
-    ///   - line: The line number where this call originates. Used for access reporting.
-    ///   - updatesHandler: A closure that handles an async sequence of updates to the value. The sequence
-    ///     produces an error if the provider returned a `nil` value or if the value was of an incorrect type.
-    /// - Returns: The result produced by the handler.
-    /// - Throws: Rethrows any error thrown by the handler or the underlying watch operation.
-    public func watchRequiredString<Return>(
-        forKey key: String,
-        context: [String: ConfigContextValue] = [:],
-        isSecret: Bool = false,
-        fileID: String = #fileID,
-        line: UInt = #line,
-        updatesHandler: (ConfigUpdatesAsyncSequence<String, any Error>) async throws -> Return
-    ) async throws -> Return {
-        try await watchRequiredString(
-            forKey: keyDecoder.decode(key, context: context),
-            isSecret: isSecret,
             fileID: fileID,
             line: line,
             updatesHandler: updatesHandler
@@ -6098,51 +3128,6 @@ extension ConfigReader {
         )
     }
 
-    /// Watches for updates to a config value for the given string key.
-    ///
-    /// Use this method to observe changes to optional configuration values over time.
-    /// The handler receives an async sequence that produces the current value whenever it changes,
-    /// or `nil` if the value is missing or can't be converted.
-    ///
-    /// ```swift
-    /// try await config.watchInt(forKey: "server.port") { updates in
-    ///     for await port in updates {
-    ///         if let port = port {
-    ///             print("Server port is: \(port)")
-    ///         } else {
-    ///             print("No server port configured")
-    ///         }
-    ///     }
-    /// }
-    /// ```
-    ///
-    /// - Parameters:
-    ///   - key: The string representation of the config key to watch.
-    ///   - context: Additional context used for key resolution.
-    ///   - isSecret: Whether the value should be treated as secret for logging and debugging purposes.
-    ///   - fileID: The file ID where this call originates. Used for access reporting.
-    ///   - line: The line number where this call originates. Used for access reporting.
-    ///   - updatesHandler: A closure that handles an async sequence of updates to the value. The sequence
-    ///     produces `nil` if the value is missing or can't be converted.
-    /// - Returns: The result produced by the handler.
-    /// - Throws: Rethrows any error thrown by the handler or the underlying watch operation.
-    public func watchInt<Return>(
-        forKey key: String,
-        context: [String: ConfigContextValue] = [:],
-        isSecret: Bool = false,
-        fileID: String = #fileID,
-        line: UInt = #line,
-        updatesHandler: (ConfigUpdatesAsyncSequence<Int?, Never>) async throws -> Return
-    ) async throws -> Return {
-        try await watchInt(
-            forKey: keyDecoder.decode(key, context: context),
-            isSecret: isSecret,
-            fileID: fileID,
-            line: line,
-            updatesHandler: updatesHandler
-        )
-    }
-
     /// Watches for updates to a config value for the given config key with default fallback.
     ///
     /// Use this method to observe changes to configuration values over time with a guaranteed fallback.
@@ -6188,50 +3173,6 @@ extension ConfigReader {
         )
     }
 
-    /// Watches for updates to a config value for the given string key with default fallback.
-    ///
-    /// Use this method to observe changes to configuration values over time with a guaranteed fallback.
-    /// The handler receives an async sequence that produces the current value whenever it changes,
-    /// or the default value if the configuration value is missing or can't be converted.
-    ///
-    /// ```swift
-    /// try await config.watchInt(forKey: "server.port", default: 8080) { updates in
-    ///     for await port in updates {
-    ///         print("Server port is: \(port)")
-    ///     }
-    /// }
-    /// ```
-    ///
-    /// - Parameters:
-    ///   - key: The string representation of the config key to watch.
-    ///   - context: Additional context used for key resolution.
-    ///   - isSecret: Whether the value should be treated as secret for logging and debugging purposes.
-    ///   - defaultValue: The fallback value used when the config value is missing or invalid.
-    ///   - fileID: The file ID where this call originates. Used for access reporting.
-    ///   - line: The line number where this call originates. Used for access reporting.
-    ///   - updatesHandler: A closure that handles an async sequence of updates to the value. The sequence
-    ///     produces the default value if the provider returned a `nil` value or conversion failed.
-    /// - Returns: The result produced by the handler.
-    /// - Throws: Rethrows any error thrown by the handler or the underlying watch operation.
-    public func watchInt<Return>(
-        forKey key: String,
-        context: [String: ConfigContextValue] = [:],
-        isSecret: Bool = false,
-        default defaultValue: Int,
-        fileID: String = #fileID,
-        line: UInt = #line,
-        updatesHandler: (ConfigUpdatesAsyncSequence<Int, Never>) async throws -> Return
-    ) async throws -> Return {
-        try await watchInt(
-            forKey: keyDecoder.decode(key, context: context),
-            isSecret: isSecret,
-            default: defaultValue,
-            fileID: fileID,
-            line: line,
-            updatesHandler: updatesHandler
-        )
-    }
-
     /// Watches for updates to a required config value for the given config key.
     ///
     /// Use this method to observe changes to configuration values that must be present.
@@ -6268,47 +3209,6 @@ extension ConfigReader {
             isSecret: isSecret,
             unwrap: { try $0.asInt },
             wrap: ConfigContent.int,
-            fileID: fileID,
-            line: line,
-            updatesHandler: updatesHandler
-        )
-    }
-
-    /// Watches for updates to a required config value for the given string key.
-    ///
-    /// Use this method to observe changes to configuration values that must be present.
-    /// The handler receives an async sequence that produces the current value whenever it changes,
-    /// or an error if the configuration value is missing or can't be converted.
-    ///
-    /// ```swift
-    /// try await config.watchRequiredInt(forKey: "server.port") { updates in
-    ///     for try await port in updates {
-    ///         print("Server port is: \(port)")
-    ///     }
-    /// }
-    /// ```
-    ///
-    /// - Parameters:
-    ///   - key: The string representation of the config key to watch.
-    ///   - context: Additional context used for key resolution.
-    ///   - isSecret: Whether the value should be treated as secret for logging and debugging purposes.
-    ///   - fileID: The file ID where this call originates. Used for access reporting.
-    ///   - line: The line number where this call originates. Used for access reporting.
-    ///   - updatesHandler: A closure that handles an async sequence of updates to the value. The sequence
-    ///     produces an error if the provider returned a `nil` value or if the value was of an incorrect type.
-    /// - Returns: The result produced by the handler.
-    /// - Throws: Rethrows any error thrown by the handler or the underlying watch operation.
-    public func watchRequiredInt<Return>(
-        forKey key: String,
-        context: [String: ConfigContextValue] = [:],
-        isSecret: Bool = false,
-        fileID: String = #fileID,
-        line: UInt = #line,
-        updatesHandler: (ConfigUpdatesAsyncSequence<Int, any Error>) async throws -> Return
-    ) async throws -> Return {
-        try await watchRequiredInt(
-            forKey: keyDecoder.decode(key, context: context),
-            isSecret: isSecret,
             fileID: fileID,
             line: line,
             updatesHandler: updatesHandler
@@ -6361,51 +3261,6 @@ extension ConfigReader {
         )
     }
 
-    /// Watches for updates to a config value for the given string key.
-    ///
-    /// Use this method to observe changes to optional configuration values over time.
-    /// The handler receives an async sequence that produces the current value whenever it changes,
-    /// or `nil` if the value is missing or can't be converted.
-    ///
-    /// ```swift
-    /// try await config.watchInt(forKey: "server.port") { updates in
-    ///     for await port in updates {
-    ///         if let port = port {
-    ///             print("Server port is: \(port)")
-    ///         } else {
-    ///             print("No server port configured")
-    ///         }
-    ///     }
-    /// }
-    /// ```
-    ///
-    /// - Parameters:
-    ///   - key: The string representation of the config key to watch.
-    ///   - context: Additional context used for key resolution.
-    ///   - isSecret: Whether the value should be treated as secret for logging and debugging purposes.
-    ///   - fileID: The file ID where this call originates. Used for access reporting.
-    ///   - line: The line number where this call originates. Used for access reporting.
-    ///   - updatesHandler: A closure that handles an async sequence of updates to the value. The sequence
-    ///     produces `nil` if the value is missing or can't be converted.
-    /// - Returns: The result produced by the handler.
-    /// - Throws: Rethrows any error thrown by the handler or the underlying watch operation.
-    public func watchDouble<Return>(
-        forKey key: String,
-        context: [String: ConfigContextValue] = [:],
-        isSecret: Bool = false,
-        fileID: String = #fileID,
-        line: UInt = #line,
-        updatesHandler: (ConfigUpdatesAsyncSequence<Double?, Never>) async throws -> Return
-    ) async throws -> Return {
-        try await watchDouble(
-            forKey: keyDecoder.decode(key, context: context),
-            isSecret: isSecret,
-            fileID: fileID,
-            line: line,
-            updatesHandler: updatesHandler
-        )
-    }
-
     /// Watches for updates to a config value for the given config key with default fallback.
     ///
     /// Use this method to observe changes to configuration values over time with a guaranteed fallback.
@@ -6451,50 +3306,6 @@ extension ConfigReader {
         )
     }
 
-    /// Watches for updates to a config value for the given string key with default fallback.
-    ///
-    /// Use this method to observe changes to configuration values over time with a guaranteed fallback.
-    /// The handler receives an async sequence that produces the current value whenever it changes,
-    /// or the default value if the configuration value is missing or can't be converted.
-    ///
-    /// ```swift
-    /// try await config.watchInt(forKey: "server.port", default: 8080) { updates in
-    ///     for await port in updates {
-    ///         print("Server port is: \(port)")
-    ///     }
-    /// }
-    /// ```
-    ///
-    /// - Parameters:
-    ///   - key: The string representation of the config key to watch.
-    ///   - context: Additional context used for key resolution.
-    ///   - isSecret: Whether the value should be treated as secret for logging and debugging purposes.
-    ///   - defaultValue: The fallback value used when the config value is missing or invalid.
-    ///   - fileID: The file ID where this call originates. Used for access reporting.
-    ///   - line: The line number where this call originates. Used for access reporting.
-    ///   - updatesHandler: A closure that handles an async sequence of updates to the value. The sequence
-    ///     produces the default value if the provider returned a `nil` value or conversion failed.
-    /// - Returns: The result produced by the handler.
-    /// - Throws: Rethrows any error thrown by the handler or the underlying watch operation.
-    public func watchDouble<Return>(
-        forKey key: String,
-        context: [String: ConfigContextValue] = [:],
-        isSecret: Bool = false,
-        default defaultValue: Double,
-        fileID: String = #fileID,
-        line: UInt = #line,
-        updatesHandler: (ConfigUpdatesAsyncSequence<Double, Never>) async throws -> Return
-    ) async throws -> Return {
-        try await watchDouble(
-            forKey: keyDecoder.decode(key, context: context),
-            isSecret: isSecret,
-            default: defaultValue,
-            fileID: fileID,
-            line: line,
-            updatesHandler: updatesHandler
-        )
-    }
-
     /// Watches for updates to a required config value for the given config key.
     ///
     /// Use this method to observe changes to configuration values that must be present.
@@ -6531,47 +3342,6 @@ extension ConfigReader {
             isSecret: isSecret,
             unwrap: { try $0.asDouble },
             wrap: ConfigContent.double,
-            fileID: fileID,
-            line: line,
-            updatesHandler: updatesHandler
-        )
-    }
-
-    /// Watches for updates to a required config value for the given string key.
-    ///
-    /// Use this method to observe changes to configuration values that must be present.
-    /// The handler receives an async sequence that produces the current value whenever it changes,
-    /// or an error if the configuration value is missing or can't be converted.
-    ///
-    /// ```swift
-    /// try await config.watchRequiredInt(forKey: "server.port") { updates in
-    ///     for try await port in updates {
-    ///         print("Server port is: \(port)")
-    ///     }
-    /// }
-    /// ```
-    ///
-    /// - Parameters:
-    ///   - key: The string representation of the config key to watch.
-    ///   - context: Additional context used for key resolution.
-    ///   - isSecret: Whether the value should be treated as secret for logging and debugging purposes.
-    ///   - fileID: The file ID where this call originates. Used for access reporting.
-    ///   - line: The line number where this call originates. Used for access reporting.
-    ///   - updatesHandler: A closure that handles an async sequence of updates to the value. The sequence
-    ///     produces an error if the provider returned a `nil` value or if the value was of an incorrect type.
-    /// - Returns: The result produced by the handler.
-    /// - Throws: Rethrows any error thrown by the handler or the underlying watch operation.
-    public func watchRequiredDouble<Return>(
-        forKey key: String,
-        context: [String: ConfigContextValue] = [:],
-        isSecret: Bool = false,
-        fileID: String = #fileID,
-        line: UInt = #line,
-        updatesHandler: (ConfigUpdatesAsyncSequence<Double, any Error>) async throws -> Return
-    ) async throws -> Return {
-        try await watchRequiredDouble(
-            forKey: keyDecoder.decode(key, context: context),
-            isSecret: isSecret,
             fileID: fileID,
             line: line,
             updatesHandler: updatesHandler
@@ -6624,51 +3394,6 @@ extension ConfigReader {
         )
     }
 
-    /// Watches for updates to a config value for the given string key.
-    ///
-    /// Use this method to observe changes to optional configuration values over time.
-    /// The handler receives an async sequence that produces the current value whenever it changes,
-    /// or `nil` if the value is missing or can't be converted.
-    ///
-    /// ```swift
-    /// try await config.watchInt(forKey: "server.port") { updates in
-    ///     for await port in updates {
-    ///         if let port = port {
-    ///             print("Server port is: \(port)")
-    ///         } else {
-    ///             print("No server port configured")
-    ///         }
-    ///     }
-    /// }
-    /// ```
-    ///
-    /// - Parameters:
-    ///   - key: The string representation of the config key to watch.
-    ///   - context: Additional context used for key resolution.
-    ///   - isSecret: Whether the value should be treated as secret for logging and debugging purposes.
-    ///   - fileID: The file ID where this call originates. Used for access reporting.
-    ///   - line: The line number where this call originates. Used for access reporting.
-    ///   - updatesHandler: A closure that handles an async sequence of updates to the value. The sequence
-    ///     produces `nil` if the value is missing or can't be converted.
-    /// - Returns: The result produced by the handler.
-    /// - Throws: Rethrows any error thrown by the handler or the underlying watch operation.
-    public func watchBool<Return>(
-        forKey key: String,
-        context: [String: ConfigContextValue] = [:],
-        isSecret: Bool = false,
-        fileID: String = #fileID,
-        line: UInt = #line,
-        updatesHandler: (ConfigUpdatesAsyncSequence<Bool?, Never>) async throws -> Return
-    ) async throws -> Return {
-        try await watchBool(
-            forKey: keyDecoder.decode(key, context: context),
-            isSecret: isSecret,
-            fileID: fileID,
-            line: line,
-            updatesHandler: updatesHandler
-        )
-    }
-
     /// Watches for updates to a config value for the given config key with default fallback.
     ///
     /// Use this method to observe changes to configuration values over time with a guaranteed fallback.
@@ -6714,50 +3439,6 @@ extension ConfigReader {
         )
     }
 
-    /// Watches for updates to a config value for the given string key with default fallback.
-    ///
-    /// Use this method to observe changes to configuration values over time with a guaranteed fallback.
-    /// The handler receives an async sequence that produces the current value whenever it changes,
-    /// or the default value if the configuration value is missing or can't be converted.
-    ///
-    /// ```swift
-    /// try await config.watchInt(forKey: "server.port", default: 8080) { updates in
-    ///     for await port in updates {
-    ///         print("Server port is: \(port)")
-    ///     }
-    /// }
-    /// ```
-    ///
-    /// - Parameters:
-    ///   - key: The string representation of the config key to watch.
-    ///   - context: Additional context used for key resolution.
-    ///   - isSecret: Whether the value should be treated as secret for logging and debugging purposes.
-    ///   - defaultValue: The fallback value used when the config value is missing or invalid.
-    ///   - fileID: The file ID where this call originates. Used for access reporting.
-    ///   - line: The line number where this call originates. Used for access reporting.
-    ///   - updatesHandler: A closure that handles an async sequence of updates to the value. The sequence
-    ///     produces the default value if the provider returned a `nil` value or conversion failed.
-    /// - Returns: The result produced by the handler.
-    /// - Throws: Rethrows any error thrown by the handler or the underlying watch operation.
-    public func watchBool<Return>(
-        forKey key: String,
-        context: [String: ConfigContextValue] = [:],
-        isSecret: Bool = false,
-        default defaultValue: Bool,
-        fileID: String = #fileID,
-        line: UInt = #line,
-        updatesHandler: (ConfigUpdatesAsyncSequence<Bool, Never>) async throws -> Return
-    ) async throws -> Return {
-        try await watchBool(
-            forKey: keyDecoder.decode(key, context: context),
-            isSecret: isSecret,
-            default: defaultValue,
-            fileID: fileID,
-            line: line,
-            updatesHandler: updatesHandler
-        )
-    }
-
     /// Watches for updates to a required config value for the given config key.
     ///
     /// Use this method to observe changes to configuration values that must be present.
@@ -6794,47 +3475,6 @@ extension ConfigReader {
             isSecret: isSecret,
             unwrap: { try $0.asBool },
             wrap: ConfigContent.bool,
-            fileID: fileID,
-            line: line,
-            updatesHandler: updatesHandler
-        )
-    }
-
-    /// Watches for updates to a required config value for the given string key.
-    ///
-    /// Use this method to observe changes to configuration values that must be present.
-    /// The handler receives an async sequence that produces the current value whenever it changes,
-    /// or an error if the configuration value is missing or can't be converted.
-    ///
-    /// ```swift
-    /// try await config.watchRequiredInt(forKey: "server.port") { updates in
-    ///     for try await port in updates {
-    ///         print("Server port is: \(port)")
-    ///     }
-    /// }
-    /// ```
-    ///
-    /// - Parameters:
-    ///   - key: The string representation of the config key to watch.
-    ///   - context: Additional context used for key resolution.
-    ///   - isSecret: Whether the value should be treated as secret for logging and debugging purposes.
-    ///   - fileID: The file ID where this call originates. Used for access reporting.
-    ///   - line: The line number where this call originates. Used for access reporting.
-    ///   - updatesHandler: A closure that handles an async sequence of updates to the value. The sequence
-    ///     produces an error if the provider returned a `nil` value or if the value was of an incorrect type.
-    /// - Returns: The result produced by the handler.
-    /// - Throws: Rethrows any error thrown by the handler or the underlying watch operation.
-    public func watchRequiredBool<Return>(
-        forKey key: String,
-        context: [String: ConfigContextValue] = [:],
-        isSecret: Bool = false,
-        fileID: String = #fileID,
-        line: UInt = #line,
-        updatesHandler: (ConfigUpdatesAsyncSequence<Bool, any Error>) async throws -> Return
-    ) async throws -> Return {
-        try await watchRequiredBool(
-            forKey: keyDecoder.decode(key, context: context),
-            isSecret: isSecret,
             fileID: fileID,
             line: line,
             updatesHandler: updatesHandler
@@ -6887,51 +3527,6 @@ extension ConfigReader {
         )
     }
 
-    /// Watches for updates to a config value for the given string key.
-    ///
-    /// Use this method to observe changes to optional configuration values over time.
-    /// The handler receives an async sequence that produces the current value whenever it changes,
-    /// or `nil` if the value is missing or can't be converted.
-    ///
-    /// ```swift
-    /// try await config.watchInt(forKey: "server.port") { updates in
-    ///     for await port in updates {
-    ///         if let port = port {
-    ///             print("Server port is: \(port)")
-    ///         } else {
-    ///             print("No server port configured")
-    ///         }
-    ///     }
-    /// }
-    /// ```
-    ///
-    /// - Parameters:
-    ///   - key: The string representation of the config key to watch.
-    ///   - context: Additional context used for key resolution.
-    ///   - isSecret: Whether the value should be treated as secret for logging and debugging purposes.
-    ///   - fileID: The file ID where this call originates. Used for access reporting.
-    ///   - line: The line number where this call originates. Used for access reporting.
-    ///   - updatesHandler: A closure that handles an async sequence of updates to the value. The sequence
-    ///     produces `nil` if the value is missing or can't be converted.
-    /// - Returns: The result produced by the handler.
-    /// - Throws: Rethrows any error thrown by the handler or the underlying watch operation.
-    public func watchBytes<Return>(
-        forKey key: String,
-        context: [String: ConfigContextValue] = [:],
-        isSecret: Bool = false,
-        fileID: String = #fileID,
-        line: UInt = #line,
-        updatesHandler: (ConfigUpdatesAsyncSequence<[UInt8]?, Never>) async throws -> Return
-    ) async throws -> Return {
-        try await watchBytes(
-            forKey: keyDecoder.decode(key, context: context),
-            isSecret: isSecret,
-            fileID: fileID,
-            line: line,
-            updatesHandler: updatesHandler
-        )
-    }
-
     /// Watches for updates to a config value for the given config key with default fallback.
     ///
     /// Use this method to observe changes to configuration values over time with a guaranteed fallback.
@@ -6977,50 +3572,6 @@ extension ConfigReader {
         )
     }
 
-    /// Watches for updates to a config value for the given string key with default fallback.
-    ///
-    /// Use this method to observe changes to configuration values over time with a guaranteed fallback.
-    /// The handler receives an async sequence that produces the current value whenever it changes,
-    /// or the default value if the configuration value is missing or can't be converted.
-    ///
-    /// ```swift
-    /// try await config.watchInt(forKey: "server.port", default: 8080) { updates in
-    ///     for await port in updates {
-    ///         print("Server port is: \(port)")
-    ///     }
-    /// }
-    /// ```
-    ///
-    /// - Parameters:
-    ///   - key: The string representation of the config key to watch.
-    ///   - context: Additional context used for key resolution.
-    ///   - isSecret: Whether the value should be treated as secret for logging and debugging purposes.
-    ///   - defaultValue: The fallback value used when the config value is missing or invalid.
-    ///   - fileID: The file ID where this call originates. Used for access reporting.
-    ///   - line: The line number where this call originates. Used for access reporting.
-    ///   - updatesHandler: A closure that handles an async sequence of updates to the value. The sequence
-    ///     produces the default value if the provider returned a `nil` value or conversion failed.
-    /// - Returns: The result produced by the handler.
-    /// - Throws: Rethrows any error thrown by the handler or the underlying watch operation.
-    public func watchBytes<Return>(
-        forKey key: String,
-        context: [String: ConfigContextValue] = [:],
-        isSecret: Bool = false,
-        default defaultValue: [UInt8],
-        fileID: String = #fileID,
-        line: UInt = #line,
-        updatesHandler: (ConfigUpdatesAsyncSequence<[UInt8], Never>) async throws -> Return
-    ) async throws -> Return {
-        try await watchBytes(
-            forKey: keyDecoder.decode(key, context: context),
-            isSecret: isSecret,
-            default: defaultValue,
-            fileID: fileID,
-            line: line,
-            updatesHandler: updatesHandler
-        )
-    }
-
     /// Watches for updates to a required config value for the given config key.
     ///
     /// Use this method to observe changes to configuration values that must be present.
@@ -7057,47 +3608,6 @@ extension ConfigReader {
             isSecret: isSecret,
             unwrap: { try $0.asBytes },
             wrap: ConfigContent.bytes,
-            fileID: fileID,
-            line: line,
-            updatesHandler: updatesHandler
-        )
-    }
-
-    /// Watches for updates to a required config value for the given string key.
-    ///
-    /// Use this method to observe changes to configuration values that must be present.
-    /// The handler receives an async sequence that produces the current value whenever it changes,
-    /// or an error if the configuration value is missing or can't be converted.
-    ///
-    /// ```swift
-    /// try await config.watchRequiredInt(forKey: "server.port") { updates in
-    ///     for try await port in updates {
-    ///         print("Server port is: \(port)")
-    ///     }
-    /// }
-    /// ```
-    ///
-    /// - Parameters:
-    ///   - key: The string representation of the config key to watch.
-    ///   - context: Additional context used for key resolution.
-    ///   - isSecret: Whether the value should be treated as secret for logging and debugging purposes.
-    ///   - fileID: The file ID where this call originates. Used for access reporting.
-    ///   - line: The line number where this call originates. Used for access reporting.
-    ///   - updatesHandler: A closure that handles an async sequence of updates to the value. The sequence
-    ///     produces an error if the provider returned a `nil` value or if the value was of an incorrect type.
-    /// - Returns: The result produced by the handler.
-    /// - Throws: Rethrows any error thrown by the handler or the underlying watch operation.
-    public func watchRequiredBytes<Return>(
-        forKey key: String,
-        context: [String: ConfigContextValue] = [:],
-        isSecret: Bool = false,
-        fileID: String = #fileID,
-        line: UInt = #line,
-        updatesHandler: (ConfigUpdatesAsyncSequence<[UInt8], any Error>) async throws -> Return
-    ) async throws -> Return {
-        try await watchRequiredBytes(
-            forKey: keyDecoder.decode(key, context: context),
-            isSecret: isSecret,
             fileID: fileID,
             line: line,
             updatesHandler: updatesHandler
@@ -7150,51 +3660,6 @@ extension ConfigReader {
         )
     }
 
-    /// Watches for updates to a config value for the given string key.
-    ///
-    /// Use this method to observe changes to optional configuration values over time.
-    /// The handler receives an async sequence that produces the current value whenever it changes,
-    /// or `nil` if the value is missing or can't be converted.
-    ///
-    /// ```swift
-    /// try await config.watchInt(forKey: "server.port") { updates in
-    ///     for await port in updates {
-    ///         if let port = port {
-    ///             print("Server port is: \(port)")
-    ///         } else {
-    ///             print("No server port configured")
-    ///         }
-    ///     }
-    /// }
-    /// ```
-    ///
-    /// - Parameters:
-    ///   - key: The string representation of the config key to watch.
-    ///   - context: Additional context used for key resolution.
-    ///   - isSecret: Whether the value should be treated as secret for logging and debugging purposes.
-    ///   - fileID: The file ID where this call originates. Used for access reporting.
-    ///   - line: The line number where this call originates. Used for access reporting.
-    ///   - updatesHandler: A closure that handles an async sequence of updates to the value. The sequence
-    ///     produces `nil` if the value is missing or can't be converted.
-    /// - Returns: The result produced by the handler.
-    /// - Throws: Rethrows any error thrown by the handler or the underlying watch operation.
-    public func watchStringArray<Return>(
-        forKey key: String,
-        context: [String: ConfigContextValue] = [:],
-        isSecret: Bool = false,
-        fileID: String = #fileID,
-        line: UInt = #line,
-        updatesHandler: (ConfigUpdatesAsyncSequence<[String]?, Never>) async throws -> Return
-    ) async throws -> Return {
-        try await watchStringArray(
-            forKey: keyDecoder.decode(key, context: context),
-            isSecret: isSecret,
-            fileID: fileID,
-            line: line,
-            updatesHandler: updatesHandler
-        )
-    }
-
     /// Watches for updates to a config value for the given config key with default fallback.
     ///
     /// Use this method to observe changes to configuration values over time with a guaranteed fallback.
@@ -7240,50 +3705,6 @@ extension ConfigReader {
         )
     }
 
-    /// Watches for updates to a config value for the given string key with default fallback.
-    ///
-    /// Use this method to observe changes to configuration values over time with a guaranteed fallback.
-    /// The handler receives an async sequence that produces the current value whenever it changes,
-    /// or the default value if the configuration value is missing or can't be converted.
-    ///
-    /// ```swift
-    /// try await config.watchInt(forKey: "server.port", default: 8080) { updates in
-    ///     for await port in updates {
-    ///         print("Server port is: \(port)")
-    ///     }
-    /// }
-    /// ```
-    ///
-    /// - Parameters:
-    ///   - key: The string representation of the config key to watch.
-    ///   - context: Additional context used for key resolution.
-    ///   - isSecret: Whether the value should be treated as secret for logging and debugging purposes.
-    ///   - defaultValue: The fallback value used when the config value is missing or invalid.
-    ///   - fileID: The file ID where this call originates. Used for access reporting.
-    ///   - line: The line number where this call originates. Used for access reporting.
-    ///   - updatesHandler: A closure that handles an async sequence of updates to the value. The sequence
-    ///     produces the default value if the provider returned a `nil` value or conversion failed.
-    /// - Returns: The result produced by the handler.
-    /// - Throws: Rethrows any error thrown by the handler or the underlying watch operation.
-    public func watchStringArray<Return>(
-        forKey key: String,
-        context: [String: ConfigContextValue] = [:],
-        isSecret: Bool = false,
-        default defaultValue: [String],
-        fileID: String = #fileID,
-        line: UInt = #line,
-        updatesHandler: (ConfigUpdatesAsyncSequence<[String], Never>) async throws -> Return
-    ) async throws -> Return {
-        try await watchStringArray(
-            forKey: keyDecoder.decode(key, context: context),
-            isSecret: isSecret,
-            default: defaultValue,
-            fileID: fileID,
-            line: line,
-            updatesHandler: updatesHandler
-        )
-    }
-
     /// Watches for updates to a required config value for the given config key.
     ///
     /// Use this method to observe changes to configuration values that must be present.
@@ -7320,47 +3741,6 @@ extension ConfigReader {
             isSecret: isSecret,
             unwrap: { try $0.asStringArray },
             wrap: ConfigContent.stringArray,
-            fileID: fileID,
-            line: line,
-            updatesHandler: updatesHandler
-        )
-    }
-
-    /// Watches for updates to a required config value for the given string key.
-    ///
-    /// Use this method to observe changes to configuration values that must be present.
-    /// The handler receives an async sequence that produces the current value whenever it changes,
-    /// or an error if the configuration value is missing or can't be converted.
-    ///
-    /// ```swift
-    /// try await config.watchRequiredInt(forKey: "server.port") { updates in
-    ///     for try await port in updates {
-    ///         print("Server port is: \(port)")
-    ///     }
-    /// }
-    /// ```
-    ///
-    /// - Parameters:
-    ///   - key: The string representation of the config key to watch.
-    ///   - context: Additional context used for key resolution.
-    ///   - isSecret: Whether the value should be treated as secret for logging and debugging purposes.
-    ///   - fileID: The file ID where this call originates. Used for access reporting.
-    ///   - line: The line number where this call originates. Used for access reporting.
-    ///   - updatesHandler: A closure that handles an async sequence of updates to the value. The sequence
-    ///     produces an error if the provider returned a `nil` value or if the value was of an incorrect type.
-    /// - Returns: The result produced by the handler.
-    /// - Throws: Rethrows any error thrown by the handler or the underlying watch operation.
-    public func watchRequiredStringArray<Return>(
-        forKey key: String,
-        context: [String: ConfigContextValue] = [:],
-        isSecret: Bool = false,
-        fileID: String = #fileID,
-        line: UInt = #line,
-        updatesHandler: (ConfigUpdatesAsyncSequence<[String], any Error>) async throws -> Return
-    ) async throws -> Return {
-        try await watchRequiredStringArray(
-            forKey: keyDecoder.decode(key, context: context),
-            isSecret: isSecret,
             fileID: fileID,
             line: line,
             updatesHandler: updatesHandler
@@ -7413,51 +3793,6 @@ extension ConfigReader {
         )
     }
 
-    /// Watches for updates to a config value for the given string key.
-    ///
-    /// Use this method to observe changes to optional configuration values over time.
-    /// The handler receives an async sequence that produces the current value whenever it changes,
-    /// or `nil` if the value is missing or can't be converted.
-    ///
-    /// ```swift
-    /// try await config.watchInt(forKey: "server.port") { updates in
-    ///     for await port in updates {
-    ///         if let port = port {
-    ///             print("Server port is: \(port)")
-    ///         } else {
-    ///             print("No server port configured")
-    ///         }
-    ///     }
-    /// }
-    /// ```
-    ///
-    /// - Parameters:
-    ///   - key: The string representation of the config key to watch.
-    ///   - context: Additional context used for key resolution.
-    ///   - isSecret: Whether the value should be treated as secret for logging and debugging purposes.
-    ///   - fileID: The file ID where this call originates. Used for access reporting.
-    ///   - line: The line number where this call originates. Used for access reporting.
-    ///   - updatesHandler: A closure that handles an async sequence of updates to the value. The sequence
-    ///     produces `nil` if the value is missing or can't be converted.
-    /// - Returns: The result produced by the handler.
-    /// - Throws: Rethrows any error thrown by the handler or the underlying watch operation.
-    public func watchIntArray<Return>(
-        forKey key: String,
-        context: [String: ConfigContextValue] = [:],
-        isSecret: Bool = false,
-        fileID: String = #fileID,
-        line: UInt = #line,
-        updatesHandler: (ConfigUpdatesAsyncSequence<[Int]?, Never>) async throws -> Return
-    ) async throws -> Return {
-        try await watchIntArray(
-            forKey: keyDecoder.decode(key, context: context),
-            isSecret: isSecret,
-            fileID: fileID,
-            line: line,
-            updatesHandler: updatesHandler
-        )
-    }
-
     /// Watches for updates to a config value for the given config key with default fallback.
     ///
     /// Use this method to observe changes to configuration values over time with a guaranteed fallback.
@@ -7503,50 +3838,6 @@ extension ConfigReader {
         )
     }
 
-    /// Watches for updates to a config value for the given string key with default fallback.
-    ///
-    /// Use this method to observe changes to configuration values over time with a guaranteed fallback.
-    /// The handler receives an async sequence that produces the current value whenever it changes,
-    /// or the default value if the configuration value is missing or can't be converted.
-    ///
-    /// ```swift
-    /// try await config.watchInt(forKey: "server.port", default: 8080) { updates in
-    ///     for await port in updates {
-    ///         print("Server port is: \(port)")
-    ///     }
-    /// }
-    /// ```
-    ///
-    /// - Parameters:
-    ///   - key: The string representation of the config key to watch.
-    ///   - context: Additional context used for key resolution.
-    ///   - isSecret: Whether the value should be treated as secret for logging and debugging purposes.
-    ///   - defaultValue: The fallback value used when the config value is missing or invalid.
-    ///   - fileID: The file ID where this call originates. Used for access reporting.
-    ///   - line: The line number where this call originates. Used for access reporting.
-    ///   - updatesHandler: A closure that handles an async sequence of updates to the value. The sequence
-    ///     produces the default value if the provider returned a `nil` value or conversion failed.
-    /// - Returns: The result produced by the handler.
-    /// - Throws: Rethrows any error thrown by the handler or the underlying watch operation.
-    public func watchIntArray<Return>(
-        forKey key: String,
-        context: [String: ConfigContextValue] = [:],
-        isSecret: Bool = false,
-        default defaultValue: [Int],
-        fileID: String = #fileID,
-        line: UInt = #line,
-        updatesHandler: (ConfigUpdatesAsyncSequence<[Int], Never>) async throws -> Return
-    ) async throws -> Return {
-        try await watchIntArray(
-            forKey: keyDecoder.decode(key, context: context),
-            isSecret: isSecret,
-            default: defaultValue,
-            fileID: fileID,
-            line: line,
-            updatesHandler: updatesHandler
-        )
-    }
-
     /// Watches for updates to a required config value for the given config key.
     ///
     /// Use this method to observe changes to configuration values that must be present.
@@ -7583,47 +3874,6 @@ extension ConfigReader {
             isSecret: isSecret,
             unwrap: { try $0.asIntArray },
             wrap: ConfigContent.intArray,
-            fileID: fileID,
-            line: line,
-            updatesHandler: updatesHandler
-        )
-    }
-
-    /// Watches for updates to a required config value for the given string key.
-    ///
-    /// Use this method to observe changes to configuration values that must be present.
-    /// The handler receives an async sequence that produces the current value whenever it changes,
-    /// or an error if the configuration value is missing or can't be converted.
-    ///
-    /// ```swift
-    /// try await config.watchRequiredInt(forKey: "server.port") { updates in
-    ///     for try await port in updates {
-    ///         print("Server port is: \(port)")
-    ///     }
-    /// }
-    /// ```
-    ///
-    /// - Parameters:
-    ///   - key: The string representation of the config key to watch.
-    ///   - context: Additional context used for key resolution.
-    ///   - isSecret: Whether the value should be treated as secret for logging and debugging purposes.
-    ///   - fileID: The file ID where this call originates. Used for access reporting.
-    ///   - line: The line number where this call originates. Used for access reporting.
-    ///   - updatesHandler: A closure that handles an async sequence of updates to the value. The sequence
-    ///     produces an error if the provider returned a `nil` value or if the value was of an incorrect type.
-    /// - Returns: The result produced by the handler.
-    /// - Throws: Rethrows any error thrown by the handler or the underlying watch operation.
-    public func watchRequiredIntArray<Return>(
-        forKey key: String,
-        context: [String: ConfigContextValue] = [:],
-        isSecret: Bool = false,
-        fileID: String = #fileID,
-        line: UInt = #line,
-        updatesHandler: (ConfigUpdatesAsyncSequence<[Int], any Error>) async throws -> Return
-    ) async throws -> Return {
-        try await watchRequiredIntArray(
-            forKey: keyDecoder.decode(key, context: context),
-            isSecret: isSecret,
             fileID: fileID,
             line: line,
             updatesHandler: updatesHandler
@@ -7676,51 +3926,6 @@ extension ConfigReader {
         )
     }
 
-    /// Watches for updates to a config value for the given string key.
-    ///
-    /// Use this method to observe changes to optional configuration values over time.
-    /// The handler receives an async sequence that produces the current value whenever it changes,
-    /// or `nil` if the value is missing or can't be converted.
-    ///
-    /// ```swift
-    /// try await config.watchInt(forKey: "server.port") { updates in
-    ///     for await port in updates {
-    ///         if let port = port {
-    ///             print("Server port is: \(port)")
-    ///         } else {
-    ///             print("No server port configured")
-    ///         }
-    ///     }
-    /// }
-    /// ```
-    ///
-    /// - Parameters:
-    ///   - key: The string representation of the config key to watch.
-    ///   - context: Additional context used for key resolution.
-    ///   - isSecret: Whether the value should be treated as secret for logging and debugging purposes.
-    ///   - fileID: The file ID where this call originates. Used for access reporting.
-    ///   - line: The line number where this call originates. Used for access reporting.
-    ///   - updatesHandler: A closure that handles an async sequence of updates to the value. The sequence
-    ///     produces `nil` if the value is missing or can't be converted.
-    /// - Returns: The result produced by the handler.
-    /// - Throws: Rethrows any error thrown by the handler or the underlying watch operation.
-    public func watchDoubleArray<Return>(
-        forKey key: String,
-        context: [String: ConfigContextValue] = [:],
-        isSecret: Bool = false,
-        fileID: String = #fileID,
-        line: UInt = #line,
-        updatesHandler: (ConfigUpdatesAsyncSequence<[Double]?, Never>) async throws -> Return
-    ) async throws -> Return {
-        try await watchDoubleArray(
-            forKey: keyDecoder.decode(key, context: context),
-            isSecret: isSecret,
-            fileID: fileID,
-            line: line,
-            updatesHandler: updatesHandler
-        )
-    }
-
     /// Watches for updates to a config value for the given config key with default fallback.
     ///
     /// Use this method to observe changes to configuration values over time with a guaranteed fallback.
@@ -7766,50 +3971,6 @@ extension ConfigReader {
         )
     }
 
-    /// Watches for updates to a config value for the given string key with default fallback.
-    ///
-    /// Use this method to observe changes to configuration values over time with a guaranteed fallback.
-    /// The handler receives an async sequence that produces the current value whenever it changes,
-    /// or the default value if the configuration value is missing or can't be converted.
-    ///
-    /// ```swift
-    /// try await config.watchInt(forKey: "server.port", default: 8080) { updates in
-    ///     for await port in updates {
-    ///         print("Server port is: \(port)")
-    ///     }
-    /// }
-    /// ```
-    ///
-    /// - Parameters:
-    ///   - key: The string representation of the config key to watch.
-    ///   - context: Additional context used for key resolution.
-    ///   - isSecret: Whether the value should be treated as secret for logging and debugging purposes.
-    ///   - defaultValue: The fallback value used when the config value is missing or invalid.
-    ///   - fileID: The file ID where this call originates. Used for access reporting.
-    ///   - line: The line number where this call originates. Used for access reporting.
-    ///   - updatesHandler: A closure that handles an async sequence of updates to the value. The sequence
-    ///     produces the default value if the provider returned a `nil` value or conversion failed.
-    /// - Returns: The result produced by the handler.
-    /// - Throws: Rethrows any error thrown by the handler or the underlying watch operation.
-    public func watchDoubleArray<Return>(
-        forKey key: String,
-        context: [String: ConfigContextValue] = [:],
-        isSecret: Bool = false,
-        default defaultValue: [Double],
-        fileID: String = #fileID,
-        line: UInt = #line,
-        updatesHandler: (ConfigUpdatesAsyncSequence<[Double], Never>) async throws -> Return
-    ) async throws -> Return {
-        try await watchDoubleArray(
-            forKey: keyDecoder.decode(key, context: context),
-            isSecret: isSecret,
-            default: defaultValue,
-            fileID: fileID,
-            line: line,
-            updatesHandler: updatesHandler
-        )
-    }
-
     /// Watches for updates to a required config value for the given config key.
     ///
     /// Use this method to observe changes to configuration values that must be present.
@@ -7846,47 +4007,6 @@ extension ConfigReader {
             isSecret: isSecret,
             unwrap: { try $0.asDoubleArray },
             wrap: ConfigContent.doubleArray,
-            fileID: fileID,
-            line: line,
-            updatesHandler: updatesHandler
-        )
-    }
-
-    /// Watches for updates to a required config value for the given string key.
-    ///
-    /// Use this method to observe changes to configuration values that must be present.
-    /// The handler receives an async sequence that produces the current value whenever it changes,
-    /// or an error if the configuration value is missing or can't be converted.
-    ///
-    /// ```swift
-    /// try await config.watchRequiredInt(forKey: "server.port") { updates in
-    ///     for try await port in updates {
-    ///         print("Server port is: \(port)")
-    ///     }
-    /// }
-    /// ```
-    ///
-    /// - Parameters:
-    ///   - key: The string representation of the config key to watch.
-    ///   - context: Additional context used for key resolution.
-    ///   - isSecret: Whether the value should be treated as secret for logging and debugging purposes.
-    ///   - fileID: The file ID where this call originates. Used for access reporting.
-    ///   - line: The line number where this call originates. Used for access reporting.
-    ///   - updatesHandler: A closure that handles an async sequence of updates to the value. The sequence
-    ///     produces an error if the provider returned a `nil` value or if the value was of an incorrect type.
-    /// - Returns: The result produced by the handler.
-    /// - Throws: Rethrows any error thrown by the handler or the underlying watch operation.
-    public func watchRequiredDoubleArray<Return>(
-        forKey key: String,
-        context: [String: ConfigContextValue] = [:],
-        isSecret: Bool = false,
-        fileID: String = #fileID,
-        line: UInt = #line,
-        updatesHandler: (ConfigUpdatesAsyncSequence<[Double], any Error>) async throws -> Return
-    ) async throws -> Return {
-        try await watchRequiredDoubleArray(
-            forKey: keyDecoder.decode(key, context: context),
-            isSecret: isSecret,
             fileID: fileID,
             line: line,
             updatesHandler: updatesHandler
@@ -7939,51 +4059,6 @@ extension ConfigReader {
         )
     }
 
-    /// Watches for updates to a config value for the given string key.
-    ///
-    /// Use this method to observe changes to optional configuration values over time.
-    /// The handler receives an async sequence that produces the current value whenever it changes,
-    /// or `nil` if the value is missing or can't be converted.
-    ///
-    /// ```swift
-    /// try await config.watchInt(forKey: "server.port") { updates in
-    ///     for await port in updates {
-    ///         if let port = port {
-    ///             print("Server port is: \(port)")
-    ///         } else {
-    ///             print("No server port configured")
-    ///         }
-    ///     }
-    /// }
-    /// ```
-    ///
-    /// - Parameters:
-    ///   - key: The string representation of the config key to watch.
-    ///   - context: Additional context used for key resolution.
-    ///   - isSecret: Whether the value should be treated as secret for logging and debugging purposes.
-    ///   - fileID: The file ID where this call originates. Used for access reporting.
-    ///   - line: The line number where this call originates. Used for access reporting.
-    ///   - updatesHandler: A closure that handles an async sequence of updates to the value. The sequence
-    ///     produces `nil` if the value is missing or can't be converted.
-    /// - Returns: The result produced by the handler.
-    /// - Throws: Rethrows any error thrown by the handler or the underlying watch operation.
-    public func watchBoolArray<Return>(
-        forKey key: String,
-        context: [String: ConfigContextValue] = [:],
-        isSecret: Bool = false,
-        fileID: String = #fileID,
-        line: UInt = #line,
-        updatesHandler: (ConfigUpdatesAsyncSequence<[Bool]?, Never>) async throws -> Return
-    ) async throws -> Return {
-        try await watchBoolArray(
-            forKey: keyDecoder.decode(key, context: context),
-            isSecret: isSecret,
-            fileID: fileID,
-            line: line,
-            updatesHandler: updatesHandler
-        )
-    }
-
     /// Watches for updates to a config value for the given config key with default fallback.
     ///
     /// Use this method to observe changes to configuration values over time with a guaranteed fallback.
@@ -8029,50 +4104,6 @@ extension ConfigReader {
         )
     }
 
-    /// Watches for updates to a config value for the given string key with default fallback.
-    ///
-    /// Use this method to observe changes to configuration values over time with a guaranteed fallback.
-    /// The handler receives an async sequence that produces the current value whenever it changes,
-    /// or the default value if the configuration value is missing or can't be converted.
-    ///
-    /// ```swift
-    /// try await config.watchInt(forKey: "server.port", default: 8080) { updates in
-    ///     for await port in updates {
-    ///         print("Server port is: \(port)")
-    ///     }
-    /// }
-    /// ```
-    ///
-    /// - Parameters:
-    ///   - key: The string representation of the config key to watch.
-    ///   - context: Additional context used for key resolution.
-    ///   - isSecret: Whether the value should be treated as secret for logging and debugging purposes.
-    ///   - defaultValue: The fallback value used when the config value is missing or invalid.
-    ///   - fileID: The file ID where this call originates. Used for access reporting.
-    ///   - line: The line number where this call originates. Used for access reporting.
-    ///   - updatesHandler: A closure that handles an async sequence of updates to the value. The sequence
-    ///     produces the default value if the provider returned a `nil` value or conversion failed.
-    /// - Returns: The result produced by the handler.
-    /// - Throws: Rethrows any error thrown by the handler or the underlying watch operation.
-    public func watchBoolArray<Return>(
-        forKey key: String,
-        context: [String: ConfigContextValue] = [:],
-        isSecret: Bool = false,
-        default defaultValue: [Bool],
-        fileID: String = #fileID,
-        line: UInt = #line,
-        updatesHandler: (ConfigUpdatesAsyncSequence<[Bool], Never>) async throws -> Return
-    ) async throws -> Return {
-        try await watchBoolArray(
-            forKey: keyDecoder.decode(key, context: context),
-            isSecret: isSecret,
-            default: defaultValue,
-            fileID: fileID,
-            line: line,
-            updatesHandler: updatesHandler
-        )
-    }
-
     /// Watches for updates to a required config value for the given config key.
     ///
     /// Use this method to observe changes to configuration values that must be present.
@@ -8109,47 +4140,6 @@ extension ConfigReader {
             isSecret: isSecret,
             unwrap: { try $0.asBoolArray },
             wrap: ConfigContent.boolArray,
-            fileID: fileID,
-            line: line,
-            updatesHandler: updatesHandler
-        )
-    }
-
-    /// Watches for updates to a required config value for the given string key.
-    ///
-    /// Use this method to observe changes to configuration values that must be present.
-    /// The handler receives an async sequence that produces the current value whenever it changes,
-    /// or an error if the configuration value is missing or can't be converted.
-    ///
-    /// ```swift
-    /// try await config.watchRequiredInt(forKey: "server.port") { updates in
-    ///     for try await port in updates {
-    ///         print("Server port is: \(port)")
-    ///     }
-    /// }
-    /// ```
-    ///
-    /// - Parameters:
-    ///   - key: The string representation of the config key to watch.
-    ///   - context: Additional context used for key resolution.
-    ///   - isSecret: Whether the value should be treated as secret for logging and debugging purposes.
-    ///   - fileID: The file ID where this call originates. Used for access reporting.
-    ///   - line: The line number where this call originates. Used for access reporting.
-    ///   - updatesHandler: A closure that handles an async sequence of updates to the value. The sequence
-    ///     produces an error if the provider returned a `nil` value or if the value was of an incorrect type.
-    /// - Returns: The result produced by the handler.
-    /// - Throws: Rethrows any error thrown by the handler or the underlying watch operation.
-    public func watchRequiredBoolArray<Return>(
-        forKey key: String,
-        context: [String: ConfigContextValue] = [:],
-        isSecret: Bool = false,
-        fileID: String = #fileID,
-        line: UInt = #line,
-        updatesHandler: (ConfigUpdatesAsyncSequence<[Bool], any Error>) async throws -> Return
-    ) async throws -> Return {
-        try await watchRequiredBoolArray(
-            forKey: keyDecoder.decode(key, context: context),
-            isSecret: isSecret,
             fileID: fileID,
             line: line,
             updatesHandler: updatesHandler
@@ -8202,51 +4192,6 @@ extension ConfigReader {
         )
     }
 
-    /// Watches for updates to a config value for the given string key.
-    ///
-    /// Use this method to observe changes to optional configuration values over time.
-    /// The handler receives an async sequence that produces the current value whenever it changes,
-    /// or `nil` if the value is missing or can't be converted.
-    ///
-    /// ```swift
-    /// try await config.watchInt(forKey: "server.port") { updates in
-    ///     for await port in updates {
-    ///         if let port = port {
-    ///             print("Server port is: \(port)")
-    ///         } else {
-    ///             print("No server port configured")
-    ///         }
-    ///     }
-    /// }
-    /// ```
-    ///
-    /// - Parameters:
-    ///   - key: The string representation of the config key to watch.
-    ///   - context: Additional context used for key resolution.
-    ///   - isSecret: Whether the value should be treated as secret for logging and debugging purposes.
-    ///   - fileID: The file ID where this call originates. Used for access reporting.
-    ///   - line: The line number where this call originates. Used for access reporting.
-    ///   - updatesHandler: A closure that handles an async sequence of updates to the value. The sequence
-    ///     produces `nil` if the value is missing or can't be converted.
-    /// - Returns: The result produced by the handler.
-    /// - Throws: Rethrows any error thrown by the handler or the underlying watch operation.
-    public func watchByteChunkArray<Return>(
-        forKey key: String,
-        context: [String: ConfigContextValue] = [:],
-        isSecret: Bool = false,
-        fileID: String = #fileID,
-        line: UInt = #line,
-        updatesHandler: (ConfigUpdatesAsyncSequence<[[UInt8]]?, Never>) async throws -> Return
-    ) async throws -> Return {
-        try await watchByteChunkArray(
-            forKey: keyDecoder.decode(key, context: context),
-            isSecret: isSecret,
-            fileID: fileID,
-            line: line,
-            updatesHandler: updatesHandler
-        )
-    }
-
     /// Watches for updates to a config value for the given config key with default fallback.
     ///
     /// Use this method to observe changes to configuration values over time with a guaranteed fallback.
@@ -8292,50 +4237,6 @@ extension ConfigReader {
         )
     }
 
-    /// Watches for updates to a config value for the given string key with default fallback.
-    ///
-    /// Use this method to observe changes to configuration values over time with a guaranteed fallback.
-    /// The handler receives an async sequence that produces the current value whenever it changes,
-    /// or the default value if the configuration value is missing or can't be converted.
-    ///
-    /// ```swift
-    /// try await config.watchInt(forKey: "server.port", default: 8080) { updates in
-    ///     for await port in updates {
-    ///         print("Server port is: \(port)")
-    ///     }
-    /// }
-    /// ```
-    ///
-    /// - Parameters:
-    ///   - key: The string representation of the config key to watch.
-    ///   - context: Additional context used for key resolution.
-    ///   - isSecret: Whether the value should be treated as secret for logging and debugging purposes.
-    ///   - defaultValue: The fallback value used when the config value is missing or invalid.
-    ///   - fileID: The file ID where this call originates. Used for access reporting.
-    ///   - line: The line number where this call originates. Used for access reporting.
-    ///   - updatesHandler: A closure that handles an async sequence of updates to the value. The sequence
-    ///     produces the default value if the provider returned a `nil` value or conversion failed.
-    /// - Returns: The result produced by the handler.
-    /// - Throws: Rethrows any error thrown by the handler or the underlying watch operation.
-    public func watchByteChunkArray<Return>(
-        forKey key: String,
-        context: [String: ConfigContextValue] = [:],
-        isSecret: Bool = false,
-        default defaultValue: [[UInt8]],
-        fileID: String = #fileID,
-        line: UInt = #line,
-        updatesHandler: (ConfigUpdatesAsyncSequence<[[UInt8]], Never>) async throws -> Return
-    ) async throws -> Return {
-        try await watchByteChunkArray(
-            forKey: keyDecoder.decode(key, context: context),
-            isSecret: isSecret,
-            default: defaultValue,
-            fileID: fileID,
-            line: line,
-            updatesHandler: updatesHandler
-        )
-    }
-
     /// Watches for updates to a required config value for the given config key.
     ///
     /// Use this method to observe changes to configuration values that must be present.
@@ -8372,47 +4273,6 @@ extension ConfigReader {
             isSecret: isSecret,
             unwrap: { try $0.asByteChunkArray },
             wrap: ConfigContent.byteChunkArray,
-            fileID: fileID,
-            line: line,
-            updatesHandler: updatesHandler
-        )
-    }
-
-    /// Watches for updates to a required config value for the given string key.
-    ///
-    /// Use this method to observe changes to configuration values that must be present.
-    /// The handler receives an async sequence that produces the current value whenever it changes,
-    /// or an error if the configuration value is missing or can't be converted.
-    ///
-    /// ```swift
-    /// try await config.watchRequiredInt(forKey: "server.port") { updates in
-    ///     for try await port in updates {
-    ///         print("Server port is: \(port)")
-    ///     }
-    /// }
-    /// ```
-    ///
-    /// - Parameters:
-    ///   - key: The string representation of the config key to watch.
-    ///   - context: Additional context used for key resolution.
-    ///   - isSecret: Whether the value should be treated as secret for logging and debugging purposes.
-    ///   - fileID: The file ID where this call originates. Used for access reporting.
-    ///   - line: The line number where this call originates. Used for access reporting.
-    ///   - updatesHandler: A closure that handles an async sequence of updates to the value. The sequence
-    ///     produces an error if the provider returned a `nil` value or if the value was of an incorrect type.
-    /// - Returns: The result produced by the handler.
-    /// - Throws: Rethrows any error thrown by the handler or the underlying watch operation.
-    public func watchRequiredByteChunkArray<Return>(
-        forKey key: String,
-        context: [String: ConfigContextValue] = [:],
-        isSecret: Bool = false,
-        fileID: String = #fileID,
-        line: UInt = #line,
-        updatesHandler: (ConfigUpdatesAsyncSequence<[[UInt8]], any Error>) async throws -> Return
-    ) async throws -> Return {
-        try await watchRequiredByteChunkArray(
-            forKey: keyDecoder.decode(key, context: context),
-            isSecret: isSecret,
             fileID: fileID,
             line: line,
             updatesHandler: updatesHandler
@@ -8467,54 +4327,6 @@ extension ConfigReader {
         )
     }
 
-    /// Watches for updates to a config value for the given string key, converting from string.
-    ///
-    /// Use this method to observe changes to optional string-convertible configuration values over time.
-    /// The handler receives an async sequence that produces the current value whenever it changes,
-    /// or `nil` if the value is missing or can't be converted.
-    ///
-    /// ```swift
-    /// try await config.watchString(forKey: "server.mode", as: ServerMode.self) { updates in
-    ///     for await mode in updates {
-    ///         if let mode = mode {
-    ///             print("Server mode is: \(mode.description)")
-    ///         } else {
-    ///             print("No server mode configured")
-    ///         }
-    ///     }
-    /// }
-    /// ```
-    ///
-    /// - Parameters:
-    ///   - key: The string representation of the config key to watch.
-    ///   - context: Additional context used for key resolution.
-    ///   - type: The type to convert the string value to.
-    ///   - isSecret: Whether the value should be treated as secret for logging and debugging purposes.
-    ///   - fileID: The file ID where this call originates. Used for access reporting.
-    ///   - line: The line number where this call originates. Used for access reporting.
-    ///   - updatesHandler: A closure that handles an async sequence of updates to the value. The sequence
-    ///     produces `nil` if the value is missing or can't be converted.
-    /// - Returns: The result produced by the handler.
-    /// - Throws: Rethrows any error thrown by the handler or the underlying watch operation.
-    public func watchString<Value: ExpressibleByConfigString & Sendable, Return>(
-        forKey key: String,
-        context: [String: ConfigContextValue] = [:],
-        as type: Value.Type = Value.self,
-        isSecret: Bool = false,
-        fileID: String = #fileID,
-        line: UInt = #line,
-        updatesHandler: (ConfigUpdatesAsyncSequence<Value?, Never>) async throws -> Return
-    ) async throws -> Return {
-        try await watchString(
-            forKey: keyDecoder.decode(key, context: context),
-            as: type,
-            isSecret: isSecret,
-            fileID: fileID,
-            line: line,
-            updatesHandler: updatesHandler
-        )
-    }
-
     /// Watches for updates to a config value for the given config key with default fallback, converting from string.
     ///
     /// Use this method to observe changes to string-convertible configuration values over time with a guaranteed fallback.
@@ -8562,53 +4374,6 @@ extension ConfigReader {
         )
     }
 
-    /// Watches for updates to a config value for the given string key with default fallback, converting from string.
-    ///
-    /// Use this method to observe changes to string-convertible configuration values over time with a guaranteed fallback.
-    /// The handler receives an async sequence that produces the current value whenever it changes,
-    /// or the default value if the configuration value is missing or can't be converted.
-    ///
-    /// ```swift
-    /// try await config.watchString(forKey: "server.mode", as: ServerMode.self, default: .production) { updates in
-    ///     for await mode in updates {
-    ///         print("Server mode is: \(mode.description)")
-    ///     }
-    /// }
-    /// ```
-    ///
-    /// - Parameters:
-    ///   - key: The string representation of the config key to watch.
-    ///   - context: Additional context used for key resolution.
-    ///   - type: The type to convert the string value to.
-    ///   - isSecret: Whether the value should be treated as secret for logging and debugging purposes.
-    ///   - defaultValue: The fallback value used when the config value is missing or invalid.
-    ///   - fileID: The file ID where this call originates. Used for access reporting.
-    ///   - line: The line number where this call originates. Used for access reporting.
-    ///   - updatesHandler: A closure that handles an async sequence of updates to the value. The sequence
-    ///     produces the default value if the provider returned a `nil` value or conversion failed.
-    /// - Returns: The result produced by the handler.
-    /// - Throws: Rethrows any error thrown by the handler or the underlying watch operation.
-    public func watchString<Value: ExpressibleByConfigString & Sendable, Return>(
-        forKey key: String,
-        context: [String: ConfigContextValue] = [:],
-        as type: Value.Type = Value.self,
-        isSecret: Bool = false,
-        default defaultValue: Value,
-        fileID: String = #fileID,
-        line: UInt = #line,
-        updatesHandler: (ConfigUpdatesAsyncSequence<Value, Never>) async throws -> Return
-    ) async throws -> Return {
-        try await watchString(
-            forKey: keyDecoder.decode(key, context: context),
-            as: type,
-            isSecret: isSecret,
-            default: defaultValue,
-            fileID: fileID,
-            line: line,
-            updatesHandler: updatesHandler
-        )
-    }
-
     /// Watches for updates to a required config value for the given config key, converting from string.
     ///
     /// Use this method to observe changes to mandatory string-convertible configuration values over time.
@@ -8647,50 +4412,6 @@ extension ConfigReader {
             isSecret: isSecret,
             unwrap: { try cast($0.asString, type: Value.self, key: key) },
             wrap: { uncast($0) },
-            fileID: fileID,
-            line: line,
-            updatesHandler: updatesHandler
-        )
-    }
-
-    /// Watches for updates to a required config value for the given string key, converting from string.
-    ///
-    /// Use this method to observe changes to mandatory string-convertible configuration values over time.
-    /// The handler receives an async sequence that produces the current value whenever it changes,
-    /// or an error if the value is missing or can't be converted.
-    ///
-    /// ```swift
-    /// try await config.watchRequiredString(forKey: "server.mode", as: ServerMode.self) { updates in
-    ///     for try await mode in updates {
-    ///         print("Server mode is: \(mode.description)")
-    ///     }
-    /// }
-    /// ```
-    ///
-    /// - Parameters:
-    ///   - key: The string representation of the config key to watch.
-    ///   - context: Additional context used for key resolution.
-    ///   - type: The type to convert the string value to.
-    ///   - isSecret: Whether the value should be treated as secret for logging and debugging purposes.
-    ///   - fileID: The file ID where this call originates. Used for access reporting.
-    ///   - line: The line number where this call originates. Used for access reporting.
-    ///   - updatesHandler: A closure that handles an async sequence of updates to the value. The sequence
-    ///     produces an error if the provider returned a `nil` value or if the value was of an incorrect type.
-    /// - Returns: The result produced by the handler.
-    /// - Throws: Rethrows any error thrown by the handler or the underlying watch operation.
-    public func watchRequiredString<Value: ExpressibleByConfigString & Sendable, Return>(
-        forKey key: String,
-        context: [String: ConfigContextValue] = [:],
-        as type: Value.Type = Value.self,
-        isSecret: Bool = false,
-        fileID: String = #fileID,
-        line: UInt = #line,
-        updatesHandler: (ConfigUpdatesAsyncSequence<Value, any Error>) async throws -> Return
-    ) async throws -> Return {
-        try await watchRequiredString(
-            forKey: keyDecoder.decode(key, context: context),
-            as: type,
-            isSecret: isSecret,
             fileID: fileID,
             line: line,
             updatesHandler: updatesHandler
@@ -8745,54 +4466,6 @@ extension ConfigReader {
         )
     }
 
-    /// Watches for updates to an array of config values for the given string key, converting from strings.
-    ///
-    /// Use this method to observe changes to optional string-convertible array configuration values over time.
-    /// The handler receives an async sequence that produces the current array whenever it changes,
-    /// or `nil` if the value is missing or can't be converted.
-    ///
-    /// ```swift
-    /// try await config.watchStringArray(forKey: "server.allowedModes", as: ServerMode.self) { updates in
-    ///     for await modes in updates {
-    ///         if let modes = modes {
-    ///             print("Allowed server modes: \(modes.map(\.description).joined(separator: ", "))")
-    ///         } else {
-    ///             print("No server modes configured")
-    ///         }
-    ///     }
-    /// }
-    /// ```
-    ///
-    /// - Parameters:
-    ///   - key: The string representation of the config key to watch.
-    ///   - context: Additional context used for key resolution.
-    ///   - type: The element type to convert each string value to.
-    ///   - isSecret: Whether the value should be treated as secret for logging and debugging purposes.
-    ///   - fileID: The file ID where this call originates. Used for access reporting.
-    ///   - line: The line number where this call originates. Used for access reporting.
-    ///   - updatesHandler: A closure that handles an async sequence of updates to the value. The sequence
-    ///     produces `nil` if the value is missing or can't be converted.
-    /// - Returns: The result produced by the handler.
-    /// - Throws: Rethrows any error thrown by the handler or the underlying watch operation.
-    public func watchStringArray<Value: ExpressibleByConfigString & Sendable, Return>(
-        forKey key: String,
-        context: [String: ConfigContextValue] = [:],
-        as type: Value.Type = Value.self,
-        isSecret: Bool = false,
-        fileID: String = #fileID,
-        line: UInt = #line,
-        updatesHandler: (ConfigUpdatesAsyncSequence<[Value]?, Never>) async throws -> Return
-    ) async throws -> Return {
-        try await watchStringArray(
-            forKey: keyDecoder.decode(key, context: context),
-            as: type,
-            isSecret: isSecret,
-            fileID: fileID,
-            line: line,
-            updatesHandler: updatesHandler
-        )
-    }
-
     /// Watches for updates to an array of config values for the given config key with default fallback, converting from strings.
     ///
     /// Use this method to observe changes to string-convertible array configuration values over time with a guaranteed fallback.
@@ -8840,53 +4513,6 @@ extension ConfigReader {
         )
     }
 
-    /// Watches for updates to an array of config values for the given string key with default fallback, converting from strings.
-    ///
-    /// Use this method to observe changes to string-convertible array configuration values over time with a guaranteed fallback.
-    /// The handler receives an async sequence that produces the current array whenever it changes,
-    /// or the default value if the configuration value is missing or can't be converted.
-    ///
-    /// ```swift
-    /// try await config.watchStringArray(forKey: "server.allowedModes", as: ServerMode.self, default: [.production]) { updates in
-    ///     for await modes in updates {
-    ///         print("Allowed server modes: \(modes.map(\.description).joined(separator: ", "))")
-    ///     }
-    /// }
-    /// ```
-    ///
-    /// - Parameters:
-    ///   - key: The string representation of the config key to watch.
-    ///   - context: Additional context used for key resolution.
-    ///   - type: The element type to convert each string value to.
-    ///   - isSecret: Whether the value should be treated as secret for logging and debugging purposes.
-    ///   - defaultValue: The fallback array used when the config value is missing or invalid.
-    ///   - fileID: The file ID where this call originates. Used for access reporting.
-    ///   - line: The line number where this call originates. Used for access reporting.
-    ///   - updatesHandler: A closure that handles an async sequence of updates to the value. The sequence
-    ///     produces the default value if the provider returned a `nil` value or conversion failed.
-    /// - Returns: The result produced by the handler.
-    /// - Throws: Rethrows any error thrown by the handler or the underlying watch operation.
-    public func watchStringArray<Value: ExpressibleByConfigString & Sendable, Return>(
-        forKey key: String,
-        context: [String: ConfigContextValue] = [:],
-        as type: Value.Type = Value.self,
-        isSecret: Bool = false,
-        default defaultValue: [Value],
-        fileID: String = #fileID,
-        line: UInt = #line,
-        updatesHandler: (ConfigUpdatesAsyncSequence<[Value], Never>) async throws -> Return
-    ) async throws -> Return {
-        try await watchStringArray(
-            forKey: keyDecoder.decode(key, context: context),
-            as: type,
-            isSecret: isSecret,
-            default: defaultValue,
-            fileID: fileID,
-            line: line,
-            updatesHandler: updatesHandler
-        )
-    }
-
     /// Watches for updates to a required array of config values for the given config key, converting from strings.
     ///
     /// Use this method to observe changes to mandatory string-convertible array configuration values over time.
@@ -8925,50 +4551,6 @@ extension ConfigReader {
             isSecret: isSecret,
             unwrap: { try $0.asStringArray.map { try cast($0, type: Value.self, key: key) } },
             wrap: { uncast($0) },
-            fileID: fileID,
-            line: line,
-            updatesHandler: updatesHandler
-        )
-    }
-
-    /// Watches for updates to a required array of config values for the given string key, converting from strings.
-    ///
-    /// Use this method to observe changes to mandatory string-convertible array configuration values over time.
-    /// The handler receives an async sequence that produces the current array whenever it changes,
-    /// or throws an error if the value is missing or can't be converted.
-    ///
-    /// ```swift
-    /// try await config.watchRequiredStringArray(forKey: "server.allowedModes", as: ServerMode.self) { updates in
-    ///     for try await modes in updates {
-    ///         print("Allowed server modes: \(modes.map(\.description).joined(separator: ", "))")
-    ///     }
-    /// }
-    /// ```
-    ///
-    /// - Parameters:
-    ///   - key: The string representation of the config key to watch.
-    ///   - context: Additional context used for key resolution.
-    ///   - type: The element type to convert each string value to.
-    ///   - isSecret: Whether the value should be treated as secret for logging and debugging purposes.
-    ///   - fileID: The file ID where this call originates. Used for access reporting.
-    ///   - line: The line number where this call originates. Used for access reporting.
-    ///   - updatesHandler: A closure that handles an async sequence of updates to the value. The sequence
-    ///     produces an error if the provider returned a `nil` value or if the value was of an incorrect type.
-    /// - Returns: The result produced by the handler.
-    /// - Throws: Rethrows any error thrown by the handler or the underlying watch operation.
-    public func watchRequiredStringArray<Value: ExpressibleByConfigString & Sendable, Return>(
-        forKey key: String,
-        context: [String: ConfigContextValue] = [:],
-        as type: Value.Type = Value.self,
-        isSecret: Bool = false,
-        fileID: String = #fileID,
-        line: UInt = #line,
-        updatesHandler: (ConfigUpdatesAsyncSequence<[Value], any Error>) async throws -> Return
-    ) async throws -> Return {
-        try await watchRequiredStringArray(
-            forKey: keyDecoder.decode(key, context: context),
-            as: type,
-            isSecret: isSecret,
             fileID: fileID,
             line: line,
             updatesHandler: updatesHandler
@@ -9023,54 +4605,6 @@ extension ConfigReader {
         )
     }
 
-    /// Watches for updates to a config value for the given string key, converting from string.
-    ///
-    /// Use this method to observe changes to optional string-convertible configuration values over time.
-    /// The handler receives an async sequence that produces the current value whenever it changes,
-    /// or `nil` if the value is missing or can't be converted.
-    ///
-    /// ```swift
-    /// try await config.watchString(forKey: "server.mode", as: ServerMode.self) { updates in
-    ///     for await mode in updates {
-    ///         if let mode = mode {
-    ///             print("Server mode is: \(mode.description)")
-    ///         } else {
-    ///             print("No server mode configured")
-    ///         }
-    ///     }
-    /// }
-    /// ```
-    ///
-    /// - Parameters:
-    ///   - key: The string representation of the config key to watch.
-    ///   - context: Additional context used for key resolution.
-    ///   - type: The type to convert the string value to.
-    ///   - isSecret: Whether the value should be treated as secret for logging and debugging purposes.
-    ///   - fileID: The file ID where this call originates. Used for access reporting.
-    ///   - line: The line number where this call originates. Used for access reporting.
-    ///   - updatesHandler: A closure that handles an async sequence of updates to the value. The sequence
-    ///     produces `nil` if the value is missing or can't be converted.
-    /// - Returns: The result produced by the handler.
-    /// - Throws: Rethrows any error thrown by the handler or the underlying watch operation.
-    public func watchString<Value: RawRepresentable<String> & Sendable, Return>(
-        forKey key: String,
-        context: [String: ConfigContextValue] = [:],
-        as type: Value.Type = Value.self,
-        isSecret: Bool = false,
-        fileID: String = #fileID,
-        line: UInt = #line,
-        updatesHandler: (ConfigUpdatesAsyncSequence<Value?, Never>) async throws -> Return
-    ) async throws -> Return {
-        try await watchString(
-            forKey: keyDecoder.decode(key, context: context),
-            as: type,
-            isSecret: isSecret,
-            fileID: fileID,
-            line: line,
-            updatesHandler: updatesHandler
-        )
-    }
-
     /// Watches for updates to a config value for the given config key with default fallback, converting from string.
     ///
     /// Use this method to observe changes to string-convertible configuration values over time with a guaranteed fallback.
@@ -9118,53 +4652,6 @@ extension ConfigReader {
         )
     }
 
-    /// Watches for updates to a config value for the given string key with default fallback, converting from string.
-    ///
-    /// Use this method to observe changes to string-convertible configuration values over time with a guaranteed fallback.
-    /// The handler receives an async sequence that produces the current value whenever it changes,
-    /// or the default value if the configuration value is missing or can't be converted.
-    ///
-    /// ```swift
-    /// try await config.watchString(forKey: "server.mode", as: ServerMode.self, default: .production) { updates in
-    ///     for await mode in updates {
-    ///         print("Server mode is: \(mode.description)")
-    ///     }
-    /// }
-    /// ```
-    ///
-    /// - Parameters:
-    ///   - key: The string representation of the config key to watch.
-    ///   - context: Additional context used for key resolution.
-    ///   - type: The type to convert the string value to.
-    ///   - isSecret: Whether the value should be treated as secret for logging and debugging purposes.
-    ///   - defaultValue: The fallback value used when the config value is missing or invalid.
-    ///   - fileID: The file ID where this call originates. Used for access reporting.
-    ///   - line: The line number where this call originates. Used for access reporting.
-    ///   - updatesHandler: A closure that handles an async sequence of updates to the value. The sequence
-    ///     produces the default value if the provider returned a `nil` value or conversion failed.
-    /// - Returns: The result produced by the handler.
-    /// - Throws: Rethrows any error thrown by the handler or the underlying watch operation.
-    public func watchString<Value: RawRepresentable<String> & Sendable, Return>(
-        forKey key: String,
-        context: [String: ConfigContextValue] = [:],
-        as type: Value.Type = Value.self,
-        isSecret: Bool = false,
-        default defaultValue: Value,
-        fileID: String = #fileID,
-        line: UInt = #line,
-        updatesHandler: (ConfigUpdatesAsyncSequence<Value, Never>) async throws -> Return
-    ) async throws -> Return {
-        try await watchString(
-            forKey: keyDecoder.decode(key, context: context),
-            as: type,
-            isSecret: isSecret,
-            default: defaultValue,
-            fileID: fileID,
-            line: line,
-            updatesHandler: updatesHandler
-        )
-    }
-
     /// Watches for updates to a required config value for the given config key, converting from string.
     ///
     /// Use this method to observe changes to mandatory string-convertible configuration values over time.
@@ -9203,50 +4690,6 @@ extension ConfigReader {
             isSecret: isSecret,
             unwrap: { try cast($0.asString, type: Value.self, key: key) },
             wrap: { uncast($0) },
-            fileID: fileID,
-            line: line,
-            updatesHandler: updatesHandler
-        )
-    }
-
-    /// Watches for updates to a required config value for the given string key, converting from string.
-    ///
-    /// Use this method to observe changes to mandatory string-convertible configuration values over time.
-    /// The handler receives an async sequence that produces the current value whenever it changes,
-    /// or an error if the value is missing or can't be converted.
-    ///
-    /// ```swift
-    /// try await config.watchRequiredString(forKey: "server.mode", as: ServerMode.self) { updates in
-    ///     for try await mode in updates {
-    ///         print("Server mode is: \(mode.description)")
-    ///     }
-    /// }
-    /// ```
-    ///
-    /// - Parameters:
-    ///   - key: The string representation of the config key to watch.
-    ///   - context: Additional context used for key resolution.
-    ///   - type: The type to convert the string value to.
-    ///   - isSecret: Whether the value should be treated as secret for logging and debugging purposes.
-    ///   - fileID: The file ID where this call originates. Used for access reporting.
-    ///   - line: The line number where this call originates. Used for access reporting.
-    ///   - updatesHandler: A closure that handles an async sequence of updates to the value. The sequence
-    ///     produces an error if the provider returned a `nil` value or if the value was of an incorrect type.
-    /// - Returns: The result produced by the handler.
-    /// - Throws: Rethrows any error thrown by the handler or the underlying watch operation.
-    public func watchRequiredString<Value: RawRepresentable<String> & Sendable, Return>(
-        forKey key: String,
-        context: [String: ConfigContextValue] = [:],
-        as type: Value.Type = Value.self,
-        isSecret: Bool = false,
-        fileID: String = #fileID,
-        line: UInt = #line,
-        updatesHandler: (ConfigUpdatesAsyncSequence<Value, any Error>) async throws -> Return
-    ) async throws -> Return {
-        try await watchRequiredString(
-            forKey: keyDecoder.decode(key, context: context),
-            as: type,
-            isSecret: isSecret,
             fileID: fileID,
             line: line,
             updatesHandler: updatesHandler
@@ -9301,54 +4744,6 @@ extension ConfigReader {
         )
     }
 
-    /// Watches for updates to an array of config values for the given string key, converting from strings.
-    ///
-    /// Use this method to observe changes to optional string-convertible array configuration values over time.
-    /// The handler receives an async sequence that produces the current array whenever it changes,
-    /// or `nil` if the value is missing or can't be converted.
-    ///
-    /// ```swift
-    /// try await config.watchStringArray(forKey: "server.allowedModes", as: ServerMode.self) { updates in
-    ///     for await modes in updates {
-    ///         if let modes = modes {
-    ///             print("Allowed server modes: \(modes.map(\.description).joined(separator: ", "))")
-    ///         } else {
-    ///             print("No server modes configured")
-    ///         }
-    ///     }
-    /// }
-    /// ```
-    ///
-    /// - Parameters:
-    ///   - key: The string representation of the config key to watch.
-    ///   - context: Additional context used for key resolution.
-    ///   - type: The element type to convert each string value to.
-    ///   - isSecret: Whether the value should be treated as secret for logging and debugging purposes.
-    ///   - fileID: The file ID where this call originates. Used for access reporting.
-    ///   - line: The line number where this call originates. Used for access reporting.
-    ///   - updatesHandler: A closure that handles an async sequence of updates to the value. The sequence
-    ///     produces `nil` if the value is missing or can't be converted.
-    /// - Returns: The result produced by the handler.
-    /// - Throws: Rethrows any error thrown by the handler or the underlying watch operation.
-    public func watchStringArray<Value: RawRepresentable<String> & Sendable, Return>(
-        forKey key: String,
-        context: [String: ConfigContextValue] = [:],
-        as type: Value.Type = Value.self,
-        isSecret: Bool = false,
-        fileID: String = #fileID,
-        line: UInt = #line,
-        updatesHandler: (ConfigUpdatesAsyncSequence<[Value]?, Never>) async throws -> Return
-    ) async throws -> Return {
-        try await watchStringArray(
-            forKey: keyDecoder.decode(key, context: context),
-            as: type,
-            isSecret: isSecret,
-            fileID: fileID,
-            line: line,
-            updatesHandler: updatesHandler
-        )
-    }
-
     /// Watches for updates to an array of config values for the given config key with default fallback, converting from strings.
     ///
     /// Use this method to observe changes to string-convertible array configuration values over time with a guaranteed fallback.
@@ -9396,53 +4791,6 @@ extension ConfigReader {
         )
     }
 
-    /// Watches for updates to an array of config values for the given string key with default fallback, converting from strings.
-    ///
-    /// Use this method to observe changes to string-convertible array configuration values over time with a guaranteed fallback.
-    /// The handler receives an async sequence that produces the current array whenever it changes,
-    /// or the default value if the configuration value is missing or can't be converted.
-    ///
-    /// ```swift
-    /// try await config.watchStringArray(forKey: "server.allowedModes", as: ServerMode.self, default: [.production]) { updates in
-    ///     for await modes in updates {
-    ///         print("Allowed server modes: \(modes.map(\.description).joined(separator: ", "))")
-    ///     }
-    /// }
-    /// ```
-    ///
-    /// - Parameters:
-    ///   - key: The string representation of the config key to watch.
-    ///   - context: Additional context used for key resolution.
-    ///   - type: The element type to convert each string value to.
-    ///   - isSecret: Whether the value should be treated as secret for logging and debugging purposes.
-    ///   - defaultValue: The fallback array used when the config value is missing or invalid.
-    ///   - fileID: The file ID where this call originates. Used for access reporting.
-    ///   - line: The line number where this call originates. Used for access reporting.
-    ///   - updatesHandler: A closure that handles an async sequence of updates to the value. The sequence
-    ///     produces the default value if the provider returned a `nil` value or conversion failed.
-    /// - Returns: The result produced by the handler.
-    /// - Throws: Rethrows any error thrown by the handler or the underlying watch operation.
-    public func watchStringArray<Value: RawRepresentable<String> & Sendable, Return>(
-        forKey key: String,
-        context: [String: ConfigContextValue] = [:],
-        as type: Value.Type = Value.self,
-        isSecret: Bool = false,
-        default defaultValue: [Value],
-        fileID: String = #fileID,
-        line: UInt = #line,
-        updatesHandler: (ConfigUpdatesAsyncSequence<[Value], Never>) async throws -> Return
-    ) async throws -> Return {
-        try await watchStringArray(
-            forKey: keyDecoder.decode(key, context: context),
-            as: type,
-            isSecret: isSecret,
-            default: defaultValue,
-            fileID: fileID,
-            line: line,
-            updatesHandler: updatesHandler
-        )
-    }
-
     /// Watches for updates to a required array of config values for the given config key, converting from strings.
     ///
     /// Use this method to observe changes to mandatory string-convertible array configuration values over time.
@@ -9481,50 +4829,6 @@ extension ConfigReader {
             isSecret: isSecret,
             unwrap: { try $0.asStringArray.map { try cast($0, type: Value.self, key: key) } },
             wrap: { uncast($0) },
-            fileID: fileID,
-            line: line,
-            updatesHandler: updatesHandler
-        )
-    }
-
-    /// Watches for updates to a required array of config values for the given string key, converting from strings.
-    ///
-    /// Use this method to observe changes to mandatory string-convertible array configuration values over time.
-    /// The handler receives an async sequence that produces the current array whenever it changes,
-    /// or throws an error if the value is missing or can't be converted.
-    ///
-    /// ```swift
-    /// try await config.watchRequiredStringArray(forKey: "server.allowedModes", as: ServerMode.self) { updates in
-    ///     for try await modes in updates {
-    ///         print("Allowed server modes: \(modes.map(\.description).joined(separator: ", "))")
-    ///     }
-    /// }
-    /// ```
-    ///
-    /// - Parameters:
-    ///   - key: The string representation of the config key to watch.
-    ///   - context: Additional context used for key resolution.
-    ///   - type: The element type to convert each string value to.
-    ///   - isSecret: Whether the value should be treated as secret for logging and debugging purposes.
-    ///   - fileID: The file ID where this call originates. Used for access reporting.
-    ///   - line: The line number where this call originates. Used for access reporting.
-    ///   - updatesHandler: A closure that handles an async sequence of updates to the value. The sequence
-    ///     produces an error if the provider returned a `nil` value or if the value was of an incorrect type.
-    /// - Returns: The result produced by the handler.
-    /// - Throws: Rethrows any error thrown by the handler or the underlying watch operation.
-    public func watchRequiredStringArray<Value: RawRepresentable<String> & Sendable, Return>(
-        forKey key: String,
-        context: [String: ConfigContextValue] = [:],
-        as type: Value.Type = Value.self,
-        isSecret: Bool = false,
-        fileID: String = #fileID,
-        line: UInt = #line,
-        updatesHandler: (ConfigUpdatesAsyncSequence<[Value], any Error>) async throws -> Return
-    ) async throws -> Return {
-        try await watchRequiredStringArray(
-            forKey: keyDecoder.decode(key, context: context),
-            as: type,
-            isSecret: isSecret,
             fileID: fileID,
             line: line,
             updatesHandler: updatesHandler

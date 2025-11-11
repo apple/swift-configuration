@@ -34,31 +34,18 @@ struct ConfigReaderMethodTestsFetch1 {
 
         do {
             // Optional - success
-            #expect(try await config.fetchString(forKey: ConfigKey(["string"])) == Defaults.string)
             #expect(try await config.fetchString(forKey: "string") == Defaults.string)
 
             // Optional - missing
-            #expect(try await config.fetchString(forKey: ConfigKey(["absentString"])) == nil)
             #expect(try await config.fetchString(forKey: "absentString") == nil)
 
             // Optional - failing
-            await #expect(throws: TestProvider.TestError.self) {
-                try await config.fetchString(forKey: ConfigKey(["failure"]))
-            }
             await #expect(throws: TestProvider.TestError.self) { try await config.fetchString(forKey: "failure") }
 
             // Defaulted - success
-            #expect(
-                try await config.fetchString(forKey: ConfigKey(["string"]), default: Defaults.otherString)
-                    == Defaults.string
-            )
             #expect(try await config.fetchString(forKey: "string", default: Defaults.otherString) == Defaults.string)
 
             // Defaulted - missing
-            #expect(
-                try await config.fetchString(forKey: ConfigKey(["absentString"]), default: Defaults.otherString)
-                    == Defaults.otherString
-            )
             #expect(
                 try await config.fetchString(forKey: "absentString", default: Defaults.otherString)
                     == Defaults.otherString
@@ -66,115 +53,70 @@ struct ConfigReaderMethodTestsFetch1 {
 
             // Defaulted - failing
             await #expect(throws: TestProvider.TestError.self) {
-                try await config.fetchString(forKey: ConfigKey(["failure"]), default: Defaults.otherString)
-            }
-            await #expect(throws: TestProvider.TestError.self) {
                 try await config.fetchString(forKey: "failure", default: Defaults.otherString)
             }
 
             // Required - success
-            #expect(try await config.fetchRequiredString(forKey: ConfigKey(["string"])) == Defaults.string)
             #expect(try await config.fetchRequiredString(forKey: "string") == Defaults.string)
 
             // Required - missing
             let error1 = await #expect(throws: ConfigError.self) {
-                try await config.fetchRequiredString(forKey: ConfigKey(["absentString"]))
-            }
-            #expect(error1 == .missingRequiredConfigValue(AbsoluteConfigKey(["absentString"])))
-            let error2 = await #expect(throws: ConfigError.self) {
                 try await config.fetchRequiredString(forKey: "absentString")
             }
-            #expect(error2 == .missingRequiredConfigValue(AbsoluteConfigKey(["absentString"])))
+            #expect(error1 == .missingRequiredConfigValue(AbsoluteConfigKey(["absentString"])))
 
             // Required - failing
-            await #expect(throws: TestProvider.TestError.self) {
-                try await config.fetchRequiredString(forKey: ConfigKey(["failure"]))
-            }
             await #expect(throws: TestProvider.TestError.self) {
                 try await config.fetchRequiredString(forKey: "failure")
             }
         }
         do {
             // Optional - success
-            #expect(try await config.fetchInt(forKey: ConfigKey(["int"])) == Defaults.int)
             #expect(try await config.fetchInt(forKey: "int") == Defaults.int)
 
             // Optional - missing
-            #expect(try await config.fetchInt(forKey: ConfigKey(["absentInt"])) == nil)
             #expect(try await config.fetchInt(forKey: "absentInt") == nil)
 
             // Optional - failing
-            await #expect(throws: TestProvider.TestError.self) {
-                try await config.fetchInt(forKey: ConfigKey(["failure"]))
-            }
             await #expect(throws: TestProvider.TestError.self) { try await config.fetchInt(forKey: "failure") }
 
             // Defaulted - success
-            #expect(try await config.fetchInt(forKey: ConfigKey(["int"]), default: Defaults.otherInt) == Defaults.int)
             #expect(try await config.fetchInt(forKey: "int", default: Defaults.otherInt) == Defaults.int)
 
             // Defaulted - missing
-            #expect(
-                try await config.fetchInt(forKey: ConfigKey(["absentInt"]), default: Defaults.otherInt)
-                    == Defaults.otherInt
-            )
             #expect(try await config.fetchInt(forKey: "absentInt", default: Defaults.otherInt) == Defaults.otherInt)
 
             // Defaulted - failing
-            await #expect(throws: TestProvider.TestError.self) {
-                try await config.fetchInt(forKey: ConfigKey(["failure"]), default: Defaults.otherInt)
-            }
             await #expect(throws: TestProvider.TestError.self) {
                 try await config.fetchInt(forKey: "failure", default: Defaults.otherInt)
             }
 
             // Required - success
-            #expect(try await config.fetchRequiredInt(forKey: ConfigKey(["int"])) == Defaults.int)
             #expect(try await config.fetchRequiredInt(forKey: "int") == Defaults.int)
 
             // Required - missing
             let error1 = await #expect(throws: ConfigError.self) {
-                try await config.fetchRequiredInt(forKey: ConfigKey(["absentInt"]))
-            }
-            #expect(error1 == .missingRequiredConfigValue(AbsoluteConfigKey(["absentInt"])))
-            let error2 = await #expect(throws: ConfigError.self) {
                 try await config.fetchRequiredInt(forKey: "absentInt")
             }
-            #expect(error2 == .missingRequiredConfigValue(AbsoluteConfigKey(["absentInt"])))
+            #expect(error1 == .missingRequiredConfigValue(AbsoluteConfigKey(["absentInt"])))
 
             // Required - failing
-            await #expect(throws: TestProvider.TestError.self) {
-                try await config.fetchRequiredInt(forKey: ConfigKey(["failure"]))
-            }
             await #expect(throws: TestProvider.TestError.self) { try await config.fetchRequiredInt(forKey: "failure") }
         }
         do {
             // Optional - success
-            #expect(try await config.fetchDouble(forKey: ConfigKey(["double"])) == Defaults.double)
             #expect(try await config.fetchDouble(forKey: "double") == Defaults.double)
 
             // Optional - missing
-            #expect(try await config.fetchDouble(forKey: ConfigKey(["absentDouble"])) == nil)
             #expect(try await config.fetchDouble(forKey: "absentDouble") == nil)
 
             // Optional - failing
-            await #expect(throws: TestProvider.TestError.self) {
-                try await config.fetchDouble(forKey: ConfigKey(["failure"]))
-            }
             await #expect(throws: TestProvider.TestError.self) { try await config.fetchDouble(forKey: "failure") }
 
             // Defaulted - success
-            #expect(
-                try await config.fetchDouble(forKey: ConfigKey(["double"]), default: Defaults.otherDouble)
-                    == Defaults.double
-            )
             #expect(try await config.fetchDouble(forKey: "double", default: Defaults.otherDouble) == Defaults.double)
 
             // Defaulted - missing
-            #expect(
-                try await config.fetchDouble(forKey: ConfigKey(["absentDouble"]), default: Defaults.otherDouble)
-                    == Defaults.otherDouble
-            )
             #expect(
                 try await config.fetchDouble(forKey: "absentDouble", default: Defaults.otherDouble)
                     == Defaults.otherDouble
@@ -182,173 +124,104 @@ struct ConfigReaderMethodTestsFetch1 {
 
             // Defaulted - failing
             await #expect(throws: TestProvider.TestError.self) {
-                try await config.fetchDouble(forKey: ConfigKey(["failure"]), default: Defaults.otherDouble)
-            }
-            await #expect(throws: TestProvider.TestError.self) {
                 try await config.fetchDouble(forKey: "failure", default: Defaults.otherDouble)
             }
 
             // Required - success
-            #expect(try await config.fetchRequiredDouble(forKey: ConfigKey(["double"])) == Defaults.double)
             #expect(try await config.fetchRequiredDouble(forKey: "double") == Defaults.double)
 
             // Required - missing
             let error1 = await #expect(throws: ConfigError.self) {
-                try await config.fetchRequiredDouble(forKey: ConfigKey(["absentDouble"]))
-            }
-            #expect(error1 == .missingRequiredConfigValue(AbsoluteConfigKey(["absentDouble"])))
-            let error2 = await #expect(throws: ConfigError.self) {
                 try await config.fetchRequiredDouble(forKey: "absentDouble")
             }
-            #expect(error2 == .missingRequiredConfigValue(AbsoluteConfigKey(["absentDouble"])))
+            #expect(error1 == .missingRequiredConfigValue(AbsoluteConfigKey(["absentDouble"])))
 
             // Required - failing
-            await #expect(throws: TestProvider.TestError.self) {
-                try await config.fetchRequiredDouble(forKey: ConfigKey(["failure"]))
-            }
             await #expect(throws: TestProvider.TestError.self) {
                 try await config.fetchRequiredDouble(forKey: "failure")
             }
         }
         do {
             // Optional - success
-            #expect(try await config.fetchBool(forKey: ConfigKey(["bool"])) == Defaults.bool)
             #expect(try await config.fetchBool(forKey: "bool") == Defaults.bool)
 
             // Optional - missing
-            #expect(try await config.fetchBool(forKey: ConfigKey(["absentBool"])) == nil)
             #expect(try await config.fetchBool(forKey: "absentBool") == nil)
 
             // Optional - failing
-            await #expect(throws: TestProvider.TestError.self) {
-                try await config.fetchBool(forKey: ConfigKey(["failure"]))
-            }
             await #expect(throws: TestProvider.TestError.self) { try await config.fetchBool(forKey: "failure") }
 
             // Defaulted - success
-            #expect(
-                try await config.fetchBool(forKey: ConfigKey(["bool"]), default: Defaults.otherBool) == Defaults.bool
-            )
             #expect(try await config.fetchBool(forKey: "bool", default: Defaults.otherBool) == Defaults.bool)
 
             // Defaulted - missing
-            #expect(
-                try await config.fetchBool(forKey: ConfigKey(["absentBool"]), default: Defaults.otherBool)
-                    == Defaults.otherBool
-            )
             #expect(try await config.fetchBool(forKey: "absentBool", default: Defaults.otherBool) == Defaults.otherBool)
 
             // Defaulted - failing
-            await #expect(throws: TestProvider.TestError.self) {
-                try await config.fetchBool(forKey: ConfigKey(["failure"]), default: Defaults.otherBool)
-            }
             await #expect(throws: TestProvider.TestError.self) {
                 try await config.fetchBool(forKey: "failure", default: Defaults.otherBool)
             }
 
             // Required - success
-            #expect(try await config.fetchRequiredBool(forKey: ConfigKey(["bool"])) == Defaults.bool)
             #expect(try await config.fetchRequiredBool(forKey: "bool") == Defaults.bool)
 
             // Required - missing
             let error1 = await #expect(throws: ConfigError.self) {
-                try await config.fetchRequiredBool(forKey: ConfigKey(["absentBool"]))
-            }
-            #expect(error1 == .missingRequiredConfigValue(AbsoluteConfigKey(["absentBool"])))
-            let error2 = await #expect(throws: ConfigError.self) {
                 try await config.fetchRequiredBool(forKey: "absentBool")
             }
-            #expect(error2 == .missingRequiredConfigValue(AbsoluteConfigKey(["absentBool"])))
+            #expect(error1 == .missingRequiredConfigValue(AbsoluteConfigKey(["absentBool"])))
 
             // Required - failing
-            await #expect(throws: TestProvider.TestError.self) {
-                try await config.fetchRequiredBool(forKey: ConfigKey(["failure"]))
-            }
             await #expect(throws: TestProvider.TestError.self) { try await config.fetchRequiredBool(forKey: "failure") }
         }
         do {
             // Optional - success
-            #expect(try await config.fetchBytes(forKey: ConfigKey(["bytes"])) == Defaults.bytes)
             #expect(try await config.fetchBytes(forKey: "bytes") == Defaults.bytes)
 
             // Optional - missing
-            #expect(try await config.fetchBytes(forKey: ConfigKey(["absentBytes"])) == nil)
             #expect(try await config.fetchBytes(forKey: "absentBytes") == nil)
 
             // Optional - failing
-            await #expect(throws: TestProvider.TestError.self) {
-                try await config.fetchBytes(forKey: ConfigKey(["failure"]))
-            }
             await #expect(throws: TestProvider.TestError.self) { try await config.fetchBytes(forKey: "failure") }
 
             // Defaulted - success
-            #expect(
-                try await config.fetchBytes(forKey: ConfigKey(["bytes"]), default: Defaults.otherBytes)
-                    == Defaults.bytes
-            )
             #expect(try await config.fetchBytes(forKey: "bytes", default: Defaults.otherBytes) == Defaults.bytes)
 
             // Defaulted - missing
-            #expect(
-                try await config.fetchBytes(forKey: ConfigKey(["absentBytes"]), default: Defaults.otherBytes)
-                    == Defaults.otherBytes
-            )
             #expect(
                 try await config.fetchBytes(forKey: "absentBytes", default: Defaults.otherBytes) == Defaults.otherBytes
             )
 
             // Defaulted - failing
             await #expect(throws: TestProvider.TestError.self) {
-                try await config.fetchBytes(forKey: ConfigKey(["failure"]), default: Defaults.otherBytes)
-            }
-            await #expect(throws: TestProvider.TestError.self) {
                 try await config.fetchBytes(forKey: "failure", default: Defaults.otherBytes)
             }
 
             // Required - success
-            #expect(try await config.fetchRequiredBytes(forKey: ConfigKey(["bytes"])) == Defaults.bytes)
             #expect(try await config.fetchRequiredBytes(forKey: "bytes") == Defaults.bytes)
 
             // Required - missing
             let error1 = await #expect(throws: ConfigError.self) {
-                try await config.fetchRequiredBytes(forKey: ConfigKey(["absentBytes"]))
-            }
-            #expect(error1 == .missingRequiredConfigValue(AbsoluteConfigKey(["absentBytes"])))
-            let error2 = await #expect(throws: ConfigError.self) {
                 try await config.fetchRequiredBytes(forKey: "absentBytes")
             }
-            #expect(error2 == .missingRequiredConfigValue(AbsoluteConfigKey(["absentBytes"])))
+            #expect(error1 == .missingRequiredConfigValue(AbsoluteConfigKey(["absentBytes"])))
 
             // Required - failing
-            await #expect(throws: TestProvider.TestError.self) {
-                try await config.fetchRequiredBytes(forKey: ConfigKey(["failure"]))
-            }
             await #expect(throws: TestProvider.TestError.self) {
                 try await config.fetchRequiredBytes(forKey: "failure")
             }
         }
         do {
             // Optional - success
-            #expect(try await config.fetchStringArray(forKey: ConfigKey(["stringArray"])) == Defaults.stringArray)
             #expect(try await config.fetchStringArray(forKey: "stringArray") == Defaults.stringArray)
 
             // Optional - missing
-            #expect(try await config.fetchStringArray(forKey: ConfigKey(["absentStringArray"])) == nil)
             #expect(try await config.fetchStringArray(forKey: "absentStringArray") == nil)
 
             // Optional - failing
-            await #expect(throws: TestProvider.TestError.self) {
-                try await config.fetchStringArray(forKey: ConfigKey(["failure"]))
-            }
             await #expect(throws: TestProvider.TestError.self) { try await config.fetchStringArray(forKey: "failure") }
 
             // Defaulted - success
-            #expect(
-                try await config.fetchStringArray(
-                    forKey: ConfigKey(["stringArray"]),
-                    default: Defaults.otherStringArray
-                ) == Defaults.stringArray
-            )
             #expect(
                 try await config.fetchStringArray(forKey: "stringArray", default: Defaults.otherStringArray)
                     == Defaults.stringArray
@@ -356,77 +229,45 @@ struct ConfigReaderMethodTestsFetch1 {
 
             // Defaulted - missing
             #expect(
-                try await config.fetchStringArray(
-                    forKey: ConfigKey(["absentStringArray"]),
-                    default: Defaults.otherStringArray
-                ) == Defaults.otherStringArray
-            )
-            #expect(
                 try await config.fetchStringArray(forKey: "absentStringArray", default: Defaults.otherStringArray)
                     == Defaults.otherStringArray
             )
 
             // Defaulted - failing
             await #expect(throws: TestProvider.TestError.self) {
-                try await config.fetchStringArray(forKey: ConfigKey(["failure"]), default: Defaults.otherStringArray)
-            }
-            await #expect(throws: TestProvider.TestError.self) {
                 try await config.fetchStringArray(forKey: "failure", default: Defaults.otherStringArray)
             }
 
             // Required - success
-            #expect(
-                try await config.fetchRequiredStringArray(forKey: ConfigKey(["stringArray"])) == Defaults.stringArray
-            )
             #expect(try await config.fetchRequiredStringArray(forKey: "stringArray") == Defaults.stringArray)
 
             // Required - missing
             let error1 = await #expect(throws: ConfigError.self) {
-                try await config.fetchRequiredStringArray(forKey: ConfigKey(["absentStringArray"]))
-            }
-            #expect(error1 == .missingRequiredConfigValue(AbsoluteConfigKey(["absentStringArray"])))
-            let error2 = await #expect(throws: ConfigError.self) {
                 try await config.fetchRequiredStringArray(forKey: "absentStringArray")
             }
-            #expect(error2 == .missingRequiredConfigValue(AbsoluteConfigKey(["absentStringArray"])))
+            #expect(error1 == .missingRequiredConfigValue(AbsoluteConfigKey(["absentStringArray"])))
 
             // Required - failing
-            await #expect(throws: TestProvider.TestError.self) {
-                try await config.fetchRequiredStringArray(forKey: ConfigKey(["failure"]))
-            }
             await #expect(throws: TestProvider.TestError.self) {
                 try await config.fetchRequiredStringArray(forKey: "failure")
             }
         }
         do {
             // Optional - success
-            #expect(try await config.fetchIntArray(forKey: ConfigKey(["intArray"])) == Defaults.intArray)
             #expect(try await config.fetchIntArray(forKey: "intArray") == Defaults.intArray)
 
             // Optional - missing
-            #expect(try await config.fetchIntArray(forKey: ConfigKey(["absentIntArray"])) == nil)
             #expect(try await config.fetchIntArray(forKey: "absentIntArray") == nil)
 
             // Optional - failing
-            await #expect(throws: TestProvider.TestError.self) {
-                try await config.fetchIntArray(forKey: ConfigKey(["failure"]))
-            }
             await #expect(throws: TestProvider.TestError.self) { try await config.fetchIntArray(forKey: "failure") }
 
             // Defaulted - success
-            #expect(
-                try await config.fetchIntArray(forKey: ConfigKey(["intArray"]), default: Defaults.otherIntArray)
-                    == Defaults.intArray
-            )
             #expect(
                 try await config.fetchIntArray(forKey: "intArray", default: Defaults.otherIntArray) == Defaults.intArray
             )
 
             // Defaulted - missing
-            #expect(
-                try await config.fetchIntArray(forKey: ConfigKey(["absentIntArray"]), default: Defaults.otherIntArray)
-                    == Defaults.otherIntArray
-            )
             #expect(
                 try await config.fetchIntArray(forKey: "absentIntArray", default: Defaults.otherIntArray)
                     == Defaults.otherIntArray
@@ -434,56 +275,34 @@ struct ConfigReaderMethodTestsFetch1 {
 
             // Defaulted - failing
             await #expect(throws: TestProvider.TestError.self) {
-                try await config.fetchIntArray(forKey: ConfigKey(["failure"]), default: Defaults.otherIntArray)
-            }
-            await #expect(throws: TestProvider.TestError.self) {
                 try await config.fetchIntArray(forKey: "failure", default: Defaults.otherIntArray)
             }
 
             // Required - success
-            #expect(try await config.fetchRequiredIntArray(forKey: ConfigKey(["intArray"])) == Defaults.intArray)
             #expect(try await config.fetchRequiredIntArray(forKey: "intArray") == Defaults.intArray)
 
             // Required - missing
             let error1 = await #expect(throws: ConfigError.self) {
-                try await config.fetchRequiredIntArray(forKey: ConfigKey(["absentIntArray"]))
-            }
-            #expect(error1 == .missingRequiredConfigValue(AbsoluteConfigKey(["absentIntArray"])))
-            let error2 = await #expect(throws: ConfigError.self) {
                 try await config.fetchRequiredIntArray(forKey: "absentIntArray")
             }
-            #expect(error2 == .missingRequiredConfigValue(AbsoluteConfigKey(["absentIntArray"])))
+            #expect(error1 == .missingRequiredConfigValue(AbsoluteConfigKey(["absentIntArray"])))
 
             // Required - failing
-            await #expect(throws: TestProvider.TestError.self) {
-                try await config.fetchRequiredIntArray(forKey: ConfigKey(["failure"]))
-            }
             await #expect(throws: TestProvider.TestError.self) {
                 try await config.fetchRequiredIntArray(forKey: "failure")
             }
         }
         do {
             // Optional - success
-            #expect(try await config.fetchDoubleArray(forKey: ConfigKey(["doubleArray"])) == Defaults.doubleArray)
             #expect(try await config.fetchDoubleArray(forKey: "doubleArray") == Defaults.doubleArray)
 
             // Optional - missing
-            #expect(try await config.fetchDoubleArray(forKey: ConfigKey(["absentDoubleArray"])) == nil)
             #expect(try await config.fetchDoubleArray(forKey: "absentDoubleArray") == nil)
 
             // Optional - failing
-            await #expect(throws: TestProvider.TestError.self) {
-                try await config.fetchDoubleArray(forKey: ConfigKey(["failure"]))
-            }
             await #expect(throws: TestProvider.TestError.self) { try await config.fetchDoubleArray(forKey: "failure") }
 
             // Defaulted - success
-            #expect(
-                try await config.fetchDoubleArray(
-                    forKey: ConfigKey(["doubleArray"]),
-                    default: Defaults.otherDoubleArray
-                ) == Defaults.doubleArray
-            )
             #expect(
                 try await config.fetchDoubleArray(forKey: "doubleArray", default: Defaults.otherDoubleArray)
                     == Defaults.doubleArray
@@ -491,68 +310,40 @@ struct ConfigReaderMethodTestsFetch1 {
 
             // Defaulted - missing
             #expect(
-                try await config.fetchDoubleArray(
-                    forKey: ConfigKey(["absentDoubleArray"]),
-                    default: Defaults.otherDoubleArray
-                ) == Defaults.otherDoubleArray
-            )
-            #expect(
                 try await config.fetchDoubleArray(forKey: "absentDoubleArray", default: Defaults.otherDoubleArray)
                     == Defaults.otherDoubleArray
             )
 
             // Defaulted - failing
             await #expect(throws: TestProvider.TestError.self) {
-                try await config.fetchDoubleArray(forKey: ConfigKey(["failure"]), default: Defaults.otherDoubleArray)
-            }
-            await #expect(throws: TestProvider.TestError.self) {
                 try await config.fetchDoubleArray(forKey: "failure", default: Defaults.otherDoubleArray)
             }
 
             // Required - success
-            #expect(
-                try await config.fetchRequiredDoubleArray(forKey: ConfigKey(["doubleArray"])) == Defaults.doubleArray
-            )
             #expect(try await config.fetchRequiredDoubleArray(forKey: "doubleArray") == Defaults.doubleArray)
 
             // Required - missing
             let error1 = await #expect(throws: ConfigError.self) {
-                try await config.fetchRequiredDoubleArray(forKey: ConfigKey(["absentDoubleArray"]))
-            }
-            #expect(error1 == .missingRequiredConfigValue(AbsoluteConfigKey(["absentDoubleArray"])))
-            let error2 = await #expect(throws: ConfigError.self) {
                 try await config.fetchRequiredDoubleArray(forKey: "absentDoubleArray")
             }
-            #expect(error2 == .missingRequiredConfigValue(AbsoluteConfigKey(["absentDoubleArray"])))
+            #expect(error1 == .missingRequiredConfigValue(AbsoluteConfigKey(["absentDoubleArray"])))
 
             // Required - failing
-            await #expect(throws: TestProvider.TestError.self) {
-                try await config.fetchRequiredDoubleArray(forKey: ConfigKey(["failure"]))
-            }
             await #expect(throws: TestProvider.TestError.self) {
                 try await config.fetchRequiredDoubleArray(forKey: "failure")
             }
         }
         do {
             // Optional - success
-            #expect(try await config.fetchBoolArray(forKey: ConfigKey(["boolArray"])) == Defaults.boolArray)
             #expect(try await config.fetchBoolArray(forKey: "boolArray") == Defaults.boolArray)
 
             // Optional - missing
-            #expect(try await config.fetchBoolArray(forKey: ConfigKey(["absentBoolArray"])) == nil)
             #expect(try await config.fetchBoolArray(forKey: "absentBoolArray") == nil)
 
             // Optional - failing
-            await #expect(throws: TestProvider.TestError.self) {
-                try await config.fetchBoolArray(forKey: ConfigKey(["failure"]))
-            }
             await #expect(throws: TestProvider.TestError.self) { try await config.fetchBoolArray(forKey: "failure") }
 
             // Defaulted - success
-            #expect(
-                try await config.fetchBoolArray(forKey: ConfigKey(["boolArray"]), default: Defaults.otherBoolArray)
-                    == Defaults.boolArray
-            )
             #expect(
                 try await config.fetchBoolArray(forKey: "boolArray", default: Defaults.otherBoolArray)
                     == Defaults.boolArray
@@ -560,84 +351,48 @@ struct ConfigReaderMethodTestsFetch1 {
 
             // Defaulted - missing
             #expect(
-                try await config.fetchBoolArray(
-                    forKey: ConfigKey(["absentBoolArray"]),
-                    default: Defaults.otherBoolArray
-                ) == Defaults.otherBoolArray
-            )
-            #expect(
                 try await config.fetchBoolArray(forKey: "absentBoolArray", default: Defaults.otherBoolArray)
                     == Defaults.otherBoolArray
             )
 
             // Defaulted - failing
             await #expect(throws: TestProvider.TestError.self) {
-                try await config.fetchBoolArray(forKey: ConfigKey(["failure"]), default: Defaults.otherBoolArray)
-            }
-            await #expect(throws: TestProvider.TestError.self) {
                 try await config.fetchBoolArray(forKey: "failure", default: Defaults.otherBoolArray)
             }
 
             // Required - success
-            #expect(try await config.fetchRequiredBoolArray(forKey: ConfigKey(["boolArray"])) == Defaults.boolArray)
             #expect(try await config.fetchRequiredBoolArray(forKey: "boolArray") == Defaults.boolArray)
 
             // Required - missing
             let error1 = await #expect(throws: ConfigError.self) {
-                try await config.fetchRequiredBoolArray(forKey: ConfigKey(["absentBoolArray"]))
-            }
-            #expect(error1 == .missingRequiredConfigValue(AbsoluteConfigKey(["absentBoolArray"])))
-            let error2 = await #expect(throws: ConfigError.self) {
                 try await config.fetchRequiredBoolArray(forKey: "absentBoolArray")
             }
-            #expect(error2 == .missingRequiredConfigValue(AbsoluteConfigKey(["absentBoolArray"])))
+            #expect(error1 == .missingRequiredConfigValue(AbsoluteConfigKey(["absentBoolArray"])))
 
             // Required - failing
-            await #expect(throws: TestProvider.TestError.self) {
-                try await config.fetchRequiredBoolArray(forKey: ConfigKey(["failure"]))
-            }
             await #expect(throws: TestProvider.TestError.self) {
                 try await config.fetchRequiredBoolArray(forKey: "failure")
             }
         }
         do {
             // Optional - success
-            #expect(
-                try await config.fetchByteChunkArray(forKey: ConfigKey(["byteChunkArray"])) == Defaults.byteChunkArray
-            )
             #expect(try await config.fetchByteChunkArray(forKey: "byteChunkArray") == Defaults.byteChunkArray)
 
             // Optional - missing
-            #expect(try await config.fetchByteChunkArray(forKey: ConfigKey(["absentByteChunkArray"])) == nil)
             #expect(try await config.fetchByteChunkArray(forKey: "absentByteChunkArray") == nil)
 
             // Optional - failing
-            await #expect(throws: TestProvider.TestError.self) {
-                try await config.fetchByteChunkArray(forKey: ConfigKey(["failure"]))
-            }
             await #expect(throws: TestProvider.TestError.self) {
                 try await config.fetchByteChunkArray(forKey: "failure")
             }
 
             // Defaulted - success
             #expect(
-                try await config.fetchByteChunkArray(
-                    forKey: ConfigKey(["byteChunkArray"]),
-                    default: Defaults.otherByteChunkArray
-                ) == Defaults.byteChunkArray
-            )
-            #expect(
                 try await config.fetchByteChunkArray(forKey: "byteChunkArray", default: Defaults.otherByteChunkArray)
                     == Defaults.byteChunkArray
             )
 
             // Defaulted - missing
-            #expect(
-                try await config.fetchByteChunkArray(
-                    forKey: ConfigKey(["absentByteChunkArray"]),
-                    default: Defaults.otherByteChunkArray
-                ) == Defaults.otherByteChunkArray
-            )
             #expect(
                 try await config.fetchByteChunkArray(
                     forKey: "absentByteChunkArray",
@@ -647,36 +402,19 @@ struct ConfigReaderMethodTestsFetch1 {
 
             // Defaulted - failing
             await #expect(throws: TestProvider.TestError.self) {
-                try await config.fetchByteChunkArray(
-                    forKey: ConfigKey(["failure"]),
-                    default: Defaults.otherByteChunkArray
-                )
-            }
-            await #expect(throws: TestProvider.TestError.self) {
                 try await config.fetchByteChunkArray(forKey: "failure", default: Defaults.otherByteChunkArray)
             }
 
             // Required - success
-            #expect(
-                try await config.fetchRequiredByteChunkArray(forKey: ConfigKey(["byteChunkArray"]))
-                    == Defaults.byteChunkArray
-            )
             #expect(try await config.fetchRequiredByteChunkArray(forKey: "byteChunkArray") == Defaults.byteChunkArray)
 
             // Required - missing
             let error1 = await #expect(throws: ConfigError.self) {
-                try await config.fetchRequiredByteChunkArray(forKey: ConfigKey(["absentByteChunkArray"]))
-            }
-            #expect(error1 == .missingRequiredConfigValue(AbsoluteConfigKey(["absentByteChunkArray"])))
-            let error2 = await #expect(throws: ConfigError.self) {
                 try await config.fetchRequiredByteChunkArray(forKey: "absentByteChunkArray")
             }
-            #expect(error2 == .missingRequiredConfigValue(AbsoluteConfigKey(["absentByteChunkArray"])))
+            #expect(error1 == .missingRequiredConfigValue(AbsoluteConfigKey(["absentByteChunkArray"])))
 
             // Required - failing
-            await #expect(throws: TestProvider.TestError.self) {
-                try await config.fetchRequiredByteChunkArray(forKey: ConfigKey(["failure"]))
-            }
             await #expect(throws: TestProvider.TestError.self) {
                 try await config.fetchRequiredByteChunkArray(forKey: "failure")
             }

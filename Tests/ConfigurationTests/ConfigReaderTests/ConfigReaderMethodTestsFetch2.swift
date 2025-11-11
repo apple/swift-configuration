@@ -35,41 +35,21 @@ struct ConfigReaderMethodTestsFetch2 {
         do {
             // Optional - success
             #expect(
-                try await config.fetchString(forKey: ConfigKey(["stringConvertible"]), as: TestStringConvertible.self)
-                    == Defaults.stringConvertible
-            )
-            #expect(
                 try await config.fetchString(forKey: "stringConvertible", as: TestStringConvertible.self)
                     == Defaults.stringConvertible
             )
 
             // Optional - missing
             #expect(
-                try await config.fetchString(
-                    forKey: ConfigKey(["absentStringConvertible"]),
-                    as: TestStringConvertible.self
-                ) == nil
-            )
-            #expect(
                 try await config.fetchString(forKey: "absentStringConvertible", as: TestStringConvertible.self) == nil
             )
 
             // Optional - failing
             await #expect(throws: TestProvider.TestError.self) {
-                try await config.fetchString(forKey: ConfigKey(["failure"]), as: TestStringConvertible.self)
-            }
-            await #expect(throws: TestProvider.TestError.self) {
                 try await config.fetchString(forKey: "failure", as: TestStringConvertible.self)
             }
 
             // Defaulted - success
-            #expect(
-                try await config.fetchString(
-                    forKey: ConfigKey(["stringConvertible"]),
-                    as: TestStringConvertible.self,
-                    default: Defaults.otherStringConvertible
-                ) == Defaults.stringConvertible
-            )
             #expect(
                 try await config.fetchString(
                     forKey: "stringConvertible",
@@ -81,13 +61,6 @@ struct ConfigReaderMethodTestsFetch2 {
             // Defaulted - missing
             #expect(
                 try await config.fetchString(
-                    forKey: ConfigKey(["absentStringConvertible"]),
-                    as: TestStringConvertible.self,
-                    default: Defaults.otherStringConvertible
-                ) == Defaults.otherStringConvertible
-            )
-            #expect(
-                try await config.fetchString(
                     forKey: "absentStringConvertible",
                     as: TestStringConvertible.self,
                     default: Defaults.otherStringConvertible
@@ -95,13 +68,6 @@ struct ConfigReaderMethodTestsFetch2 {
             )
 
             // Defaulted - failing
-            await #expect(throws: TestProvider.TestError.self) {
-                try await config.fetchString(
-                    forKey: ConfigKey(["failure"]),
-                    as: TestStringConvertible.self,
-                    default: Defaults.otherStringConvertible
-                )
-            }
             await #expect(throws: TestProvider.TestError.self) {
                 try await config.fetchString(
                     forKey: "failure",
@@ -112,78 +78,40 @@ struct ConfigReaderMethodTestsFetch2 {
 
             // Required - success
             #expect(
-                try await config.fetchRequiredString(
-                    forKey: ConfigKey(["stringConvertible"]),
-                    as: TestStringConvertible.self
-                ) == Defaults.stringConvertible
-            )
-            #expect(
                 try await config.fetchRequiredString(forKey: "stringConvertible", as: TestStringConvertible.self)
                     == Defaults.stringConvertible
             )
 
             // Required - missing
             let error1 = await #expect(throws: ConfigError.self) {
-                try await config.fetchRequiredString(
-                    forKey: ConfigKey(["absentStringConvertible"]),
-                    as: TestStringConvertible.self
-                )
-            }
-            #expect(error1 == .missingRequiredConfigValue(AbsoluteConfigKey(["absentStringConvertible"])))
-            let error2 = await #expect(throws: ConfigError.self) {
                 try await config.fetchRequiredString(forKey: "absentStringConvertible", as: TestStringConvertible.self)
             }
-            #expect(error2 == .missingRequiredConfigValue(AbsoluteConfigKey(["absentStringConvertible"])))
+            #expect(error1 == .missingRequiredConfigValue(AbsoluteConfigKey(["absentStringConvertible"])))
 
             // Required - failing
-            await #expect(throws: TestProvider.TestError.self) {
-                try await config.fetchRequiredString(forKey: ConfigKey(["failure"]), as: TestStringConvertible.self)
-            }
             await #expect(throws: TestProvider.TestError.self) {
                 try await config.fetchRequiredString(forKey: "failure", as: TestStringConvertible.self)
             }
         }
         do {
             // Optional - success
-            #expect(
-                try await config.fetchString(forKey: ConfigKey(["stringEnum"]), as: TestEnum.self)
-                    == Defaults.stringEnum
-            )
             #expect(try await config.fetchString(forKey: "stringEnum", as: TestEnum.self) == Defaults.stringEnum)
 
             // Optional - missing
-            #expect(try await config.fetchString(forKey: ConfigKey(["absentStringEnum"]), as: TestEnum.self) == nil)
             #expect(try await config.fetchString(forKey: "absentStringEnum", as: TestEnum.self) == nil)
 
             // Optional - failing
-            await #expect(throws: TestProvider.TestError.self) {
-                try await config.fetchString(forKey: ConfigKey(["failure"]), as: TestEnum.self)
-            }
             await #expect(throws: TestProvider.TestError.self) {
                 try await config.fetchString(forKey: "failure", as: TestEnum.self)
             }
 
             // Defaulted - success
             #expect(
-                try await config.fetchString(
-                    forKey: ConfigKey(["stringEnum"]),
-                    as: TestEnum.self,
-                    default: Defaults.otherStringEnum
-                ) == Defaults.stringEnum
-            )
-            #expect(
                 try await config.fetchString(forKey: "stringEnum", as: TestEnum.self, default: Defaults.otherStringEnum)
                     == Defaults.stringEnum
             )
 
             // Defaulted - missing
-            #expect(
-                try await config.fetchString(
-                    forKey: ConfigKey(["absentStringEnum"]),
-                    as: TestEnum.self,
-                    default: Defaults.otherStringEnum
-                ) == Defaults.otherStringEnum
-            )
             #expect(
                 try await config.fetchString(
                     forKey: "absentStringEnum",
@@ -194,39 +122,21 @@ struct ConfigReaderMethodTestsFetch2 {
 
             // Defaulted - failing
             await #expect(throws: TestProvider.TestError.self) {
-                try await config.fetchString(
-                    forKey: ConfigKey(["failure"]),
-                    as: TestEnum.self,
-                    default: Defaults.otherStringEnum
-                )
-            }
-            await #expect(throws: TestProvider.TestError.self) {
                 try await config.fetchString(forKey: "failure", as: TestEnum.self, default: Defaults.otherStringEnum)
             }
 
             // Required - success
-            #expect(
-                try await config.fetchRequiredString(forKey: ConfigKey(["stringEnum"]), as: TestEnum.self)
-                    == Defaults.stringEnum
-            )
             #expect(
                 try await config.fetchRequiredString(forKey: "stringEnum", as: TestEnum.self) == Defaults.stringEnum
             )
 
             // Required - missing
             let error1 = await #expect(throws: ConfigError.self) {
-                try await config.fetchRequiredString(forKey: ConfigKey(["absentStringEnum"]), as: TestEnum.self)
-            }
-            #expect(error1 == .missingRequiredConfigValue(AbsoluteConfigKey(["absentStringEnum"])))
-            let error2 = await #expect(throws: ConfigError.self) {
                 try await config.fetchRequiredString(forKey: "absentStringEnum", as: TestEnum.self)
             }
-            #expect(error2 == .missingRequiredConfigValue(AbsoluteConfigKey(["absentStringEnum"])))
+            #expect(error1 == .missingRequiredConfigValue(AbsoluteConfigKey(["absentStringEnum"])))
 
             // Required - failing
-            await #expect(throws: TestProvider.TestError.self) {
-                try await config.fetchRequiredString(forKey: ConfigKey(["failure"]), as: TestEnum.self)
-            }
             await #expect(throws: TestProvider.TestError.self) {
                 try await config.fetchRequiredString(forKey: "failure", as: TestEnum.self)
             }

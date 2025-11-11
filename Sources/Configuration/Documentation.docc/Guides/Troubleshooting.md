@@ -8,13 +8,11 @@ Check out some techniques to debug unexpected issues and to increase visibility 
 
 If your configuration values aren't being read correctly, check:
 
-1. **Key formatting**: Make sure the key format matches your `ConfigKeyDecoder`. The default is dot-notation (for example, `database.url`).
+1. **Environment variable naming**: When using `EnvironmentVariablesProvider`, keys are automatically converted to uppercase with dots replaced by underscores. For example, `database.url` becomes `DATABASE_URL`.
 
-2. **Environment variable naming**: When using `EnvironmentVariablesProvider`, keys are automatically converted to uppercase with dots replaced by underscores. For example, `database.url` becomes `DATABASE_URL`.
+2. **Provider ordering**: When using multiple providers, remember they're checked in order, and the first one that returns a value wins.
 
-3. **Provider ordering**: When using multiple providers, remember they're checked in order, and the first one that returns a value wins.
-
-4. **Debug with an access reporter**: Use the access reporting feature to see which keys are being queried and what values (if any) are being returned. See the next section for details.
+3. **Debug with an access reporter**: Use the access reporting feature to see which keys are being queried and what values (if any) are being returned. See the next section for details.
 
 For guidance on selecting the right configuration access patterns and reader methods, check out <doc:Choosing-access-patterns> and <doc:Choosing-reader-methods>.
 

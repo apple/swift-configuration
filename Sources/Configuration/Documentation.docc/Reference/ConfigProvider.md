@@ -15,4 +15,3 @@
 - ``ConfigProvider/watchSnapshotFromSnapshot(updatesHandler:)``
 - ``ConfigProvider/mapKeys(_:)``
 - ``ConfigProvider/prefixKeys(with:)``
-- ``ConfigProvider/prefixKeys(with:context:keyDecoder:)``

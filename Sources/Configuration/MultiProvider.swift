@@ -209,7 +209,7 @@ extension MultiProvider {
             updateSequences: &updateSequences,
         ) { providerUpdateSequences in
             let updateArrays = combineLatestMany(
-                elementType: (any ConfigSnapshotProtocol).self,
+                elementType: (any ConfigSnapshot).self,
                 failureType: Never.self,
                 providerUpdateSequences
             )
@@ -364,8 +364,8 @@ nonisolated(nonsending) private func withProvidersWatchingValue<ReturnInner>(
 @available(Configuration 1.0, *)
 nonisolated(nonsending) private func withProvidersWatchingSnapshot<ReturnInner>(
     providers: ArraySlice<any ConfigProvider>,
-    updateSequences: inout [any (AsyncSequence<any ConfigSnapshotProtocol, Never> & Sendable)],
-    body: ([any (AsyncSequence<any ConfigSnapshotProtocol, Never> & Sendable)]) async throws -> ReturnInner
+    updateSequences: inout [any (AsyncSequence<any ConfigSnapshot, Never> & Sendable)],
+    body: ([any (AsyncSequence<any ConfigSnapshot, Never> & Sendable)]) async throws -> ReturnInner
 ) async throws -> ReturnInner {
     guard let provider = providers.first else {
         // Recursion termination, once we've collected all update sequences, execute the body.

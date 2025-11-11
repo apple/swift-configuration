@@ -35,33 +35,17 @@ struct ConfigReaderMethodTestsGet3 {
         do {
             // Optional - success
             #expect(
-                config.stringArray(forKey: ConfigKey(["stringConvertibleArray"]), as: TestStringConvertible.self)
-                    == Defaults.stringConvertibleArray
-            )
-            #expect(
                 config.stringArray(forKey: "stringConvertibleArray", as: TestStringConvertible.self)
                     == Defaults.stringConvertibleArray
             )
 
             // Optional - missing
-            #expect(
-                config.stringArray(forKey: ConfigKey(["absentStringConvertibleArray"]), as: TestStringConvertible.self)
-                    == nil
-            )
             #expect(config.stringArray(forKey: "absentStringConvertibleArray", as: TestStringConvertible.self) == nil)
 
             // Optional - failing
-            #expect(config.stringArray(forKey: ConfigKey(["failure"]), as: TestStringConvertible.self) == nil)
             #expect(config.stringArray(forKey: "failure", as: TestStringConvertible.self) == nil)
 
             // Defaulted - success
-            #expect(
-                config.stringArray(
-                    forKey: ConfigKey(["stringConvertibleArray"]),
-                    as: TestStringConvertible.self,
-                    default: Defaults.otherStringConvertibleArray
-                ) == Defaults.stringConvertibleArray
-            )
             #expect(
                 config.stringArray(
                     forKey: "stringConvertibleArray",
@@ -73,13 +57,6 @@ struct ConfigReaderMethodTestsGet3 {
             // Defaulted - missing
             #expect(
                 config.stringArray(
-                    forKey: ConfigKey(["absentStringConvertibleArray"]),
-                    as: TestStringConvertible.self,
-                    default: Defaults.otherStringConvertibleArray
-                ) == Defaults.otherStringConvertibleArray
-            )
-            #expect(
-                config.stringArray(
                     forKey: "absentStringConvertibleArray",
                     as: TestStringConvertible.self,
                     default: Defaults.otherStringConvertibleArray
@@ -87,13 +64,6 @@ struct ConfigReaderMethodTestsGet3 {
             )
 
             // Defaulted - failing
-            #expect(
-                config.stringArray(
-                    forKey: ConfigKey(["failure"]),
-                    as: TestStringConvertible.self,
-                    default: Defaults.otherStringConvertibleArray
-                ) == Defaults.otherStringConvertibleArray
-            )
             #expect(
                 config.stringArray(
                     forKey: "failure",
@@ -104,74 +74,38 @@ struct ConfigReaderMethodTestsGet3 {
 
             // Required - success
             #expect(
-                try config.requiredStringArray(
-                    forKey: ConfigKey(["stringConvertibleArray"]),
-                    as: TestStringConvertible.self
-                ) == Defaults.stringConvertibleArray
-            )
-            #expect(
                 try config.requiredStringArray(forKey: "stringConvertibleArray", as: TestStringConvertible.self)
                     == Defaults.stringConvertibleArray
             )
 
             // Required - missing
             let error1 = #expect(throws: ConfigError.self) {
-                try config.requiredStringArray(
-                    forKey: ConfigKey(["absentStringConvertibleArray"]),
-                    as: TestStringConvertible.self
-                )
-            }
-            #expect(error1 == .missingRequiredConfigValue(AbsoluteConfigKey(["absentStringConvertibleArray"])))
-            let error2 = #expect(throws: ConfigError.self) {
                 try config.requiredStringArray(forKey: "absentStringConvertibleArray", as: TestStringConvertible.self)
             }
-            #expect(error2 == .missingRequiredConfigValue(AbsoluteConfigKey(["absentStringConvertibleArray"])))
+            #expect(error1 == .missingRequiredConfigValue(AbsoluteConfigKey(["absentStringConvertibleArray"])))
 
             // Required - failing
-            #expect(throws: TestProvider.TestError.self) {
-                try config.requiredStringArray(forKey: ConfigKey(["failure"]), as: TestStringConvertible.self)
-            }
             #expect(throws: TestProvider.TestError.self) {
                 try config.requiredStringArray(forKey: "failure", as: TestStringConvertible.self)
             }
         }
         do {
             // Optional - success
-            #expect(
-                config.stringArray(forKey: ConfigKey(["stringEnumArray"]), as: TestEnum.self)
-                    == Defaults.stringEnumArray
-            )
             #expect(config.stringArray(forKey: "stringEnumArray", as: TestEnum.self) == Defaults.stringEnumArray)
 
             // Optional - missing
-            #expect(config.stringArray(forKey: ConfigKey(["absentStringEnumArray"]), as: TestEnum.self) == nil)
             #expect(config.stringArray(forKey: "absentStringEnumArray", as: TestEnum.self) == nil)
 
             // Optional - failing
-            #expect(config.stringArray(forKey: ConfigKey(["failure"]), as: TestEnum.self) == nil)
             #expect(config.stringArray(forKey: "failure", as: TestEnum.self) == nil)
 
             // Defaulted - success
-            #expect(
-                config.stringArray(
-                    forKey: ConfigKey(["stringEnumArray"]),
-                    as: TestEnum.self,
-                    default: Defaults.otherStringEnumArray
-                ) == Defaults.stringEnumArray
-            )
             #expect(
                 config.stringArray(forKey: "stringEnumArray", as: TestEnum.self, default: Defaults.otherStringEnumArray)
                     == Defaults.stringEnumArray
             )
 
             // Defaulted - missing
-            #expect(
-                config.stringArray(
-                    forKey: ConfigKey(["absentStringEnumArray"]),
-                    as: TestEnum.self,
-                    default: Defaults.otherStringEnumArray
-                ) == Defaults.otherStringEnumArray
-            )
             #expect(
                 config.stringArray(
                     forKey: "absentStringEnumArray",
@@ -182,40 +116,22 @@ struct ConfigReaderMethodTestsGet3 {
 
             // Defaulted - failing
             #expect(
-                config.stringArray(
-                    forKey: ConfigKey(["failure"]),
-                    as: TestEnum.self,
-                    default: Defaults.otherStringEnumArray
-                ) == Defaults.otherStringEnumArray
-            )
-            #expect(
                 config.stringArray(forKey: "failure", as: TestEnum.self, default: Defaults.otherStringEnumArray)
                     == Defaults.otherStringEnumArray
             )
 
             // Required - success
             #expect(
-                try config.requiredStringArray(forKey: ConfigKey(["stringEnumArray"]), as: TestEnum.self)
-                    == Defaults.stringEnumArray
-            )
-            #expect(
                 try config.requiredStringArray(forKey: "stringEnumArray", as: TestEnum.self) == Defaults.stringEnumArray
             )
 
             // Required - missing
             let error1 = #expect(throws: ConfigError.self) {
-                try config.requiredStringArray(forKey: ConfigKey(["absentStringEnumArray"]), as: TestEnum.self)
-            }
-            #expect(error1 == .missingRequiredConfigValue(AbsoluteConfigKey(["absentStringEnumArray"])))
-            let error2 = #expect(throws: ConfigError.self) {
                 try config.requiredStringArray(forKey: "absentStringEnumArray", as: TestEnum.self)
             }
-            #expect(error2 == .missingRequiredConfigValue(AbsoluteConfigKey(["absentStringEnumArray"])))
+            #expect(error1 == .missingRequiredConfigValue(AbsoluteConfigKey(["absentStringEnumArray"])))
 
             // Required - failing
-            #expect(throws: TestProvider.TestError.self) {
-                try config.requiredStringArray(forKey: ConfigKey(["failure"]), as: TestEnum.self)
-            }
             #expect(throws: TestProvider.TestError.self) {
                 try config.requiredStringArray(forKey: "failure", as: TestEnum.self)
             }

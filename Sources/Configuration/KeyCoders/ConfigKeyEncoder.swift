@@ -38,8 +38,8 @@
 ///
 /// ## See also
 ///
-/// - ``ConfigKeyDecoder`` - For decoding strings back to keys
 /// - ``AbsoluteConfigKey`` - The structured key representation
+@available(Configuration 1.0, *)
 public protocol ConfigKeyEncoder: Sendable {
 
     /// Encodes a structured configuration key into its string representation.

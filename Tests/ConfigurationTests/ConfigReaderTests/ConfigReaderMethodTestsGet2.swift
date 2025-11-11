@@ -35,31 +35,16 @@ struct ConfigReaderMethodTestsGet2 {
         do {
             // Optional - success
             #expect(
-                config.string(forKey: ConfigKey(["stringConvertible"]), as: TestStringConvertible.self)
-                    == Defaults.stringConvertible
-            )
-            #expect(
                 config.string(forKey: "stringConvertible", as: TestStringConvertible.self) == Defaults.stringConvertible
             )
 
             // Optional - missing
-            #expect(
-                config.string(forKey: ConfigKey(["absentStringConvertible"]), as: TestStringConvertible.self) == nil
-            )
             #expect(config.string(forKey: "absentStringConvertible", as: TestStringConvertible.self) == nil)
 
             // Optional - failing
-            #expect(config.string(forKey: ConfigKey(["failure"]), as: TestStringConvertible.self) == nil)
             #expect(config.string(forKey: "failure", as: TestStringConvertible.self) == nil)
 
             // Defaulted - success
-            #expect(
-                config.string(
-                    forKey: ConfigKey(["stringConvertible"]),
-                    as: TestStringConvertible.self,
-                    default: Defaults.otherStringConvertible
-                ) == Defaults.stringConvertible
-            )
             #expect(
                 config.string(
                     forKey: "stringConvertible",
@@ -71,13 +56,6 @@ struct ConfigReaderMethodTestsGet2 {
             // Defaulted - missing
             #expect(
                 config.string(
-                    forKey: ConfigKey(["absentStringConvertible"]),
-                    as: TestStringConvertible.self,
-                    default: Defaults.otherStringConvertible
-                ) == Defaults.otherStringConvertible
-            )
-            #expect(
-                config.string(
                     forKey: "absentStringConvertible",
                     as: TestStringConvertible.self,
                     default: Defaults.otherStringConvertible
@@ -85,13 +63,6 @@ struct ConfigReaderMethodTestsGet2 {
             )
 
             // Defaulted - failing
-            #expect(
-                config.string(
-                    forKey: ConfigKey(["failure"]),
-                    as: TestStringConvertible.self,
-                    default: Defaults.otherStringConvertible
-                ) == Defaults.otherStringConvertible
-            )
             #expect(
                 config.string(
                     forKey: "failure",
@@ -102,53 +73,32 @@ struct ConfigReaderMethodTestsGet2 {
 
             // Required - success
             #expect(
-                try config.requiredString(forKey: ConfigKey(["stringConvertible"]), as: TestStringConvertible.self)
-                    == Defaults.stringConvertible
-            )
-            #expect(
                 try config.requiredString(forKey: "stringConvertible", as: TestStringConvertible.self)
                     == Defaults.stringConvertible
             )
 
             // Required - missing
             let error1 = #expect(throws: ConfigError.self) {
-                try config.requiredString(
-                    forKey: ConfigKey(["absentStringConvertible"]),
-                    as: TestStringConvertible.self
-                )
-            }
-            #expect(error1 == .missingRequiredConfigValue(AbsoluteConfigKey(["absentStringConvertible"])))
-            let error2 = #expect(throws: ConfigError.self) {
                 try config.requiredString(forKey: "absentStringConvertible", as: TestStringConvertible.self)
             }
-            #expect(error2 == .missingRequiredConfigValue(AbsoluteConfigKey(["absentStringConvertible"])))
+            #expect(error1 == .missingRequiredConfigValue(AbsoluteConfigKey(["absentStringConvertible"])))
 
             // Required - failing
-            #expect(throws: TestProvider.TestError.self) {
-                try config.requiredString(forKey: ConfigKey(["failure"]), as: TestStringConvertible.self)
-            }
             #expect(throws: TestProvider.TestError.self) {
                 try config.requiredString(forKey: "failure", as: TestStringConvertible.self)
             }
         }
         do {
             // Optional - success
-            #expect(config.string(forKey: ConfigKey(["stringEnum"]), as: TestEnum.self) == Defaults.stringEnum)
             #expect(config.string(forKey: "stringEnum", as: TestEnum.self) == Defaults.stringEnum)
 
             // Optional - missing
-            #expect(config.string(forKey: ConfigKey(["absentStringEnum"]), as: TestEnum.self) == nil)
             #expect(config.string(forKey: "absentStringEnum", as: TestEnum.self) == nil)
 
             // Optional - failing
-            #expect(config.string(forKey: ConfigKey(["failure"]), as: TestEnum.self) == nil)
             #expect(config.string(forKey: "failure", as: TestEnum.self) == nil)
 
             // Defaulted - success
-            #expect(
-                config.string(forKey: ConfigKey(["stringEnum"]), as: TestEnum.self, default: Defaults.otherStringEnum)
-                    == Defaults.stringEnum
-            )
             #expect(
                 config.string(forKey: "stringEnum", as: TestEnum.self, default: Defaults.otherStringEnum)
                     == Defaults.stringEnum
@@ -156,47 +106,26 @@ struct ConfigReaderMethodTestsGet2 {
 
             // Defaulted - missing
             #expect(
-                config.string(
-                    forKey: ConfigKey(["absentStringEnum"]),
-                    as: TestEnum.self,
-                    default: Defaults.otherStringEnum
-                ) == Defaults.otherStringEnum
-            )
-            #expect(
                 config.string(forKey: "absentStringEnum", as: TestEnum.self, default: Defaults.otherStringEnum)
                     == Defaults.otherStringEnum
             )
 
             // Defaulted - failing
             #expect(
-                config.string(forKey: ConfigKey(["failure"]), as: TestEnum.self, default: Defaults.otherStringEnum)
-                    == Defaults.otherStringEnum
-            )
-            #expect(
                 config.string(forKey: "failure", as: TestEnum.self, default: Defaults.otherStringEnum)
                     == Defaults.otherStringEnum
             )
 
             // Required - success
-            #expect(
-                try config.requiredString(forKey: ConfigKey(["stringEnum"]), as: TestEnum.self) == Defaults.stringEnum
-            )
             #expect(try config.requiredString(forKey: "stringEnum", as: TestEnum.self) == Defaults.stringEnum)
 
             // Required - missing
             let error1 = #expect(throws: ConfigError.self) {
-                try config.requiredString(forKey: ConfigKey(["absentStringEnum"]), as: TestEnum.self)
-            }
-            #expect(error1 == .missingRequiredConfigValue(AbsoluteConfigKey(["absentStringEnum"])))
-            let error2 = #expect(throws: ConfigError.self) {
                 try config.requiredString(forKey: "absentStringEnum", as: TestEnum.self)
             }
-            #expect(error2 == .missingRequiredConfigValue(AbsoluteConfigKey(["absentStringEnum"])))
+            #expect(error1 == .missingRequiredConfigValue(AbsoluteConfigKey(["absentStringEnum"])))
 
             // Required - failing
-            #expect(throws: TestProvider.TestError.self) {
-                try config.requiredString(forKey: ConfigKey(["failure"]), as: TestEnum.self)
-            }
             #expect(throws: TestProvider.TestError.self) {
                 try config.requiredString(forKey: "failure", as: TestEnum.self)
             }

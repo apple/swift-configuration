@@ -42,6 +42,7 @@ import Foundation
 /// // Multi-level hierarchy
 /// encoder.encode(["app", "database", "connectionPool", "maxSize"]) // "--app-database-connection-pool-max-size"
 /// ```
+@available(Configuration 1.0, *)
 internal struct CLIKeyEncoder {
 
     /// Converts a camelCase string to dash-case.
@@ -81,6 +82,7 @@ internal struct CLIKeyEncoder {
     }
 }
 
+@available(Configuration 1.0, *)
 extension CLIKeyEncoder: ConfigKeyEncoder {
     // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
     func encode(_ key: AbsoluteConfigKey) -> String {
