@@ -13,6 +13,11 @@
 //===----------------------------------------------------------------------===//
 
 import SystemPackage
+#if canImport(FoundationEssentials)
+import FoundationEssentials
+#else
+import Foundation
+#endif
 
 /// Prints a string to the standard error stream.
 ///
@@ -28,5 +33,22 @@ extension StringProtocol {
     /// - Returns: The trimmed string.
     internal func trimmed() -> String {
         String(trimmingPrefix(while: \.isWhitespace).reversed().trimmingPrefix(while: \.isWhitespace).reversed())
+    }
+}
+
+extension Error {
+    /// Inspects whether the error represents a file not found.
+    internal var isFileNotFoundError: Bool {
+        if let posixError = self as? POSIXError {
+            return posixError.code == POSIXError.Code.ENOENT
+        }
+        if let cocoaError = self as? CocoaError, cocoaError.isFileError {
+            return [
+                CocoaError.fileNoSuchFile,
+                CocoaError.fileReadNoSuchFile,
+            ]
+            .contains(cocoaError.code)
+        }
+        return false
     }
 }

@@ -24,68 +24,95 @@ package import SystemPackage
 package protocol CommonProviderFileSystem: Sendable {
     /// Loads the file contents at the specified file path.
     /// - Parameter filePath: The path to the file.
-    /// - Returns: The byte contents of the file.
+    /// - Returns: The byte contents of the file. Nil if file is missing.
     /// - Throws: When the file cannot be read.
-    func fileContents(atPath filePath: FilePath) async throws -> Data
+    func fileContents(atPath filePath: FilePath) async throws -> Data?
 
     /// Reads the last modified timestamp of the file, if it exists.
     /// - Parameter filePath: The file path to check.
-    /// - Returns: The last modified timestamp, if found. Nil if the file is not found.
+    /// - Returns: The last modified timestamp. Nil if file is missing.
     /// - Throws: When any other attribute reading error occurs.
-    func lastModifiedTimestamp(atPath filePath: FilePath) async throws -> Date
+    func lastModifiedTimestamp(atPath filePath: FilePath) async throws -> Date?
 
     /// Lists all regular file names in the specified directory.
     /// - Parameter directoryPath: The path to the directory.
-    /// - Returns: An array of file names in the directory.
+    /// - Returns: An array of file names in the directory. Nil if file is missing.
     /// - Throws: When the directory cannot be read or doesn't exist.
-    func listFileNames(atPath directoryPath: FilePath) async throws -> [String]
+    func listFileNames(atPath directoryPath: FilePath) async throws -> [String]?
 
     /// Resolves symlinks and returns the real file path.
     ///
     /// If the provided path is not a symlink, returns the same unmodified path.
     /// - Parameter filePath: The file path that may contain symlinks.
-    /// - Returns: The resolved file path with symlinks resolved.
+    /// - Returns: The resolved file path with symlinks resolved. Nil if file is missing.
     /// - Throws: When the path cannot be resolved.
-    func resolveSymlinks(atPath filePath: FilePath) async throws -> FilePath
+    func resolveSymlinks(atPath filePath: FilePath) async throws -> FilePath?
+}
+
+/// The error thrown by the file system.
+package enum FileSystemError: Error, CustomStringConvertible {
+    /// The directory was not found at the provided path.
+    case directoryNotFound(path: FilePath)
+
+    /// The file was not found at the provided path.
+    case fileNotFound(path: FilePath)
+
+    /// Failed to read a file in the directory.
+    case fileReadError(filePath: FilePath, underlyingError: any Error)
+
+    /// Failed to read a file in the directory.
+    case missingLastModifiedTimestampAttribute(filePath: FilePath)
+
+    /// The path exists but is not a directory.
+    case notADirectory(path: FilePath)
+
+    package var description: String {
+        switch self {
+        case .directoryNotFound(let path):
+            return "Directory not found at path: \(path)."
+        case .fileNotFound(let path):
+            return "File not found at path: \(path)."
+        case .fileReadError(let filePath, let error):
+            return "Failed to read file '\(filePath)': \(error)."
+        case .missingLastModifiedTimestampAttribute(let filePath):
+            return "Missing last modified timestamp attribute for file '\(filePath)."
+        case .notADirectory(let path):
+            return "Path exists but is not a directory: \(path)."
+        }
+    }
 }
 
 /// A file system implementation that uses the local file system.
 @available(Configuration 1.0, *)
-package struct LocalCommonProviderFileSystem: Sendable {
-    /// The error thrown by the file system.
-    package enum FileSystemError: Error, CustomStringConvertible {
-        /// The directory was not found at the provided path.
-        case directoryNotFound(path: FilePath)
+package struct LocalCommonProviderFileSystem: Sendable {}
 
-        /// Failed to read a file in the directory.
-        case fileReadError(filePath: FilePath, underlyingError: any Error)
-
-        /// Failed to read a file in the directory.
-        case missingLastModifiedTimestampAttribute(filePath: FilePath)
-
-        /// The path exists but is not a directory.
-        case notADirectory(path: FilePath)
-
-        package var description: String {
-            switch self {
-            case .directoryNotFound(let path):
-                return "Directory not found at path: \(path)."
-            case .fileReadError(let filePath, let error):
-                return "Failed to read file '\(filePath)': \(error)."
-            case .missingLastModifiedTimestampAttribute(let filePath):
-                return "Missing last modified timestamp attribute for file '\(filePath)."
-            case .notADirectory(let path):
-                return "Path exists but is not a directory: \(path)."
-            }
+/// A utility function that wraps an async throwing operation and returns `nil` if the operation
+/// fails with a file not found error, otherwise returns the result or rethrows other errors.
+///
+/// - Parameter body: A body closure that performs the file system operation.
+/// - Returns: The result of the operation, or `nil` if the file was not found.
+/// - Throws: Any error from the operation except file not found errors.
+private func returnNilIfMissing<Return>(
+    _ body: () async throws -> Return
+) async throws -> Return? {
+    do {
+        return try await body()
+    } catch {
+        if error.isFileNotFoundError {
+            return nil
         }
+        throw error
     }
 }
 
 @available(Configuration 1.0, *)
 extension LocalCommonProviderFileSystem: CommonProviderFileSystem {
-    package func fileContents(atPath filePath: FilePath) async throws -> Data {
+
+    package func fileContents(atPath filePath: FilePath) async throws -> Data? {
         do {
-            return try Data(contentsOf: URL(filePath: filePath.string))
+            return try await returnNilIfMissing {
+                try Data(contentsOf: URL(filePath: filePath.string))
+            }
         } catch {
             throw FileSystemError.fileReadError(
                 filePath: filePath,
@@ -94,17 +121,19 @@ extension LocalCommonProviderFileSystem: CommonProviderFileSystem {
         }
     }
 
-    package func lastModifiedTimestamp(atPath filePath: FilePath) async throws -> Date {
-        guard
-            let timestamp = try FileManager().attributesOfItem(atPath: filePath.string)[.modificationDate]
-                as? Date
-        else {
-            throw FileSystemError.missingLastModifiedTimestampAttribute(filePath: filePath)
+    package func lastModifiedTimestamp(atPath filePath: FilePath) async throws -> Date? {
+        try await returnNilIfMissing {
+            guard
+                let timestamp = try FileManager().attributesOfItem(atPath: filePath.string)[.modificationDate]
+                    as? Date
+            else {
+                throw FileSystemError.missingLastModifiedTimestampAttribute(filePath: filePath)
+            }
+            return timestamp
         }
-        return timestamp
     }
 
-    package func listFileNames(atPath directoryPath: FilePath) async throws -> [String] {
+    package func listFileNames(atPath directoryPath: FilePath) async throws -> [String]? {
         let fileManager = FileManager.default
         #if canImport(Darwin)
         var isDirectoryWrapper: ObjCBool = false
@@ -112,7 +141,7 @@ extension LocalCommonProviderFileSystem: CommonProviderFileSystem {
         var isDirectoryWrapper: Bool = false
         #endif
         guard fileManager.fileExists(atPath: directoryPath.string, isDirectory: &isDirectoryWrapper) else {
-            throw FileSystemError.directoryNotFound(path: directoryPath)
+            return nil
         }
         #if canImport(Darwin)
         let isDirectory = isDirectoryWrapper.boolValue
@@ -138,7 +167,9 @@ extension LocalCommonProviderFileSystem: CommonProviderFileSystem {
             }
     }
 
-    package func resolveSymlinks(atPath filePath: FilePath) async throws -> FilePath {
-        FilePath(URL(filePath: filePath.string).resolvingSymlinksInPath().path())
+    package func resolveSymlinks(atPath filePath: FilePath) async throws -> FilePath? {
+        try await returnNilIfMissing {
+            FilePath(URL(filePath: filePath.string).resolvingSymlinksInPath().path())
+        }
     }
 }
