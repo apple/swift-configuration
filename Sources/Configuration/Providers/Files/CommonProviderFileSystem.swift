@@ -92,6 +92,7 @@ package struct LocalCommonProviderFileSystem: Sendable {}
 /// - Parameter body: A body closure that performs the file system operation.
 /// - Returns: The result of the operation, or `nil` if the file was not found.
 /// - Throws: Any error from the operation except file not found errors.
+@available(Configuration 1.0, *)
 private func returnNilIfMissing<Return>(
     _ body: () async throws -> Return
 ) async throws -> Return? {
