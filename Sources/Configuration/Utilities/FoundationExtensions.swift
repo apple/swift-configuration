@@ -40,7 +40,7 @@ extension Error {
     /// Inspects whether the error represents a file not found.
     internal var isFileNotFoundError: Bool {
         if let posixError = self as? POSIXError {
-            return posixError.code == POSIXError.Code.ENOENT
+            return posixError.code == POSIXError.ENOENT
         }
         if let cocoaError = self as? CocoaError, cocoaError.isFileError {
             return [
