@@ -93,3 +93,29 @@ public protocol FileConfigSnapshot: ConfigSnapshot, CustomStringConvertible,
     /// - Throws: If the file data cannot be parsed or contains invalid configuration.
     init(data: RawSpan, providerName: String, parsingOptions: ParsingOptions) throws
 }
+
+@available(Configuration 1.0, *)
+internal struct EmptyFileConfigSnapshot: Sendable {
+    var providerName: String
+}
+
+@available(Configuration 1.0, *)
+extension EmptyFileConfigSnapshot: ConfigSnapshot {
+    func value(forKey key: AbsoluteConfigKey, type: ConfigType) throws -> LookupResult {
+        .init(encodedKey: key.description, value: nil)
+    }
+}
+
+@available(Configuration 1.0, *)
+extension EmptyFileConfigSnapshot: CustomStringConvertible {
+    var description: String {
+        "\(providerName)[empty]"
+    }
+}
+
+@available(Configuration 1.0, *)
+extension EmptyFileConfigSnapshot: CustomDebugStringConvertible {
+    var debugDescription: String {
+        description
+    }
+}

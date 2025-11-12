@@ -9,12 +9,6 @@ import Foundation
 
 let defaultTraits: Set<String> = [
     "JSONSupport"
-
-    // Disabled due to a bug in SwiftPM with traits that pull in an external dependency.
-    // Once that's fixed in Swift 6.2.x, we can enable these traits by default.
-    // Open fix: https://github.com/swiftlang/swift-package-manager/pull/9136
-    // "LoggingSupport",
-    // "ReloadingSupport",
 ]
 
 var traits: Set<Trait> = [
@@ -146,9 +140,6 @@ let package = Package(
                 "ConfigReaderTests/ConfigSnapshotReaderMethodTestsGet1.swift.gyb",
                 "ConfigReaderTests/ConfigSnapshotReaderMethodTestsGet2.swift.gyb",
                 "ConfigReaderTests/ConfigSnapshotReaderMethodTestsGet3.swift.gyb",
-            ],
-            resources: [
-                .copy("Resources")
             ]
         ),
 
@@ -188,7 +179,11 @@ for target in package.targets {
     // https://docs.swift.org/compiler/documentation/diagnostics/nonisolated-nonsending-by-default/
     settings.append(.enableUpcomingFeature("NonisolatedNonsendingByDefault"))
 
-    settings.append(.enableExperimentalFeature("AvailabilityMacro=Configuration 1.0:macOS 15.0, iOS 18.0, watchOS 11.0, tvOS 18.0, visionOS 2.0"))
+    settings.append(
+        .enableExperimentalFeature(
+            "AvailabilityMacro=Configuration 1.0:macOS 15.0, iOS 18.0, watchOS 11.0, tvOS 18.0, visionOS 2.0"
+        )
+    )
 
     if enableAllCIFlags {
         // Ensure all public types are explicitly annotated as Sendable or not Sendable.

@@ -21,8 +21,88 @@ import Foundation
 import ConfigurationTesting
 import SystemPackage
 
-private let resourcesPath = FilePath(try! #require(Bundle.module.path(forResource: "Resources", ofType: nil)))
-let jsonConfigFile = resourcesPath.appending("/config.json")
+let jsonTestFileContents = """
+    {
+        "string": "Hello",
+        "int": 42,
+        "double": 3.14,
+        "bool": true,
+        "bytes": "bWFnaWM=",
+
+        "other": {
+            "string": "Other Hello",
+            "int": 24,
+            "double": 2.72,
+            "bool": false,
+            "bytes": "bWFnaWMy",
+
+            "stringy": {
+                "array": [
+                    "Hello",
+                    "Swift"
+                ]
+            },
+            "inty": {
+                "array": [
+                    16,
+                    32
+                ]
+            },
+            "doubly": {
+                "array": [
+                    0.9,
+                    1.8
+                ]
+            },
+            "booly": {
+                "array": [
+                    false,
+                    true,
+                    true
+                ]
+            },
+            "byteChunky": {
+                "array": [
+                    "bWFnaWM=",
+                    "bWFnaWMy",
+                    "bWFnaWM="
+                ]
+            }
+        },
+
+        "stringy": {
+            "array": [
+                "Hello",
+                "World"
+            ]
+        },
+        "inty": {
+            "array": [
+                42,
+                24
+            ]
+        },
+        "doubly": {
+            "array": [
+                3.14,
+                2.72
+            ]
+        },
+        "booly": {
+            "array": [
+                true,
+                false
+            ]
+        },
+        "byteChunky": {
+            "array": [
+                "bWFnaWM=",
+                "bWFnaWMy"
+            ]
+        }
+    }
+
+    """
 
 struct JSONFileProviderTests {
 
@@ -30,7 +110,7 @@ struct JSONFileProviderTests {
     var provider: JSONSnapshot {
         get throws {
             try JSONSnapshot(
-                data: Data(contentsOf: URL(filePath: jsonConfigFile.string)).bytes,
+                data: Data(jsonTestFileContents.utf8).bytes,
                 providerName: "TestProvider",
                 parsingOptions: .default
             )
@@ -55,8 +135,16 @@ struct JSONFileProviderTests {
 
     @available(Configuration 1.0, *)
     @Test func compat() async throws {
+        let fileSystem = InMemoryFileSystem(files: [
+            "/etc/config.json": .file(timestamp: .now, contents: jsonTestFileContents)
+        ])
         try await ProviderCompatTest(
-            provider: FileProvider<JSONSnapshot>(filePath: jsonConfigFile)
+            provider: FileProvider<JSONSnapshot>(
+                parsingOptions: .default,
+                filePath: "/etc/config.json",
+                allowMissing: false,
+                fileSystem: fileSystem
+            )
         )
         .runTest()
     }

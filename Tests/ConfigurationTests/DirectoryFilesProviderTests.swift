@@ -65,6 +65,7 @@ struct DirectoryFilesProviderTests {
         let fileSystem = InMemoryFileSystem(files: Self.testFiles)
         let provider = try await DirectoryFilesProvider(
             directoryPath: "/test",
+            allowMissing: false,
             fileSystem: fileSystem
         )
 
@@ -76,6 +77,7 @@ struct DirectoryFilesProviderTests {
         let fileSystem = InMemoryFileSystem(files: Self.testFiles)
         let provider = try await DirectoryFilesProvider(
             directoryPath: "/test",
+            allowMissing: false,
             fileSystem: fileSystem,
             secretsSpecifier: .specific(["database-password"])
         )
@@ -91,6 +93,7 @@ struct DirectoryFilesProviderTests {
         let fileSystem = InMemoryFileSystem(files: Self.testFiles)
         let provider = try await DirectoryFilesProvider(
             directoryPath: "/test",
+            allowMissing: false,
             fileSystem: fileSystem
         )
         try await ProviderCompatTest(
@@ -101,5 +104,32 @@ struct DirectoryFilesProviderTests {
             ])
         )
         .runTest()
+    }
+
+    @available(Configuration 1.0, *)
+    @Test func missingDirectoryMissingError() async throws {
+        let fileSystem = InMemoryFileSystem(files: [:])
+        let error = await #expect(throws: FileSystemError.self) {
+            _ = try await DirectoryFilesProvider(
+                directoryPath: "/test",
+                allowMissing: false,
+                fileSystem: fileSystem
+            )
+        }
+        guard case .directoryNotFound(let filePath) = error else {
+            Issue.record("Incorrect error thrown: \(error)")
+            return
+        }
+        #expect(filePath == "/test")
+    }
+
+    @available(Configuration 1.0, *)
+    @Test func missingDirectoryAllowedMissing() async throws {
+        let fileSystem = InMemoryFileSystem(files: [:])
+        _ = try await DirectoryFilesProvider(
+            directoryPath: "/test",
+            allowMissing: true,
+            fileSystem: fileSystem
+        )
     }
 }

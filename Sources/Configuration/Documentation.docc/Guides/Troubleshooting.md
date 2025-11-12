@@ -82,6 +82,45 @@ When no provider has the requested value:
 - **Methods without defaults**: Return nil.
 - **Required methods**: Throw an error.
 
+#### File not found errors
+
+File-based providers (``FileProvider``, ``ReloadingFileProvider``, ``DirectoryFilesProvider``, ``EnvironmentVariablesProvider`` with file path) can throw "file not found" errors when expected configuration files don't exist.
+
+Common scenarios and solutions:
+
+**Optional configuration files:**
+```swift
+// Problem: App crashes when optional config file is missing
+let provider = try await FileProvider<JSONSnapshot>(filePath: "/etc/optional-config.json")
+
+// Solution: Use allowMissing parameter
+let provider = try await FileProvider<JSONSnapshot>(
+    filePath: "/etc/optional-config.json",
+    allowMissing: true
+)
+```
+
+**Environment-specific files:**
+```swift
+// Different environments may have different config files
+let configPath = "/etc/\(environment)/config.json"
+let provider = try await FileProvider<JSONSnapshot>(
+    filePath: configPath,
+    allowMissing: true  // Gracefully handle missing env-specific configs
+)
+```
+
+**Container startup issues:**
+```swift
+// Config files might not be ready when container starts
+let provider = try await ReloadingFileProvider<JSONSnapshot>(
+    filePath: "/mnt/config/app.json",
+    allowMissing: true  // Allow startup with empty config, load when available
+)
+```
+
+> Important: The `allowMissing` parameter only affects missing files or directories. Files with syntax errors (invalid JSON, YAML, and so on) will still throw parsing errors.
+
 ### Reloading provider troubleshooting
 
 #### Configuration not updating

@@ -77,6 +77,71 @@ such as Kubernetes secrets mounted into a container's filesystem.
 
 > Tip: For comprehensive guidance on handling secrets securely, see <doc:Handling-secrets-correctly>.
 
+### Handling optional configuration files
+
+File-based providers support an `allowMissing` parameter to control whether missing files should throw an error or be treated as empty configuration. This is useful when configuration files are optional.
+
+When `allowMissing` is `false` (the default), missing files throw an error:
+
+```swift
+import Configuration
+
+// This will throw an error if config.json doesn't exist
+let config = ConfigReader(
+    provider: try await FileProvider<JSONSnapshot>(
+        filePath: "/etc/config.json",
+        allowMissing: false  // This is the default
+    )
+)
+```
+
+When `allowMissing` is `true`, missing files are treated as empty configuration:
+
+```swift
+import Configuration
+
+// This won't throw if config.json is missing - treats it as empty
+let config = ConfigReader(
+    provider: try await FileProvider<JSONSnapshot>(
+        filePath: "/etc/config.json",
+        allowMissing: true
+    )
+)
+
+// Returns the default value if the file is missing
+let port = config.int(forKey: "server.port", default: 8080)
+```
+
+The same applies to other file-based providers:
+
+```swift
+// Optional secrets directory
+let secretsConfig = ConfigReader(
+    provider: try await DirectoryFilesProvider(
+        directoryPath: "/run/secrets",
+        allowMissing: true
+    )
+)
+
+// Optional environment file
+let envConfig = ConfigReader(
+    provider: try await EnvironmentVariablesProvider(
+        environmentFilePath: "/etc/app.env",
+        allowMissing: true
+    )
+)
+
+// Optional reloading configuration
+let reloadingConfig = ConfigReader(
+    provider: try await ReloadingFileProvider<YAMLSnapshot>(
+        filePath: "/etc/dynamic-config.yaml",
+        allowMissing: true
+    )
+)
+```
+
+> Important: The `allowMissing` parameter only affects missing files. Malformed files, such as invalid JSON and YAML syntax errors will still throw parsing errors regardless of this setting.
+
 ### Setting up a fallback hierarchy
 
 Use multiple providers together to provide a configuration hierarchy that can override values at different levels.
