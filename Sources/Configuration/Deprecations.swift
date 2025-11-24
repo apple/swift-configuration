@@ -79,7 +79,6 @@ extension ConfigReader {
         let snapshotReader = ConfigSnapshotReader(
             keyPrefix: keyPrefix,
             storage: .init(
-                keyDecoder: keyDecoder,
                 snapshot: multiSnapshot,
                 accessReporter: accessReporter
             )
