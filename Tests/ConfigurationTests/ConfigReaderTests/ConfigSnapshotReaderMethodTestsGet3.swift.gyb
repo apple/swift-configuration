@@ -35,7 +35,9 @@ struct ConfigSnapshotReaderMethodTestsGet3 {
         % test_type = string_convertible_type["testType"]
         % test_suffix = string_convertible_type["testSuffix"] + "Array"
         % lower_test_suffix = lower_first(test_suffix)
-        try config.withSnapshot { snapshot in
+        do { 
+            let snapshot = config.snapshot()
+
             // Optional - success
             #expect(snapshot.stringArray(forKey: "${lower_test_suffix}", as: ${test_type}.self) == Defaults.${lower_test_suffix})
 

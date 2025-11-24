@@ -358,7 +358,7 @@ Read <doc:Handling-secrets-correctly> for guidance on best practices for secrets
 #### Consistent snapshots
 
 Retrieve related values from a consistent snapshot using ``ConfigSnapshotReader``, which you
-get from calling ``ConfigReader/withSnapshot(_:)``.
+get by calling ``ConfigReader/snapshot()``.
 
 This ensures that multiple values are read from a single snapshot inside each provider, even when using
 providers that update their internal values.
@@ -366,11 +366,10 @@ For example by downloading new data periodically:
 
 ```swift
 let config = /* a reader with one or more providers that change values over time */
-try config.withSnapshot { snapshot in
-    let certificate = try snapshot.requiredString(forKey: "mtls.certificate")
-    let privateKey = try snapshot.requiredString(forKey: "mtls.privateKey", isSecret: true)
-    // `certificate` and `privateKey` are guaranteed to come from the same snapshot in the provider
-}
+let snapshot = config.snapshot()
+let certificate = try snapshot.requiredString(forKey: "mtls.certificate")
+let privateKey = try snapshot.requiredString(forKey: "mtls.privateKey", isSecret: true)
+// `certificate` and `privateKey` are guaranteed to come from the same snapshot in the provider
 ```
 
 #### Extensible ecosystem

@@ -3,7 +3,7 @@
 ## Topics
 
 ### Creating a snapshot
-- ``ConfigReader/withSnapshot(_:)``
+- ``ConfigReader/snapshot()``
 - ``ConfigReader/watchSnapshot(fileID:line:updatesHandler:)``
 
 ### Namespacing

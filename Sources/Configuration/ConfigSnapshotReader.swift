@@ -22,20 +22,19 @@ import Synchronization
 ///
 /// ## Usage
 ///
-/// Get a ``ConfigSnapshotReader`` from a ``ConfigReader`` by using ``ConfigReader/withSnapshot(_:)``
-/// to retrieve a snapshot. The values of the snapshot are guaranteed to be from the same point in time:
+/// Get a ``ConfigSnapshotReader`` from a ``ConfigReader`` by using ``ConfigReader/snapshot()``
+/// to retrieve a snapshot. All values in the snapshot are guaranteed to be from the same point in time:
 /// ```swift
 /// // Get a snapshot from a ConfigReader
 /// let config = ConfigReader(provider: EnvironmentVariablesProvider())
-/// let result = config.withSnapshot { snapshot in
-///     // Use snapshot to read config values
-///     let cert = snapshot.string(forKey: "cert")
-///     let privateKey = snapshot.string(forKey: "privateKey")
-///     // Ensures that both values are coming from the same
-///     // underlying snapshot and that a provider didn't change
-///     // its internal state between the two `string(...)` calls.
-///     return MyCert(cert: cert, privateKey: privateKey)
-/// }
+/// let snapshot = config.snapshot()
+/// // Use snapshot to read config values
+/// let cert = snapshot.string(forKey: "cert")
+/// let privateKey = snapshot.string(forKey: "privateKey")
+/// // Ensures that both values are coming from the same
+/// // underlying snapshot and that a provider didn't change
+/// // its internal state between the two `string(...)` calls.
+/// let identity = MyIdentity(cert: cert, privateKey: privateKey)
 /// ```
 ///
 /// Or you can watch for snapshot updates using the ``ConfigReader/watchSnapshot(fileID:line:updatesHandler:)``:
@@ -226,29 +225,23 @@ public struct ConfigSnapshotReader: Sendable {
 
 @available(Configuration 1.0, *)
 extension ConfigReader {
-    /// Provides a snapshot of the current configuration state and passes it to the provided closure.
+    /// Returns a snapshot of the current configuration state.
     ///
-    /// This method creates a snapshot of the current configuration state and passes it to the
-    /// provided closure. The snapshot reader provides read-only access to the configuration's state
+    /// The snapshot reader provides read-only access to the configuration's state
     /// at the time the method was called.
     ///
     /// ```swift
-    /// let result = config.withSnapshot { snapshot in
-    ///     // Use snapshot to read config values
-    ///     let cert = snapshot.string(forKey: "cert")
-    ///     let privateKey = snapshot.string(forKey: "privateKey")
-    ///     // Ensures that both values are coming from the same underlying snapshot and that a provider
-    ///     // didn't change its internal state between the two `string(...)` calls.
-    ///     return MyCert(cert: cert, privateKey: privateKey)
-    /// }
+    /// let snapshot = config.snapshot()
+    /// // Use snapshot to read config values
+    /// let cert = snapshot.string(forKey: "cert")
+    /// let privateKey = snapshot.string(forKey: "privateKey")
+    /// // Ensures that both values are coming from the same underlying snapshot and that a provider
+    /// // didn't change its internal state between the two `string(...)` calls.
+    /// let identity = MyIdentity(cert: cert, privateKey: privateKey)
     /// ```
     ///
-    /// - Parameter body: A closure that takes a `ConfigSnapshotReader` and returns a value.
-    /// - Returns: The value returned by the closure.
-    /// - Throws: Rethrows any errors thrown by the provided closure.
-    public func withSnapshot<Failure: Error, Return>(
-        _ body: (ConfigSnapshotReader) throws(Failure) -> Return
-    ) throws(Failure) -> Return {
+    /// - Returns: The snapshot.
+    public func snapshot() -> ConfigSnapshotReader {
         let multiSnapshot = provider.snapshot()
         let snapshotReader = ConfigSnapshotReader(
             keyPrefix: keyPrefix,
@@ -257,7 +250,7 @@ extension ConfigReader {
                 accessReporter: accessReporter
             )
         )
-        return try body(snapshotReader)
+        return snapshotReader
     }
 
     /// Watches the configuration for changes.
