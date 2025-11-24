@@ -101,7 +101,7 @@ public protocol ConfigProvider: Sendable {
         forKey key: AbsoluteConfigKey,
         type: ConfigType,
         updatesHandler: (
-            ConfigUpdatesAsyncSequence<Result<LookupResult, any Error>, Never>
+            _ updates: ConfigUpdatesAsyncSequence<Result<LookupResult, any Error>, Never>
         ) async throws -> Return
     ) async throws -> Return
 
@@ -129,7 +129,7 @@ public protocol ConfigProvider: Sendable {
     /// - Throws: Provider-specific errors or errors thrown by the handler closure.
     /// - Returns: The value returned by the closure.
     func watchSnapshot<Return>(
-        updatesHandler: (ConfigUpdatesAsyncSequence<any ConfigSnapshot, Never>) async throws -> Return
+        updatesHandler: (_ updates: ConfigUpdatesAsyncSequence<any ConfigSnapshot, Never>) async throws -> Return
     ) async throws -> Return
 }
 

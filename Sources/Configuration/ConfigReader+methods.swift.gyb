@@ -703,7 +703,7 @@ extension ConfigReader {
         isSecret: Bool = false,
         fileID: String = #fileID,
         line: UInt = #line,
-        updatesHandler: (ConfigUpdatesAsyncSequence<${primitive_type["type"]}?, Never>) async throws -> Return
+        updatesHandler: (_ updates: ConfigUpdatesAsyncSequence<${primitive_type["type"]}?, Never>) async throws -> Return
     ) async throws -> Return {
         try await watchValue(
             forKey: key,
@@ -747,7 +747,7 @@ extension ConfigReader {
         default defaultValue: ${primitive_type["type"]},
         fileID: String = #fileID,
         line: UInt = #line,
-        updatesHandler: (ConfigUpdatesAsyncSequence<${primitive_type["type"]}, Never>) async throws -> Return
+        updatesHandler: (_ updates: ConfigUpdatesAsyncSequence<${primitive_type["type"]}, Never>) async throws -> Return
     ) async throws -> Return {
         try await watchValue(
             forKey: key,
@@ -790,7 +790,7 @@ extension ConfigReader {
         isSecret: Bool = false,
         fileID: String = #fileID,
         line: UInt = #line,
-        updatesHandler: (ConfigUpdatesAsyncSequence<${primitive_type["type"]}, any Error>) async throws -> Return
+        updatesHandler: (_ updates: ConfigUpdatesAsyncSequence<${primitive_type["type"]}, any Error>) async throws -> Return
     ) async throws -> Return {
         try await watchRequiredValue(
             forKey: key,
@@ -840,7 +840,7 @@ extension ConfigReader {
         isSecret: Bool = false,
         fileID: String = #fileID,
         line: UInt = #line,
-        updatesHandler: (ConfigUpdatesAsyncSequence<Value?, Never>) async throws -> Return
+        updatesHandler: (_ updates: ConfigUpdatesAsyncSequence<Value?, Never>) async throws -> Return
     ) async throws -> Return {
         try await watchValue(
             forKey: key,
@@ -886,7 +886,7 @@ extension ConfigReader {
         default defaultValue: Value,
         fileID: String = #fileID,
         line: UInt = #line,
-        updatesHandler: (ConfigUpdatesAsyncSequence<Value, Never>) async throws -> Return
+        updatesHandler: (_ updates: ConfigUpdatesAsyncSequence<Value, Never>) async throws -> Return
     ) async throws -> Return {
         try await watchValue(
             forKey: key,
@@ -931,7 +931,7 @@ extension ConfigReader {
         isSecret: Bool = false,
         fileID: String = #fileID,
         line: UInt = #line,
-        updatesHandler: (ConfigUpdatesAsyncSequence<Value, any Error>) async throws -> Return
+        updatesHandler: (_ updates: ConfigUpdatesAsyncSequence<Value, any Error>) async throws -> Return
     ) async throws -> Return {
         try await watchRequiredValue(
             forKey: key,
@@ -979,7 +979,7 @@ extension ConfigReader {
         isSecret: Bool = false,
         fileID: String = #fileID,
         line: UInt = #line,
-        updatesHandler: (ConfigUpdatesAsyncSequence<[Value]?, Never>) async throws -> Return
+        updatesHandler: (_ updates: ConfigUpdatesAsyncSequence<[Value]?, Never>) async throws -> Return
     ) async throws -> Return {
         try await watchValue(
             forKey: key,
@@ -1025,7 +1025,7 @@ extension ConfigReader {
         default defaultValue: [Value],
         fileID: String = #fileID,
         line: UInt = #line,
-        updatesHandler: (ConfigUpdatesAsyncSequence<[Value], Never>) async throws -> Return
+        updatesHandler: (_ updates: ConfigUpdatesAsyncSequence<[Value], Never>) async throws -> Return
     ) async throws -> Return {
         try await watchValue(
             forKey: key,
@@ -1070,7 +1070,7 @@ extension ConfigReader {
         isSecret: Bool = false,
         fileID: String = #fileID,
         line: UInt = #line,
-        updatesHandler: (ConfigUpdatesAsyncSequence<[Value], any Error>) async throws -> Return
+        updatesHandler: (_ updates: ConfigUpdatesAsyncSequence<[Value], any Error>) async throws -> Return
     ) async throws -> Return {
         try await watchRequiredValue(
             forKey: key,

@@ -105,7 +105,7 @@ extension KeyMappingProvider: ConfigProvider {
         forKey key: AbsoluteConfigKey,
         type: ConfigType,
         updatesHandler: (
-            ConfigUpdatesAsyncSequence<Result<LookupResult, any Error>, Never>
+            _ updates: ConfigUpdatesAsyncSequence<Result<LookupResult, any Error>, Never>
         ) async throws -> Return
     ) async throws -> Return {
         try await upstream.watchValue(forKey: self.mapKey(key), type: type, updatesHandler: updatesHandler)
@@ -118,7 +118,7 @@ extension KeyMappingProvider: ConfigProvider {
 
     // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
     public func watchSnapshot<Return>(
-        updatesHandler: (ConfigUpdatesAsyncSequence<any ConfigSnapshot, Never>) async throws -> Return
+        updatesHandler: (_ updates: ConfigUpdatesAsyncSequence<any ConfigSnapshot, Never>) async throws -> Return
     ) async throws -> Return {
         try await upstream.watchSnapshot { sequence in
             try await updatesHandler(
