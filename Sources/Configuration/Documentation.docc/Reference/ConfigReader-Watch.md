@@ -4,29 +4,29 @@
 
 ### Watching string values
 - ``ConfigReader/watchString(forKey:isSecret:fileID:line:updatesHandler:)``
-- ``ConfigReader/watchString(forKey:as:isSecret:fileID:line:updatesHandler:)-7mxw1``
-- ``ConfigReader/watchString(forKey:as:isSecret:fileID:line:updatesHandler:)-818sy``
+- ``ConfigReader/watchString(forKey:as:isSecret:fileID:line:updatesHandler:)-4zs5y``
+- ``ConfigReader/watchString(forKey:as:isSecret:fileID:line:updatesHandler:)-8hegv``
 - ``ConfigReader/watchString(forKey:isSecret:default:fileID:line:updatesHandler:)``
-- ``ConfigReader/watchString(forKey:as:isSecret:default:fileID:line:updatesHandler:)-6m0yu``
-- ``ConfigReader/watchString(forKey:as:isSecret:default:fileID:line:updatesHandler:)-6dpc3``
+- ``ConfigReader/watchString(forKey:as:isSecret:default:fileID:line:updatesHandler:)-hi1l``
+- ``ConfigReader/watchString(forKey:as:isSecret:default:fileID:line:updatesHandler:)-9qsww``
 
 ### Watching required string values
 - ``ConfigReader/watchRequiredString(forKey:isSecret:fileID:line:updatesHandler:)``
-- ``ConfigReader/watchRequiredString(forKey:as:isSecret:fileID:line:updatesHandler:)-86ot1``
-- ``ConfigReader/watchRequiredString(forKey:as:isSecret:fileID:line:updatesHandler:)-3lrs7``
+- ``ConfigReader/watchRequiredString(forKey:as:isSecret:fileID:line:updatesHandler:)-581rg``
+- ``ConfigReader/watchRequiredString(forKey:as:isSecret:fileID:line:updatesHandler:)-13z9o``
 
 ### Watching lists of string values
 - ``ConfigReader/watchStringArray(forKey:isSecret:fileID:line:updatesHandler:)``
-- ``ConfigReader/watchStringArray(forKey:as:isSecret:fileID:line:updatesHandler:)-8t4nb``
-- ``ConfigReader/watchStringArray(forKey:as:isSecret:fileID:line:updatesHandler:)-9cmju``
+- ``ConfigReader/watchStringArray(forKey:as:isSecret:fileID:line:updatesHandler:)-15oye``
+- ``ConfigReader/watchStringArray(forKey:as:isSecret:fileID:line:updatesHandler:)-7snta``
 - ``ConfigReader/watchStringArray(forKey:isSecret:default:fileID:line:updatesHandler:)``
-- ``ConfigReader/watchStringArray(forKey:as:isSecret:default:fileID:line:updatesHandler:)-59de``
-- ``ConfigReader/watchStringArray(forKey:as:isSecret:default:fileID:line:updatesHandler:)-8nsil``
+- ``ConfigReader/watchStringArray(forKey:as:isSecret:default:fileID:line:updatesHandler:)-9t8bb``
+- ``ConfigReader/watchStringArray(forKey:as:isSecret:default:fileID:line:updatesHandler:)-256k2``
 
 ### Watching required lists of string values
 - ``ConfigReader/watchRequiredStringArray(forKey:isSecret:fileID:line:updatesHandler:)``
-- ``ConfigReader/watchRequiredStringArray(forKey:as:isSecret:fileID:line:updatesHandler:)-3whiy``
-- ``ConfigReader/watchRequiredStringArray(forKey:as:isSecret:fileID:line:updatesHandler:)-4zyyq``
+- ``ConfigReader/watchRequiredStringArray(forKey:as:isSecret:fileID:line:updatesHandler:)-4acy``
+- ``ConfigReader/watchRequiredStringArray(forKey:as:isSecret:fileID:line:updatesHandler:)-8wvyc``
 
 ### Watching Boolean values
 - ``ConfigReader/watchBool(forKey:isSecret:fileID:line:updatesHandler:)``

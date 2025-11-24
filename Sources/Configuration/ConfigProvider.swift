@@ -97,7 +97,7 @@ public protocol ConfigProvider: Sendable {
     ///   - updatesHandler: The closure that processes the async sequence of value updates.
     /// - Throws: Provider-specific errors or errors thrown by the handler closure.
     /// - Returns: The value returned by the closure.
-    func watchValue<Return>(
+    func watchValue<Return: ~Copyable>(
         forKey key: AbsoluteConfigKey,
         type: ConfigType,
         updatesHandler: (
@@ -128,7 +128,7 @@ public protocol ConfigProvider: Sendable {
     /// - Parameter updatesHandler: The closure that processes the asynchronous sequence of snapshot updates.
     /// - Throws: Provider-specific errors or errors thrown by the handler closure.
     /// - Returns: The value returned by the closure.
-    func watchSnapshot<Return>(
+    func watchSnapshot<Return: ~Copyable>(
         updatesHandler: (ConfigUpdatesAsyncSequence<any ConfigSnapshot, Never>) async throws -> Return
     ) async throws -> Return
 }

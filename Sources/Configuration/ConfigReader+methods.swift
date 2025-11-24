@@ -2976,7 +2976,7 @@ extension ConfigReader {
     ///     produces `nil` if the value is missing or can't be converted.
     /// - Returns: The result produced by the handler.
     /// - Throws: Rethrows any error thrown by the handler or the underlying watch operation.
-    public func watchString<Return>(
+    public func watchString<Return: ~Copyable>(
         forKey key: ConfigKey,
         isSecret: Bool = false,
         fileID: String = #fileID,
@@ -3019,7 +3019,7 @@ extension ConfigReader {
     ///     produces the default value if the provider returned a `nil` value or conversion failed.
     /// - Returns: The result produced by the handler.
     /// - Throws: Rethrows any error thrown by the handler or the underlying watch operation.
-    public func watchString<Return>(
+    public func watchString<Return: ~Copyable>(
         forKey key: ConfigKey,
         isSecret: Bool = false,
         default defaultValue: String,
@@ -3063,7 +3063,7 @@ extension ConfigReader {
     ///     produces an error if the provider returned a `nil` value or if the value was of an incorrect type.
     /// - Returns: The result produced by the handler.
     /// - Throws: Rethrows any error thrown by the handler or the underlying watch operation.
-    public func watchRequiredString<Return>(
+    public func watchRequiredString<Return: ~Copyable>(
         forKey key: ConfigKey,
         isSecret: Bool = false,
         fileID: String = #fileID,
@@ -3109,7 +3109,7 @@ extension ConfigReader {
     ///     produces `nil` if the value is missing or can't be converted.
     /// - Returns: The result produced by the handler.
     /// - Throws: Rethrows any error thrown by the handler or the underlying watch operation.
-    public func watchInt<Return>(
+    public func watchInt<Return: ~Copyable>(
         forKey key: ConfigKey,
         isSecret: Bool = false,
         fileID: String = #fileID,
@@ -3152,7 +3152,7 @@ extension ConfigReader {
     ///     produces the default value if the provider returned a `nil` value or conversion failed.
     /// - Returns: The result produced by the handler.
     /// - Throws: Rethrows any error thrown by the handler or the underlying watch operation.
-    public func watchInt<Return>(
+    public func watchInt<Return: ~Copyable>(
         forKey key: ConfigKey,
         isSecret: Bool = false,
         default defaultValue: Int,
@@ -3196,7 +3196,7 @@ extension ConfigReader {
     ///     produces an error if the provider returned a `nil` value or if the value was of an incorrect type.
     /// - Returns: The result produced by the handler.
     /// - Throws: Rethrows any error thrown by the handler or the underlying watch operation.
-    public func watchRequiredInt<Return>(
+    public func watchRequiredInt<Return: ~Copyable>(
         forKey key: ConfigKey,
         isSecret: Bool = false,
         fileID: String = #fileID,
@@ -3242,7 +3242,7 @@ extension ConfigReader {
     ///     produces `nil` if the value is missing or can't be converted.
     /// - Returns: The result produced by the handler.
     /// - Throws: Rethrows any error thrown by the handler or the underlying watch operation.
-    public func watchDouble<Return>(
+    public func watchDouble<Return: ~Copyable>(
         forKey key: ConfigKey,
         isSecret: Bool = false,
         fileID: String = #fileID,
@@ -3285,7 +3285,7 @@ extension ConfigReader {
     ///     produces the default value if the provider returned a `nil` value or conversion failed.
     /// - Returns: The result produced by the handler.
     /// - Throws: Rethrows any error thrown by the handler or the underlying watch operation.
-    public func watchDouble<Return>(
+    public func watchDouble<Return: ~Copyable>(
         forKey key: ConfigKey,
         isSecret: Bool = false,
         default defaultValue: Double,
@@ -3329,7 +3329,7 @@ extension ConfigReader {
     ///     produces an error if the provider returned a `nil` value or if the value was of an incorrect type.
     /// - Returns: The result produced by the handler.
     /// - Throws: Rethrows any error thrown by the handler or the underlying watch operation.
-    public func watchRequiredDouble<Return>(
+    public func watchRequiredDouble<Return: ~Copyable>(
         forKey key: ConfigKey,
         isSecret: Bool = false,
         fileID: String = #fileID,
@@ -3375,7 +3375,7 @@ extension ConfigReader {
     ///     produces `nil` if the value is missing or can't be converted.
     /// - Returns: The result produced by the handler.
     /// - Throws: Rethrows any error thrown by the handler or the underlying watch operation.
-    public func watchBool<Return>(
+    public func watchBool<Return: ~Copyable>(
         forKey key: ConfigKey,
         isSecret: Bool = false,
         fileID: String = #fileID,
@@ -3418,7 +3418,7 @@ extension ConfigReader {
     ///     produces the default value if the provider returned a `nil` value or conversion failed.
     /// - Returns: The result produced by the handler.
     /// - Throws: Rethrows any error thrown by the handler or the underlying watch operation.
-    public func watchBool<Return>(
+    public func watchBool<Return: ~Copyable>(
         forKey key: ConfigKey,
         isSecret: Bool = false,
         default defaultValue: Bool,
@@ -3462,7 +3462,7 @@ extension ConfigReader {
     ///     produces an error if the provider returned a `nil` value or if the value was of an incorrect type.
     /// - Returns: The result produced by the handler.
     /// - Throws: Rethrows any error thrown by the handler or the underlying watch operation.
-    public func watchRequiredBool<Return>(
+    public func watchRequiredBool<Return: ~Copyable>(
         forKey key: ConfigKey,
         isSecret: Bool = false,
         fileID: String = #fileID,
@@ -3508,7 +3508,7 @@ extension ConfigReader {
     ///     produces `nil` if the value is missing or can't be converted.
     /// - Returns: The result produced by the handler.
     /// - Throws: Rethrows any error thrown by the handler or the underlying watch operation.
-    public func watchBytes<Return>(
+    public func watchBytes<Return: ~Copyable>(
         forKey key: ConfigKey,
         isSecret: Bool = false,
         fileID: String = #fileID,
@@ -3551,7 +3551,7 @@ extension ConfigReader {
     ///     produces the default value if the provider returned a `nil` value or conversion failed.
     /// - Returns: The result produced by the handler.
     /// - Throws: Rethrows any error thrown by the handler or the underlying watch operation.
-    public func watchBytes<Return>(
+    public func watchBytes<Return: ~Copyable>(
         forKey key: ConfigKey,
         isSecret: Bool = false,
         default defaultValue: [UInt8],
@@ -3595,7 +3595,7 @@ extension ConfigReader {
     ///     produces an error if the provider returned a `nil` value or if the value was of an incorrect type.
     /// - Returns: The result produced by the handler.
     /// - Throws: Rethrows any error thrown by the handler or the underlying watch operation.
-    public func watchRequiredBytes<Return>(
+    public func watchRequiredBytes<Return: ~Copyable>(
         forKey key: ConfigKey,
         isSecret: Bool = false,
         fileID: String = #fileID,
@@ -3641,7 +3641,7 @@ extension ConfigReader {
     ///     produces `nil` if the value is missing or can't be converted.
     /// - Returns: The result produced by the handler.
     /// - Throws: Rethrows any error thrown by the handler or the underlying watch operation.
-    public func watchStringArray<Return>(
+    public func watchStringArray<Return: ~Copyable>(
         forKey key: ConfigKey,
         isSecret: Bool = false,
         fileID: String = #fileID,
@@ -3684,7 +3684,7 @@ extension ConfigReader {
     ///     produces the default value if the provider returned a `nil` value or conversion failed.
     /// - Returns: The result produced by the handler.
     /// - Throws: Rethrows any error thrown by the handler or the underlying watch operation.
-    public func watchStringArray<Return>(
+    public func watchStringArray<Return: ~Copyable>(
         forKey key: ConfigKey,
         isSecret: Bool = false,
         default defaultValue: [String],
@@ -3728,7 +3728,7 @@ extension ConfigReader {
     ///     produces an error if the provider returned a `nil` value or if the value was of an incorrect type.
     /// - Returns: The result produced by the handler.
     /// - Throws: Rethrows any error thrown by the handler or the underlying watch operation.
-    public func watchRequiredStringArray<Return>(
+    public func watchRequiredStringArray<Return: ~Copyable>(
         forKey key: ConfigKey,
         isSecret: Bool = false,
         fileID: String = #fileID,
@@ -3774,7 +3774,7 @@ extension ConfigReader {
     ///     produces `nil` if the value is missing or can't be converted.
     /// - Returns: The result produced by the handler.
     /// - Throws: Rethrows any error thrown by the handler or the underlying watch operation.
-    public func watchIntArray<Return>(
+    public func watchIntArray<Return: ~Copyable>(
         forKey key: ConfigKey,
         isSecret: Bool = false,
         fileID: String = #fileID,
@@ -3817,7 +3817,7 @@ extension ConfigReader {
     ///     produces the default value if the provider returned a `nil` value or conversion failed.
     /// - Returns: The result produced by the handler.
     /// - Throws: Rethrows any error thrown by the handler or the underlying watch operation.
-    public func watchIntArray<Return>(
+    public func watchIntArray<Return: ~Copyable>(
         forKey key: ConfigKey,
         isSecret: Bool = false,
         default defaultValue: [Int],
@@ -3861,7 +3861,7 @@ extension ConfigReader {
     ///     produces an error if the provider returned a `nil` value or if the value was of an incorrect type.
     /// - Returns: The result produced by the handler.
     /// - Throws: Rethrows any error thrown by the handler or the underlying watch operation.
-    public func watchRequiredIntArray<Return>(
+    public func watchRequiredIntArray<Return: ~Copyable>(
         forKey key: ConfigKey,
         isSecret: Bool = false,
         fileID: String = #fileID,
@@ -3907,7 +3907,7 @@ extension ConfigReader {
     ///     produces `nil` if the value is missing or can't be converted.
     /// - Returns: The result produced by the handler.
     /// - Throws: Rethrows any error thrown by the handler or the underlying watch operation.
-    public func watchDoubleArray<Return>(
+    public func watchDoubleArray<Return: ~Copyable>(
         forKey key: ConfigKey,
         isSecret: Bool = false,
         fileID: String = #fileID,
@@ -3950,7 +3950,7 @@ extension ConfigReader {
     ///     produces the default value if the provider returned a `nil` value or conversion failed.
     /// - Returns: The result produced by the handler.
     /// - Throws: Rethrows any error thrown by the handler or the underlying watch operation.
-    public func watchDoubleArray<Return>(
+    public func watchDoubleArray<Return: ~Copyable>(
         forKey key: ConfigKey,
         isSecret: Bool = false,
         default defaultValue: [Double],
@@ -3994,7 +3994,7 @@ extension ConfigReader {
     ///     produces an error if the provider returned a `nil` value or if the value was of an incorrect type.
     /// - Returns: The result produced by the handler.
     /// - Throws: Rethrows any error thrown by the handler or the underlying watch operation.
-    public func watchRequiredDoubleArray<Return>(
+    public func watchRequiredDoubleArray<Return: ~Copyable>(
         forKey key: ConfigKey,
         isSecret: Bool = false,
         fileID: String = #fileID,
@@ -4040,7 +4040,7 @@ extension ConfigReader {
     ///     produces `nil` if the value is missing or can't be converted.
     /// - Returns: The result produced by the handler.
     /// - Throws: Rethrows any error thrown by the handler or the underlying watch operation.
-    public func watchBoolArray<Return>(
+    public func watchBoolArray<Return: ~Copyable>(
         forKey key: ConfigKey,
         isSecret: Bool = false,
         fileID: String = #fileID,
@@ -4083,7 +4083,7 @@ extension ConfigReader {
     ///     produces the default value if the provider returned a `nil` value or conversion failed.
     /// - Returns: The result produced by the handler.
     /// - Throws: Rethrows any error thrown by the handler or the underlying watch operation.
-    public func watchBoolArray<Return>(
+    public func watchBoolArray<Return: ~Copyable>(
         forKey key: ConfigKey,
         isSecret: Bool = false,
         default defaultValue: [Bool],
@@ -4127,7 +4127,7 @@ extension ConfigReader {
     ///     produces an error if the provider returned a `nil` value or if the value was of an incorrect type.
     /// - Returns: The result produced by the handler.
     /// - Throws: Rethrows any error thrown by the handler or the underlying watch operation.
-    public func watchRequiredBoolArray<Return>(
+    public func watchRequiredBoolArray<Return: ~Copyable>(
         forKey key: ConfigKey,
         isSecret: Bool = false,
         fileID: String = #fileID,
@@ -4173,7 +4173,7 @@ extension ConfigReader {
     ///     produces `nil` if the value is missing or can't be converted.
     /// - Returns: The result produced by the handler.
     /// - Throws: Rethrows any error thrown by the handler or the underlying watch operation.
-    public func watchByteChunkArray<Return>(
+    public func watchByteChunkArray<Return: ~Copyable>(
         forKey key: ConfigKey,
         isSecret: Bool = false,
         fileID: String = #fileID,
@@ -4216,7 +4216,7 @@ extension ConfigReader {
     ///     produces the default value if the provider returned a `nil` value or conversion failed.
     /// - Returns: The result produced by the handler.
     /// - Throws: Rethrows any error thrown by the handler or the underlying watch operation.
-    public func watchByteChunkArray<Return>(
+    public func watchByteChunkArray<Return: ~Copyable>(
         forKey key: ConfigKey,
         isSecret: Bool = false,
         default defaultValue: [[UInt8]],
@@ -4260,7 +4260,7 @@ extension ConfigReader {
     ///     produces an error if the provider returned a `nil` value or if the value was of an incorrect type.
     /// - Returns: The result produced by the handler.
     /// - Throws: Rethrows any error thrown by the handler or the underlying watch operation.
-    public func watchRequiredByteChunkArray<Return>(
+    public func watchRequiredByteChunkArray<Return: ~Copyable>(
         forKey key: ConfigKey,
         isSecret: Bool = false,
         fileID: String = #fileID,
@@ -4307,7 +4307,7 @@ extension ConfigReader {
     ///     produces `nil` if the value is missing or can't be converted.
     /// - Returns: The result produced by the handler.
     /// - Throws: Rethrows any error thrown by the handler or the underlying watch operation.
-    public func watchString<Value: ExpressibleByConfigString & Sendable, Return>(
+    public func watchString<Value: ExpressibleByConfigString & Sendable, Return: ~Copyable>(
         forKey key: ConfigKey,
         as type: Value.Type = Value.self,
         isSecret: Bool = false,
@@ -4352,7 +4352,7 @@ extension ConfigReader {
     ///     produces the default value if the provider returned a `nil` value or conversion failed.
     /// - Returns: The result produced by the handler.
     /// - Throws: Rethrows any error thrown by the handler or the underlying watch operation.
-    public func watchString<Value: ExpressibleByConfigString & Sendable, Return>(
+    public func watchString<Value: ExpressibleByConfigString & Sendable, Return: ~Copyable>(
         forKey key: ConfigKey,
         as type: Value.Type = Value.self,
         isSecret: Bool = false,
@@ -4398,7 +4398,7 @@ extension ConfigReader {
     ///     produces an error if the provider returned a `nil` value or if the value was of an incorrect type.
     /// - Returns: The result produced by the handler.
     /// - Throws: Rethrows any error thrown by the handler or the underlying watch operation.
-    public func watchRequiredString<Value: ExpressibleByConfigString & Sendable, Return>(
+    public func watchRequiredString<Value: ExpressibleByConfigString & Sendable, Return: ~Copyable>(
         forKey key: ConfigKey,
         as type: Value.Type = Value.self,
         isSecret: Bool = false,
@@ -4446,7 +4446,7 @@ extension ConfigReader {
     ///     produces `nil` if the value is missing or can't be converted.
     /// - Returns: The result produced by the handler.
     /// - Throws: Rethrows any error thrown by the handler or the underlying watch operation.
-    public func watchStringArray<Value: ExpressibleByConfigString & Sendable, Return>(
+    public func watchStringArray<Value: ExpressibleByConfigString & Sendable, Return: ~Copyable>(
         forKey key: ConfigKey,
         as type: Value.Type = Value.self,
         isSecret: Bool = false,
@@ -4491,7 +4491,7 @@ extension ConfigReader {
     ///     produces the default value if the provider returned a `nil` value or conversion failed.
     /// - Returns: The result produced by the handler.
     /// - Throws: Rethrows any error thrown by the handler or the underlying watch operation.
-    public func watchStringArray<Value: ExpressibleByConfigString & Sendable, Return>(
+    public func watchStringArray<Value: ExpressibleByConfigString & Sendable, Return: ~Copyable>(
         forKey key: ConfigKey,
         as type: Value.Type = Value.self,
         isSecret: Bool = false,
@@ -4537,7 +4537,7 @@ extension ConfigReader {
     ///     produces an error if the provider returned a `nil` value or if the value was of an incorrect type.
     /// - Returns: The result produced by the handler.
     /// - Throws: Rethrows any error thrown by the handler or the underlying watch operation.
-    public func watchRequiredStringArray<Value: ExpressibleByConfigString & Sendable, Return>(
+    public func watchRequiredStringArray<Value: ExpressibleByConfigString & Sendable, Return: ~Copyable>(
         forKey key: ConfigKey,
         as type: Value.Type = Value.self,
         isSecret: Bool = false,
@@ -4585,7 +4585,7 @@ extension ConfigReader {
     ///     produces `nil` if the value is missing or can't be converted.
     /// - Returns: The result produced by the handler.
     /// - Throws: Rethrows any error thrown by the handler or the underlying watch operation.
-    public func watchString<Value: RawRepresentable<String> & Sendable, Return>(
+    public func watchString<Value: RawRepresentable<String> & Sendable, Return: ~Copyable>(
         forKey key: ConfigKey,
         as type: Value.Type = Value.self,
         isSecret: Bool = false,
@@ -4630,7 +4630,7 @@ extension ConfigReader {
     ///     produces the default value if the provider returned a `nil` value or conversion failed.
     /// - Returns: The result produced by the handler.
     /// - Throws: Rethrows any error thrown by the handler or the underlying watch operation.
-    public func watchString<Value: RawRepresentable<String> & Sendable, Return>(
+    public func watchString<Value: RawRepresentable<String> & Sendable, Return: ~Copyable>(
         forKey key: ConfigKey,
         as type: Value.Type = Value.self,
         isSecret: Bool = false,
@@ -4676,7 +4676,7 @@ extension ConfigReader {
     ///     produces an error if the provider returned a `nil` value or if the value was of an incorrect type.
     /// - Returns: The result produced by the handler.
     /// - Throws: Rethrows any error thrown by the handler or the underlying watch operation.
-    public func watchRequiredString<Value: RawRepresentable<String> & Sendable, Return>(
+    public func watchRequiredString<Value: RawRepresentable<String> & Sendable, Return: ~Copyable>(
         forKey key: ConfigKey,
         as type: Value.Type = Value.self,
         isSecret: Bool = false,
@@ -4724,7 +4724,7 @@ extension ConfigReader {
     ///     produces `nil` if the value is missing or can't be converted.
     /// - Returns: The result produced by the handler.
     /// - Throws: Rethrows any error thrown by the handler or the underlying watch operation.
-    public func watchStringArray<Value: RawRepresentable<String> & Sendable, Return>(
+    public func watchStringArray<Value: RawRepresentable<String> & Sendable, Return: ~Copyable>(
         forKey key: ConfigKey,
         as type: Value.Type = Value.self,
         isSecret: Bool = false,
@@ -4769,7 +4769,7 @@ extension ConfigReader {
     ///     produces the default value if the provider returned a `nil` value or conversion failed.
     /// - Returns: The result produced by the handler.
     /// - Throws: Rethrows any error thrown by the handler or the underlying watch operation.
-    public func watchStringArray<Value: RawRepresentable<String> & Sendable, Return>(
+    public func watchStringArray<Value: RawRepresentable<String> & Sendable, Return: ~Copyable>(
         forKey key: ConfigKey,
         as type: Value.Type = Value.self,
         isSecret: Bool = false,
@@ -4815,7 +4815,7 @@ extension ConfigReader {
     ///     produces an error if the provider returned a `nil` value or if the value was of an incorrect type.
     /// - Returns: The result produced by the handler.
     /// - Throws: Rethrows any error thrown by the handler or the underlying watch operation.
-    public func watchRequiredStringArray<Value: RawRepresentable<String> & Sendable, Return>(
+    public func watchRequiredStringArray<Value: RawRepresentable<String> & Sendable, Return: ~Copyable>(
         forKey key: ConfigKey,
         as type: Value.Type = Value.self,
         isSecret: Bool = false,

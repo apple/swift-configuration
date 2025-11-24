@@ -72,7 +72,7 @@ extension ConfigReader {
     /// - Returns: The value returned by the closure.
     /// - Throws: Rethrows any errors thrown by the provided closure.
     @available(*, deprecated, message: "Renamed to snapshot().")
-    public func withSnapshot<Failure: Error, Return>(
+    public func withSnapshot<Failure: Error, Return: ~Copyable>(
         _ body: (ConfigSnapshotReader) throws(Failure) -> Return
     ) throws(Failure) -> Return {
         let multiSnapshot = provider.snapshot()

@@ -698,7 +698,7 @@ extension ConfigReader {
     ///     produces `nil` if the value is missing or can't be converted.
     /// - Returns: The result produced by the handler.
     /// - Throws: Rethrows any error thrown by the handler or the underlying watch operation.
-    public func watch${primitive_type["name"]}<Return>(
+    public func watch${primitive_type["name"]}<Return: ~Copyable>(
         forKey key: ConfigKey,
         isSecret: Bool = false,
         fileID: String = #fileID,
@@ -741,7 +741,7 @@ extension ConfigReader {
     ///     produces the default value if the provider returned a `nil` value or conversion failed.
     /// - Returns: The result produced by the handler.
     /// - Throws: Rethrows any error thrown by the handler or the underlying watch operation.
-    public func watch${primitive_type["name"]}<Return>(
+    public func watch${primitive_type["name"]}<Return: ~Copyable>(
         forKey key: ConfigKey,
         isSecret: Bool = false,
         default defaultValue: ${primitive_type["type"]},
@@ -785,7 +785,7 @@ extension ConfigReader {
     ///     produces an error if the provider returned a `nil` value or if the value was of an incorrect type.
     /// - Returns: The result produced by the handler.
     /// - Throws: Rethrows any error thrown by the handler or the underlying watch operation.
-    public func watchRequired${primitive_type["name"]}<Return>(
+    public func watchRequired${primitive_type["name"]}<Return: ~Copyable>(
         forKey key: ConfigKey,
         isSecret: Bool = false,
         fileID: String = #fileID,
@@ -834,7 +834,7 @@ extension ConfigReader {
     ///     produces `nil` if the value is missing or can't be converted.
     /// - Returns: The result produced by the handler.
     /// - Throws: Rethrows any error thrown by the handler or the underlying watch operation.
-    public func watchString<Value: ${string_convertible_type["protocol"]} & Sendable, Return>(
+    public func watchString<Value: ${string_convertible_type["protocol"]} & Sendable, Return: ~Copyable>(
         forKey key: ConfigKey,
         as type: Value.Type = Value.self,
         isSecret: Bool = false,
@@ -879,7 +879,7 @@ extension ConfigReader {
     ///     produces the default value if the provider returned a `nil` value or conversion failed.
     /// - Returns: The result produced by the handler.
     /// - Throws: Rethrows any error thrown by the handler or the underlying watch operation.
-    public func watchString<Value: ${string_convertible_type["protocol"]} & Sendable, Return>(
+    public func watchString<Value: ${string_convertible_type["protocol"]} & Sendable, Return: ~Copyable>(
         forKey key: ConfigKey,
         as type: Value.Type = Value.self,
         isSecret: Bool = false,
@@ -925,7 +925,7 @@ extension ConfigReader {
     ///     produces an error if the provider returned a `nil` value or if the value was of an incorrect type.
     /// - Returns: The result produced by the handler.
     /// - Throws: Rethrows any error thrown by the handler or the underlying watch operation.
-    public func watchRequiredString<Value: ${string_convertible_type["protocol"]} & Sendable, Return>(
+    public func watchRequiredString<Value: ${string_convertible_type["protocol"]} & Sendable, Return: ~Copyable>(
         forKey key: ConfigKey,
         as type: Value.Type = Value.self,
         isSecret: Bool = false,
@@ -973,7 +973,7 @@ extension ConfigReader {
     ///     produces `nil` if the value is missing or can't be converted.
     /// - Returns: The result produced by the handler.
     /// - Throws: Rethrows any error thrown by the handler or the underlying watch operation.
-    public func watchStringArray<Value: ${string_convertible_type["protocol"]} & Sendable, Return>(
+    public func watchStringArray<Value: ${string_convertible_type["protocol"]} & Sendable, Return: ~Copyable>(
         forKey key: ConfigKey,
         as type: Value.Type = Value.self,
         isSecret: Bool = false,
@@ -1018,7 +1018,7 @@ extension ConfigReader {
     ///     produces the default value if the provider returned a `nil` value or conversion failed.
     /// - Returns: The result produced by the handler.
     /// - Throws: Rethrows any error thrown by the handler or the underlying watch operation.
-    public func watchStringArray<Value: ${string_convertible_type["protocol"]} & Sendable, Return>(
+    public func watchStringArray<Value: ${string_convertible_type["protocol"]} & Sendable, Return: ~Copyable>(
         forKey key: ConfigKey,
         as type: Value.Type = Value.self,
         isSecret: Bool = false,
@@ -1064,7 +1064,7 @@ extension ConfigReader {
     ///     produces an error if the provider returned a `nil` value or if the value was of an incorrect type.
     /// - Returns: The result produced by the handler.
     /// - Throws: Rethrows any error thrown by the handler or the underlying watch operation.
-    public func watchRequiredStringArray<Value: ${string_convertible_type["protocol"]} & Sendable, Return>(
+    public func watchRequiredStringArray<Value: ${string_convertible_type["protocol"]} & Sendable, Return: ~Copyable>(
         forKey key: ConfigKey,
         as type: Value.Type = Value.self,
         isSecret: Bool = false,
