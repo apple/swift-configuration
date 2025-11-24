@@ -43,7 +43,7 @@ extension ConfigProvider {
     /// - Returns: The value returned by the handler closure.
     /// - Throws: Provider-specific errors or errors thrown by the handler.
     nonisolated(nonsending)
-        public func watchValueFromValue<Return>(
+        public func watchValueFromValue<Return: ~Copyable>(
             forKey key: AbsoluteConfigKey,
             type: ConfigType,
             updatesHandler: (
@@ -85,7 +85,7 @@ extension ConfigProvider {
     /// - Parameter updatesHandler: The closure that processes the async sequence of snapshot updates.
     /// - Returns: The value returned by the handler closure.
     /// - Throws: Provider-specific errors or errors thrown by the handler.
-    nonisolated(nonsending) public func watchSnapshotFromSnapshot<Return>(
+    nonisolated(nonsending) public func watchSnapshotFromSnapshot<Return: ~Copyable>(
         updatesHandler: (ConfigUpdatesAsyncSequence<any ConfigSnapshot, Never>) async throws -> Return
     ) async throws -> Return {
         let (stream, continuation) = AsyncStream<any ConfigSnapshot>

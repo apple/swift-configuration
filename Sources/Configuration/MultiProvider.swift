@@ -196,7 +196,7 @@ extension MultiProvider {
     /// - Returns: The value returned by the body closure.
     /// - Throws: Any error thrown by the nested providers or the body closure.
     nonisolated(nonsending)
-        func watchSnapshot<Return>(
+        func watchSnapshot<Return: ~Copyable>(
             _ body: (ConfigUpdatesAsyncSequence<MultiSnapshot, Never>) async throws -> Return
         ) async throws -> Return
     {
@@ -209,7 +209,7 @@ extension MultiProvider {
             updateSequences: &updateSequences,
         ) { providerUpdateSequences in
             let updateArrays = combineLatestMany(
-                elementType: (any ConfigSnapshotProtocol).self,
+                elementType: (any ConfigSnapshot).self,
                 failureType: Never.self,
                 providerUpdateSequences
             )
@@ -287,7 +287,7 @@ extension MultiProvider {
     /// - Throws: Any error thrown by the nested providers or the handler closure.
     /// - Returns: The value returned by the handler.
     nonisolated(nonsending)
-        func watchValue<Return>(
+        func watchValue<Return: ~Copyable>(
             forKey key: AbsoluteConfigKey,
             type: ConfigType,
             updatesHandler: (
@@ -338,13 +338,13 @@ extension MultiProvider {
 }
 
 @available(Configuration 1.0, *)
-nonisolated(nonsending) private func withProvidersWatchingValue<ReturnInner>(
+nonisolated(nonsending) private func withProvidersWatchingValue<Return: ~Copyable>(
     providers: ArraySlice<any ConfigProvider>,
     updateSequences: inout [any (AsyncSequence<Result<LookupResult, any Error>, Never> & Sendable)],
     key: AbsoluteConfigKey,
     configType: ConfigType,
-    body: ([any (AsyncSequence<Result<LookupResult, any Error>, Never> & Sendable)]) async throws -> ReturnInner
-) async throws -> ReturnInner {
+    body: ([any (AsyncSequence<Result<LookupResult, any Error>, Never> & Sendable)]) async throws -> Return
+) async throws -> Return {
     guard let provider = providers.first else {
         // Recursion termination, once we've collected all update sequences, execute the body.
         return try await body(updateSequences)
@@ -362,11 +362,11 @@ nonisolated(nonsending) private func withProvidersWatchingValue<ReturnInner>(
 }
 
 @available(Configuration 1.0, *)
-nonisolated(nonsending) private func withProvidersWatchingSnapshot<ReturnInner>(
+nonisolated(nonsending) private func withProvidersWatchingSnapshot<Return: ~Copyable>(
     providers: ArraySlice<any ConfigProvider>,
-    updateSequences: inout [any (AsyncSequence<any ConfigSnapshotProtocol, Never> & Sendable)],
-    body: ([any (AsyncSequence<any ConfigSnapshotProtocol, Never> & Sendable)]) async throws -> ReturnInner
-) async throws -> ReturnInner {
+    updateSequences: inout [any (AsyncSequence<any ConfigSnapshot, Never> & Sendable)],
+    body: ([any (AsyncSequence<any ConfigSnapshot, Never> & Sendable)]) async throws -> Return
+) async throws -> Return {
     guard let provider = providers.first else {
         // Recursion termination, once we've collected all update sequences, execute the body.
         return try await body(updateSequences)

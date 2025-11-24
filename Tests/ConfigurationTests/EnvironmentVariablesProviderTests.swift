@@ -110,9 +110,20 @@ struct EnvironmentVariablesProviderTests {
 
     @available(Configuration 1.0, *)
     @Test func loadEnvironmentFile() async throws {
-        let envFilePath = try #require(Bundle.module.path(forResource: "Resources", ofType: nil)?.appending("/.env"))
+        let fileSystem = InMemoryFileSystem(files: [
+            "/etc/.env": .file(
+                timestamp: .now,
+                contents: """
+                    HTTP_SECRET=s3cret
+                    ENABLED=true
+
+                    """
+            )
+        ])
         let provider = try await EnvironmentVariablesProvider(
-            environmentFilePath: FilePath(envFilePath),
+            environmentFilePath: "/etc/.env",
+            allowMissing: false,
+            fileSystem: fileSystem,
             secretsSpecifier: .specific([
                 "HTTP_SECRET"
             ])
@@ -123,23 +134,37 @@ struct EnvironmentVariablesProviderTests {
     }
 
     @available(Configuration 1.0, *)
-    @Test func loadEnvironmentFileError() async throws {
+    @Test func loadEnvironmentMissingError() async throws {
+        let fileSystem = InMemoryFileSystem(files: [:])
         let envFilePath: FilePath = "/tmp/definitelyNotAnEnvFile"
         do {
             _ = try await EnvironmentVariablesProvider(
                 environmentFilePath: envFilePath,
+                allowMissing: false,
+                fileSystem: fileSystem,
                 secretsSpecifier: .specific([
                     "HTTP_SECRET"
                 ])
             )
             #expect(Bool(false), "Initializer should have thrown an error")
-        } catch let error as EnvironmentVariablesProvider.ProviderError {
-            guard case .environmentFileNotFound(path: let path) = error else {
+        } catch let error as FileSystemError {
+            guard case .fileNotFound(path: let path) = error else {
                 #expect(Bool(false), "Initializer should have thrown an error")
                 return
             }
             #expect(path == "/tmp/definitelyNotAnEnvFile")
         }
+    }
+
+    @available(Configuration 1.0, *)
+    @Test func loadEnvironmentAllowedMissing() async throws {
+        let fileSystem = InMemoryFileSystem(files: [:])
+        let envFilePath: FilePath = "/tmp/definitelyNotAnEnvFile"
+        _ = try await EnvironmentVariablesProvider(
+            environmentFilePath: envFilePath,
+            allowMissing: true,
+            fileSystem: fileSystem
+        )
     }
 }
 

@@ -32,250 +32,179 @@ struct ConfigSnapshotReaderMethodTestsGet1 {
     @Test func get() async throws {
         let config = ConfigReaderTests.config
 
-        try config.withSnapshot { snapshot in
+        do {
+            let snapshot = config.snapshot()
+
             // Optional - success
-            #expect(snapshot.string(forKey: ConfigKey(["string"])) == Defaults.string)
             #expect(snapshot.string(forKey: "string") == Defaults.string)
 
             // Optional - missing
-            #expect(snapshot.string(forKey: ConfigKey(["absentString"])) == nil)
             #expect(snapshot.string(forKey: "absentString") == nil)
 
             // Optional - failing
-            #expect(snapshot.string(forKey: ConfigKey(["failure"])) == nil)
             #expect(snapshot.string(forKey: "failure") == nil)
 
             // Defaulted - success
-            #expect(snapshot.string(forKey: ConfigKey(["string"]), default: Defaults.otherString) == Defaults.string)
             #expect(snapshot.string(forKey: "string", default: Defaults.otherString) == Defaults.string)
 
             // Defaulted - missing
-            #expect(
-                snapshot.string(forKey: ConfigKey(["absentString"]), default: Defaults.otherString)
-                    == Defaults.otherString
-            )
             #expect(snapshot.string(forKey: "absentString", default: Defaults.otherString) == Defaults.otherString)
 
             // Defaulted - failing
-            #expect(
-                snapshot.string(forKey: ConfigKey(["failure"]), default: Defaults.otherString) == Defaults.otherString
-            )
             #expect(snapshot.string(forKey: "failure", default: Defaults.otherString) == Defaults.otherString)
 
             // Required - success
-            try #expect(snapshot.requiredString(forKey: ConfigKey(["string"])) == Defaults.string)
             try #expect(snapshot.requiredString(forKey: "string") == Defaults.string)
 
             // Required - missing
-            let error1 = #expect(throws: ConfigError.self) {
-                try snapshot.requiredString(forKey: ConfigKey(["absentString"]))
-            }
+            let error1 = #expect(throws: ConfigError.self) { try snapshot.requiredString(forKey: "absentString") }
             #expect(error1 == .missingRequiredConfigValue(AbsoluteConfigKey(["absentString"])))
-            let error2 = #expect(throws: ConfigError.self) { try snapshot.requiredString(forKey: "absentString") }
-            #expect(error2 == .missingRequiredConfigValue(AbsoluteConfigKey(["absentString"])))
 
             // Required - failing
-            #expect(throws: TestProvider.TestError.self) { try snapshot.requiredString(forKey: ConfigKey(["failure"])) }
             #expect(throws: TestProvider.TestError.self) { try snapshot.requiredString(forKey: "failure") }
         }
-        try config.withSnapshot { snapshot in
+        do {
+            let snapshot = config.snapshot()
+
             // Optional - success
-            #expect(snapshot.int(forKey: ConfigKey(["int"])) == Defaults.int)
             #expect(snapshot.int(forKey: "int") == Defaults.int)
 
             // Optional - missing
-            #expect(snapshot.int(forKey: ConfigKey(["absentInt"])) == nil)
             #expect(snapshot.int(forKey: "absentInt") == nil)
 
             // Optional - failing
-            #expect(snapshot.int(forKey: ConfigKey(["failure"])) == nil)
             #expect(snapshot.int(forKey: "failure") == nil)
 
             // Defaulted - success
-            #expect(snapshot.int(forKey: ConfigKey(["int"]), default: Defaults.otherInt) == Defaults.int)
             #expect(snapshot.int(forKey: "int", default: Defaults.otherInt) == Defaults.int)
 
             // Defaulted - missing
-            #expect(snapshot.int(forKey: ConfigKey(["absentInt"]), default: Defaults.otherInt) == Defaults.otherInt)
             #expect(snapshot.int(forKey: "absentInt", default: Defaults.otherInt) == Defaults.otherInt)
 
             // Defaulted - failing
-            #expect(snapshot.int(forKey: ConfigKey(["failure"]), default: Defaults.otherInt) == Defaults.otherInt)
             #expect(snapshot.int(forKey: "failure", default: Defaults.otherInt) == Defaults.otherInt)
 
             // Required - success
-            try #expect(snapshot.requiredInt(forKey: ConfigKey(["int"])) == Defaults.int)
             try #expect(snapshot.requiredInt(forKey: "int") == Defaults.int)
 
             // Required - missing
-            let error1 = #expect(throws: ConfigError.self) {
-                try snapshot.requiredInt(forKey: ConfigKey(["absentInt"]))
-            }
+            let error1 = #expect(throws: ConfigError.self) { try snapshot.requiredInt(forKey: "absentInt") }
             #expect(error1 == .missingRequiredConfigValue(AbsoluteConfigKey(["absentInt"])))
-            let error2 = #expect(throws: ConfigError.self) { try snapshot.requiredInt(forKey: "absentInt") }
-            #expect(error2 == .missingRequiredConfigValue(AbsoluteConfigKey(["absentInt"])))
 
             // Required - failing
-            #expect(throws: TestProvider.TestError.self) { try snapshot.requiredInt(forKey: ConfigKey(["failure"])) }
             #expect(throws: TestProvider.TestError.self) { try snapshot.requiredInt(forKey: "failure") }
         }
-        try config.withSnapshot { snapshot in
+        do {
+            let snapshot = config.snapshot()
+
             // Optional - success
-            #expect(snapshot.double(forKey: ConfigKey(["double"])) == Defaults.double)
             #expect(snapshot.double(forKey: "double") == Defaults.double)
 
             // Optional - missing
-            #expect(snapshot.double(forKey: ConfigKey(["absentDouble"])) == nil)
             #expect(snapshot.double(forKey: "absentDouble") == nil)
 
             // Optional - failing
-            #expect(snapshot.double(forKey: ConfigKey(["failure"])) == nil)
             #expect(snapshot.double(forKey: "failure") == nil)
 
             // Defaulted - success
-            #expect(snapshot.double(forKey: ConfigKey(["double"]), default: Defaults.otherDouble) == Defaults.double)
             #expect(snapshot.double(forKey: "double", default: Defaults.otherDouble) == Defaults.double)
 
             // Defaulted - missing
-            #expect(
-                snapshot.double(forKey: ConfigKey(["absentDouble"]), default: Defaults.otherDouble)
-                    == Defaults.otherDouble
-            )
             #expect(snapshot.double(forKey: "absentDouble", default: Defaults.otherDouble) == Defaults.otherDouble)
 
             // Defaulted - failing
-            #expect(
-                snapshot.double(forKey: ConfigKey(["failure"]), default: Defaults.otherDouble) == Defaults.otherDouble
-            )
             #expect(snapshot.double(forKey: "failure", default: Defaults.otherDouble) == Defaults.otherDouble)
 
             // Required - success
-            try #expect(snapshot.requiredDouble(forKey: ConfigKey(["double"])) == Defaults.double)
             try #expect(snapshot.requiredDouble(forKey: "double") == Defaults.double)
 
             // Required - missing
-            let error1 = #expect(throws: ConfigError.self) {
-                try snapshot.requiredDouble(forKey: ConfigKey(["absentDouble"]))
-            }
+            let error1 = #expect(throws: ConfigError.self) { try snapshot.requiredDouble(forKey: "absentDouble") }
             #expect(error1 == .missingRequiredConfigValue(AbsoluteConfigKey(["absentDouble"])))
-            let error2 = #expect(throws: ConfigError.self) { try snapshot.requiredDouble(forKey: "absentDouble") }
-            #expect(error2 == .missingRequiredConfigValue(AbsoluteConfigKey(["absentDouble"])))
 
             // Required - failing
-            #expect(throws: TestProvider.TestError.self) { try snapshot.requiredDouble(forKey: ConfigKey(["failure"])) }
             #expect(throws: TestProvider.TestError.self) { try snapshot.requiredDouble(forKey: "failure") }
         }
-        try config.withSnapshot { snapshot in
+        do {
+            let snapshot = config.snapshot()
+
             // Optional - success
-            #expect(snapshot.bool(forKey: ConfigKey(["bool"])) == Defaults.bool)
             #expect(snapshot.bool(forKey: "bool") == Defaults.bool)
 
             // Optional - missing
-            #expect(snapshot.bool(forKey: ConfigKey(["absentBool"])) == nil)
             #expect(snapshot.bool(forKey: "absentBool") == nil)
 
             // Optional - failing
-            #expect(snapshot.bool(forKey: ConfigKey(["failure"])) == nil)
             #expect(snapshot.bool(forKey: "failure") == nil)
 
             // Defaulted - success
-            #expect(snapshot.bool(forKey: ConfigKey(["bool"]), default: Defaults.otherBool) == Defaults.bool)
             #expect(snapshot.bool(forKey: "bool", default: Defaults.otherBool) == Defaults.bool)
 
             // Defaulted - missing
-            #expect(snapshot.bool(forKey: ConfigKey(["absentBool"]), default: Defaults.otherBool) == Defaults.otherBool)
             #expect(snapshot.bool(forKey: "absentBool", default: Defaults.otherBool) == Defaults.otherBool)
 
             // Defaulted - failing
-            #expect(snapshot.bool(forKey: ConfigKey(["failure"]), default: Defaults.otherBool) == Defaults.otherBool)
             #expect(snapshot.bool(forKey: "failure", default: Defaults.otherBool) == Defaults.otherBool)
 
             // Required - success
-            try #expect(snapshot.requiredBool(forKey: ConfigKey(["bool"])) == Defaults.bool)
             try #expect(snapshot.requiredBool(forKey: "bool") == Defaults.bool)
 
             // Required - missing
-            let error1 = #expect(throws: ConfigError.self) {
-                try snapshot.requiredBool(forKey: ConfigKey(["absentBool"]))
-            }
+            let error1 = #expect(throws: ConfigError.self) { try snapshot.requiredBool(forKey: "absentBool") }
             #expect(error1 == .missingRequiredConfigValue(AbsoluteConfigKey(["absentBool"])))
-            let error2 = #expect(throws: ConfigError.self) { try snapshot.requiredBool(forKey: "absentBool") }
-            #expect(error2 == .missingRequiredConfigValue(AbsoluteConfigKey(["absentBool"])))
 
             // Required - failing
-            #expect(throws: TestProvider.TestError.self) { try snapshot.requiredBool(forKey: ConfigKey(["failure"])) }
             #expect(throws: TestProvider.TestError.self) { try snapshot.requiredBool(forKey: "failure") }
         }
-        try config.withSnapshot { snapshot in
+        do {
+            let snapshot = config.snapshot()
+
             // Optional - success
-            #expect(snapshot.bytes(forKey: ConfigKey(["bytes"])) == Defaults.bytes)
             #expect(snapshot.bytes(forKey: "bytes") == Defaults.bytes)
 
             // Optional - missing
-            #expect(snapshot.bytes(forKey: ConfigKey(["absentBytes"])) == nil)
             #expect(snapshot.bytes(forKey: "absentBytes") == nil)
 
             // Optional - failing
-            #expect(snapshot.bytes(forKey: ConfigKey(["failure"])) == nil)
             #expect(snapshot.bytes(forKey: "failure") == nil)
 
             // Defaulted - success
-            #expect(snapshot.bytes(forKey: ConfigKey(["bytes"]), default: Defaults.otherBytes) == Defaults.bytes)
             #expect(snapshot.bytes(forKey: "bytes", default: Defaults.otherBytes) == Defaults.bytes)
 
             // Defaulted - missing
-            #expect(
-                snapshot.bytes(forKey: ConfigKey(["absentBytes"]), default: Defaults.otherBytes) == Defaults.otherBytes
-            )
             #expect(snapshot.bytes(forKey: "absentBytes", default: Defaults.otherBytes) == Defaults.otherBytes)
 
             // Defaulted - failing
-            #expect(snapshot.bytes(forKey: ConfigKey(["failure"]), default: Defaults.otherBytes) == Defaults.otherBytes)
             #expect(snapshot.bytes(forKey: "failure", default: Defaults.otherBytes) == Defaults.otherBytes)
 
             // Required - success
-            try #expect(snapshot.requiredBytes(forKey: ConfigKey(["bytes"])) == Defaults.bytes)
             try #expect(snapshot.requiredBytes(forKey: "bytes") == Defaults.bytes)
 
             // Required - missing
-            let error1 = #expect(throws: ConfigError.self) {
-                try snapshot.requiredBytes(forKey: ConfigKey(["absentBytes"]))
-            }
+            let error1 = #expect(throws: ConfigError.self) { try snapshot.requiredBytes(forKey: "absentBytes") }
             #expect(error1 == .missingRequiredConfigValue(AbsoluteConfigKey(["absentBytes"])))
-            let error2 = #expect(throws: ConfigError.self) { try snapshot.requiredBytes(forKey: "absentBytes") }
-            #expect(error2 == .missingRequiredConfigValue(AbsoluteConfigKey(["absentBytes"])))
 
             // Required - failing
-            #expect(throws: TestProvider.TestError.self) { try snapshot.requiredBytes(forKey: ConfigKey(["failure"])) }
             #expect(throws: TestProvider.TestError.self) { try snapshot.requiredBytes(forKey: "failure") }
         }
-        try config.withSnapshot { snapshot in
+        do {
+            let snapshot = config.snapshot()
+
             // Optional - success
-            #expect(snapshot.stringArray(forKey: ConfigKey(["stringArray"])) == Defaults.stringArray)
             #expect(snapshot.stringArray(forKey: "stringArray") == Defaults.stringArray)
 
             // Optional - missing
-            #expect(snapshot.stringArray(forKey: ConfigKey(["absentStringArray"])) == nil)
             #expect(snapshot.stringArray(forKey: "absentStringArray") == nil)
 
             // Optional - failing
-            #expect(snapshot.stringArray(forKey: ConfigKey(["failure"])) == nil)
             #expect(snapshot.stringArray(forKey: "failure") == nil)
 
             // Defaulted - success
-            #expect(
-                snapshot.stringArray(forKey: ConfigKey(["stringArray"]), default: Defaults.otherStringArray)
-                    == Defaults.stringArray
-            )
             #expect(
                 snapshot.stringArray(forKey: "stringArray", default: Defaults.otherStringArray) == Defaults.stringArray
             )
 
             // Defaulted - missing
-            #expect(
-                snapshot.stringArray(forKey: ConfigKey(["absentStringArray"]), default: Defaults.otherStringArray)
-                    == Defaults.otherStringArray
-            )
             #expect(
                 snapshot.stringArray(forKey: "absentStringArray", default: Defaults.otherStringArray)
                     == Defaults.otherStringArray
@@ -283,113 +212,72 @@ struct ConfigSnapshotReaderMethodTestsGet1 {
 
             // Defaulted - failing
             #expect(
-                snapshot.stringArray(forKey: ConfigKey(["failure"]), default: Defaults.otherStringArray)
-                    == Defaults.otherStringArray
-            )
-            #expect(
                 snapshot.stringArray(forKey: "failure", default: Defaults.otherStringArray) == Defaults.otherStringArray
             )
 
             // Required - success
-            try #expect(snapshot.requiredStringArray(forKey: ConfigKey(["stringArray"])) == Defaults.stringArray)
             try #expect(snapshot.requiredStringArray(forKey: "stringArray") == Defaults.stringArray)
 
             // Required - missing
             let error1 = #expect(throws: ConfigError.self) {
-                try snapshot.requiredStringArray(forKey: ConfigKey(["absentStringArray"]))
-            }
-            #expect(error1 == .missingRequiredConfigValue(AbsoluteConfigKey(["absentStringArray"])))
-            let error2 = #expect(throws: ConfigError.self) {
                 try snapshot.requiredStringArray(forKey: "absentStringArray")
             }
-            #expect(error2 == .missingRequiredConfigValue(AbsoluteConfigKey(["absentStringArray"])))
+            #expect(error1 == .missingRequiredConfigValue(AbsoluteConfigKey(["absentStringArray"])))
 
             // Required - failing
-            #expect(throws: TestProvider.TestError.self) {
-                try snapshot.requiredStringArray(forKey: ConfigKey(["failure"]))
-            }
             #expect(throws: TestProvider.TestError.self) { try snapshot.requiredStringArray(forKey: "failure") }
         }
-        try config.withSnapshot { snapshot in
+        do {
+            let snapshot = config.snapshot()
+
             // Optional - success
-            #expect(snapshot.intArray(forKey: ConfigKey(["intArray"])) == Defaults.intArray)
             #expect(snapshot.intArray(forKey: "intArray") == Defaults.intArray)
 
             // Optional - missing
-            #expect(snapshot.intArray(forKey: ConfigKey(["absentIntArray"])) == nil)
             #expect(snapshot.intArray(forKey: "absentIntArray") == nil)
 
             // Optional - failing
-            #expect(snapshot.intArray(forKey: ConfigKey(["failure"])) == nil)
             #expect(snapshot.intArray(forKey: "failure") == nil)
 
             // Defaulted - success
-            #expect(
-                snapshot.intArray(forKey: ConfigKey(["intArray"]), default: Defaults.otherIntArray) == Defaults.intArray
-            )
             #expect(snapshot.intArray(forKey: "intArray", default: Defaults.otherIntArray) == Defaults.intArray)
 
             // Defaulted - missing
-            #expect(
-                snapshot.intArray(forKey: ConfigKey(["absentIntArray"]), default: Defaults.otherIntArray)
-                    == Defaults.otherIntArray
-            )
             #expect(
                 snapshot.intArray(forKey: "absentIntArray", default: Defaults.otherIntArray) == Defaults.otherIntArray
             )
 
             // Defaulted - failing
-            #expect(
-                snapshot.intArray(forKey: ConfigKey(["failure"]), default: Defaults.otherIntArray)
-                    == Defaults.otherIntArray
-            )
             #expect(snapshot.intArray(forKey: "failure", default: Defaults.otherIntArray) == Defaults.otherIntArray)
 
             // Required - success
-            try #expect(snapshot.requiredIntArray(forKey: ConfigKey(["intArray"])) == Defaults.intArray)
             try #expect(snapshot.requiredIntArray(forKey: "intArray") == Defaults.intArray)
 
             // Required - missing
-            let error1 = #expect(throws: ConfigError.self) {
-                try snapshot.requiredIntArray(forKey: ConfigKey(["absentIntArray"]))
-            }
+            let error1 = #expect(throws: ConfigError.self) { try snapshot.requiredIntArray(forKey: "absentIntArray") }
             #expect(error1 == .missingRequiredConfigValue(AbsoluteConfigKey(["absentIntArray"])))
-            let error2 = #expect(throws: ConfigError.self) { try snapshot.requiredIntArray(forKey: "absentIntArray") }
-            #expect(error2 == .missingRequiredConfigValue(AbsoluteConfigKey(["absentIntArray"])))
 
             // Required - failing
-            #expect(throws: TestProvider.TestError.self) {
-                try snapshot.requiredIntArray(forKey: ConfigKey(["failure"]))
-            }
             #expect(throws: TestProvider.TestError.self) { try snapshot.requiredIntArray(forKey: "failure") }
         }
-        try config.withSnapshot { snapshot in
+        do {
+            let snapshot = config.snapshot()
+
             // Optional - success
-            #expect(snapshot.doubleArray(forKey: ConfigKey(["doubleArray"])) == Defaults.doubleArray)
             #expect(snapshot.doubleArray(forKey: "doubleArray") == Defaults.doubleArray)
 
             // Optional - missing
-            #expect(snapshot.doubleArray(forKey: ConfigKey(["absentDoubleArray"])) == nil)
             #expect(snapshot.doubleArray(forKey: "absentDoubleArray") == nil)
 
             // Optional - failing
-            #expect(snapshot.doubleArray(forKey: ConfigKey(["failure"])) == nil)
             #expect(snapshot.doubleArray(forKey: "failure") == nil)
 
             // Defaulted - success
-            #expect(
-                snapshot.doubleArray(forKey: ConfigKey(["doubleArray"]), default: Defaults.otherDoubleArray)
-                    == Defaults.doubleArray
-            )
             #expect(
                 snapshot.doubleArray(forKey: "doubleArray", default: Defaults.otherDoubleArray) == Defaults.doubleArray
             )
 
             // Defaulted - missing
-            #expect(
-                snapshot.doubleArray(forKey: ConfigKey(["absentDoubleArray"]), default: Defaults.otherDoubleArray)
-                    == Defaults.otherDoubleArray
-            )
             #expect(
                 snapshot.doubleArray(forKey: "absentDoubleArray", default: Defaults.otherDoubleArray)
                     == Defaults.otherDoubleArray
@@ -397,106 +285,68 @@ struct ConfigSnapshotReaderMethodTestsGet1 {
 
             // Defaulted - failing
             #expect(
-                snapshot.doubleArray(forKey: ConfigKey(["failure"]), default: Defaults.otherDoubleArray)
-                    == Defaults.otherDoubleArray
-            )
-            #expect(
                 snapshot.doubleArray(forKey: "failure", default: Defaults.otherDoubleArray) == Defaults.otherDoubleArray
             )
 
             // Required - success
-            try #expect(snapshot.requiredDoubleArray(forKey: ConfigKey(["doubleArray"])) == Defaults.doubleArray)
             try #expect(snapshot.requiredDoubleArray(forKey: "doubleArray") == Defaults.doubleArray)
 
             // Required - missing
             let error1 = #expect(throws: ConfigError.self) {
-                try snapshot.requiredDoubleArray(forKey: ConfigKey(["absentDoubleArray"]))
-            }
-            #expect(error1 == .missingRequiredConfigValue(AbsoluteConfigKey(["absentDoubleArray"])))
-            let error2 = #expect(throws: ConfigError.self) {
                 try snapshot.requiredDoubleArray(forKey: "absentDoubleArray")
             }
-            #expect(error2 == .missingRequiredConfigValue(AbsoluteConfigKey(["absentDoubleArray"])))
+            #expect(error1 == .missingRequiredConfigValue(AbsoluteConfigKey(["absentDoubleArray"])))
 
             // Required - failing
-            #expect(throws: TestProvider.TestError.self) {
-                try snapshot.requiredDoubleArray(forKey: ConfigKey(["failure"]))
-            }
             #expect(throws: TestProvider.TestError.self) { try snapshot.requiredDoubleArray(forKey: "failure") }
         }
-        try config.withSnapshot { snapshot in
+        do {
+            let snapshot = config.snapshot()
+
             // Optional - success
-            #expect(snapshot.boolArray(forKey: ConfigKey(["boolArray"])) == Defaults.boolArray)
             #expect(snapshot.boolArray(forKey: "boolArray") == Defaults.boolArray)
 
             // Optional - missing
-            #expect(snapshot.boolArray(forKey: ConfigKey(["absentBoolArray"])) == nil)
             #expect(snapshot.boolArray(forKey: "absentBoolArray") == nil)
 
             // Optional - failing
-            #expect(snapshot.boolArray(forKey: ConfigKey(["failure"])) == nil)
             #expect(snapshot.boolArray(forKey: "failure") == nil)
 
             // Defaulted - success
-            #expect(
-                snapshot.boolArray(forKey: ConfigKey(["boolArray"]), default: Defaults.otherBoolArray)
-                    == Defaults.boolArray
-            )
             #expect(snapshot.boolArray(forKey: "boolArray", default: Defaults.otherBoolArray) == Defaults.boolArray)
 
             // Defaulted - missing
-            #expect(
-                snapshot.boolArray(forKey: ConfigKey(["absentBoolArray"]), default: Defaults.otherBoolArray)
-                    == Defaults.otherBoolArray
-            )
             #expect(
                 snapshot.boolArray(forKey: "absentBoolArray", default: Defaults.otherBoolArray)
                     == Defaults.otherBoolArray
             )
 
             // Defaulted - failing
-            #expect(
-                snapshot.boolArray(forKey: ConfigKey(["failure"]), default: Defaults.otherBoolArray)
-                    == Defaults.otherBoolArray
-            )
             #expect(snapshot.boolArray(forKey: "failure", default: Defaults.otherBoolArray) == Defaults.otherBoolArray)
 
             // Required - success
-            try #expect(snapshot.requiredBoolArray(forKey: ConfigKey(["boolArray"])) == Defaults.boolArray)
             try #expect(snapshot.requiredBoolArray(forKey: "boolArray") == Defaults.boolArray)
 
             // Required - missing
-            let error1 = #expect(throws: ConfigError.self) {
-                try snapshot.requiredBoolArray(forKey: ConfigKey(["absentBoolArray"]))
-            }
+            let error1 = #expect(throws: ConfigError.self) { try snapshot.requiredBoolArray(forKey: "absentBoolArray") }
             #expect(error1 == .missingRequiredConfigValue(AbsoluteConfigKey(["absentBoolArray"])))
-            let error2 = #expect(throws: ConfigError.self) { try snapshot.requiredBoolArray(forKey: "absentBoolArray") }
-            #expect(error2 == .missingRequiredConfigValue(AbsoluteConfigKey(["absentBoolArray"])))
 
             // Required - failing
-            #expect(throws: TestProvider.TestError.self) {
-                try snapshot.requiredBoolArray(forKey: ConfigKey(["failure"]))
-            }
             #expect(throws: TestProvider.TestError.self) { try snapshot.requiredBoolArray(forKey: "failure") }
         }
-        try config.withSnapshot { snapshot in
+        do {
+            let snapshot = config.snapshot()
+
             // Optional - success
-            #expect(snapshot.byteChunkArray(forKey: ConfigKey(["byteChunkArray"])) == Defaults.byteChunkArray)
             #expect(snapshot.byteChunkArray(forKey: "byteChunkArray") == Defaults.byteChunkArray)
 
             // Optional - missing
-            #expect(snapshot.byteChunkArray(forKey: ConfigKey(["absentByteChunkArray"])) == nil)
             #expect(snapshot.byteChunkArray(forKey: "absentByteChunkArray") == nil)
 
             // Optional - failing
-            #expect(snapshot.byteChunkArray(forKey: ConfigKey(["failure"])) == nil)
             #expect(snapshot.byteChunkArray(forKey: "failure") == nil)
 
             // Defaulted - success
-            #expect(
-                snapshot.byteChunkArray(forKey: ConfigKey(["byteChunkArray"]), default: Defaults.otherByteChunkArray)
-                    == Defaults.byteChunkArray
-            )
             #expect(
                 snapshot.byteChunkArray(forKey: "byteChunkArray", default: Defaults.otherByteChunkArray)
                     == Defaults.byteChunkArray
@@ -504,46 +354,26 @@ struct ConfigSnapshotReaderMethodTestsGet1 {
 
             // Defaulted - missing
             #expect(
-                snapshot.byteChunkArray(
-                    forKey: ConfigKey(["absentByteChunkArray"]),
-                    default: Defaults.otherByteChunkArray
-                ) == Defaults.otherByteChunkArray
-            )
-            #expect(
                 snapshot.byteChunkArray(forKey: "absentByteChunkArray", default: Defaults.otherByteChunkArray)
                     == Defaults.otherByteChunkArray
             )
 
             // Defaulted - failing
             #expect(
-                snapshot.byteChunkArray(forKey: ConfigKey(["failure"]), default: Defaults.otherByteChunkArray)
-                    == Defaults.otherByteChunkArray
-            )
-            #expect(
                 snapshot.byteChunkArray(forKey: "failure", default: Defaults.otherByteChunkArray)
                     == Defaults.otherByteChunkArray
             )
 
             // Required - success
-            try #expect(
-                snapshot.requiredByteChunkArray(forKey: ConfigKey(["byteChunkArray"])) == Defaults.byteChunkArray
-            )
             try #expect(snapshot.requiredByteChunkArray(forKey: "byteChunkArray") == Defaults.byteChunkArray)
 
             // Required - missing
             let error1 = #expect(throws: ConfigError.self) {
-                try snapshot.requiredByteChunkArray(forKey: ConfigKey(["absentByteChunkArray"]))
-            }
-            #expect(error1 == .missingRequiredConfigValue(AbsoluteConfigKey(["absentByteChunkArray"])))
-            let error2 = #expect(throws: ConfigError.self) {
                 try snapshot.requiredByteChunkArray(forKey: "absentByteChunkArray")
             }
-            #expect(error2 == .missingRequiredConfigValue(AbsoluteConfigKey(["absentByteChunkArray"])))
+            #expect(error1 == .missingRequiredConfigValue(AbsoluteConfigKey(["absentByteChunkArray"])))
 
             // Required - failing
-            #expect(throws: TestProvider.TestError.self) {
-                try snapshot.requiredByteChunkArray(forKey: ConfigKey(["failure"]))
-            }
             #expect(throws: TestProvider.TestError.self) { try snapshot.requiredByteChunkArray(forKey: "failure") }
         }
     }

@@ -36,6 +36,7 @@
 /// let dotEncoder = ConfigKeyEncoder.dotSeparated
 /// let dashEncoder = ConfigKeyEncoder.dashSeparated
 /// ```
+@available(Configuration 1.0, *)
 public struct SeparatorKeyEncoder {
 
     /// The string used to join key components.
@@ -60,6 +61,7 @@ public struct SeparatorKeyEncoder {
     }
 }
 
+@available(Configuration 1.0, *)
 extension SeparatorKeyEncoder: ConfigKeyEncoder {
     // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
     public func encode(_ key: AbsoluteConfigKey) -> String {
@@ -67,6 +69,7 @@ extension SeparatorKeyEncoder: ConfigKeyEncoder {
     }
 }
 
+@available(Configuration 1.0, *)
 extension ConfigKeyEncoder where Self == SeparatorKeyEncoder {
     /// An encoder that uses dot notation for hierarchical keys.
     ///

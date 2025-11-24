@@ -4,15 +4,14 @@
 
 ### Creating config readers
 
-- ``ConfigReader/init(keyDecoder:provider:accessReporter:)``
-- ``ConfigReader/init(keyDecoder:providers:accessReporter:)``
+- ``ConfigReader/init(provider:accessReporter:)``
+- ``ConfigReader/init(providers:accessReporter:)``
 
 ### Retrieving a scoped config reader
-- ``ConfigReader/scoped(to:context:keyDecoderOverride:)``
-- ``ConfigReader/scoped(to:keyDecoderOverride:)``
+- ``ConfigReader/scoped(to:)``
 
 ### Reading from a snapshot
-- ``ConfigReader/withSnapshot(_:)``
+- ``ConfigReader/snapshot()``
 - ``ConfigReader/watchSnapshot(fileID:line:updatesHandler:)``
 
 - <doc:ConfigReader-Get>

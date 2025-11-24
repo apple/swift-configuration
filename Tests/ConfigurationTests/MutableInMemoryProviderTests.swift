@@ -132,11 +132,11 @@ struct MutableInMemoryProviderTests {
         let provider = makeProvider()
         let config = ConfigReader(provider: provider)
 
-        config.withSnapshot { snapshot in
-            #expect(snapshot.bool(forKey: "bool") == true)
-            provider.setValue(false, forKey: "bool")
-            #expect(snapshot.bool(forKey: "bool") == true)
-        }
+        let snapshot = config.snapshot()
+        #expect(snapshot.bool(forKey: "bool") == true)
+        provider.setValue(false, forKey: "bool")
+        #expect(snapshot.bool(forKey: "bool") == true)
+
         #expect(config.bool(forKey: "bool") == false)
     }
 

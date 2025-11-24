@@ -22,20 +22,19 @@ import Synchronization
 ///
 /// ## Usage
 ///
-/// Get a ``ConfigSnapshotReader`` from a ``ConfigReader`` by using ``ConfigReader/withSnapshot(_:)``
-/// to retrieve a snapshot. The values of the snapshot are guaranteed to be from the same point in time:
+/// Get a ``ConfigSnapshotReader`` from a ``ConfigReader`` by using ``ConfigReader/snapshot()``
+/// to retrieve a snapshot. All values in the snapshot are guaranteed to be from the same point in time:
 /// ```swift
 /// // Get a snapshot from a ConfigReader
 /// let config = ConfigReader(provider: EnvironmentVariablesProvider())
-/// let result = config.withSnapshot { snapshot in
-///     // Use snapshot to read config values
-///     let cert = snapshot.string(forKey: "cert")
-///     let privateKey = snapshot.string(forKey: "privateKey")
-///     // Ensures that both values are coming from the same
-///     // underlying snapshot and that a provider didn't change
-///     // its internal state between the two `string(...)` calls.
-///     return MyCert(cert: cert, privateKey: privateKey)
-/// }
+/// let snapshot = config.snapshot()
+/// // Use snapshot to read config values
+/// let cert = snapshot.string(forKey: "cert")
+/// let privateKey = snapshot.string(forKey: "privateKey")
+/// // Ensures that both values are coming from the same
+/// // underlying snapshot and that a provider didn't change
+/// // its internal state between the two `string(...)` calls.
+/// let identity = MyIdentity(cert: cert, privateKey: privateKey)
 /// ```
 ///
 /// Or you can watch for snapshot updates using the ``ConfigReader/watchSnapshot(fileID:line:updatesHandler:)``:
@@ -73,24 +72,7 @@ import Synchronization
 ///
 /// ```swift
 /// let httpTimeout = snapshotReader.int(
-///     forKey: "http.timeout",
-///     context: ["upstream": "example.com"],
-///     default: 60
-/// )
-/// ```
-///
-/// ### Key decoding
-///
-/// By default, the snapshot reader uses the key decoder from the original config reader, but you can
-/// provide a different one when creating a scoped reader:
-///
-/// ```swift
-/// let scopedReader = snapshotReader.scoped(
-///     to: "http",
-///     keyDecoderOverride: .colonSeparated
-/// )
-/// let timeout = scopedReader.int(
-///     forKey: "http:timeout",
+///     forKey: ConfigKey("http.timeout", context: ["upstream": "example.com"]),
 ///     default: 60
 /// )
 /// ```
@@ -164,11 +146,6 @@ public struct ConfigSnapshotReader: Sendable {
     /// from this one.
     final class Storage: Sendable {
 
-        /// The key decoder that the library uses to interpret string keys.
-        ///
-        /// For example, turns `foo.bar.baz` into `["foo", "bar", "baz"]`.
-        let keyDecoder: any ConfigKeyDecoder
-
         /// The underlying multi snapshot.
         let snapshot: MultiSnapshot
 
@@ -177,15 +154,12 @@ public struct ConfigSnapshotReader: Sendable {
 
         /// Creates a storage instance.
         /// - Parameters:
-        ///   - keyDecoder: The key decoder used by methods that take string keys.
         ///   - snapshot: The underlying multi snapshot.
         ///   - accessReporter: The reporter of access events.
         init(
-            keyDecoder: some ConfigKeyDecoder,
             snapshot: MultiSnapshot,
             accessReporter: (any AccessReporter)?
         ) {
-            self.keyDecoder = keyDecoder
             self.snapshot = snapshot
             self.accessReporter = accessReporter
         }
@@ -193,11 +167,6 @@ public struct ConfigSnapshotReader: Sendable {
 
     /// The underlying storage that is shared with any transitive child readers created from this one.
     private var storage: Storage
-
-    /// The key decoder the library uses to interpret  string keys.
-    var keyDecoder: any ConfigKeyDecoder {
-        storage.keyDecoder
-    }
 
     /// The underlying multi snapshot.
     private var snapshot: MultiSnapshot {
@@ -226,21 +195,10 @@ public struct ConfigSnapshotReader: Sendable {
     /// - Parameters:
     ///   - scopedKey: The key to append to the current key prefix.
     ///   - parent: The parent reader from which to create a scoped reader.
-    ///   - keyDecoderOverride: A key decoder that replaces the original key decoder.
-    private init(scopedKey: ConfigKey, parent: ConfigSnapshotReader, keyDecoderOverride: (any ConfigKeyDecoder)?) {
-        let storage: Storage
-        if let keyDecoderOverride {
-            storage = .init(
-                keyDecoder: keyDecoderOverride,
-                snapshot: parent.storage.snapshot,
-                accessReporter: parent.storage.accessReporter
-            )
-        } else {
-            storage = parent.storage
-        }
+    private init(scopedKey: ConfigKey, parent: ConfigSnapshotReader) {
         self.init(
             keyPrefix: parent.keyPrefix.appending(scopedKey),
-            storage: storage
+            storage: parent.storage
         )
     }
 
@@ -253,83 +211,46 @@ public struct ConfigSnapshotReader: Sendable {
     /// let timeout = httpConfig.int(forKey: "timeout") // Reads from "client.http.timeout" in the snapshot
     /// ```
     ///
-    /// - Parameters:
-    ///   - configKey: The key to append to the current key prefix.
-    ///   - keyDecoderOverride: A key decoder that replaces the original key decoder.
+    /// - Parameters configKey: The key to append to the current key prefix.
     /// - Returns: A reader for accessing scoped values.
-    public func scoped(to configKey: ConfigKey, keyDecoderOverride: (any ConfigKeyDecoder)? = nil)
+    public func scoped(to configKey: ConfigKey)
         -> ConfigSnapshotReader
     {
         ConfigSnapshotReader(
             scopedKey: configKey,
-            parent: self,
-            keyDecoderOverride: keyDecoderOverride
-        )
-    }
-
-    /// Returns a scoped reader by appending the provided key to the current key prefix.
-    ///
-    /// Use this method to create a reader that accesses a subset of the configuration,
-    /// using a string key that will be decoded according to the reader's key decoder.
-    ///
-    /// ```swift
-    /// let httpConfig = snapshotReader.scoped(to: "http.client")
-    /// let timeout = httpConfig.int(forKey: "timeout") // Reads from "http.client.timeout" in the snapshot
-    /// ```
-    ///
-    /// - Parameters:
-    ///   - key: The key to append to the current key prefix.
-    ///   - context: Additional config context for the key.
-    ///   - keyDecoderOverride: A key decoder that replaces the original key decoder.
-    /// - Returns: A reader for accessing scoped values.
-    public func scoped(
-        to key: String,
-        context: [String: ConfigContextValue] = [:],
-        keyDecoderOverride: (any ConfigKeyDecoder)? = nil
-    ) -> ConfigSnapshotReader {
-        ConfigSnapshotReader(
-            scopedKey: (keyDecoderOverride ?? keyDecoder).decode(key, context: context),
-            parent: self,
-            keyDecoderOverride: keyDecoderOverride
+            parent: self
         )
     }
 }
 
 @available(Configuration 1.0, *)
 extension ConfigReader {
-    /// Provides a snapshot of the current configuration state and passes it to the provided closure.
+    /// Returns a snapshot of the current configuration state.
     ///
-    /// This method creates a snapshot of the current configuration state and passes it to the
-    /// provided closure. The snapshot reader provides read-only access to the configuration's state
+    /// The snapshot reader provides read-only access to the configuration's state
     /// at the time the method was called.
     ///
     /// ```swift
-    /// let result = config.withSnapshot { snapshot in
-    ///     // Use snapshot to read config values
-    ///     let cert = snapshot.string(forKey: "cert")
-    ///     let privateKey = snapshot.string(forKey: "privateKey")
-    ///     // Ensures that both values are coming from the same underlying snapshot and that a provider
-    ///     // didn't change its internal state between the two `string(...)` calls.
-    ///     return MyCert(cert: cert, privateKey: privateKey)
-    /// }
+    /// let snapshot = config.snapshot()
+    /// // Use snapshot to read config values
+    /// let cert = snapshot.string(forKey: "cert")
+    /// let privateKey = snapshot.string(forKey: "privateKey")
+    /// // Ensures that both values are coming from the same underlying snapshot and that a provider
+    /// // didn't change its internal state between the two `string(...)` calls.
+    /// let identity = MyIdentity(cert: cert, privateKey: privateKey)
     /// ```
     ///
-    /// - Parameter body: A closure that takes a `ConfigSnapshotReader` and returns a value.
-    /// - Returns: The value returned by the closure.
-    /// - Throws: Rethrows any errors thrown by the provided closure.
-    public func withSnapshot<Failure: Error, Return>(
-        _ body: (ConfigSnapshotReader) throws(Failure) -> Return
-    ) throws(Failure) -> Return {
+    /// - Returns: The snapshot.
+    public func snapshot() -> ConfigSnapshotReader {
         let multiSnapshot = provider.snapshot()
         let snapshotReader = ConfigSnapshotReader(
             keyPrefix: keyPrefix,
             storage: .init(
-                keyDecoder: keyDecoder,
                 snapshot: multiSnapshot,
                 accessReporter: accessReporter
             )
         )
-        return try body(snapshotReader)
+        return snapshotReader
     }
 
     /// Watches the configuration for changes.
@@ -357,7 +278,7 @@ extension ConfigReader {
     ///   - updatesHandler: A closure that receives an async sequence of `ConfigSnapshotReader` instances.
     /// - Returns: The value returned by the handler.
     /// - Throws: Any error thrown by the handler.
-    public func watchSnapshot<Return>(
+    public func watchSnapshot<Return: ~Copyable>(
         fileID: String = #fileID,
         line: UInt = #line,
         updatesHandler: (ConfigUpdatesAsyncSequence<ConfigSnapshotReader, Never>) async throws -> Return
@@ -370,7 +291,6 @@ extension ConfigReader {
                             ConfigSnapshotReader(
                                 keyPrefix: keyPrefix,
                                 storage: .init(
-                                    keyDecoder: keyDecoder,
                                     snapshot: multiSnapshot,
                                     accessReporter: accessReporter
                                 )
