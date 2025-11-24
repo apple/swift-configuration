@@ -291,7 +291,7 @@ Read <doc:Using-reloading-providers> for details on how to receive updates as co
 #### Namespacing and scoped readers
 
 The built-in namespacing of ``ConfigKey`` interprets `"http.timeout"` as an array of two components: `"http"` and `"timeout"`.
-The following example uses ``ConfigReader/scoped(to:context:keyDecoderOverride:)`` to create a namespaced reader with the key `"http"`, to allow reads to use the shorter key `"timeout"`:
+The following example uses ``ConfigReader/scoped(to:)`` to create a namespaced reader with the key `"http"`, to allow reads to use the shorter key `"timeout"`:
 
 Consider the following JSON configuration:
 
@@ -358,7 +358,7 @@ Read <doc:Handling-secrets-correctly> for guidance on best practices for secrets
 #### Consistent snapshots
 
 Retrieve related values from a consistent snapshot using ``ConfigSnapshotReader``, which you
-get from calling ``ConfigReader/withSnapshot(_:)``.
+get by calling ``ConfigReader/snapshot()``.
 
 This ensures that multiple values are read from a single snapshot inside each provider, even when using
 providers that update their internal values.
@@ -366,29 +366,10 @@ For example by downloading new data periodically:
 
 ```swift
 let config = /* a reader with one or more providers that change values over time */
-try config.withSnapshot { snapshot in
-    let certificate = try snapshot.requiredString(forKey: "mtls.certificate")
-    let privateKey = try snapshot.requiredString(forKey: "mtls.privateKey", isSecret: true)
-    // `certificate` and `privateKey` are guaranteed to come from the same snapshot in the provider
-}
-```
-
-#### Custom key syntax
-
-Customizable shorthand key syntax using ``ConfigKeyDecoder`` allows namespacing using not just the default dot-separated `http.timeout`, but any custom convention, such as `http::timeout`:
-
-```swift
-// Create a custom key decoder that uses double-colon separator
-let doubleColonDecoder = SeparatorKeyDecoder(separator: "::")
-
-// Use the keyDecoder parameter when creating the config reader
-let config = ConfigReader(
-    provider: EnvironmentVariablesProvider(),
-    keyDecoder: doubleColonDecoder
-)
-
-// Now you can use double-colon syntax in your keys
-let timeout = config.int(forKey: "http::timeout", default: 60)
+let snapshot = config.snapshot()
+let certificate = try snapshot.requiredString(forKey: "mtls.certificate")
+let privateKey = try snapshot.requiredString(forKey: "mtls.privateKey", isSecret: true)
+// `certificate` and `privateKey` are guaranteed to come from the same snapshot in the provider
 ```
 
 #### Extensible ecosystem
@@ -441,9 +422,7 @@ Any package can implement a ``ConfigProvider``, making the ecosystem extensible 
 - ``AbsoluteConfigKey``
 - ``ConfigContextValue``
 - ``ConfigKeyEncoder``
-- ``ConfigKeyDecoder``
 - ``SeparatorKeyEncoder``
-- ``SeparatorKeyDecoder``
 - ``DirectoryFileKeyEncoder``
 
 ### Troubleshooting and access reporting

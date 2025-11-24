@@ -48,3 +48,41 @@ public typealias ReloadingYAMLProvider = ReloadingFileProvider<YAMLSnapshot>
 @available(Configuration 1.0, *)
 @available(*, deprecated, renamed: "ConfigSnapshot")
 public typealias ConfigSnapshotProtocol = ConfigSnapshot
+
+@available(Configuration 1.0, *)
+extension ConfigReader {
+    /// Provides a snapshot of the current configuration state and passes it to the provided closure.
+    ///
+    /// This method creates a snapshot of the current configuration state and passes it to the
+    /// provided closure. The snapshot reader provides read-only access to the configuration's state
+    /// at the time the method was called.
+    ///
+    /// ```swift
+    /// let result = config.withSnapshot { snapshot in
+    ///     // Use snapshot to read config values
+    ///     let cert = snapshot.string(forKey: "cert")
+    ///     let privateKey = snapshot.string(forKey: "privateKey")
+    ///     // Ensures that both values are coming from the same underlying snapshot and that a provider
+    ///     // didn't change its internal state between the two `string(...)` calls.
+    ///     return MyCert(cert: cert, privateKey: privateKey)
+    /// }
+    /// ```
+    ///
+    /// - Parameter body: A closure that takes a `ConfigSnapshotReader` and returns a value.
+    /// - Returns: The value returned by the closure.
+    /// - Throws: Rethrows any errors thrown by the provided closure.
+    @available(*, deprecated, message: "Renamed to snapshot().")
+    public func withSnapshot<Failure: Error, Return>(
+        _ body: (ConfigSnapshotReader) throws(Failure) -> Return
+    ) throws(Failure) -> Return {
+        let multiSnapshot = provider.snapshot()
+        let snapshotReader = ConfigSnapshotReader(
+            keyPrefix: keyPrefix,
+            storage: .init(
+                snapshot: multiSnapshot,
+                accessReporter: accessReporter
+            )
+        )
+        return try body(snapshotReader)
+    }
+}

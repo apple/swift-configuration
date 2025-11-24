@@ -38,13 +38,6 @@ struct ConfigReaderMethodTestsWatch3 {
             // Optional - success
             #expect(
                 try await config.watchStringArray(
-                    forKey: ConfigKey(["stringConvertibleArray"]),
-                    as: TestStringConvertible.self,
-                    updatesHandler: awaitFirst
-                ) == Defaults.stringConvertibleArray
-            )
-            #expect(
-                try await config.watchStringArray(
                     forKey: "stringConvertibleArray",
                     as: TestStringConvertible.self,
                     updatesHandler: awaitFirst
@@ -52,13 +45,6 @@ struct ConfigReaderMethodTestsWatch3 {
             )
 
             // Optional - missing
-            #expect(
-                try await config.watchStringArray(
-                    forKey: ConfigKey(["absentStringConvertibleArray"]),
-                    as: TestStringConvertible.self,
-                    updatesHandler: awaitFirst
-                ) == .some(nil)
-            )
             #expect(
                 try await config.watchStringArray(
                     forKey: "absentStringConvertibleArray",
@@ -70,13 +56,6 @@ struct ConfigReaderMethodTestsWatch3 {
             // Optional - failing
             #expect(
                 try await config.watchStringArray(
-                    forKey: ConfigKey(["failure"]),
-                    as: TestStringConvertible.self,
-                    updatesHandler: awaitFirst
-                ) == .some(nil)
-            )
-            #expect(
-                try await config.watchStringArray(
                     forKey: "failure",
                     as: TestStringConvertible.self,
                     updatesHandler: awaitFirst
@@ -84,14 +63,6 @@ struct ConfigReaderMethodTestsWatch3 {
             )
 
             // Defaulted - success
-            #expect(
-                try await config.watchStringArray(
-                    forKey: ConfigKey(["stringConvertibleArray"]),
-                    as: TestStringConvertible.self,
-                    default: Defaults.otherStringConvertibleArray,
-                    updatesHandler: awaitFirst
-                ) == Defaults.stringConvertibleArray
-            )
             #expect(
                 try await config.watchStringArray(
                     forKey: "stringConvertibleArray",
@@ -104,14 +75,6 @@ struct ConfigReaderMethodTestsWatch3 {
             // Defaulted - missing
             #expect(
                 try await config.watchStringArray(
-                    forKey: ConfigKey(["absentStringConvertibleArray"]),
-                    as: TestStringConvertible.self,
-                    default: Defaults.otherStringConvertibleArray,
-                    updatesHandler: awaitFirst
-                ) == Defaults.otherStringConvertibleArray
-            )
-            #expect(
-                try await config.watchStringArray(
                     forKey: "absentStringConvertibleArray",
                     as: TestStringConvertible.self,
                     default: Defaults.otherStringConvertibleArray,
@@ -120,14 +83,6 @@ struct ConfigReaderMethodTestsWatch3 {
             )
 
             // Defaulted - failing
-            #expect(
-                try await config.watchStringArray(
-                    forKey: ConfigKey(["failure"]),
-                    as: TestStringConvertible.self,
-                    default: Defaults.otherStringConvertibleArray,
-                    updatesHandler: awaitFirst
-                ) == Defaults.otherStringConvertibleArray
-            )
             #expect(
                 try await config.watchStringArray(
                     forKey: "failure",
@@ -140,13 +95,6 @@ struct ConfigReaderMethodTestsWatch3 {
             // Required - success
             #expect(
                 try await config.watchRequiredStringArray(
-                    forKey: ConfigKey(["stringConvertibleArray"]),
-                    as: TestStringConvertible.self,
-                    updatesHandler: awaitFirst
-                ) == Defaults.stringConvertibleArray
-            )
-            #expect(
-                try await config.watchRequiredStringArray(
                     forKey: "stringConvertibleArray",
                     as: TestStringConvertible.self,
                     updatesHandler: awaitFirst
@@ -156,29 +104,14 @@ struct ConfigReaderMethodTestsWatch3 {
             // Required - missing
             let error1 = await #expect(throws: ConfigError.self) {
                 try await config.watchRequiredStringArray(
-                    forKey: ConfigKey(["absentStringConvertibleArray"]),
-                    as: TestStringConvertible.self,
-                    updatesHandler: awaitFirst
-                )
-            }
-            #expect(error1 == .missingRequiredConfigValue(AbsoluteConfigKey(["absentStringConvertibleArray"])))
-            let error2 = await #expect(throws: ConfigError.self) {
-                try await config.watchRequiredStringArray(
                     forKey: "absentStringConvertibleArray",
                     as: TestStringConvertible.self,
                     updatesHandler: awaitFirst
                 )
             }
-            #expect(error2 == .missingRequiredConfigValue(AbsoluteConfigKey(["absentStringConvertibleArray"])))
+            #expect(error1 == .missingRequiredConfigValue(AbsoluteConfigKey(["absentStringConvertibleArray"])))
 
             // Required - failing
-            await #expect(throws: TestProvider.TestError.self) {
-                try await config.watchRequiredStringArray(
-                    forKey: ConfigKey(["failure"]),
-                    as: TestStringConvertible.self,
-                    updatesHandler: awaitFirst
-                )
-            }
             await #expect(throws: TestProvider.TestError.self) {
                 try await config.watchRequiredStringArray(
                     forKey: "failure",
@@ -191,13 +124,6 @@ struct ConfigReaderMethodTestsWatch3 {
             // Optional - success
             #expect(
                 try await config.watchStringArray(
-                    forKey: ConfigKey(["stringEnumArray"]),
-                    as: TestEnum.self,
-                    updatesHandler: awaitFirst
-                ) == Defaults.stringEnumArray
-            )
-            #expect(
-                try await config.watchStringArray(
                     forKey: "stringEnumArray",
                     as: TestEnum.self,
                     updatesHandler: awaitFirst
@@ -205,13 +131,6 @@ struct ConfigReaderMethodTestsWatch3 {
             )
 
             // Optional - missing
-            #expect(
-                try await config.watchStringArray(
-                    forKey: ConfigKey(["absentStringEnumArray"]),
-                    as: TestEnum.self,
-                    updatesHandler: awaitFirst
-                ) == .some(nil)
-            )
             #expect(
                 try await config.watchStringArray(
                     forKey: "absentStringEnumArray",
@@ -222,26 +141,11 @@ struct ConfigReaderMethodTestsWatch3 {
 
             // Optional - failing
             #expect(
-                try await config.watchStringArray(
-                    forKey: ConfigKey(["failure"]),
-                    as: TestEnum.self,
-                    updatesHandler: awaitFirst
-                ) == .some(nil)
-            )
-            #expect(
                 try await config.watchStringArray(forKey: "failure", as: TestEnum.self, updatesHandler: awaitFirst)
                     == .some(nil)
             )
 
             // Defaulted - success
-            #expect(
-                try await config.watchStringArray(
-                    forKey: ConfigKey(["stringEnumArray"]),
-                    as: TestEnum.self,
-                    default: Defaults.otherStringEnumArray,
-                    updatesHandler: awaitFirst
-                ) == Defaults.stringEnumArray
-            )
             #expect(
                 try await config.watchStringArray(
                     forKey: "stringEnumArray",
@@ -254,14 +158,6 @@ struct ConfigReaderMethodTestsWatch3 {
             // Defaulted - missing
             #expect(
                 try await config.watchStringArray(
-                    forKey: ConfigKey(["absentStringEnumArray"]),
-                    as: TestEnum.self,
-                    default: Defaults.otherStringEnumArray,
-                    updatesHandler: awaitFirst
-                ) == Defaults.otherStringEnumArray
-            )
-            #expect(
-                try await config.watchStringArray(
                     forKey: "absentStringEnumArray",
                     as: TestEnum.self,
                     default: Defaults.otherStringEnumArray,
@@ -270,14 +166,6 @@ struct ConfigReaderMethodTestsWatch3 {
             )
 
             // Defaulted - failing
-            #expect(
-                try await config.watchStringArray(
-                    forKey: ConfigKey(["failure"]),
-                    as: TestEnum.self,
-                    default: Defaults.otherStringEnumArray,
-                    updatesHandler: awaitFirst
-                ) == Defaults.otherStringEnumArray
-            )
             #expect(
                 try await config.watchStringArray(
                     forKey: "failure",
@@ -290,13 +178,6 @@ struct ConfigReaderMethodTestsWatch3 {
             // Required - success
             #expect(
                 try await config.watchRequiredStringArray(
-                    forKey: ConfigKey(["stringEnumArray"]),
-                    as: TestEnum.self,
-                    updatesHandler: awaitFirst
-                ) == Defaults.stringEnumArray
-            )
-            #expect(
-                try await config.watchRequiredStringArray(
                     forKey: "stringEnumArray",
                     as: TestEnum.self,
                     updatesHandler: awaitFirst
@@ -306,29 +187,14 @@ struct ConfigReaderMethodTestsWatch3 {
             // Required - missing
             let error1 = await #expect(throws: ConfigError.self) {
                 try await config.watchRequiredStringArray(
-                    forKey: ConfigKey(["absentStringEnumArray"]),
-                    as: TestEnum.self,
-                    updatesHandler: awaitFirst
-                )
-            }
-            #expect(error1 == .missingRequiredConfigValue(AbsoluteConfigKey(["absentStringEnumArray"])))
-            let error2 = await #expect(throws: ConfigError.self) {
-                try await config.watchRequiredStringArray(
                     forKey: "absentStringEnumArray",
                     as: TestEnum.self,
                     updatesHandler: awaitFirst
                 )
             }
-            #expect(error2 == .missingRequiredConfigValue(AbsoluteConfigKey(["absentStringEnumArray"])))
+            #expect(error1 == .missingRequiredConfigValue(AbsoluteConfigKey(["absentStringEnumArray"])))
 
             // Required - failing
-            await #expect(throws: TestProvider.TestError.self) {
-                try await config.watchRequiredStringArray(
-                    forKey: ConfigKey(["failure"]),
-                    as: TestEnum.self,
-                    updatesHandler: awaitFirst
-                )
-            }
             await #expect(throws: TestProvider.TestError.self) {
                 try await config.watchRequiredStringArray(
                     forKey: "failure",
