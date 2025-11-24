@@ -21,8 +21,65 @@ import Foundation
 import ConfigurationTesting
 import SystemPackage
 
-private let resourcesPath = FilePath(try! #require(Bundle.module.path(forResource: "Resources", ofType: nil)))
-let yamlConfigFile = resourcesPath.appending("/config.yaml")
+let yamlTestFileContents = """
+    string: "Hello"
+    int: 42
+    double: 3.14
+    bool: true
+    bytes: "bWFnaWM="
+
+    other:
+        string: "Other Hello"
+        int: 24
+        double: 2.72
+        bool: false
+        bytes: "bWFnaWMy"
+
+        stringy:
+            array:
+                - "Hello"
+                - "Swift"
+        inty:
+            array:
+                - 16
+                - 32
+        doubly:
+            array:
+                - 0.9
+                - 1.8
+        booly:
+            array:
+                - false
+                - true
+                - true
+        byteChunky:
+            array:
+                - "bWFnaWM="
+                - "bWFnaWMy"
+                - "bWFnaWM="
+
+    stringy:
+        array:
+            - "Hello"
+            - "World"
+    inty:
+        array:
+            - 42
+            - 24
+    doubly:
+        array:
+            - 3.14
+            - 2.72
+    booly:
+        array:
+            - true
+            - false
+    byteChunky:
+        array:
+            - "bWFnaWM="
+            - "bWFnaWMy"
+
+    """
 
 struct YAMLFileProviderTests {
 
@@ -30,7 +87,7 @@ struct YAMLFileProviderTests {
     var provider: YAMLSnapshot {
         get throws {
             try YAMLSnapshot(
-                data: Data(contentsOf: URL(filePath: yamlConfigFile.string)).bytes,
+                data: Data(yamlTestFileContents.utf8).bytes,
                 providerName: "TestProvider",
                 parsingOptions: .default
             )
@@ -55,8 +112,16 @@ struct YAMLFileProviderTests {
 
     @available(Configuration 1.0, *)
     @Test func compat() async throws {
+        let fileSystem = InMemoryFileSystem(files: [
+            "/etc/config.yaml": .file(timestamp: .now, contents: yamlTestFileContents)
+        ])
         try await ProviderCompatTest(
-            provider: FileProvider<YAMLSnapshot>(filePath: yamlConfigFile)
+            provider: FileProvider<YAMLSnapshot>(
+                parsingOptions: .default,
+                filePath: "/etc/config.yaml",
+                allowMissing: false,
+                fileSystem: fileSystem
+            )
         )
         .runTest()
     }

@@ -6,7 +6,7 @@
 
 - ``init(secretsSpecifier:bytesDecoder:arraySeparator:)``
 - ``init(environmentVariables:secretsSpecifier:bytesDecoder:arraySeparator:)``
-- ``init(environmentFilePath:secretsSpecifier:bytesDecoder:arraySeparator:)``
+- ``init(environmentFilePath:allowMissing:secretsSpecifier:bytesDecoder:arraySeparator:)``
 
 ### Inspecting an environment variable provider
 
