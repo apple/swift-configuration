@@ -147,20 +147,6 @@ public struct EnvironmentVariablesProvider: Sendable {
     /// The underlying snapshot of the provider.
     private let _snapshot: Snapshot
 
-    /// The error thrown by the provider.
-    enum ProviderError: Error, CustomStringConvertible {
-
-        /// The environment file was not found at the provided path.
-        case environmentFileNotFound(path: FilePath)
-
-        var description: String {
-            switch self {
-            case .environmentFileNotFound(let path):
-                return "EnvironmentVariablesProvider: File not found at path: \(path)."
-            }
-        }
-    }
-
     /// Creates a new provider that reads from the current process environment.
     ///
     /// This initializer creates a provider that sources configuration values from
@@ -239,7 +225,7 @@ public struct EnvironmentVariablesProvider: Sendable {
 
     /// Creates a new provider that reads from an environment file.
     ///
-    /// This initializer loads environment variables from a `.env` file at the specified path.
+    /// This initializer loads environment variables from an `.env` file at the specified path.
     /// The file should contain key-value pairs in the format `KEY=value`, one per line.
     /// Comments (lines starting with `#`) and empty lines are ignored.
     ///
@@ -247,36 +233,72 @@ public struct EnvironmentVariablesProvider: Sendable {
     /// // Load from a .env file
     /// let provider = try await EnvironmentVariablesProvider(
     ///     environmentFilePath: ".env",
+    ///     allowMissing: true,
     ///     secretsSpecifier: .specific(["API_KEY"])
     /// )
     /// ```
     ///
     /// - Parameters:
     ///   - environmentFilePath: The file system path to the environment file to load.
+    ///   - allowMissing: A flag controlling how the provider handles a missing file.
+    ///     - When `false` (the default), if the file is missing or malformed, throws an error.
+    ///     - When `true`, if the file is missing, treats it as empty. Malformed files still throw an error.
     ///   - secretsSpecifier: Specifies which environment variables should be treated as secrets.
     ///   - bytesDecoder: The decoder used for converting string values to byte arrays.
     ///   - arraySeparator: The character used to separate elements in array values.
-    /// - Throws: If the file cannot be found or read.
+    /// - Throws: If the file is malformed, or if missing when allowMissing is `false`.
     public init(
         environmentFilePath: FilePath,
+        allowMissing: Bool = false,
         secretsSpecifier: SecretsSpecifier<String, String> = .none,
         bytesDecoder: some ConfigBytesFromStringDecoder = .base64,
         arraySeparator: Character = ","
     ) async throws {
-        do {
-            let contents = try String(
-                contentsOfFile: environmentFilePath.string,
-                encoding: .utf8
-            )
-            self.init(
-                environmentVariables: EnvironmentFileParser.parsed(contents),
-                secretsSpecifier: secretsSpecifier,
-                bytesDecoder: bytesDecoder,
-                arraySeparator: arraySeparator
-            )
-        } catch let error where error.isFileNotFoundError {
-            throw ProviderError.environmentFileNotFound(path: environmentFilePath)
+        try await self.init(
+            environmentFilePath: environmentFilePath,
+            allowMissing: allowMissing,
+            fileSystem: LocalCommonProviderFileSystem(),
+            secretsSpecifier: secretsSpecifier,
+            bytesDecoder: bytesDecoder,
+            arraySeparator: arraySeparator
+        )
+    }
+
+    /// Creates a new provider that reads from an environment file.
+    /// - Parameters:
+    ///   - environmentFilePath: The file system path to the environment file to load.
+    ///   - allowMissing: A flag controlling how the provider handles a missing file.
+    ///     - When `false` (the default), if the file is missing or malformed, throws an error.
+    ///     - When `true`, if the file is missing, treats it as empty. Malformed files still throw an error.
+    ///   - fileSystem: The file system implementation to use.
+    ///   - secretsSpecifier: Specifies which environment variables should be treated as secrets.
+    ///   - bytesDecoder: The decoder used for converting string values to byte arrays.
+    ///   - arraySeparator: The character used to separate elements in array values.
+    /// - Throws: If the file is malformed, or if missing when allowMissing is `false`.
+    internal init(
+        environmentFilePath: FilePath,
+        allowMissing: Bool,
+        fileSystem: some CommonProviderFileSystem,
+        secretsSpecifier: SecretsSpecifier<String, String> = .none,
+        bytesDecoder: some ConfigBytesFromStringDecoder = .base64,
+        arraySeparator: Character = ","
+    ) async throws {
+        let loadedData = try await fileSystem.fileContents(atPath: environmentFilePath)
+        let data: Data
+        if let loadedData {
+            data = loadedData
+        } else if allowMissing {
+            data = Data()
+        } else {
+            throw FileSystemError.fileNotFound(path: environmentFilePath)
         }
+        let contents = String(decoding: data, as: UTF8.self)
+        self.init(
+            environmentVariables: EnvironmentFileParser.parsed(contents),
+            secretsSpecifier: secretsSpecifier,
+            bytesDecoder: bytesDecoder,
+            arraySeparator: arraySeparator
+        )
     }
 
     /// Returns the raw string value for a specific environment variable name.
@@ -314,23 +336,6 @@ internal struct EnvironmentValueArrayDecoder {
     /// - Returns: The parsed array.
     func decode(_ string: String) -> [String] {
         string.split(separator: separator).map { $0.trimmed() }
-    }
-}
-
-extension Error {
-    /// Inspects whether the error represents a file not found.
-    internal var isFileNotFoundError: Bool {
-        if let posixError = self as? POSIXError {
-            return posixError.code == POSIXError.Code.ENOENT
-        }
-        if let cocoaError = self as? CocoaError, cocoaError.isFileError {
-            return [
-                CocoaError.fileNoSuchFile,
-                CocoaError.fileReadNoSuchFile,
-            ]
-            .contains(cocoaError.code)
-        }
-        return false
     }
 }
 
@@ -486,7 +491,7 @@ extension EnvironmentVariablesProvider: ConfigProvider {
     }
 
     // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
-    public func watchValue<Return>(
+    public func watchValue<Return: ~Copyable>(
         forKey key: AbsoluteConfigKey,
         type: ConfigType,
         updatesHandler: (ConfigUpdatesAsyncSequence<Result<LookupResult, any Error>, Never>) async throws -> Return
@@ -500,7 +505,7 @@ extension EnvironmentVariablesProvider: ConfigProvider {
     }
 
     // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
-    public func watchSnapshot<Return>(
+    public func watchSnapshot<Return: ~Copyable>(
         updatesHandler: (ConfigUpdatesAsyncSequence<any ConfigSnapshot, Never>) async throws -> Return
     ) async throws -> Return {
         try await watchSnapshotFromSnapshot(updatesHandler: updatesHandler)

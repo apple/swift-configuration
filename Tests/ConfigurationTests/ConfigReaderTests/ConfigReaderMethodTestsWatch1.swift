@@ -36,33 +36,15 @@ struct ConfigReaderMethodTestsWatch1 {
 
         do {
             // Optional - success
-            #expect(
-                try await config.watchString(forKey: ConfigKey(["string"]), updatesHandler: awaitFirst)
-                    == Defaults.string
-            )
             #expect(try await config.watchString(forKey: "string", updatesHandler: awaitFirst) == Defaults.string)
 
             // Optional - missing
-            #expect(
-                try await config.watchString(forKey: ConfigKey(["absentString"]), updatesHandler: awaitFirst)
-                    == .some(nil)
-            )
             #expect(try await config.watchString(forKey: "absentString", updatesHandler: awaitFirst) == .some(nil))
 
             // Optional - failing
-            #expect(
-                try await config.watchString(forKey: ConfigKey(["failure"]), updatesHandler: awaitFirst) == .some(nil)
-            )
             #expect(try await config.watchString(forKey: "failure", updatesHandler: awaitFirst) == .some(nil))
 
             // Defaulted - success
-            #expect(
-                try await config.watchString(
-                    forKey: ConfigKey(["string"]),
-                    default: Defaults.otherString,
-                    updatesHandler: awaitFirst
-                ) == Defaults.string
-            )
             #expect(
                 try await config.watchString(
                     forKey: "string",
@@ -74,13 +56,6 @@ struct ConfigReaderMethodTestsWatch1 {
             // Defaulted - missing
             #expect(
                 try await config.watchString(
-                    forKey: ConfigKey(["absentString"]),
-                    default: Defaults.otherString,
-                    updatesHandler: awaitFirst
-                ) == Defaults.otherString
-            )
-            #expect(
-                try await config.watchString(
                     forKey: "absentString",
                     default: Defaults.otherString,
                     updatesHandler: awaitFirst
@@ -88,13 +63,6 @@ struct ConfigReaderMethodTestsWatch1 {
             )
 
             // Defaulted - failing
-            #expect(
-                try await config.watchString(
-                    forKey: ConfigKey(["failure"]),
-                    default: Defaults.otherString,
-                    updatesHandler: awaitFirst
-                ) == Defaults.otherString
-            )
             #expect(
                 try await config.watchString(
                     forKey: "failure",
@@ -105,54 +73,31 @@ struct ConfigReaderMethodTestsWatch1 {
 
             // Required - success
             #expect(
-                try await config.watchRequiredString(forKey: ConfigKey(["string"]), updatesHandler: awaitFirst)
-                    == Defaults.string
-            )
-            #expect(
                 try await config.watchRequiredString(forKey: "string", updatesHandler: awaitFirst) == Defaults.string
             )
 
             // Required - missing
             let error1 = await #expect(throws: ConfigError.self) {
-                try await config.watchRequiredString(forKey: ConfigKey(["absentString"]), updatesHandler: awaitFirst)
-            }
-            #expect(error1 == .missingRequiredConfigValue(AbsoluteConfigKey(["absentString"])))
-            let error2 = await #expect(throws: ConfigError.self) {
                 try await config.watchRequiredString(forKey: "absentString", updatesHandler: awaitFirst)
             }
-            #expect(error2 == .missingRequiredConfigValue(AbsoluteConfigKey(["absentString"])))
+            #expect(error1 == .missingRequiredConfigValue(AbsoluteConfigKey(["absentString"])))
 
             // Required - failing
-            await #expect(throws: TestProvider.TestError.self) {
-                try await config.watchRequiredString(forKey: ConfigKey(["failure"]), updatesHandler: awaitFirst)
-            }
             await #expect(throws: TestProvider.TestError.self) {
                 try await config.watchRequiredString(forKey: "failure", updatesHandler: awaitFirst)
             }
         }
         do {
             // Optional - success
-            #expect(try await config.watchInt(forKey: ConfigKey(["int"]), updatesHandler: awaitFirst) == Defaults.int)
             #expect(try await config.watchInt(forKey: "int", updatesHandler: awaitFirst) == Defaults.int)
 
             // Optional - missing
-            #expect(
-                try await config.watchInt(forKey: ConfigKey(["absentInt"]), updatesHandler: awaitFirst) == .some(nil)
-            )
             #expect(try await config.watchInt(forKey: "absentInt", updatesHandler: awaitFirst) == .some(nil))
 
             // Optional - failing
-            #expect(try await config.watchInt(forKey: ConfigKey(["failure"]), updatesHandler: awaitFirst) == .some(nil))
             #expect(try await config.watchInt(forKey: "failure", updatesHandler: awaitFirst) == .some(nil))
 
             // Defaulted - success
-            #expect(
-                try await config.watchInt(
-                    forKey: ConfigKey(["int"]),
-                    default: Defaults.otherInt,
-                    updatesHandler: awaitFirst
-                ) == Defaults.int
-            )
             #expect(
                 try await config.watchInt(forKey: "int", default: Defaults.otherInt, updatesHandler: awaitFirst)
                     == Defaults.int
@@ -160,84 +105,41 @@ struct ConfigReaderMethodTestsWatch1 {
 
             // Defaulted - missing
             #expect(
-                try await config.watchInt(
-                    forKey: ConfigKey(["absentInt"]),
-                    default: Defaults.otherInt,
-                    updatesHandler: awaitFirst
-                ) == Defaults.otherInt
-            )
-            #expect(
                 try await config.watchInt(forKey: "absentInt", default: Defaults.otherInt, updatesHandler: awaitFirst)
                     == Defaults.otherInt
             )
 
             // Defaulted - failing
             #expect(
-                try await config.watchInt(
-                    forKey: ConfigKey(["failure"]),
-                    default: Defaults.otherInt,
-                    updatesHandler: awaitFirst
-                ) == Defaults.otherInt
-            )
-            #expect(
                 try await config.watchInt(forKey: "failure", default: Defaults.otherInt, updatesHandler: awaitFirst)
                     == Defaults.otherInt
             )
 
             // Required - success
-            #expect(
-                try await config.watchRequiredInt(forKey: ConfigKey(["int"]), updatesHandler: awaitFirst)
-                    == Defaults.int
-            )
             #expect(try await config.watchRequiredInt(forKey: "int", updatesHandler: awaitFirst) == Defaults.int)
 
             // Required - missing
             let error1 = await #expect(throws: ConfigError.self) {
-                try await config.watchRequiredInt(forKey: ConfigKey(["absentInt"]), updatesHandler: awaitFirst)
-            }
-            #expect(error1 == .missingRequiredConfigValue(AbsoluteConfigKey(["absentInt"])))
-            let error2 = await #expect(throws: ConfigError.self) {
                 try await config.watchRequiredInt(forKey: "absentInt", updatesHandler: awaitFirst)
             }
-            #expect(error2 == .missingRequiredConfigValue(AbsoluteConfigKey(["absentInt"])))
+            #expect(error1 == .missingRequiredConfigValue(AbsoluteConfigKey(["absentInt"])))
 
             // Required - failing
-            await #expect(throws: TestProvider.TestError.self) {
-                try await config.watchRequiredInt(forKey: ConfigKey(["failure"]), updatesHandler: awaitFirst)
-            }
             await #expect(throws: TestProvider.TestError.self) {
                 try await config.watchRequiredInt(forKey: "failure", updatesHandler: awaitFirst)
             }
         }
         do {
             // Optional - success
-            #expect(
-                try await config.watchDouble(forKey: ConfigKey(["double"]), updatesHandler: awaitFirst)
-                    == Defaults.double
-            )
             #expect(try await config.watchDouble(forKey: "double", updatesHandler: awaitFirst) == Defaults.double)
 
             // Optional - missing
-            #expect(
-                try await config.watchDouble(forKey: ConfigKey(["absentDouble"]), updatesHandler: awaitFirst)
-                    == .some(nil)
-            )
             #expect(try await config.watchDouble(forKey: "absentDouble", updatesHandler: awaitFirst) == .some(nil))
 
             // Optional - failing
-            #expect(
-                try await config.watchDouble(forKey: ConfigKey(["failure"]), updatesHandler: awaitFirst) == .some(nil)
-            )
             #expect(try await config.watchDouble(forKey: "failure", updatesHandler: awaitFirst) == .some(nil))
 
             // Defaulted - success
-            #expect(
-                try await config.watchDouble(
-                    forKey: ConfigKey(["double"]),
-                    default: Defaults.otherDouble,
-                    updatesHandler: awaitFirst
-                ) == Defaults.double
-            )
             #expect(
                 try await config.watchDouble(
                     forKey: "double",
@@ -249,13 +151,6 @@ struct ConfigReaderMethodTestsWatch1 {
             // Defaulted - missing
             #expect(
                 try await config.watchDouble(
-                    forKey: ConfigKey(["absentDouble"]),
-                    default: Defaults.otherDouble,
-                    updatesHandler: awaitFirst
-                ) == Defaults.otherDouble
-            )
-            #expect(
-                try await config.watchDouble(
                     forKey: "absentDouble",
                     default: Defaults.otherDouble,
                     updatesHandler: awaitFirst
@@ -263,13 +158,6 @@ struct ConfigReaderMethodTestsWatch1 {
             )
 
             // Defaulted - failing
-            #expect(
-                try await config.watchDouble(
-                    forKey: ConfigKey(["failure"]),
-                    default: Defaults.otherDouble,
-                    updatesHandler: awaitFirst
-                ) == Defaults.otherDouble
-            )
             #expect(
                 try await config.watchDouble(
                     forKey: "failure",
@@ -280,71 +168,37 @@ struct ConfigReaderMethodTestsWatch1 {
 
             // Required - success
             #expect(
-                try await config.watchRequiredDouble(forKey: ConfigKey(["double"]), updatesHandler: awaitFirst)
-                    == Defaults.double
-            )
-            #expect(
                 try await config.watchRequiredDouble(forKey: "double", updatesHandler: awaitFirst) == Defaults.double
             )
 
             // Required - missing
             let error1 = await #expect(throws: ConfigError.self) {
-                try await config.watchRequiredDouble(forKey: ConfigKey(["absentDouble"]), updatesHandler: awaitFirst)
-            }
-            #expect(error1 == .missingRequiredConfigValue(AbsoluteConfigKey(["absentDouble"])))
-            let error2 = await #expect(throws: ConfigError.self) {
                 try await config.watchRequiredDouble(forKey: "absentDouble", updatesHandler: awaitFirst)
             }
-            #expect(error2 == .missingRequiredConfigValue(AbsoluteConfigKey(["absentDouble"])))
+            #expect(error1 == .missingRequiredConfigValue(AbsoluteConfigKey(["absentDouble"])))
 
             // Required - failing
-            await #expect(throws: TestProvider.TestError.self) {
-                try await config.watchRequiredDouble(forKey: ConfigKey(["failure"]), updatesHandler: awaitFirst)
-            }
             await #expect(throws: TestProvider.TestError.self) {
                 try await config.watchRequiredDouble(forKey: "failure", updatesHandler: awaitFirst)
             }
         }
         do {
             // Optional - success
-            #expect(
-                try await config.watchBool(forKey: ConfigKey(["bool"]), updatesHandler: awaitFirst) == Defaults.bool
-            )
             #expect(try await config.watchBool(forKey: "bool", updatesHandler: awaitFirst) == Defaults.bool)
 
             // Optional - missing
-            #expect(
-                try await config.watchBool(forKey: ConfigKey(["absentBool"]), updatesHandler: awaitFirst) == .some(nil)
-            )
             #expect(try await config.watchBool(forKey: "absentBool", updatesHandler: awaitFirst) == .some(nil))
 
             // Optional - failing
-            #expect(
-                try await config.watchBool(forKey: ConfigKey(["failure"]), updatesHandler: awaitFirst) == .some(nil)
-            )
             #expect(try await config.watchBool(forKey: "failure", updatesHandler: awaitFirst) == .some(nil))
 
             // Defaulted - success
-            #expect(
-                try await config.watchBool(
-                    forKey: ConfigKey(["bool"]),
-                    default: Defaults.otherBool,
-                    updatesHandler: awaitFirst
-                ) == Defaults.bool
-            )
             #expect(
                 try await config.watchBool(forKey: "bool", default: Defaults.otherBool, updatesHandler: awaitFirst)
                     == Defaults.bool
             )
 
             // Defaulted - missing
-            #expect(
-                try await config.watchBool(
-                    forKey: ConfigKey(["absentBool"]),
-                    default: Defaults.otherBool,
-                    updatesHandler: awaitFirst
-                ) == Defaults.otherBool
-            )
             #expect(
                 try await config.watchBool(
                     forKey: "absentBool",
@@ -355,83 +209,41 @@ struct ConfigReaderMethodTestsWatch1 {
 
             // Defaulted - failing
             #expect(
-                try await config.watchBool(
-                    forKey: ConfigKey(["failure"]),
-                    default: Defaults.otherBool,
-                    updatesHandler: awaitFirst
-                ) == Defaults.otherBool
-            )
-            #expect(
                 try await config.watchBool(forKey: "failure", default: Defaults.otherBool, updatesHandler: awaitFirst)
                     == Defaults.otherBool
             )
 
             // Required - success
-            #expect(
-                try await config.watchRequiredBool(forKey: ConfigKey(["bool"]), updatesHandler: awaitFirst)
-                    == Defaults.bool
-            )
             #expect(try await config.watchRequiredBool(forKey: "bool", updatesHandler: awaitFirst) == Defaults.bool)
 
             // Required - missing
             let error1 = await #expect(throws: ConfigError.self) {
-                try await config.watchRequiredBool(forKey: ConfigKey(["absentBool"]), updatesHandler: awaitFirst)
-            }
-            #expect(error1 == .missingRequiredConfigValue(AbsoluteConfigKey(["absentBool"])))
-            let error2 = await #expect(throws: ConfigError.self) {
                 try await config.watchRequiredBool(forKey: "absentBool", updatesHandler: awaitFirst)
             }
-            #expect(error2 == .missingRequiredConfigValue(AbsoluteConfigKey(["absentBool"])))
+            #expect(error1 == .missingRequiredConfigValue(AbsoluteConfigKey(["absentBool"])))
 
             // Required - failing
-            await #expect(throws: TestProvider.TestError.self) {
-                try await config.watchRequiredBool(forKey: ConfigKey(["failure"]), updatesHandler: awaitFirst)
-            }
             await #expect(throws: TestProvider.TestError.self) {
                 try await config.watchRequiredBool(forKey: "failure", updatesHandler: awaitFirst)
             }
         }
         do {
             // Optional - success
-            #expect(
-                try await config.watchBytes(forKey: ConfigKey(["bytes"]), updatesHandler: awaitFirst) == Defaults.bytes
-            )
             #expect(try await config.watchBytes(forKey: "bytes", updatesHandler: awaitFirst) == Defaults.bytes)
 
             // Optional - missing
-            #expect(
-                try await config.watchBytes(forKey: ConfigKey(["absentBytes"]), updatesHandler: awaitFirst)
-                    == .some(nil)
-            )
             #expect(try await config.watchBytes(forKey: "absentBytes", updatesHandler: awaitFirst) == .some(nil))
 
             // Optional - failing
-            #expect(
-                try await config.watchBytes(forKey: ConfigKey(["failure"]), updatesHandler: awaitFirst) == .some(nil)
-            )
             #expect(try await config.watchBytes(forKey: "failure", updatesHandler: awaitFirst) == .some(nil))
 
             // Defaulted - success
-            #expect(
-                try await config.watchBytes(
-                    forKey: ConfigKey(["bytes"]),
-                    default: Defaults.otherBytes,
-                    updatesHandler: awaitFirst
-                ) == Defaults.bytes
-            )
             #expect(
                 try await config.watchBytes(forKey: "bytes", default: Defaults.otherBytes, updatesHandler: awaitFirst)
                     == Defaults.bytes
             )
 
             // Defaulted - missing
-            #expect(
-                try await config.watchBytes(
-                    forKey: ConfigKey(["absentBytes"]),
-                    default: Defaults.otherBytes,
-                    updatesHandler: awaitFirst
-                ) == Defaults.otherBytes
-            )
             #expect(
                 try await config.watchBytes(
                     forKey: "absentBytes",
@@ -442,38 +254,20 @@ struct ConfigReaderMethodTestsWatch1 {
 
             // Defaulted - failing
             #expect(
-                try await config.watchBytes(
-                    forKey: ConfigKey(["failure"]),
-                    default: Defaults.otherBytes,
-                    updatesHandler: awaitFirst
-                ) == Defaults.otherBytes
-            )
-            #expect(
                 try await config.watchBytes(forKey: "failure", default: Defaults.otherBytes, updatesHandler: awaitFirst)
                     == Defaults.otherBytes
             )
 
             // Required - success
-            #expect(
-                try await config.watchRequiredBytes(forKey: ConfigKey(["bytes"]), updatesHandler: awaitFirst)
-                    == Defaults.bytes
-            )
             #expect(try await config.watchRequiredBytes(forKey: "bytes", updatesHandler: awaitFirst) == Defaults.bytes)
 
             // Required - missing
             let error1 = await #expect(throws: ConfigError.self) {
-                try await config.watchRequiredBytes(forKey: ConfigKey(["absentBytes"]), updatesHandler: awaitFirst)
-            }
-            #expect(error1 == .missingRequiredConfigValue(AbsoluteConfigKey(["absentBytes"])))
-            let error2 = await #expect(throws: ConfigError.self) {
                 try await config.watchRequiredBytes(forKey: "absentBytes", updatesHandler: awaitFirst)
             }
-            #expect(error2 == .missingRequiredConfigValue(AbsoluteConfigKey(["absentBytes"])))
+            #expect(error1 == .missingRequiredConfigValue(AbsoluteConfigKey(["absentBytes"])))
 
             // Required - failing
-            await #expect(throws: TestProvider.TestError.self) {
-                try await config.watchRequiredBytes(forKey: ConfigKey(["failure"]), updatesHandler: awaitFirst)
-            }
             await #expect(throws: TestProvider.TestError.self) {
                 try await config.watchRequiredBytes(forKey: "failure", updatesHandler: awaitFirst)
             }
@@ -481,38 +275,19 @@ struct ConfigReaderMethodTestsWatch1 {
         do {
             // Optional - success
             #expect(
-                try await config.watchStringArray(forKey: ConfigKey(["stringArray"]), updatesHandler: awaitFirst)
-                    == Defaults.stringArray
-            )
-            #expect(
                 try await config.watchStringArray(forKey: "stringArray", updatesHandler: awaitFirst)
                     == Defaults.stringArray
             )
 
             // Optional - missing
             #expect(
-                try await config.watchStringArray(forKey: ConfigKey(["absentStringArray"]), updatesHandler: awaitFirst)
-                    == .some(nil)
-            )
-            #expect(
                 try await config.watchStringArray(forKey: "absentStringArray", updatesHandler: awaitFirst) == .some(nil)
             )
 
             // Optional - failing
-            #expect(
-                try await config.watchStringArray(forKey: ConfigKey(["failure"]), updatesHandler: awaitFirst)
-                    == .some(nil)
-            )
             #expect(try await config.watchStringArray(forKey: "failure", updatesHandler: awaitFirst) == .some(nil))
 
             // Defaulted - success
-            #expect(
-                try await config.watchStringArray(
-                    forKey: ConfigKey(["stringArray"]),
-                    default: Defaults.otherStringArray,
-                    updatesHandler: awaitFirst
-                ) == Defaults.stringArray
-            )
             #expect(
                 try await config.watchStringArray(
                     forKey: "stringArray",
@@ -524,13 +299,6 @@ struct ConfigReaderMethodTestsWatch1 {
             // Defaulted - missing
             #expect(
                 try await config.watchStringArray(
-                    forKey: ConfigKey(["absentStringArray"]),
-                    default: Defaults.otherStringArray,
-                    updatesHandler: awaitFirst
-                ) == Defaults.otherStringArray
-            )
-            #expect(
-                try await config.watchStringArray(
                     forKey: "absentStringArray",
                     default: Defaults.otherStringArray,
                     updatesHandler: awaitFirst
@@ -538,13 +306,6 @@ struct ConfigReaderMethodTestsWatch1 {
             )
 
             // Defaulted - failing
-            #expect(
-                try await config.watchStringArray(
-                    forKey: ConfigKey(["failure"]),
-                    default: Defaults.otherStringArray,
-                    updatesHandler: awaitFirst
-                ) == Defaults.otherStringArray
-            )
             #expect(
                 try await config.watchStringArray(
                     forKey: "failure",
@@ -555,66 +316,32 @@ struct ConfigReaderMethodTestsWatch1 {
 
             // Required - success
             #expect(
-                try await config.watchRequiredStringArray(
-                    forKey: ConfigKey(["stringArray"]),
-                    updatesHandler: awaitFirst
-                ) == Defaults.stringArray
-            )
-            #expect(
                 try await config.watchRequiredStringArray(forKey: "stringArray", updatesHandler: awaitFirst)
                     == Defaults.stringArray
             )
 
             // Required - missing
             let error1 = await #expect(throws: ConfigError.self) {
-                try await config.watchRequiredStringArray(
-                    forKey: ConfigKey(["absentStringArray"]),
-                    updatesHandler: awaitFirst
-                )
-            }
-            #expect(error1 == .missingRequiredConfigValue(AbsoluteConfigKey(["absentStringArray"])))
-            let error2 = await #expect(throws: ConfigError.self) {
                 try await config.watchRequiredStringArray(forKey: "absentStringArray", updatesHandler: awaitFirst)
             }
-            #expect(error2 == .missingRequiredConfigValue(AbsoluteConfigKey(["absentStringArray"])))
+            #expect(error1 == .missingRequiredConfigValue(AbsoluteConfigKey(["absentStringArray"])))
 
             // Required - failing
-            await #expect(throws: TestProvider.TestError.self) {
-                try await config.watchRequiredStringArray(forKey: ConfigKey(["failure"]), updatesHandler: awaitFirst)
-            }
             await #expect(throws: TestProvider.TestError.self) {
                 try await config.watchRequiredStringArray(forKey: "failure", updatesHandler: awaitFirst)
             }
         }
         do {
             // Optional - success
-            #expect(
-                try await config.watchIntArray(forKey: ConfigKey(["intArray"]), updatesHandler: awaitFirst)
-                    == Defaults.intArray
-            )
             #expect(try await config.watchIntArray(forKey: "intArray", updatesHandler: awaitFirst) == Defaults.intArray)
 
             // Optional - missing
-            #expect(
-                try await config.watchIntArray(forKey: ConfigKey(["absentIntArray"]), updatesHandler: awaitFirst)
-                    == .some(nil)
-            )
             #expect(try await config.watchIntArray(forKey: "absentIntArray", updatesHandler: awaitFirst) == .some(nil))
 
             // Optional - failing
-            #expect(
-                try await config.watchIntArray(forKey: ConfigKey(["failure"]), updatesHandler: awaitFirst) == .some(nil)
-            )
             #expect(try await config.watchIntArray(forKey: "failure", updatesHandler: awaitFirst) == .some(nil))
 
             // Defaulted - success
-            #expect(
-                try await config.watchIntArray(
-                    forKey: ConfigKey(["intArray"]),
-                    default: Defaults.otherIntArray,
-                    updatesHandler: awaitFirst
-                ) == Defaults.intArray
-            )
             #expect(
                 try await config.watchIntArray(
                     forKey: "intArray",
@@ -626,13 +353,6 @@ struct ConfigReaderMethodTestsWatch1 {
             // Defaulted - missing
             #expect(
                 try await config.watchIntArray(
-                    forKey: ConfigKey(["absentIntArray"]),
-                    default: Defaults.otherIntArray,
-                    updatesHandler: awaitFirst
-                ) == Defaults.otherIntArray
-            )
-            #expect(
-                try await config.watchIntArray(
                     forKey: "absentIntArray",
                     default: Defaults.otherIntArray,
                     updatesHandler: awaitFirst
@@ -640,13 +360,6 @@ struct ConfigReaderMethodTestsWatch1 {
             )
 
             // Defaulted - failing
-            #expect(
-                try await config.watchIntArray(
-                    forKey: ConfigKey(["failure"]),
-                    default: Defaults.otherIntArray,
-                    updatesHandler: awaitFirst
-                ) == Defaults.otherIntArray
-            )
             #expect(
                 try await config.watchIntArray(
                     forKey: "failure",
@@ -657,31 +370,17 @@ struct ConfigReaderMethodTestsWatch1 {
 
             // Required - success
             #expect(
-                try await config.watchRequiredIntArray(forKey: ConfigKey(["intArray"]), updatesHandler: awaitFirst)
-                    == Defaults.intArray
-            )
-            #expect(
                 try await config.watchRequiredIntArray(forKey: "intArray", updatesHandler: awaitFirst)
                     == Defaults.intArray
             )
 
             // Required - missing
             let error1 = await #expect(throws: ConfigError.self) {
-                try await config.watchRequiredIntArray(
-                    forKey: ConfigKey(["absentIntArray"]),
-                    updatesHandler: awaitFirst
-                )
-            }
-            #expect(error1 == .missingRequiredConfigValue(AbsoluteConfigKey(["absentIntArray"])))
-            let error2 = await #expect(throws: ConfigError.self) {
                 try await config.watchRequiredIntArray(forKey: "absentIntArray", updatesHandler: awaitFirst)
             }
-            #expect(error2 == .missingRequiredConfigValue(AbsoluteConfigKey(["absentIntArray"])))
+            #expect(error1 == .missingRequiredConfigValue(AbsoluteConfigKey(["absentIntArray"])))
 
             // Required - failing
-            await #expect(throws: TestProvider.TestError.self) {
-                try await config.watchRequiredIntArray(forKey: ConfigKey(["failure"]), updatesHandler: awaitFirst)
-            }
             await #expect(throws: TestProvider.TestError.self) {
                 try await config.watchRequiredIntArray(forKey: "failure", updatesHandler: awaitFirst)
             }
@@ -689,38 +388,19 @@ struct ConfigReaderMethodTestsWatch1 {
         do {
             // Optional - success
             #expect(
-                try await config.watchDoubleArray(forKey: ConfigKey(["doubleArray"]), updatesHandler: awaitFirst)
-                    == Defaults.doubleArray
-            )
-            #expect(
                 try await config.watchDoubleArray(forKey: "doubleArray", updatesHandler: awaitFirst)
                     == Defaults.doubleArray
             )
 
             // Optional - missing
             #expect(
-                try await config.watchDoubleArray(forKey: ConfigKey(["absentDoubleArray"]), updatesHandler: awaitFirst)
-                    == .some(nil)
-            )
-            #expect(
                 try await config.watchDoubleArray(forKey: "absentDoubleArray", updatesHandler: awaitFirst) == .some(nil)
             )
 
             // Optional - failing
-            #expect(
-                try await config.watchDoubleArray(forKey: ConfigKey(["failure"]), updatesHandler: awaitFirst)
-                    == .some(nil)
-            )
             #expect(try await config.watchDoubleArray(forKey: "failure", updatesHandler: awaitFirst) == .some(nil))
 
             // Defaulted - success
-            #expect(
-                try await config.watchDoubleArray(
-                    forKey: ConfigKey(["doubleArray"]),
-                    default: Defaults.otherDoubleArray,
-                    updatesHandler: awaitFirst
-                ) == Defaults.doubleArray
-            )
             #expect(
                 try await config.watchDoubleArray(
                     forKey: "doubleArray",
@@ -732,13 +412,6 @@ struct ConfigReaderMethodTestsWatch1 {
             // Defaulted - missing
             #expect(
                 try await config.watchDoubleArray(
-                    forKey: ConfigKey(["absentDoubleArray"]),
-                    default: Defaults.otherDoubleArray,
-                    updatesHandler: awaitFirst
-                ) == Defaults.otherDoubleArray
-            )
-            #expect(
-                try await config.watchDoubleArray(
                     forKey: "absentDoubleArray",
                     default: Defaults.otherDoubleArray,
                     updatesHandler: awaitFirst
@@ -746,13 +419,6 @@ struct ConfigReaderMethodTestsWatch1 {
             )
 
             // Defaulted - failing
-            #expect(
-                try await config.watchDoubleArray(
-                    forKey: ConfigKey(["failure"]),
-                    default: Defaults.otherDoubleArray,
-                    updatesHandler: awaitFirst
-                ) == Defaults.otherDoubleArray
-            )
             #expect(
                 try await config.watchDoubleArray(
                     forKey: "failure",
@@ -763,33 +429,17 @@ struct ConfigReaderMethodTestsWatch1 {
 
             // Required - success
             #expect(
-                try await config.watchRequiredDoubleArray(
-                    forKey: ConfigKey(["doubleArray"]),
-                    updatesHandler: awaitFirst
-                ) == Defaults.doubleArray
-            )
-            #expect(
                 try await config.watchRequiredDoubleArray(forKey: "doubleArray", updatesHandler: awaitFirst)
                     == Defaults.doubleArray
             )
 
             // Required - missing
             let error1 = await #expect(throws: ConfigError.self) {
-                try await config.watchRequiredDoubleArray(
-                    forKey: ConfigKey(["absentDoubleArray"]),
-                    updatesHandler: awaitFirst
-                )
-            }
-            #expect(error1 == .missingRequiredConfigValue(AbsoluteConfigKey(["absentDoubleArray"])))
-            let error2 = await #expect(throws: ConfigError.self) {
                 try await config.watchRequiredDoubleArray(forKey: "absentDoubleArray", updatesHandler: awaitFirst)
             }
-            #expect(error2 == .missingRequiredConfigValue(AbsoluteConfigKey(["absentDoubleArray"])))
+            #expect(error1 == .missingRequiredConfigValue(AbsoluteConfigKey(["absentDoubleArray"])))
 
             // Required - failing
-            await #expect(throws: TestProvider.TestError.self) {
-                try await config.watchRequiredDoubleArray(forKey: ConfigKey(["failure"]), updatesHandler: awaitFirst)
-            }
             await #expect(throws: TestProvider.TestError.self) {
                 try await config.watchRequiredDoubleArray(forKey: "failure", updatesHandler: awaitFirst)
             }
@@ -797,37 +447,18 @@ struct ConfigReaderMethodTestsWatch1 {
         do {
             // Optional - success
             #expect(
-                try await config.watchBoolArray(forKey: ConfigKey(["boolArray"]), updatesHandler: awaitFirst)
-                    == Defaults.boolArray
-            )
-            #expect(
                 try await config.watchBoolArray(forKey: "boolArray", updatesHandler: awaitFirst) == Defaults.boolArray
             )
 
             // Optional - missing
             #expect(
-                try await config.watchBoolArray(forKey: ConfigKey(["absentBoolArray"]), updatesHandler: awaitFirst)
-                    == .some(nil)
-            )
-            #expect(
                 try await config.watchBoolArray(forKey: "absentBoolArray", updatesHandler: awaitFirst) == .some(nil)
             )
 
             // Optional - failing
-            #expect(
-                try await config.watchBoolArray(forKey: ConfigKey(["failure"]), updatesHandler: awaitFirst)
-                    == .some(nil)
-            )
             #expect(try await config.watchBoolArray(forKey: "failure", updatesHandler: awaitFirst) == .some(nil))
 
             // Defaulted - success
-            #expect(
-                try await config.watchBoolArray(
-                    forKey: ConfigKey(["boolArray"]),
-                    default: Defaults.otherBoolArray,
-                    updatesHandler: awaitFirst
-                ) == Defaults.boolArray
-            )
             #expect(
                 try await config.watchBoolArray(
                     forKey: "boolArray",
@@ -839,13 +470,6 @@ struct ConfigReaderMethodTestsWatch1 {
             // Defaulted - missing
             #expect(
                 try await config.watchBoolArray(
-                    forKey: ConfigKey(["absentBoolArray"]),
-                    default: Defaults.otherBoolArray,
-                    updatesHandler: awaitFirst
-                ) == Defaults.otherBoolArray
-            )
-            #expect(
-                try await config.watchBoolArray(
                     forKey: "absentBoolArray",
                     default: Defaults.otherBoolArray,
                     updatesHandler: awaitFirst
@@ -853,13 +477,6 @@ struct ConfigReaderMethodTestsWatch1 {
             )
 
             // Defaulted - failing
-            #expect(
-                try await config.watchBoolArray(
-                    forKey: ConfigKey(["failure"]),
-                    default: Defaults.otherBoolArray,
-                    updatesHandler: awaitFirst
-                ) == Defaults.otherBoolArray
-            )
             #expect(
                 try await config.watchBoolArray(
                     forKey: "failure",
@@ -870,31 +487,17 @@ struct ConfigReaderMethodTestsWatch1 {
 
             // Required - success
             #expect(
-                try await config.watchRequiredBoolArray(forKey: ConfigKey(["boolArray"]), updatesHandler: awaitFirst)
-                    == Defaults.boolArray
-            )
-            #expect(
                 try await config.watchRequiredBoolArray(forKey: "boolArray", updatesHandler: awaitFirst)
                     == Defaults.boolArray
             )
 
             // Required - missing
             let error1 = await #expect(throws: ConfigError.self) {
-                try await config.watchRequiredBoolArray(
-                    forKey: ConfigKey(["absentBoolArray"]),
-                    updatesHandler: awaitFirst
-                )
-            }
-            #expect(error1 == .missingRequiredConfigValue(AbsoluteConfigKey(["absentBoolArray"])))
-            let error2 = await #expect(throws: ConfigError.self) {
                 try await config.watchRequiredBoolArray(forKey: "absentBoolArray", updatesHandler: awaitFirst)
             }
-            #expect(error2 == .missingRequiredConfigValue(AbsoluteConfigKey(["absentBoolArray"])))
+            #expect(error1 == .missingRequiredConfigValue(AbsoluteConfigKey(["absentBoolArray"])))
 
             // Required - failing
-            await #expect(throws: TestProvider.TestError.self) {
-                try await config.watchRequiredBoolArray(forKey: ConfigKey(["failure"]), updatesHandler: awaitFirst)
-            }
             await #expect(throws: TestProvider.TestError.self) {
                 try await config.watchRequiredBoolArray(forKey: "failure", updatesHandler: awaitFirst)
             }
@@ -902,41 +505,20 @@ struct ConfigReaderMethodTestsWatch1 {
         do {
             // Optional - success
             #expect(
-                try await config.watchByteChunkArray(forKey: ConfigKey(["byteChunkArray"]), updatesHandler: awaitFirst)
-                    == Defaults.byteChunkArray
-            )
-            #expect(
                 try await config.watchByteChunkArray(forKey: "byteChunkArray", updatesHandler: awaitFirst)
                     == Defaults.byteChunkArray
             )
 
             // Optional - missing
             #expect(
-                try await config.watchByteChunkArray(
-                    forKey: ConfigKey(["absentByteChunkArray"]),
-                    updatesHandler: awaitFirst
-                ) == .some(nil)
-            )
-            #expect(
                 try await config.watchByteChunkArray(forKey: "absentByteChunkArray", updatesHandler: awaitFirst)
                     == .some(nil)
             )
 
             // Optional - failing
-            #expect(
-                try await config.watchByteChunkArray(forKey: ConfigKey(["failure"]), updatesHandler: awaitFirst)
-                    == .some(nil)
-            )
             #expect(try await config.watchByteChunkArray(forKey: "failure", updatesHandler: awaitFirst) == .some(nil))
 
             // Defaulted - success
-            #expect(
-                try await config.watchByteChunkArray(
-                    forKey: ConfigKey(["byteChunkArray"]),
-                    default: Defaults.otherByteChunkArray,
-                    updatesHandler: awaitFirst
-                ) == Defaults.byteChunkArray
-            )
             #expect(
                 try await config.watchByteChunkArray(
                     forKey: "byteChunkArray",
@@ -948,13 +530,6 @@ struct ConfigReaderMethodTestsWatch1 {
             // Defaulted - missing
             #expect(
                 try await config.watchByteChunkArray(
-                    forKey: ConfigKey(["absentByteChunkArray"]),
-                    default: Defaults.otherByteChunkArray,
-                    updatesHandler: awaitFirst
-                ) == Defaults.otherByteChunkArray
-            )
-            #expect(
-                try await config.watchByteChunkArray(
                     forKey: "absentByteChunkArray",
                     default: Defaults.otherByteChunkArray,
                     updatesHandler: awaitFirst
@@ -962,13 +537,6 @@ struct ConfigReaderMethodTestsWatch1 {
             )
 
             // Defaulted - failing
-            #expect(
-                try await config.watchByteChunkArray(
-                    forKey: ConfigKey(["failure"]),
-                    default: Defaults.otherByteChunkArray,
-                    updatesHandler: awaitFirst
-                ) == Defaults.otherByteChunkArray
-            )
             #expect(
                 try await config.watchByteChunkArray(
                     forKey: "failure",
@@ -979,33 +547,17 @@ struct ConfigReaderMethodTestsWatch1 {
 
             // Required - success
             #expect(
-                try await config.watchRequiredByteChunkArray(
-                    forKey: ConfigKey(["byteChunkArray"]),
-                    updatesHandler: awaitFirst
-                ) == Defaults.byteChunkArray
-            )
-            #expect(
                 try await config.watchRequiredByteChunkArray(forKey: "byteChunkArray", updatesHandler: awaitFirst)
                     == Defaults.byteChunkArray
             )
 
             // Required - missing
             let error1 = await #expect(throws: ConfigError.self) {
-                try await config.watchRequiredByteChunkArray(
-                    forKey: ConfigKey(["absentByteChunkArray"]),
-                    updatesHandler: awaitFirst
-                )
-            }
-            #expect(error1 == .missingRequiredConfigValue(AbsoluteConfigKey(["absentByteChunkArray"])))
-            let error2 = await #expect(throws: ConfigError.self) {
                 try await config.watchRequiredByteChunkArray(forKey: "absentByteChunkArray", updatesHandler: awaitFirst)
             }
-            #expect(error2 == .missingRequiredConfigValue(AbsoluteConfigKey(["absentByteChunkArray"])))
+            #expect(error1 == .missingRequiredConfigValue(AbsoluteConfigKey(["absentByteChunkArray"])))
 
             // Required - failing
-            await #expect(throws: TestProvider.TestError.self) {
-                try await config.watchRequiredByteChunkArray(forKey: ConfigKey(["failure"]), updatesHandler: awaitFirst)
-            }
             await #expect(throws: TestProvider.TestError.self) {
                 try await config.watchRequiredByteChunkArray(forKey: "failure", updatesHandler: awaitFirst)
             }

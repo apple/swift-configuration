@@ -8,13 +8,11 @@ Check out some techniques to debug unexpected issues and to increase visibility 
 
 If your configuration values aren't being read correctly, check:
 
-1. **Key formatting**: Make sure the key format matches your `ConfigKeyDecoder`. The default is dot-notation (for example, `database.url`).
+1. **Environment variable naming**: When using `EnvironmentVariablesProvider`, keys are automatically converted to uppercase with dots replaced by underscores. For example, `database.url` becomes `DATABASE_URL`.
 
-2. **Environment variable naming**: When using `EnvironmentVariablesProvider`, keys are automatically converted to uppercase with dots replaced by underscores. For example, `database.url` becomes `DATABASE_URL`.
+2. **Provider ordering**: When using multiple providers, remember they're checked in order, and the first one that returns a value wins.
 
-3. **Provider ordering**: When using multiple providers, remember they're checked in order, and the first one that returns a value wins.
-
-4. **Debug with an access reporter**: Use the access reporting feature to see which keys are being queried and what values (if any) are being returned. See the next section for details.
+3. **Debug with an access reporter**: Use the access reporting feature to see which keys are being queried and what values (if any) are being returned. See the next section for details.
 
 For guidance on selecting the right configuration access patterns and reader methods, check out <doc:Choosing-access-patterns> and <doc:Choosing-reader-methods>.
 
@@ -81,6 +79,45 @@ When no provider has the requested value:
 - **Methods with defaults**: Return the provided default value.
 - **Methods without defaults**: Return nil.
 - **Required methods**: Throw an error.
+
+#### File not found errors
+
+File-based providers (``FileProvider``, ``ReloadingFileProvider``, ``DirectoryFilesProvider``, ``EnvironmentVariablesProvider`` with file path) can throw "file not found" errors when expected configuration files don't exist.
+
+Common scenarios and solutions:
+
+**Optional configuration files:**
+```swift
+// Problem: App crashes when optional config file is missing
+let provider = try await FileProvider<JSONSnapshot>(filePath: "/etc/optional-config.json")
+
+// Solution: Use allowMissing parameter
+let provider = try await FileProvider<JSONSnapshot>(
+    filePath: "/etc/optional-config.json",
+    allowMissing: true
+)
+```
+
+**Environment-specific files:**
+```swift
+// Different environments may have different config files
+let configPath = "/etc/\(environment)/config.json"
+let provider = try await FileProvider<JSONSnapshot>(
+    filePath: configPath,
+    allowMissing: true  // Gracefully handle missing env-specific configs
+)
+```
+
+**Container startup issues:**
+```swift
+// Config files might not be ready when container starts
+let provider = try await ReloadingFileProvider<JSONSnapshot>(
+    filePath: "/mnt/config/app.json",
+    allowMissing: true  // Allow startup with empty config, load when available
+)
+```
+
+> Important: The `allowMissing` parameter only affects missing files or directories. Files with syntax errors (invalid JSON, YAML, and so on) will still throw parsing errors.
 
 ### Reloading provider troubleshooting
 

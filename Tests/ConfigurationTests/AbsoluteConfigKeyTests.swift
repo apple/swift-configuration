@@ -16,6 +16,7 @@ import Testing
 @testable import Configuration
 
 struct AbsoluteConfigKeyTests {
+    @available(Configuration 1.0, *)
     @Test func prependingSimpleKey() {
         let base = AbsoluteConfigKey(["bar", "baz"])
         let prefix = ConfigKey(["foo"])
@@ -25,6 +26,7 @@ struct AbsoluteConfigKeyTests {
         #expect(result.context.isEmpty)
     }
 
+    @available(Configuration 1.0, *)
     @Test func prependingWithContext() {
         let base = AbsoluteConfigKey(["bar"], context: ["env": .string("prod")])
         let prefix = ConfigKey(["foo"], context: ["region": .string("us-west")])
@@ -35,6 +37,7 @@ struct AbsoluteConfigKeyTests {
         #expect(result.context["region"] == .string("us-west"))
     }
 
+    @available(Configuration 1.0, *)
     @Test func prependingWithConflictingContext() {
         let base = AbsoluteConfigKey(["bar"], context: ["key": .string("base-value")])
         let prefix = ConfigKey(["foo"], context: ["key": .string("prefix-value")])
@@ -44,6 +47,7 @@ struct AbsoluteConfigKeyTests {
         #expect(result.context["key"] == .string("base-value"))
     }
 
+    @available(Configuration 1.0, *)
     @Test func prependingEmptyKey() {
         let base = AbsoluteConfigKey(["foo", "bar"])
         let prefix = ConfigKey([])
@@ -53,6 +57,7 @@ struct AbsoluteConfigKeyTests {
         #expect(result.context.isEmpty)
     }
 
+    @available(Configuration 1.0, *)
     @Test func appendingSimpleKey() {
         let base = AbsoluteConfigKey(["foo", "bar"])
         let suffix = ConfigKey(["baz"])
@@ -62,6 +67,7 @@ struct AbsoluteConfigKeyTests {
         #expect(result.context.isEmpty)
     }
 
+    @available(Configuration 1.0, *)
     @Test func appendingWithContext() {
         let base = AbsoluteConfigKey(["foo"], context: ["env": .string("prod")])
         let suffix = ConfigKey(["bar"], context: ["region": .string("us-west")])
@@ -72,6 +78,7 @@ struct AbsoluteConfigKeyTests {
         #expect(result.context["region"] == .string("us-west"))
     }
 
+    @available(Configuration 1.0, *)
     @Test func appendingWithConflictingContext() {
         let base = AbsoluteConfigKey(["foo"], context: ["key": .string("base-value")])
         let suffix = ConfigKey(["bar"], context: ["key": .string("suffix-value")])
@@ -81,6 +88,7 @@ struct AbsoluteConfigKeyTests {
         #expect(result.context["key"] == .string("suffix-value"))
     }
 
+    @available(Configuration 1.0, *)
     @Test func appendingEmptyKey() {
         let base = AbsoluteConfigKey(["foo", "bar"])
         let suffix = ConfigKey([])
@@ -90,6 +98,7 @@ struct AbsoluteConfigKeyTests {
         #expect(result.context.isEmpty)
     }
 
+    @available(Configuration 1.0, *)
     @Test func appendingMultipleKeys() {
         let base = AbsoluteConfigKey(["foo"])
         let result = base.appending(ConfigKey(["bar"])).appending(ConfigKey(["baz"]))
@@ -97,6 +106,7 @@ struct AbsoluteConfigKeyTests {
         #expect(result.components == ["foo", "bar", "baz"])
     }
 
+    @available(Configuration 1.0, *)
     @Test func prependingMultipleKeys() {
         let base = AbsoluteConfigKey(["baz"])
         let result = base.prepending(ConfigKey(["bar"])).prepending(ConfigKey(["foo"]))
@@ -104,6 +114,7 @@ struct AbsoluteConfigKeyTests {
         #expect(result.components == ["foo", "bar", "baz"])
     }
 
+    @available(Configuration 1.0, *)
     @Test func prependingAndAppending() {
         let base = AbsoluteConfigKey(["middle"])
         let result = base.prepending(ConfigKey(["start"])).appending(ConfigKey(["end"]))

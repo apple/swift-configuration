@@ -147,48 +147,6 @@ public final class MutableInMemoryProvider: Sendable {
 @available(Configuration 1.0, *)
 extension MutableInMemoryProvider {
 
-    /// Creates a new mutable in-memory provider from string keys and initial values.
-    ///
-    /// This convenience initializer allows you to specify configuration keys as strings,
-    /// which are then decoded into ``AbsoluteConfigKey`` instances using the provided
-    /// key decoder. This is the most common way to create mutable in-memory providers.
-    ///
-    /// ```swift
-    /// let provider = MutableInMemoryProvider(
-    ///     name: "feature-flags",
-    ///     initialValues: [
-    ///         "features.new-ui": false,
-    ///         "features.beta-api": true,
-    ///         "limits.max-requests": 1000
-    ///     ]
-    /// )
-    ///
-    /// // Toggle features at runtime
-    /// provider.setValue(true, forKey: "features.new-ui")
-    /// ```
-    ///
-    /// - Parameters:
-    ///   - name: An optional name for the provider, used in debugging and logging.
-    ///   - initialValues: A dictionary mapping string keys to initial configuration values.
-    ///   - keyDecoder: The decoder used to transform string keys into structured keys.
-    public convenience init(
-        name: String? = nil,
-        initialValues: [String: ConfigValue],
-        keyDecoder: some ConfigKeyDecoder = .dotSeparated
-    ) {
-        self.init(
-            name: name,
-            initialValues: Dictionary(
-                uniqueKeysWithValues: initialValues.map {
-                    (
-                        AbsoluteConfigKey(keyDecoder.decode($0.key, context: [:])),
-                        $0.value
-                    )
-                }
-            )
-        )
-    }
-
     /// Updates the stored value for the specified configuration key.
     ///
     /// This method atomically updates the value and notifies all active watchers
@@ -234,41 +192,6 @@ extension MutableInMemoryProvider {
                 continuation.yield(snapshot)
             }
         }
-    }
-
-    /// Updates the stored value for the specified string key.
-    ///
-    /// This convenience method allows you to update values using string keys,
-    /// which are decoded into ``AbsoluteConfigKey`` instances using the provided
-    /// key decoder and context.
-    ///
-    /// ```swift
-    /// let provider = MutableInMemoryProvider(initialValues: [:])
-    ///
-    /// // Set values using string keys
-    /// provider.setValue("localhost", forKey: "database.host")
-    /// provider.setValue(5432, forKey: "database.port")
-    ///
-    /// // Use context for environment-specific keys
-    /// provider.setValue(
-    ///     "prod-db",
-    ///     forKey: "database.host",
-    ///     context: ["env": "production"]
-    /// )
-    /// ```
-    ///
-    /// - Parameters:
-    ///   - value: The new configuration value, or `nil` to remove the value entirely.
-    ///   - key: The string representation of the configuration key.
-    ///   - context: Additional context information for key resolution.
-    ///   - keyDecoder: The decoder used to transform the string key into a structured key.
-    public func setValue(
-        _ value: ConfigValue?,
-        forKey key: String,
-        context: [String: ConfigContextValue] = [:],
-        keyDecoder: some ConfigKeyDecoder = .dotSeparated
-    ) {
-        setValue(value, forKey: AbsoluteConfigKey(keyDecoder.decode(key, context: context)))
     }
 }
 
@@ -416,7 +339,7 @@ extension MutableInMemoryProvider: ConfigProvider {
     }
 
     // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
-    public func watchValue<Return>(
+    public func watchValue<Return: ~Copyable>(
         forKey key: AbsoluteConfigKey,
         type: ConfigType,
         updatesHandler: (
@@ -455,7 +378,7 @@ extension MutableInMemoryProvider: ConfigProvider {
     }
 
     // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
-    public func watchSnapshot<Return>(
+    public func watchSnapshot<Return: ~Copyable>(
         updatesHandler: (ConfigUpdatesAsyncSequence<any ConfigSnapshot, Never>) async throws -> Return
     ) async throws -> Return {
         let (stream, continuation) = AsyncStream<Snapshot>.makeStream(bufferingPolicy: .bufferingNewest(1))

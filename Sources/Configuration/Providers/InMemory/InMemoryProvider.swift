@@ -108,51 +108,6 @@ public struct InMemoryProvider: Sendable {
 }
 
 @available(Configuration 1.0, *)
-extension InMemoryProvider {
-
-    /// Creates a new in-memory provider from string keys and configuration values.
-    ///
-    /// This convenience initializer allows you to specify configuration keys as strings,
-    /// which are then decoded into ``AbsoluteConfigKey`` instances using the provided
-    /// key decoder. This is the most common way to create in-memory providers.
-    ///
-    /// ```swift
-    /// let provider = InMemoryProvider(
-    ///     name: "app-defaults",
-    ///     values: [
-    ///         "database.host": "localhost",
-    ///         "database.port": 5432,
-    ///         "api.timeout": 30.0,
-    ///         "features.enabled": true,
-    ///         "api.key": ConfigValue("secret", isSecret: true)
-    ///     ]
-    /// )
-    /// ```
-    ///
-    /// - Parameters:
-    ///   - name: An optional name for the provider, used in debugging and logging.
-    ///   - values: A dictionary mapping string keys to configuration values.
-    ///   - keyDecoder: The decoder used to transform string keys into structured keys.
-    public init(
-        name: String? = nil,
-        values: [String: ConfigValue],
-        keyDecoder: some ConfigKeyDecoder = .dotSeparated
-    ) {
-        self.init(
-            name: name,
-            values: Dictionary(
-                uniqueKeysWithValues: values.map {
-                    (
-                        AbsoluteConfigKey(keyDecoder.decode($0.key, context: [:])),
-                        $0.value
-                    )
-                }
-            )
-        )
-    }
-}
-
-@available(Configuration 1.0, *)
 extension InMemoryProvider: CustomStringConvertible {
     // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
     public var description: String {
@@ -215,7 +170,7 @@ extension InMemoryProvider: ConfigProvider {
     }
 
     // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
-    public func watchValue<Return>(
+    public func watchValue<Return: ~Copyable>(
         forKey key: AbsoluteConfigKey,
         type: ConfigType,
         updatesHandler: (
@@ -231,7 +186,7 @@ extension InMemoryProvider: ConfigProvider {
     }
 
     // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
-    public func watchSnapshot<Return>(
+    public func watchSnapshot<Return: ~Copyable>(
         updatesHandler: (ConfigUpdatesAsyncSequence<any ConfigSnapshot, Never>) async throws -> Return
     ) async throws -> Return {
         try await watchSnapshotFromSnapshot(updatesHandler: updatesHandler)

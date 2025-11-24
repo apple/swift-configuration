@@ -637,7 +637,7 @@ extension ConfigReader {
     ///   - updatesHandler: A closure that handles the stream of updates, emits `nil` when no value is found.
     /// - Throws: An error if the watch operation fails.
     /// - Returns: The value returned by the updates handler.
-    internal func watchValue<Value: Sendable, Return>(
+    internal func watchValue<Value: Sendable, Return: ~Copyable>(
         forKey key: ConfigKey,
         type: ConfigType,
         isSecret: Bool,
@@ -713,7 +713,7 @@ extension ConfigReader {
     ///   - updatesHandler: A closure that handles the stream of updates, emits the default when no value is found.
     /// - Throws: An error if the watch operation fails.
     /// - Returns: The value returned by the updates handler.
-    internal func watchValue<Value: Sendable, Return>(
+    internal func watchValue<Value: Sendable, Return: ~Copyable>(
         forKey key: ConfigKey,
         type: ConfigType,
         isSecret: Bool,
@@ -790,7 +790,7 @@ extension ConfigReader {
     ///     or the value cannot be unwrapped.
     /// - Throws: An error if the watch operation fails.
     /// - Returns: The value returned by the updates handler.
-    internal func watchRequiredValue<Value: Sendable, Return>(
+    internal func watchRequiredValue<Value: Sendable, Return: ~Copyable>(
         forKey key: ConfigKey,
         type: ConfigType,
         isSecret: Bool,
