@@ -34,7 +34,9 @@ struct ConfigSnapshotReaderMethodTestsGet1 {
         % for primitive_type in primitive_types:
         % name = primitive_type["name"]
         % lower_name = lower_first(name)
-        try config.withSnapshot { snapshot in
+        do { 
+            let snapshot = config.snapshot()
+
             // Optional - success
             #expect(snapshot.${lower_name}(forKey: ConfigKey(["${lower_name}"])) == Defaults.${lower_name})
             #expect(snapshot.${lower_name}(forKey: "${lower_name}") == Defaults.${lower_name})

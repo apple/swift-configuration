@@ -12,7 +12,7 @@
 - ``ConfigReader/scoped(to:keyDecoderOverride:)``
 
 ### Reading from a snapshot
-- ``ConfigReader/withSnapshot(_:)``
+- ``ConfigReader/snapshot()``
 - ``ConfigReader/watchSnapshot(fileID:line:updatesHandler:)``
 
 - <doc:ConfigReader-Get>

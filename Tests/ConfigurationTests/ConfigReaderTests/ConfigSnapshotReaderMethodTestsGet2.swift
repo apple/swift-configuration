@@ -32,7 +32,9 @@ struct ConfigSnapshotReaderMethodTestsGet2 {
     @Test func get() async throws {
         let config = ConfigReaderTests.config
 
-        try config.withSnapshot { snapshot in
+        do {
+            let snapshot = config.snapshot()
+
             // Optional - success
             #expect(
                 snapshot.string(forKey: ConfigKey(["stringConvertible"]), as: TestStringConvertible.self)
@@ -132,7 +134,9 @@ struct ConfigSnapshotReaderMethodTestsGet2 {
                 try snapshot.requiredString(forKey: "failure", as: TestStringConvertible.self)
             }
         }
-        try config.withSnapshot { snapshot in
+        do {
+            let snapshot = config.snapshot()
+
             // Optional - success
             #expect(snapshot.string(forKey: ConfigKey(["stringEnum"]), as: TestEnum.self) == Defaults.stringEnum)
             #expect(snapshot.string(forKey: "stringEnum", as: TestEnum.self) == Defaults.stringEnum)

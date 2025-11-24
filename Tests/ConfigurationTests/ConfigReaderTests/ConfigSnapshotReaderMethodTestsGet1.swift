@@ -32,7 +32,9 @@ struct ConfigSnapshotReaderMethodTestsGet1 {
     @Test func get() async throws {
         let config = ConfigReaderTests.config
 
-        try config.withSnapshot { snapshot in
+        do {
+            let snapshot = config.snapshot()
+
             // Optional - success
             #expect(snapshot.string(forKey: ConfigKey(["string"])) == Defaults.string)
             #expect(snapshot.string(forKey: "string") == Defaults.string)
@@ -78,7 +80,9 @@ struct ConfigSnapshotReaderMethodTestsGet1 {
             #expect(throws: TestProvider.TestError.self) { try snapshot.requiredString(forKey: ConfigKey(["failure"])) }
             #expect(throws: TestProvider.TestError.self) { try snapshot.requiredString(forKey: "failure") }
         }
-        try config.withSnapshot { snapshot in
+        do {
+            let snapshot = config.snapshot()
+
             // Optional - success
             #expect(snapshot.int(forKey: ConfigKey(["int"])) == Defaults.int)
             #expect(snapshot.int(forKey: "int") == Defaults.int)
@@ -119,7 +123,9 @@ struct ConfigSnapshotReaderMethodTestsGet1 {
             #expect(throws: TestProvider.TestError.self) { try snapshot.requiredInt(forKey: ConfigKey(["failure"])) }
             #expect(throws: TestProvider.TestError.self) { try snapshot.requiredInt(forKey: "failure") }
         }
-        try config.withSnapshot { snapshot in
+        do {
+            let snapshot = config.snapshot()
+
             // Optional - success
             #expect(snapshot.double(forKey: ConfigKey(["double"])) == Defaults.double)
             #expect(snapshot.double(forKey: "double") == Defaults.double)
@@ -165,7 +171,9 @@ struct ConfigSnapshotReaderMethodTestsGet1 {
             #expect(throws: TestProvider.TestError.self) { try snapshot.requiredDouble(forKey: ConfigKey(["failure"])) }
             #expect(throws: TestProvider.TestError.self) { try snapshot.requiredDouble(forKey: "failure") }
         }
-        try config.withSnapshot { snapshot in
+        do {
+            let snapshot = config.snapshot()
+
             // Optional - success
             #expect(snapshot.bool(forKey: ConfigKey(["bool"])) == Defaults.bool)
             #expect(snapshot.bool(forKey: "bool") == Defaults.bool)
@@ -206,7 +214,9 @@ struct ConfigSnapshotReaderMethodTestsGet1 {
             #expect(throws: TestProvider.TestError.self) { try snapshot.requiredBool(forKey: ConfigKey(["failure"])) }
             #expect(throws: TestProvider.TestError.self) { try snapshot.requiredBool(forKey: "failure") }
         }
-        try config.withSnapshot { snapshot in
+        do {
+            let snapshot = config.snapshot()
+
             // Optional - success
             #expect(snapshot.bytes(forKey: ConfigKey(["bytes"])) == Defaults.bytes)
             #expect(snapshot.bytes(forKey: "bytes") == Defaults.bytes)
@@ -249,7 +259,9 @@ struct ConfigSnapshotReaderMethodTestsGet1 {
             #expect(throws: TestProvider.TestError.self) { try snapshot.requiredBytes(forKey: ConfigKey(["failure"])) }
             #expect(throws: TestProvider.TestError.self) { try snapshot.requiredBytes(forKey: "failure") }
         }
-        try config.withSnapshot { snapshot in
+        do {
+            let snapshot = config.snapshot()
+
             // Optional - success
             #expect(snapshot.stringArray(forKey: ConfigKey(["stringArray"])) == Defaults.stringArray)
             #expect(snapshot.stringArray(forKey: "stringArray") == Defaults.stringArray)
@@ -310,7 +322,9 @@ struct ConfigSnapshotReaderMethodTestsGet1 {
             }
             #expect(throws: TestProvider.TestError.self) { try snapshot.requiredStringArray(forKey: "failure") }
         }
-        try config.withSnapshot { snapshot in
+        do {
+            let snapshot = config.snapshot()
+
             // Optional - success
             #expect(snapshot.intArray(forKey: ConfigKey(["intArray"])) == Defaults.intArray)
             #expect(snapshot.intArray(forKey: "intArray") == Defaults.intArray)
@@ -363,7 +377,9 @@ struct ConfigSnapshotReaderMethodTestsGet1 {
             }
             #expect(throws: TestProvider.TestError.self) { try snapshot.requiredIntArray(forKey: "failure") }
         }
-        try config.withSnapshot { snapshot in
+        do {
+            let snapshot = config.snapshot()
+
             // Optional - success
             #expect(snapshot.doubleArray(forKey: ConfigKey(["doubleArray"])) == Defaults.doubleArray)
             #expect(snapshot.doubleArray(forKey: "doubleArray") == Defaults.doubleArray)
@@ -424,7 +440,9 @@ struct ConfigSnapshotReaderMethodTestsGet1 {
             }
             #expect(throws: TestProvider.TestError.self) { try snapshot.requiredDoubleArray(forKey: "failure") }
         }
-        try config.withSnapshot { snapshot in
+        do {
+            let snapshot = config.snapshot()
+
             // Optional - success
             #expect(snapshot.boolArray(forKey: ConfigKey(["boolArray"])) == Defaults.boolArray)
             #expect(snapshot.boolArray(forKey: "boolArray") == Defaults.boolArray)
@@ -479,7 +497,9 @@ struct ConfigSnapshotReaderMethodTestsGet1 {
             }
             #expect(throws: TestProvider.TestError.self) { try snapshot.requiredBoolArray(forKey: "failure") }
         }
-        try config.withSnapshot { snapshot in
+        do {
+            let snapshot = config.snapshot()
+
             // Optional - success
             #expect(snapshot.byteChunkArray(forKey: ConfigKey(["byteChunkArray"])) == Defaults.byteChunkArray)
             #expect(snapshot.byteChunkArray(forKey: "byteChunkArray") == Defaults.byteChunkArray)
