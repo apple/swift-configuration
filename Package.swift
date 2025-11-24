@@ -188,7 +188,11 @@ for target in package.targets {
     // https://docs.swift.org/compiler/documentation/diagnostics/nonisolated-nonsending-by-default/
     settings.append(.enableUpcomingFeature("NonisolatedNonsendingByDefault"))
 
-    settings.append(.enableExperimentalFeature("AvailabilityMacro=Configuration 1.0:macOS 15.0, iOS 18.0, watchOS 11.0, tvOS 18.0, visionOS 2.0"))
+    settings.append(
+        .enableExperimentalFeature(
+            "AvailabilityMacro=Configuration 1.0:macOS 15.0, iOS 18.0, watchOS 11.0, tvOS 18.0, visionOS 2.0"
+        )
+    )
 
     if enableAllCIFlags {
         // Ensure all public types are explicitly annotated as Sendable or not Sendable.
