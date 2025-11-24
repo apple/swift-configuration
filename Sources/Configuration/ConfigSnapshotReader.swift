@@ -278,7 +278,7 @@ extension ConfigReader {
     ///   - updatesHandler: A closure that receives an async sequence of `ConfigSnapshotReader` instances.
     /// - Returns: The value returned by the handler.
     /// - Throws: Any error thrown by the handler.
-    public func watchSnapshot<Return>(
+    public func watchSnapshot<Return: ~Copyable>(
         fileID: String = #fileID,
         line: UInt = #line,
         updatesHandler: (_ updates: ConfigUpdatesAsyncSequence<ConfigSnapshotReader, Never>) async throws -> Return

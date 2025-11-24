@@ -37,3 +37,5 @@ If you have any questions, ask in an issue on GitHub.
 
 - <doc:SCO-NNNN>
 - <doc:SCO-0001>
+- <doc:SCO-0002>
+- <doc:SCO-0003>

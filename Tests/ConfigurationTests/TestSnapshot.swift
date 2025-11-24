@@ -83,7 +83,7 @@ extension InMemoryFileSystem.FileInfo {
 }
 
 @available(Configuration 1.0, *)
-func withTestFileSystem<Return>(
+func withTestFileSystem<Return: ~Copyable>(
     _ body: (InMemoryFileSystem, FilePath, Date) async throws -> Return
 ) async throws -> Return {
     let filePath = FilePath("/test/config.txt")
