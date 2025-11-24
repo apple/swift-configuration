@@ -9,12 +9,6 @@ import Foundation
 
 let defaultTraits: Set<String> = [
     "JSONSupport"
-
-    // Disabled due to a bug in SwiftPM with traits that pull in an external dependency.
-    // Once that's fixed in Swift 6.2.x, we can enable these traits by default.
-    // Open fix: https://github.com/swiftlang/swift-package-manager/pull/9136
-    // "LoggingSupport",
-    // "ReloadingSupport",
 ]
 
 var traits: Set<Trait> = [
@@ -146,9 +140,6 @@ let package = Package(
                 "ConfigReaderTests/ConfigSnapshotReaderMethodTestsGet1.swift.gyb",
                 "ConfigReaderTests/ConfigSnapshotReaderMethodTestsGet2.swift.gyb",
                 "ConfigReaderTests/ConfigSnapshotReaderMethodTestsGet3.swift.gyb",
-            ],
-            resources: [
-                .copy("Resources")
             ]
         ),
 

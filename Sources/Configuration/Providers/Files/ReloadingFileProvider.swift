@@ -85,23 +85,32 @@ import Synchronization
 @available(Configuration 1.0, *)
 public final class ReloadingFileProvider<Snapshot: FileConfigSnapshot>: Sendable {
 
+    fileprivate typealias AnySnapshot = any ConfigSnapshot & CustomStringConvertible & CustomDebugStringConvertible
+
     /// The internal storage structure for the provider state.
-    private struct Storage {
+    fileprivate struct Storage {
 
         /// The current configuration snapshot.
-        var snapshot: Snapshot
+        var snapshot: AnySnapshot
 
-        /// Last modified timestamp of the resolved file.
-        var lastModifiedTimestamp: Date
+        /// The source of file contents.
+        enum Source: Equatable {
 
-        /// The resolved real file path.
-        var realFilePath: FilePath
+            /// A file loaded at the timestamp located at the real path.
+            case file(lastModifiedTimestamp: Date, realFilePath: FilePath)
+
+            /// File not found.
+            case missing
+        }
+
+        /// The source of file contents.
+        var source: Source
 
         /// Active watchers for individual configuration values, keyed by encoded key.
         var valueWatchers: [AbsoluteConfigKey: [UUID: AsyncStream<Result<LookupResult, any Error>>.Continuation]]
 
         /// Active watchers for configuration snapshots.
-        var snapshotWatchers: [UUID: AsyncStream<Snapshot>.Continuation]
+        var snapshotWatchers: [UUID: AsyncStream<AnySnapshot>.Continuation]
 
         /// Returns the total number of active watchers.
         var totalWatcherCount: Int {
@@ -123,6 +132,11 @@ public final class ReloadingFileProvider<Snapshot: FileConfigSnapshot>: Sendable
     /// The original unresolved file path provided by the user, may contain symlinks.
     private let filePath: FilePath
 
+    /// A flag controlling how the provider handles a missing file.
+    ///   - When `false` (the default), if the file is missing or malformed, throws an error.
+    ///   - When `true`, if the file is missing, treats it as empty. Malformed files still throw an error.
+    private let allowMissing: Bool
+
     /// The interval between polling checks.
     private let pollInterval: Duration
 
@@ -135,10 +149,25 @@ public final class ReloadingFileProvider<Snapshot: FileConfigSnapshot>: Sendable
     /// The metrics collector for this provider instance.
     private let metrics: ReloadingFileProviderMetrics
 
+    /// Creates a reloading file provider that monitors the specified file path.
+    ///
+    /// - Parameters:
+    ///   - snapshotType: The type of snapshot to create from the file contents.
+    ///   - parsingOptions: Options used by the snapshot to parse the file data.
+    ///   - filePath: The path to the configuration file to monitor.
+    ///   - allowMissing: A flag controlling how the provider handles a missing file.
+    ///     - When `false` (the default), if the file is missing or malformed, throws an error.
+    ///     - When `true`, if the file is missing, treats it as empty. Malformed files still throw an error.
+    ///   - pollInterval: How often to check for file changes.
+    ///   - fileSystem: The file system implementation to use for reading the file.
+    ///   - logger: The logger instance to use for this provider.
+    ///   - metrics: The metrics factory to use for monitoring provider performance.
+    /// - Throws: If the file cannot be read or if snapshot creation fails.
     internal init(
         snapshotType: Snapshot.Type = Snapshot.self,
         parsingOptions: Snapshot.ParsingOptions,
         filePath: FilePath,
+        allowMissing: Bool,
         pollInterval: Duration,
         fileSystem: any CommonProviderFileSystem,
         logger: Logger,
@@ -146,6 +175,7 @@ public final class ReloadingFileProvider<Snapshot: FileConfigSnapshot>: Sendable
     ) async throws {
         self.parsingOptions = parsingOptions
         self.filePath = filePath
+        self.allowMissing = allowMissing
         self.pollInterval = pollInterval
         self.providerName = "ReloadingFileProvider<\(Snapshot.self)>"
         self.fileSystem = fileSystem
@@ -153,6 +183,7 @@ public final class ReloadingFileProvider<Snapshot: FileConfigSnapshot>: Sendable
         // Set up the logger with metadata
         var logger = logger
         logger[metadataKey: "\(providerName).filePath"] = .string(filePath.lastComponent?.string ?? "<nil>")
+        logger[metadataKey: "\(providerName).allowMissing"] = "\(allowMissing)"
         logger[metadataKey: "\(providerName).pollInterval.seconds"] = .string(
             pollInterval.components.seconds.description
         )
@@ -166,37 +197,56 @@ public final class ReloadingFileProvider<Snapshot: FileConfigSnapshot>: Sendable
 
         // Perform initial load
         logger.debug("Performing initial file load")
-        let realPath = try await fileSystem.resolveSymlinks(atPath: filePath)
-        let timestamp = try await fileSystem.lastModifiedTimestamp(atPath: realPath)
-        let data = try await fileSystem.fileContents(atPath: realPath)
-        let initialSnapshot = try snapshotType.init(
-            data: data.bytes,
-            providerName: providerName,
-            parsingOptions: parsingOptions
-        )
+        let initialSnapshot: AnySnapshot
+        let source: Storage.Source
+        let dataSize: Int
+        if let realPath = try await fileSystem.resolveSymlinks(atPath: filePath),
+            let timestamp = try await fileSystem.lastModifiedTimestamp(atPath: realPath),
+            let data = try await fileSystem.fileContents(atPath: realPath)
+        {
+            initialSnapshot = try snapshotType.init(
+                data: data.bytes,
+                providerName: providerName,
+                parsingOptions: parsingOptions
+            )
+            source = .file(
+                lastModifiedTimestamp: timestamp,
+                realFilePath: realPath
+            )
+            dataSize = data.count
+
+            logger.debug(
+                "Successfully initialized reloading file provider",
+                metadata: [
+                    "\(providerName).realFilePath": .string(realPath.string),
+                    "\(providerName).initialTimestamp": .stringConvertible(timestamp.formatted(.iso8601)),
+                    "\(providerName).fileSize": .stringConvertible(data.count),
+                ]
+            )
+        } else if allowMissing {
+            initialSnapshot = EmptyFileConfigSnapshot(providerName: providerName)
+            source = .missing
+            dataSize = 0
+
+            logger.debug(
+                "Successfully initialized reloading file provider from a missing file"
+            )
+        } else {
+            throw FileSystemError.fileNotFound(path: filePath)
+        }
 
         // Initialize storage
         self.storage = .init(
             .init(
                 snapshot: initialSnapshot,
-                lastModifiedTimestamp: timestamp,
-                realFilePath: realPath,
+                source: source,
                 valueWatchers: [:],
                 snapshotWatchers: [:]
             )
         )
 
         // Update initial metrics
-        self.metrics.fileSize.record(data.count)
-
-        logger.debug(
-            "Successfully initialized reloading file provider",
-            metadata: [
-                "\(providerName).realFilePath": .string(realPath.string),
-                "\(providerName).initialTimestamp": .stringConvertible(timestamp.formatted(.iso8601)),
-                "\(providerName).fileSize": .stringConvertible(data.count),
-            ]
-        )
+        self.metrics.fileSize.record(dataSize)
     }
 
     /// Creates a reloading file provider that monitors the specified file path.
@@ -205,6 +255,9 @@ public final class ReloadingFileProvider<Snapshot: FileConfigSnapshot>: Sendable
     ///   - snapshotType: The type of snapshot to create from the file contents.
     ///   - parsingOptions: Options used by the snapshot to parse the file data.
     ///   - filePath: The path to the configuration file to monitor.
+    ///   - allowMissing: A flag controlling how the provider handles a missing file.
+    ///     - When `false` (the default), if the file is missing or malformed, throws an error.
+    ///     - When `true`, if the file is missing, treats it as empty. Malformed files still throw an error.
     ///   - pollInterval: How often to check for file changes.
     ///   - logger: The logger instance to use for this provider.
     ///   - metrics: The metrics factory to use for monitoring provider performance.
@@ -213,6 +266,7 @@ public final class ReloadingFileProvider<Snapshot: FileConfigSnapshot>: Sendable
         snapshotType: Snapshot.Type = Snapshot.self,
         parsingOptions: Snapshot.ParsingOptions = .default,
         filePath: FilePath,
+        allowMissing: Bool = false,
         pollInterval: Duration = .seconds(15),
         logger: Logger = Logger(label: "ReloadingFileProvider"),
         metrics: any MetricsFactory = MetricsSystem.factory
@@ -221,6 +275,7 @@ public final class ReloadingFileProvider<Snapshot: FileConfigSnapshot>: Sendable
             snapshotType: snapshotType,
             parsingOptions: parsingOptions,
             filePath: filePath,
+            allowMissing: allowMissing,
             pollInterval: pollInterval,
             fileSystem: LocalCommonProviderFileSystem(),
             logger: logger,
@@ -232,6 +287,10 @@ public final class ReloadingFileProvider<Snapshot: FileConfigSnapshot>: Sendable
     ///
     /// ## Configuration keys
     /// - `filePath` (string, required): The path to the configuration file to monitor.
+    /// - `allowMissing` (bool, optional, default: false): A flag controlling how
+    ///   the provider handles a missing file.
+    ///     - When `false` (the default), if the file is missing or malformed, throws an error.
+    ///     - When `true`, if the file is missing, treats it as empty. Malformed files still throw an error.
     /// - `pollIntervalSeconds` (int, optional, default: 15): How often to check for file changes in seconds.
     ///
     /// - Parameters:
@@ -251,9 +310,46 @@ public final class ReloadingFileProvider<Snapshot: FileConfigSnapshot>: Sendable
         try await self.init(
             snapshotType: snapshotType,
             parsingOptions: parsingOptions,
-            filePath: config.requiredString(forKey: "filePath", as: FilePath.self),
-            pollInterval: .seconds(config.int(forKey: "pollIntervalSeconds", default: 15)),
+            config: config,
             fileSystem: LocalCommonProviderFileSystem(),
+            logger: logger,
+            metrics: metrics
+        )
+    }
+
+    /// Creates a reloading file provider using configuration from a reader.
+    ///
+    /// ## Configuration keys
+    /// - `filePath` (string, required): The path to the configuration file to monitor.
+    /// - `allowMissing` (bool, optional, default: false): A flag controlling how
+    ///   the provider handles a missing file.
+    ///     - When `false` (the default), if the file is missing or malformed, throws an error.
+    ///     - When `true`, if the file is missing, treats it as empty. Malformed files still throw an error.
+    /// - `pollIntervalSeconds` (int, optional, default: 15): How often to check for file changes in seconds.
+    ///
+    /// - Parameters:
+    ///   - snapshotType: The type of snapshot to create from the file contents.
+    ///   - parsingOptions: Options used by the snapshot to parse the file data.
+    ///   - config: A configuration reader that contains the required configuration keys.
+    ///   - fileSystem: The file system implementation to use for reading the file.
+    ///   - logger: The logger instance to use for this provider.
+    ///   - metrics: The metrics factory to use for monitoring provider performance.
+    /// - Throws: If required configuration keys are missing, if the file cannot be read, or if snapshot creation fails.
+    internal convenience init(
+        snapshotType: Snapshot.Type = Snapshot.self,
+        parsingOptions: Snapshot.ParsingOptions,
+        config: ConfigReader,
+        fileSystem: some CommonProviderFileSystem,
+        logger: Logger,
+        metrics: any MetricsFactory
+    ) async throws {
+        try await self.init(
+            snapshotType: snapshotType,
+            parsingOptions: parsingOptions,
+            filePath: config.requiredString(forKey: "filePath", as: FilePath.self),
+            allowMissing: config.bool(forKey: "allowMissing", default: false),
+            pollInterval: .seconds(config.int(forKey: "pollIntervalSeconds", default: 15)),
+            fileSystem: fileSystem,
             logger: logger,
             metrics: metrics
         )
@@ -274,86 +370,115 @@ public final class ReloadingFileProvider<Snapshot: FileConfigSnapshot>: Sendable
             logger.debug("reloadIfNeeded finished")
         }
 
-        let candidateRealPath = try await fileSystem.resolveSymlinks(atPath: filePath)
-        let candidateTimestamp = try await fileSystem.lastModifiedTimestamp(atPath: candidateRealPath)
+        let candidateSource: Storage.Source
+        if let candidateRealPath = try await fileSystem.resolveSymlinks(atPath: filePath),
+            let candidateTimestamp = try await fileSystem.lastModifiedTimestamp(atPath: candidateRealPath)
+        {
+            candidateSource = .file(lastModifiedTimestamp: candidateTimestamp, realFilePath: candidateRealPath)
+        } else {
+            candidateSource = .missing
+        }
 
         guard
-            let (originalTimestamp, originalRealPath) =
+            let originalSource =
                 storage
-                .withLock({ storage -> (Date, FilePath)? in
-                    let originalTimestamp = storage.lastModifiedTimestamp
-                    let originalRealPath = storage.realFilePath
+                .withLock({ storage -> Storage.Source? in
+                    let originalSource = storage.source
 
-                    // Check if either the real path or timestamp has changed
-                    guard originalRealPath != candidateRealPath || originalTimestamp != candidateTimestamp else {
+                    // Check if the source has changed
+                    guard originalSource != candidateSource else {
                         logger.debug(
-                            "File path and timestamp unchanged, no reload needed",
-                            metadata: [
-                                "\(providerName).timestamp": .stringConvertible(originalTimestamp.formatted(.iso8601)),
-                                "\(providerName).realPath": .string(originalRealPath.string),
-                            ]
+                            "File source unchanged, no reload needed",
+                            metadata: originalSource.loggingMetadata(prefix: providerName)
                         )
                         return nil
                     }
-                    return (originalTimestamp, originalRealPath)
+                    return originalSource
                 })
         else {
             // No changes detected.
             return
         }
 
+        var summaryMetadata: Logger.Metadata = [:]
+        summaryMetadata.merge(
+            originalSource.loggingMetadata(prefix: "\(providerName).original"),
+            uniquingKeysWith: { a, b in a }
+        )
+        summaryMetadata.merge(
+            candidateSource.loggingMetadata(prefix: "\(providerName).candidate"),
+            uniquingKeysWith: { a, b in a }
+        )
         logger.debug(
             "File path or timestamp changed, reloading...",
-            metadata: [
-                "\(providerName).originalTimestamp": .stringConvertible(originalTimestamp.formatted(.iso8601)),
-                "\(providerName).candidateTimestamp": .stringConvertible(candidateTimestamp.formatted(.iso8601)),
-                "\(providerName).originalRealPath": .string(originalRealPath.string),
-                "\(providerName).candidateRealPath": .string(candidateRealPath.string),
-            ]
+            metadata: summaryMetadata
         )
 
         // Load new data outside the lock
-        let data = try await fileSystem.fileContents(atPath: candidateRealPath)
-        let newSnapshot = try Snapshot.init(
-            data: data.bytes,
-            providerName: providerName,
-            parsingOptions: parsingOptions
-        )
+        let newSnapshot: AnySnapshot
+        let newFileSize: Int
+        switch candidateSource {
+        case .file(_, realFilePath: let realPath):
+            guard let data = try await fileSystem.fileContents(atPath: realPath) else {
+                // File was removed after checking metadata but before we loaded the data.
+                // This is fine, we just exit this reload early and let the next reload
+                // update internal state.
+                logger.debug("File removed half-way through a reload, not updating state")
+                return
+            }
+            newSnapshot = try Snapshot.init(
+                data: data.bytes,
+                providerName: providerName,
+                parsingOptions: parsingOptions
+            )
+            newFileSize = data.count
+        case .missing:
+            guard allowMissing else {
+                // File was removed after initialization, but this provider doesn't allow
+                // a missing file. Keep the old snapshot and throw an error.
+                throw FileSystemError.fileNotFound(path: filePath)
+            }
+            newSnapshot = EmptyFileConfigSnapshot(providerName: providerName)
+            newFileSize = 0
+        }
 
         typealias ValueWatchers = [(
             AbsoluteConfigKey,
             Result<LookupResult, any Error>,
             [AsyncStream<Result<LookupResult, any Error>>.Continuation]
         )]
-        typealias SnapshotWatchers = (Snapshot, [AsyncStream<Snapshot>.Continuation])
+        typealias SnapshotWatchers = (AnySnapshot, [AsyncStream<AnySnapshot>.Continuation])
         guard
             let (valueWatchersToNotify, snapshotWatchersToNotify) =
                 storage
                 .withLock({ storage -> (ValueWatchers, SnapshotWatchers)? in
 
                     // Check if we lost the race with another caller
-                    if storage.lastModifiedTimestamp != originalTimestamp || storage.realFilePath != originalRealPath {
+                    if storage.source != originalSource {
+                        logger.debug("Lost race to reload file, not updating state")
                         return nil
                     }
 
                     // Update storage with new data
                     let oldSnapshot = storage.snapshot
                     storage.snapshot = newSnapshot
-                    storage.lastModifiedTimestamp = candidateTimestamp
-                    storage.realFilePath = candidateRealPath
+                    storage.source = candidateSource
 
+                    var finalMetadata: Logger.Metadata = [
+                        "\(providerName).fileSize": .stringConvertible(newFileSize)
+                    ]
+                    finalMetadata.merge(
+                        candidateSource.loggingMetadata(prefix: providerName),
+                        uniquingKeysWith: { a, b in a }
+                    )
                     logger.debug(
                         "Successfully reloaded file",
-                        metadata: [
-                            "\(providerName).timestamp": .stringConvertible(candidateTimestamp.formatted(.iso8601)),
-                            "\(providerName).fileSize": .stringConvertible(data.count),
-                            "\(providerName).realPath": .string(candidateRealPath.string),
-                        ]
+                        metadata: finalMetadata
                     )
 
                     // Update metrics
                     metrics.reloadCounter.increment(by: 1)
-                    metrics.fileSize.record(data.count)
+                    metrics.fileSize.record(newFileSize)
                     metrics.watcherCount.record(storage.totalWatcherCount)
 
                     // Collect watchers to potentially notify outside the lock
@@ -421,6 +546,33 @@ public final class ReloadingFileProvider<Snapshot: FileConfigSnapshot>: Sendable
                 "\(providerName).totalWatcherCount": .stringConvertible(totalWatchers),
             ]
         )
+    }
+}
+
+@available(Configuration 1.0, *)
+extension ReloadingFileProvider.Storage.Source {
+    /// Creates logging metadata for the source.
+    /// - Parameter prefixString: A prefix to use in logging metadata keys.
+    /// - Returns: A dictionary of metadata.
+    fileprivate func loggingMetadata(prefix prefixString: String? = nil) -> Logger.Metadata {
+        let renderedPrefix: String
+        if let prefixString {
+            renderedPrefix = "\(prefixString)."
+        } else {
+            renderedPrefix = ""
+        }
+        switch self {
+        case .file(lastModifiedTimestamp: let timestamp, realFilePath: let realPath):
+            return [
+                "\(renderedPrefix)fileExists": "true",
+                "\(renderedPrefix)timestamp": .stringConvertible(timestamp.formatted(.iso8601)),
+                "\(renderedPrefix)realPath": .string(realPath.string),
+            ]
+        case .missing:
+            return [
+                "\(renderedPrefix)fileExists": "false"
+            ]
+        }
     }
 }
 
@@ -497,7 +649,7 @@ extension ReloadingFileProvider: ConfigProvider {
     public func watchSnapshot<Return: ~Copyable>(
         updatesHandler: (ConfigUpdatesAsyncSequence<any ConfigSnapshot, Never>) async throws -> Return
     ) async throws -> Return {
-        let (stream, continuation) = AsyncStream<Snapshot>.makeStream(bufferingPolicy: .bufferingNewest(1))
+        let (stream, continuation) = AsyncStream<AnySnapshot>.makeStream(bufferingPolicy: .bufferingNewest(1))
         let id = UUID()
 
         // Add watcher and get initial snapshot
