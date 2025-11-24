@@ -281,7 +281,7 @@ extension ConfigReader {
     public func watchSnapshot<Return: ~Copyable>(
         fileID: String = #fileID,
         line: UInt = #line,
-        updatesHandler: (ConfigUpdatesAsyncSequence<ConfigSnapshotReader, Never>) async throws -> Return
+        updatesHandler: (_ updates: ConfigUpdatesAsyncSequence<ConfigSnapshotReader, Never>) async throws -> Return
     ) async throws -> Return {
         try await provider.watchSnapshot { updates in
             try await updatesHandler(

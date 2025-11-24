@@ -343,7 +343,7 @@ extension MutableInMemoryProvider: ConfigProvider {
         forKey key: AbsoluteConfigKey,
         type: ConfigType,
         updatesHandler: (
-            ConfigUpdatesAsyncSequence<Result<LookupResult, any Error>, Never>
+            _ updates: ConfigUpdatesAsyncSequence<Result<LookupResult, any Error>, Never>
         ) async throws -> Return
     ) async throws -> Return {
         let (stream, continuation) = AsyncStream<ConfigValue?>.makeStream(bufferingPolicy: .bufferingNewest(1))
@@ -379,7 +379,7 @@ extension MutableInMemoryProvider: ConfigProvider {
 
     // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
     public func watchSnapshot<Return: ~Copyable>(
-        updatesHandler: (ConfigUpdatesAsyncSequence<any ConfigSnapshot, Never>) async throws -> Return
+        updatesHandler: (_ updates: ConfigUpdatesAsyncSequence<any ConfigSnapshot, Never>) async throws -> Return
     ) async throws -> Return {
         let (stream, continuation) = AsyncStream<Snapshot>.makeStream(bufferingPolicy: .bufferingNewest(1))
         let id = UUID()

@@ -91,7 +91,8 @@ struct MultiProviderTests {
         func watchValue<Return: ~Copyable>(
             forKey key: AbsoluteConfigKey,
             type: ConfigType,
-            updatesHandler handler: (ConfigUpdatesAsyncSequence<Result<LookupResult, any Error>, Never>) async throws ->
+            updatesHandler handler: (_ updates: ConfigUpdatesAsyncSequence<Result<LookupResult, any Error>, Never>)
+                async throws ->
                 Return
         ) async throws -> Return {
             try await multiProvider.watchValue(forKey: key, type: type) { updates in
@@ -111,7 +112,7 @@ struct MultiProviderTests {
         }
 
         func watchSnapshot<Return: ~Copyable>(
-            updatesHandler: (ConfigUpdatesAsyncSequence<any ConfigSnapshot, Never>) async throws -> Return
+            updatesHandler: (_ updates: ConfigUpdatesAsyncSequence<any ConfigSnapshot, Never>) async throws -> Return
         )
             async throws -> Return
         {

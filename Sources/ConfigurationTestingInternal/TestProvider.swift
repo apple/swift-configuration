@@ -80,7 +80,7 @@ extension TestProvider: ConfigProvider, ConfigSnapshot {
     }
 
     package func watchSnapshot<Return: ~Copyable>(
-        updatesHandler: (ConfigUpdatesAsyncSequence<any ConfigSnapshot, Never>) async throws -> Return
+        updatesHandler: (_ updates: ConfigUpdatesAsyncSequence<any ConfigSnapshot, Never>) async throws -> Return
     )
         async throws -> Return
     {
@@ -98,7 +98,7 @@ extension TestProvider: ConfigProvider, ConfigSnapshot {
         forKey key: AbsoluteConfigKey,
         type: ConfigType,
         updatesHandler handler: (
-            ConfigUpdatesAsyncSequence<Result<LookupResult, any Error>, Never>
+            _ updates: ConfigUpdatesAsyncSequence<Result<LookupResult, any Error>, Never>
         ) async throws -> Return
     ) async throws -> Return {
         try await watchValueFromValue(forKey: key, type: type, updatesHandler: handler)
