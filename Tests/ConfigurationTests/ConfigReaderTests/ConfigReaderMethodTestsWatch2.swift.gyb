@@ -38,41 +38,31 @@ struct ConfigReaderMethodTestsWatch2 {
         % lower_test_suffix = lower_first(test_suffix)
         do {
             // Optional - success
-            #expect(try await config.watch${suffix}(forKey: ConfigKey(["${lower_test_suffix}"]), as: ${test_type}.self, updatesHandler: awaitFirst) == Defaults.${lower_test_suffix})
             #expect(try await config.watch${suffix}(forKey: "${lower_test_suffix}", as: ${test_type}.self, updatesHandler: awaitFirst) == Defaults.${lower_test_suffix})
 
             // Optional - missing
-            #expect(try await config.watch${suffix}(forKey: ConfigKey(["absent${test_suffix}"]), as: ${test_type}.self, updatesHandler: awaitFirst) == .some(nil))
             #expect(try await config.watch${suffix}(forKey: "absent${test_suffix}", as: ${test_type}.self, updatesHandler: awaitFirst) == .some(nil))
 
             // Optional - failing
-            #expect(try await config.watch${suffix}(forKey: ConfigKey(["failure"]), as: ${test_type}.self, updatesHandler: awaitFirst) == .some(nil))
             #expect(try await config.watch${suffix}(forKey: "failure", as: ${test_type}.self, updatesHandler: awaitFirst) == .some(nil))
 
             // Defaulted - success
-            #expect(try await config.watch${suffix}(forKey: ConfigKey(["${lower_test_suffix}"]), as: ${test_type}.self, default: Defaults.other${test_suffix}, updatesHandler: awaitFirst) == Defaults.${lower_test_suffix})
             #expect(try await config.watch${suffix}(forKey: "${lower_test_suffix}", as: ${test_type}.self, default: Defaults.other${test_suffix}, updatesHandler: awaitFirst) == Defaults.${lower_test_suffix})
 
             // Defaulted - missing
-            #expect(try await config.watch${suffix}(forKey: ConfigKey(["absent${test_suffix}"]), as: ${test_type}.self, default: Defaults.other${test_suffix}, updatesHandler: awaitFirst) == Defaults.other${test_suffix})
             #expect(try await config.watch${suffix}(forKey: "absent${test_suffix}", as: ${test_type}.self, default: Defaults.other${test_suffix}, updatesHandler: awaitFirst) == Defaults.other${test_suffix})
 
             // Defaulted - failing
-            #expect(try await config.watch${suffix}(forKey: ConfigKey(["failure"]), as: ${test_type}.self, default: Defaults.other${test_suffix}, updatesHandler: awaitFirst) == Defaults.other${test_suffix})
             #expect(try await config.watch${suffix}(forKey: "failure", as: ${test_type}.self, default: Defaults.other${test_suffix}, updatesHandler: awaitFirst) == Defaults.other${test_suffix})
 
             // Required - success
-            #expect(try await config.watchRequired${suffix}(forKey: ConfigKey(["${lower_test_suffix}"]), as: ${test_type}.self, updatesHandler: awaitFirst) == Defaults.${lower_test_suffix})
             #expect(try await config.watchRequired${suffix}(forKey: "${lower_test_suffix}", as: ${test_type}.self, updatesHandler: awaitFirst) == Defaults.${lower_test_suffix})
 
             // Required - missing
-            let error1 = await #expect(throws: ConfigError.self) { try await config.watchRequired${suffix}(forKey: ConfigKey(["absent${test_suffix}"]), as: ${test_type}.self, updatesHandler: awaitFirst) }
+            let error1 = await #expect(throws: ConfigError.self) { try await config.watchRequired${suffix}(forKey: "absent${test_suffix}", as: ${test_type}.self, updatesHandler: awaitFirst) }
             #expect(error1 == .missingRequiredConfigValue(AbsoluteConfigKey(["absent${test_suffix}"])))
-            let error2 = await #expect(throws: ConfigError.self) { try await config.watchRequired${suffix}(forKey: "absent${test_suffix}", as: ${test_type}.self, updatesHandler: awaitFirst) }
-            #expect(error2 == .missingRequiredConfigValue(AbsoluteConfigKey(["absent${test_suffix}"])))
 
             // Required - failing
-            await #expect(throws: TestProvider.TestError.self) { try await config.watchRequired${suffix}(forKey: ConfigKey(["failure"]), as: ${test_type}.self, updatesHandler: awaitFirst) }
             await #expect(throws: TestProvider.TestError.self) { try await config.watchRequired${suffix}(forKey: "failure", as: ${test_type}.self, updatesHandler: awaitFirst) }
         }
         % end

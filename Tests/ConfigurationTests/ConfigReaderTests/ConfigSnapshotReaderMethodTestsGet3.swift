@@ -37,35 +37,17 @@ struct ConfigSnapshotReaderMethodTestsGet3 {
 
             // Optional - success
             #expect(
-                snapshot.stringArray(forKey: ConfigKey(["stringConvertibleArray"]), as: TestStringConvertible.self)
-                    == Defaults.stringConvertibleArray
-            )
-            #expect(
                 snapshot.stringArray(forKey: "stringConvertibleArray", as: TestStringConvertible.self)
                     == Defaults.stringConvertibleArray
             )
 
             // Optional - missing
-            #expect(
-                snapshot.stringArray(
-                    forKey: ConfigKey(["absentStringConvertibleArray"]),
-                    as: TestStringConvertible.self
-                ) == nil
-            )
             #expect(snapshot.stringArray(forKey: "absentStringConvertibleArray", as: TestStringConvertible.self) == nil)
 
             // Optional - failing
-            #expect(snapshot.stringArray(forKey: ConfigKey(["failure"]), as: TestStringConvertible.self) == nil)
             #expect(snapshot.stringArray(forKey: "failure", as: TestStringConvertible.self) == nil)
 
             // Defaulted - success
-            #expect(
-                snapshot.stringArray(
-                    forKey: ConfigKey(["stringConvertibleArray"]),
-                    as: TestStringConvertible.self,
-                    default: Defaults.otherStringConvertibleArray
-                ) == Defaults.stringConvertibleArray
-            )
             #expect(
                 snapshot.stringArray(
                     forKey: "stringConvertibleArray",
@@ -77,13 +59,6 @@ struct ConfigSnapshotReaderMethodTestsGet3 {
             // Defaulted - missing
             #expect(
                 snapshot.stringArray(
-                    forKey: ConfigKey(["absentStringConvertibleArray"]),
-                    as: TestStringConvertible.self,
-                    default: Defaults.otherStringConvertibleArray
-                ) == Defaults.otherStringConvertibleArray
-            )
-            #expect(
-                snapshot.stringArray(
                     forKey: "absentStringConvertibleArray",
                     as: TestStringConvertible.self,
                     default: Defaults.otherStringConvertibleArray
@@ -91,13 +66,6 @@ struct ConfigSnapshotReaderMethodTestsGet3 {
             )
 
             // Defaulted - failing
-            #expect(
-                snapshot.stringArray(
-                    forKey: ConfigKey(["failure"]),
-                    as: TestStringConvertible.self,
-                    default: Defaults.otherStringConvertibleArray
-                ) == Defaults.otherStringConvertibleArray
-            )
             #expect(
                 snapshot.stringArray(
                     forKey: "failure",
@@ -108,33 +76,17 @@ struct ConfigSnapshotReaderMethodTestsGet3 {
 
             // Required - success
             try #expect(
-                snapshot.requiredStringArray(
-                    forKey: ConfigKey(["stringConvertibleArray"]),
-                    as: TestStringConvertible.self
-                ) == Defaults.stringConvertibleArray
-            )
-            try #expect(
                 snapshot.requiredStringArray(forKey: "stringConvertibleArray", as: TestStringConvertible.self)
                     == Defaults.stringConvertibleArray
             )
 
             // Required - missing
             let error1 = #expect(throws: ConfigError.self) {
-                try snapshot.requiredStringArray(
-                    forKey: ConfigKey(["absentStringConvertibleArray"]),
-                    as: TestStringConvertible.self
-                )
-            }
-            #expect(error1 == .missingRequiredConfigValue(AbsoluteConfigKey(["absentStringConvertibleArray"])))
-            let error2 = #expect(throws: ConfigError.self) {
                 try snapshot.requiredStringArray(forKey: "absentStringConvertibleArray", as: TestStringConvertible.self)
             }
-            #expect(error2 == .missingRequiredConfigValue(AbsoluteConfigKey(["absentStringConvertibleArray"])))
+            #expect(error1 == .missingRequiredConfigValue(AbsoluteConfigKey(["absentStringConvertibleArray"])))
 
             // Required - failing
-            #expect(throws: TestProvider.TestError.self) {
-                try snapshot.requiredStringArray(forKey: ConfigKey(["failure"]), as: TestStringConvertible.self)
-            }
             #expect(throws: TestProvider.TestError.self) {
                 try snapshot.requiredStringArray(forKey: "failure", as: TestStringConvertible.self)
             }
@@ -143,28 +95,15 @@ struct ConfigSnapshotReaderMethodTestsGet3 {
             let snapshot = config.snapshot()
 
             // Optional - success
-            #expect(
-                snapshot.stringArray(forKey: ConfigKey(["stringEnumArray"]), as: TestEnum.self)
-                    == Defaults.stringEnumArray
-            )
             #expect(snapshot.stringArray(forKey: "stringEnumArray", as: TestEnum.self) == Defaults.stringEnumArray)
 
             // Optional - missing
-            #expect(snapshot.stringArray(forKey: ConfigKey(["absentStringEnumArray"]), as: TestEnum.self) == nil)
             #expect(snapshot.stringArray(forKey: "absentStringEnumArray", as: TestEnum.self) == nil)
 
             // Optional - failing
-            #expect(snapshot.stringArray(forKey: ConfigKey(["failure"]), as: TestEnum.self) == nil)
             #expect(snapshot.stringArray(forKey: "failure", as: TestEnum.self) == nil)
 
             // Defaulted - success
-            #expect(
-                snapshot.stringArray(
-                    forKey: ConfigKey(["stringEnumArray"]),
-                    as: TestEnum.self,
-                    default: Defaults.otherStringEnumArray
-                ) == Defaults.stringEnumArray
-            )
             #expect(
                 snapshot.stringArray(
                     forKey: "stringEnumArray",
@@ -176,13 +115,6 @@ struct ConfigSnapshotReaderMethodTestsGet3 {
             // Defaulted - missing
             #expect(
                 snapshot.stringArray(
-                    forKey: ConfigKey(["absentStringEnumArray"]),
-                    as: TestEnum.self,
-                    default: Defaults.otherStringEnumArray
-                ) == Defaults.otherStringEnumArray
-            )
-            #expect(
-                snapshot.stringArray(
                     forKey: "absentStringEnumArray",
                     as: TestEnum.self,
                     default: Defaults.otherStringEnumArray
@@ -191,40 +123,22 @@ struct ConfigSnapshotReaderMethodTestsGet3 {
 
             // Defaulted - failing
             #expect(
-                snapshot.stringArray(
-                    forKey: ConfigKey(["failure"]),
-                    as: TestEnum.self,
-                    default: Defaults.otherStringEnumArray
-                ) == Defaults.otherStringEnumArray
-            )
-            #expect(
                 snapshot.stringArray(forKey: "failure", as: TestEnum.self, default: Defaults.otherStringEnumArray)
                     == Defaults.otherStringEnumArray
             )
 
             // Required - success
             try #expect(
-                snapshot.requiredStringArray(forKey: ConfigKey(["stringEnumArray"]), as: TestEnum.self)
-                    == Defaults.stringEnumArray
-            )
-            try #expect(
                 snapshot.requiredStringArray(forKey: "stringEnumArray", as: TestEnum.self) == Defaults.stringEnumArray
             )
 
             // Required - missing
             let error1 = #expect(throws: ConfigError.self) {
-                try snapshot.requiredStringArray(forKey: ConfigKey(["absentStringEnumArray"]), as: TestEnum.self)
-            }
-            #expect(error1 == .missingRequiredConfigValue(AbsoluteConfigKey(["absentStringEnumArray"])))
-            let error2 = #expect(throws: ConfigError.self) {
                 try snapshot.requiredStringArray(forKey: "absentStringEnumArray", as: TestEnum.self)
             }
-            #expect(error2 == .missingRequiredConfigValue(AbsoluteConfigKey(["absentStringEnumArray"])))
+            #expect(error1 == .missingRequiredConfigValue(AbsoluteConfigKey(["absentStringEnumArray"])))
 
             // Required - failing
-            #expect(throws: TestProvider.TestError.self) {
-                try snapshot.requiredStringArray(forKey: ConfigKey(["failure"]), as: TestEnum.self)
-            }
             #expect(throws: TestProvider.TestError.self) {
                 try snapshot.requiredStringArray(forKey: "failure", as: TestEnum.self)
             }

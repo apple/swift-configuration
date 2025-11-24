@@ -39,19 +39,6 @@ struct ConfigReaderTests {
     }
 
     @available(Configuration 1.0, *)
-    @Test func scopingCustomDecoder() throws {
-        let provider = InMemoryProvider(
-            name: "test",
-            values: [
-                "http.client.user-agent": "Config/1.0 (Test)"
-            ]
-        )
-        let top = ConfigReader(provider: provider)
-        let scoped = top.scoped(to: "http", keyDecoderOverride: .colonSeparated)
-        #expect(scoped.string(forKey: "client:user-agent") == "Config/1.0 (Test)")
-    }
-
-    @available(Configuration 1.0, *)
     @Test func context() throws {
         let provider = InMemoryProvider(values: [
             AbsoluteConfigKey(["http", "client", "timeout"], context: ["upstream": "example1.org"]): 15.0,
@@ -59,8 +46,8 @@ struct ConfigReaderTests {
         ])
         let config = ConfigReader(provider: provider)
         #expect(config.double(forKey: "http.client.timeout") == nil)
-        #expect(config.double(forKey: "http.client.timeout", context: ["upstream": "example1.org"]) == 15.0)
-        #expect(config.double(forKey: "http.client.timeout", context: ["upstream": "example2.org"]) == 30.0)
+        #expect(config.double(forKey: ConfigKey("http.client.timeout", context: ["upstream": "example1.org"])) == 15.0)
+        #expect(config.double(forKey: ConfigKey("http.client.timeout", context: ["upstream": "example2.org"])) == 30.0)
     }
 
     enum TestEnum: String, Equatable {
