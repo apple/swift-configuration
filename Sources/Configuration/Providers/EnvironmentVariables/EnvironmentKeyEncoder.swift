@@ -55,10 +55,10 @@ import Foundation
 /// Only alphanumeric characters (A-Z, a-z, 0-9) are preserved in the final environment
 /// variable name. All other characters are converted to underscores, ensuring compatibility
 /// with environment variable naming conventions across different systems.
-internal struct EnvironmentKeyEncoder {
+@available(Configuration 1.0, *)
+internal struct EnvironmentKeyEncoder {}
 
-}
-
+@available(Configuration 1.0, *)
 extension EnvironmentKeyEncoder: ConfigKeyEncoder {
     internal func encode(_ key: AbsoluteConfigKey) -> String {
         let mappedComponents = key.components.map { component in

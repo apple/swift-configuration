@@ -35,43 +35,35 @@ struct ConfigSnapshotReaderMethodTestsGet2 {
         % test_type = string_convertible_type["testType"]
         % test_suffix = string_convertible_type["testSuffix"]
         % lower_test_suffix = lower_first(test_suffix)
-        try config.withSnapshot { snapshot in
+        do { 
+            let snapshot = config.snapshot()
+
             // Optional - success
-            #expect(snapshot.string(forKey: ConfigKey(["${lower_test_suffix}"]), as: ${test_type}.self) == Defaults.${lower_test_suffix})
             #expect(snapshot.string(forKey: "${lower_test_suffix}", as: ${test_type}.self) == Defaults.${lower_test_suffix})
 
             // Optional - missing
-            #expect(snapshot.string(forKey: ConfigKey(["absent${test_suffix}"]), as: ${test_type}.self) == nil)
             #expect(snapshot.string(forKey: "absent${test_suffix}", as: ${test_type}.self) == nil)
 
             // Optional - failing
-            #expect(snapshot.string(forKey: ConfigKey(["failure"]), as: ${test_type}.self) == nil)
             #expect(snapshot.string(forKey: "failure", as: ${test_type}.self) == nil)
 
             // Defaulted - success
-            #expect(snapshot.string(forKey: ConfigKey(["${lower_test_suffix}"]), as: ${test_type}.self, default: Defaults.other${test_suffix}) == Defaults.${lower_test_suffix})
             #expect(snapshot.string(forKey: "${lower_test_suffix}", as: ${test_type}.self, default: Defaults.other${test_suffix}) == Defaults.${lower_test_suffix})
 
             // Defaulted - missing
-            #expect(snapshot.string(forKey: ConfigKey(["absent${test_suffix}"]), as: ${test_type}.self, default: Defaults.other${test_suffix}) == Defaults.other${test_suffix})
             #expect(snapshot.string(forKey: "absent${test_suffix}", as: ${test_type}.self, default: Defaults.other${test_suffix}) == Defaults.other${test_suffix})
 
             // Defaulted - failing
-            #expect(snapshot.string(forKey: ConfigKey(["failure"]), as: ${test_type}.self, default: Defaults.other${test_suffix}) == Defaults.other${test_suffix})
             #expect(snapshot.string(forKey: "failure", as: ${test_type}.self, default: Defaults.other${test_suffix}) == Defaults.other${test_suffix})
 
             // Required - success
-            try #expect(snapshot.requiredString(forKey: ConfigKey(["${lower_test_suffix}"]), as: ${test_type}.self) == Defaults.${lower_test_suffix})
             try #expect(snapshot.requiredString(forKey: "${lower_test_suffix}", as: ${test_type}.self) == Defaults.${lower_test_suffix})
 
             // Required - missing
-            let error1 = #expect(throws: ConfigError.self) { try snapshot.requiredString(forKey: ConfigKey(["absent${test_suffix}"]), as: ${test_type}.self) }
+            let error1 = #expect(throws: ConfigError.self) { try snapshot.requiredString(forKey: "absent${test_suffix}", as: ${test_type}.self) }
             #expect(error1 == .missingRequiredConfigValue(AbsoluteConfigKey(["absent${test_suffix}"])))
-            let error2 = #expect(throws: ConfigError.self) { try snapshot.requiredString(forKey: "absent${test_suffix}", as: ${test_type}.self) }
-            #expect(error2 == .missingRequiredConfigValue(AbsoluteConfigKey(["absent${test_suffix}"])))
 
             // Required - failing
-            #expect(throws: TestProvider.TestError.self) { try snapshot.requiredString(forKey: ConfigKey(["failure"]), as: ${test_type}.self) }
             #expect(throws: TestProvider.TestError.self) { try snapshot.requiredString(forKey: "failure", as: ${test_type}.self) }
         }
         % end

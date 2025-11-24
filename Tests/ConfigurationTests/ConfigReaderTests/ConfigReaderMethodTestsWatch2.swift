@@ -38,13 +38,6 @@ struct ConfigReaderMethodTestsWatch2 {
             // Optional - success
             #expect(
                 try await config.watchString(
-                    forKey: ConfigKey(["stringConvertible"]),
-                    as: TestStringConvertible.self,
-                    updatesHandler: awaitFirst
-                ) == Defaults.stringConvertible
-            )
-            #expect(
-                try await config.watchString(
                     forKey: "stringConvertible",
                     as: TestStringConvertible.self,
                     updatesHandler: awaitFirst
@@ -52,13 +45,6 @@ struct ConfigReaderMethodTestsWatch2 {
             )
 
             // Optional - missing
-            #expect(
-                try await config.watchString(
-                    forKey: ConfigKey(["absentStringConvertible"]),
-                    as: TestStringConvertible.self,
-                    updatesHandler: awaitFirst
-                ) == .some(nil)
-            )
             #expect(
                 try await config.watchString(
                     forKey: "absentStringConvertible",
@@ -70,13 +56,6 @@ struct ConfigReaderMethodTestsWatch2 {
             // Optional - failing
             #expect(
                 try await config.watchString(
-                    forKey: ConfigKey(["failure"]),
-                    as: TestStringConvertible.self,
-                    updatesHandler: awaitFirst
-                ) == .some(nil)
-            )
-            #expect(
-                try await config.watchString(
                     forKey: "failure",
                     as: TestStringConvertible.self,
                     updatesHandler: awaitFirst
@@ -84,14 +63,6 @@ struct ConfigReaderMethodTestsWatch2 {
             )
 
             // Defaulted - success
-            #expect(
-                try await config.watchString(
-                    forKey: ConfigKey(["stringConvertible"]),
-                    as: TestStringConvertible.self,
-                    default: Defaults.otherStringConvertible,
-                    updatesHandler: awaitFirst
-                ) == Defaults.stringConvertible
-            )
             #expect(
                 try await config.watchString(
                     forKey: "stringConvertible",
@@ -104,14 +75,6 @@ struct ConfigReaderMethodTestsWatch2 {
             // Defaulted - missing
             #expect(
                 try await config.watchString(
-                    forKey: ConfigKey(["absentStringConvertible"]),
-                    as: TestStringConvertible.self,
-                    default: Defaults.otherStringConvertible,
-                    updatesHandler: awaitFirst
-                ) == Defaults.otherStringConvertible
-            )
-            #expect(
-                try await config.watchString(
                     forKey: "absentStringConvertible",
                     as: TestStringConvertible.self,
                     default: Defaults.otherStringConvertible,
@@ -120,14 +83,6 @@ struct ConfigReaderMethodTestsWatch2 {
             )
 
             // Defaulted - failing
-            #expect(
-                try await config.watchString(
-                    forKey: ConfigKey(["failure"]),
-                    as: TestStringConvertible.self,
-                    default: Defaults.otherStringConvertible,
-                    updatesHandler: awaitFirst
-                ) == Defaults.otherStringConvertible
-            )
             #expect(
                 try await config.watchString(
                     forKey: "failure",
@@ -140,13 +95,6 @@ struct ConfigReaderMethodTestsWatch2 {
             // Required - success
             #expect(
                 try await config.watchRequiredString(
-                    forKey: ConfigKey(["stringConvertible"]),
-                    as: TestStringConvertible.self,
-                    updatesHandler: awaitFirst
-                ) == Defaults.stringConvertible
-            )
-            #expect(
-                try await config.watchRequiredString(
                     forKey: "stringConvertible",
                     as: TestStringConvertible.self,
                     updatesHandler: awaitFirst
@@ -156,29 +104,14 @@ struct ConfigReaderMethodTestsWatch2 {
             // Required - missing
             let error1 = await #expect(throws: ConfigError.self) {
                 try await config.watchRequiredString(
-                    forKey: ConfigKey(["absentStringConvertible"]),
-                    as: TestStringConvertible.self,
-                    updatesHandler: awaitFirst
-                )
-            }
-            #expect(error1 == .missingRequiredConfigValue(AbsoluteConfigKey(["absentStringConvertible"])))
-            let error2 = await #expect(throws: ConfigError.self) {
-                try await config.watchRequiredString(
                     forKey: "absentStringConvertible",
                     as: TestStringConvertible.self,
                     updatesHandler: awaitFirst
                 )
             }
-            #expect(error2 == .missingRequiredConfigValue(AbsoluteConfigKey(["absentStringConvertible"])))
+            #expect(error1 == .missingRequiredConfigValue(AbsoluteConfigKey(["absentStringConvertible"])))
 
             // Required - failing
-            await #expect(throws: TestProvider.TestError.self) {
-                try await config.watchRequiredString(
-                    forKey: ConfigKey(["failure"]),
-                    as: TestStringConvertible.self,
-                    updatesHandler: awaitFirst
-                )
-            }
             await #expect(throws: TestProvider.TestError.self) {
                 try await config.watchRequiredString(
                     forKey: "failure",
@@ -190,25 +123,11 @@ struct ConfigReaderMethodTestsWatch2 {
         do {
             // Optional - success
             #expect(
-                try await config.watchString(
-                    forKey: ConfigKey(["stringEnum"]),
-                    as: TestEnum.self,
-                    updatesHandler: awaitFirst
-                ) == Defaults.stringEnum
-            )
-            #expect(
                 try await config.watchString(forKey: "stringEnum", as: TestEnum.self, updatesHandler: awaitFirst)
                     == Defaults.stringEnum
             )
 
             // Optional - missing
-            #expect(
-                try await config.watchString(
-                    forKey: ConfigKey(["absentStringEnum"]),
-                    as: TestEnum.self,
-                    updatesHandler: awaitFirst
-                ) == .some(nil)
-            )
             #expect(
                 try await config.watchString(forKey: "absentStringEnum", as: TestEnum.self, updatesHandler: awaitFirst)
                     == .some(nil)
@@ -216,26 +135,11 @@ struct ConfigReaderMethodTestsWatch2 {
 
             // Optional - failing
             #expect(
-                try await config.watchString(
-                    forKey: ConfigKey(["failure"]),
-                    as: TestEnum.self,
-                    updatesHandler: awaitFirst
-                ) == .some(nil)
-            )
-            #expect(
                 try await config.watchString(forKey: "failure", as: TestEnum.self, updatesHandler: awaitFirst)
                     == .some(nil)
             )
 
             // Defaulted - success
-            #expect(
-                try await config.watchString(
-                    forKey: ConfigKey(["stringEnum"]),
-                    as: TestEnum.self,
-                    default: Defaults.otherStringEnum,
-                    updatesHandler: awaitFirst
-                ) == Defaults.stringEnum
-            )
             #expect(
                 try await config.watchString(
                     forKey: "stringEnum",
@@ -248,14 +152,6 @@ struct ConfigReaderMethodTestsWatch2 {
             // Defaulted - missing
             #expect(
                 try await config.watchString(
-                    forKey: ConfigKey(["absentStringEnum"]),
-                    as: TestEnum.self,
-                    default: Defaults.otherStringEnum,
-                    updatesHandler: awaitFirst
-                ) == Defaults.otherStringEnum
-            )
-            #expect(
-                try await config.watchString(
                     forKey: "absentStringEnum",
                     as: TestEnum.self,
                     default: Defaults.otherStringEnum,
@@ -264,14 +160,6 @@ struct ConfigReaderMethodTestsWatch2 {
             )
 
             // Defaulted - failing
-            #expect(
-                try await config.watchString(
-                    forKey: ConfigKey(["failure"]),
-                    as: TestEnum.self,
-                    default: Defaults.otherStringEnum,
-                    updatesHandler: awaitFirst
-                ) == Defaults.otherStringEnum
-            )
             #expect(
                 try await config.watchString(
                     forKey: "failure",
@@ -284,13 +172,6 @@ struct ConfigReaderMethodTestsWatch2 {
             // Required - success
             #expect(
                 try await config.watchRequiredString(
-                    forKey: ConfigKey(["stringEnum"]),
-                    as: TestEnum.self,
-                    updatesHandler: awaitFirst
-                ) == Defaults.stringEnum
-            )
-            #expect(
-                try await config.watchRequiredString(
                     forKey: "stringEnum",
                     as: TestEnum.self,
                     updatesHandler: awaitFirst
@@ -300,29 +181,14 @@ struct ConfigReaderMethodTestsWatch2 {
             // Required - missing
             let error1 = await #expect(throws: ConfigError.self) {
                 try await config.watchRequiredString(
-                    forKey: ConfigKey(["absentStringEnum"]),
-                    as: TestEnum.self,
-                    updatesHandler: awaitFirst
-                )
-            }
-            #expect(error1 == .missingRequiredConfigValue(AbsoluteConfigKey(["absentStringEnum"])))
-            let error2 = await #expect(throws: ConfigError.self) {
-                try await config.watchRequiredString(
                     forKey: "absentStringEnum",
                     as: TestEnum.self,
                     updatesHandler: awaitFirst
                 )
             }
-            #expect(error2 == .missingRequiredConfigValue(AbsoluteConfigKey(["absentStringEnum"])))
+            #expect(error1 == .missingRequiredConfigValue(AbsoluteConfigKey(["absentStringEnum"])))
 
             // Required - failing
-            await #expect(throws: TestProvider.TestError.self) {
-                try await config.watchRequiredString(
-                    forKey: ConfigKey(["failure"]),
-                    as: TestEnum.self,
-                    updatesHandler: awaitFirst
-                )
-            }
             await #expect(throws: TestProvider.TestError.self) {
                 try await config.watchRequiredString(forKey: "failure", as: TestEnum.self, updatesHandler: awaitFirst)
             }
