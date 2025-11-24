@@ -27,6 +27,7 @@ import SystemPackage
 
 @available(Configuration 1.0, *)
 private func withTestProvider<R>(
+    allowMissing: Bool = false,
     body: (
         ReloadingFileProvider<TestSnapshot>,
         InMemoryFileSystem,
@@ -38,6 +39,7 @@ private func withTestProvider<R>(
         let provider = try await ReloadingFileProvider<TestSnapshot>(
             parsingOptions: .default,
             filePath: filePath,
+            allowMissing: allowMissing,
             pollInterval: .seconds(1),
             fileSystem: fileSystem,
             logger: .noop,
@@ -48,6 +50,29 @@ private func withTestProvider<R>(
 }
 
 struct ReloadingFileProviderTests {
+
+    @available(Configuration 1.0, *)
+    @Test func config() async throws {
+        // Test initialization using config reader
+        let envProvider = InMemoryProvider(values: [
+            "filePath": ConfigValue("/test/config.txt", isSecret: false),
+            "pollIntervalSeconds": 30,
+        ])
+        let config = ConfigReader(provider: envProvider)
+
+        try await withTestFileSystem { fileSystem, filePath, _ in
+            let reloadingProvider = try await ReloadingFileProvider<TestSnapshot>(
+                parsingOptions: .default,
+                config: config,
+                fileSystem: fileSystem,
+                logger: .noop,
+                metrics: NOOPMetricsHandler.instance
+            )
+            #expect(reloadingProvider.providerName == "ReloadingFileProvider<TestSnapshot>")
+            #expect(reloadingProvider.description.contains("TestSnapshot"))
+        }
+    }
+
     @available(Configuration 1.0, *)
     @Test func testBasicManualReload() async throws {
         try await withTestProvider { provider, fileSystem, filePath, originalTimestamp in
@@ -77,6 +102,90 @@ struct ReloadingFileProviderTests {
     }
 
     @available(Configuration 1.0, *)
+    @Test func testBasicManualReloadMissingFile() async throws {
+        try await withTestProvider { provider, fileSystem, filePath, originalTimestamp in
+            // Check initial values
+            let result1 = try provider.value(forKey: ["key1"], type: .string)
+            #expect(try result1.value?.content.asString == "value1")
+
+            // Remove file
+            fileSystem.remove(filePath: filePath)
+
+            // Trigger reload - should throw an error but keep the old contents
+            let error = await #expect(throws: FileSystemError.self) {
+                try await provider.reloadIfNeeded(logger: .noop)
+            }
+            guard case .fileNotFound(path: let errorFilePath) = error else {
+                Issue.record("Unexpected error thrown: \(error)")
+                return
+            }
+            #expect(errorFilePath == "/test/config.txt")
+
+            // Check original value
+            let result2 = try provider.value(forKey: ["key1"], type: .string)
+            #expect(try result2.value?.content.asString == "value1")
+
+            // Update to a new valid file
+            fileSystem.update(
+                filePath: filePath,
+                timestamp: originalTimestamp.addingTimeInterval(1.0),
+                contents: .file(
+                    contents: """
+                        key1=newValue1
+                        key2=value2
+                        """
+                )
+            )
+
+            // Reload, no error thrown
+            try await provider.reloadIfNeeded(logger: .noop)
+
+            // Check new value
+            let result3 = try provider.value(forKey: ["key1"], type: .string)
+            #expect(try result3.value?.content.asString == "newValue1")
+        }
+    }
+
+    @available(Configuration 1.0, *)
+    @Test func testBasicManualReloadAllowMissing() async throws {
+        try await withTestProvider(allowMissing: true) { provider, fileSystem, filePath, originalTimestamp in
+            // Check initial values
+            let result1 = try provider.value(forKey: ["key1"], type: .string)
+            #expect(try result1.value?.content.asString == "value1")
+
+            // Remove the file
+            fileSystem.remove(filePath: filePath)
+
+            // Trigger reload, no file found but allowMissing is enabled, so
+            // leads to an empty provider
+            try await provider.reloadIfNeeded(logger: .noop)
+
+            // Check empty value
+            let result2 = try provider.value(forKey: ["key1"], type: .string)
+            #expect(try result2.value == nil)
+
+            // Update to a new valid file
+            fileSystem.update(
+                filePath: filePath,
+                timestamp: originalTimestamp.addingTimeInterval(1.0),
+                contents: .file(
+                    contents: """
+                        key1=newValue1
+                        key2=value2
+                        """
+                )
+            )
+
+            // Reload
+            try await provider.reloadIfNeeded(logger: .noop)
+
+            // Check new value
+            let result3 = try provider.value(forKey: ["key1"], type: .string)
+            #expect(try result3.value?.content.asString == "newValue1")
+        }
+    }
+
+    @available(Configuration 1.0, *)
     @Test func testBasicTimedReload() async throws {
         let filePath = FilePath("/test/config.txt")
         let originalTimestamp = Date(timeIntervalSince1970: 1_750_688_537)
@@ -94,6 +203,7 @@ struct ReloadingFileProviderTests {
         let provider = try await ReloadingFileProvider<TestSnapshot>(
             parsingOptions: .default,
             filePath: filePath,
+            allowMissing: false,
             pollInterval: .milliseconds(1),
             fileSystem: fileSystem,
             logger: .noop,

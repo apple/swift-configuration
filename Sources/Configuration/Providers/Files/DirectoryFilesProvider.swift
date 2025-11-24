@@ -173,18 +173,23 @@ public struct DirectoryFilesProvider: Sendable {
     ///
     /// - Parameters:
     ///   - directoryPath: The file system path to the directory containing configuration files.
+    ///   - allowMissing: A flag controlling how the provider handles a missing directory.
+    ///     - When `false`, if the directory is missing, throws an error.
+    ///     - When `true`, if the directory is missing, treats it as empty.
     ///   - secretsSpecifier: Specifies which values should be treated as secrets.
     ///   - arraySeparator: The character used to separate elements in array values.
     ///   - keyEncoder: The encoder to use for converting configuration keys to file names.
     /// - Throws: If the directory cannot be found or read.
     public init(
         directoryPath: FilePath,
+        allowMissing: Bool = false,
         secretsSpecifier: SecretsSpecifier<String, Data> = .all,
         arraySeparator: Character = ",",
         keyEncoder: some ConfigKeyEncoder = .directoryFiles
     ) async throws {
         try await self.init(
             directoryPath: directoryPath,
+            allowMissing: allowMissing,
             fileSystem: LocalCommonProviderFileSystem(),
             secretsSpecifier: secretsSpecifier,
             arraySeparator: arraySeparator,
@@ -199,6 +204,9 @@ public struct DirectoryFilesProvider: Sendable {
     ///
     /// - Parameters:
     ///   - directoryPath: The file system path to the directory containing configuration files.
+    ///   - allowMissing: A flag controlling how the provider handles a missing directory.
+    ///     - When `false`, if the directory is missing, throws an error.
+    ///     - When `true`, if the directory is missing, treats it as empty.
     ///   - fileSystem: The file system implementation to use.
     ///   - secretsSpecifier: Specifies which values should be treated as secrets. Defaults to `.all`.
     ///   - arraySeparator: The character used to separate elements in array values. Defaults to comma.
@@ -206,6 +214,7 @@ public struct DirectoryFilesProvider: Sendable {
     /// - Throws: If the directory cannot be found or read.
     internal init(
         directoryPath: FilePath,
+        allowMissing: Bool,
         fileSystem: some CommonProviderFileSystem,
         secretsSpecifier: SecretsSpecifier<String, Data> = .all,
         arraySeparator: Character = ",",
@@ -213,6 +222,7 @@ public struct DirectoryFilesProvider: Sendable {
     ) async throws {
         let fileValues = try await Self.loadDirectory(
             at: directoryPath,
+            allowMissing: allowMissing,
             fileSystem: fileSystem,
             secretsSpecifier: secretsSpecifier
         )
@@ -231,20 +241,36 @@ public struct DirectoryFilesProvider: Sendable {
     ///
     /// - Parameters:
     ///   - directoryPath: The path to the directory to load files from.
+    ///   - allowMissing: A flag controlling how the provider handles a missing directory.
+    ///     - When `false`, if the directory is missing, throws an error.
+    ///     - When `true`, if the directory is missing, treats it as empty.
     ///   - fileSystem: The file system implementation to use.
     ///   - secretsSpecifier: Specifies which values should be treated as secrets.
     /// - Returns: A dictionary of file values keyed by file name.
     /// - Throws: If the directory cannot be found or read, or any file cannot be read.
     private static func loadDirectory(
         at directoryPath: FilePath,
+        allowMissing: Bool,
         fileSystem: some CommonProviderFileSystem,
         secretsSpecifier: SecretsSpecifier<String, Data>
     ) async throws -> [String: FileValue] {
-        let fileNames = try await fileSystem.listFileNames(atPath: directoryPath)
+        let loadedFileNames = try await fileSystem.listFileNames(atPath: directoryPath)
+        let fileNames: [String]
+        if let loadedFileNames {
+            fileNames = loadedFileNames
+        } else if allowMissing {
+            fileNames = []
+        } else {
+            throw FileSystemError.directoryNotFound(path: directoryPath)
+        }
         var fileValues: [String: FileValue] = [:]
         for fileName in fileNames {
             let filePath = directoryPath.appending(fileName)
-            let data = try await fileSystem.fileContents(atPath: filePath)
+            guard let data = try await fileSystem.fileContents(atPath: filePath) else {
+                // File disappeared since the last call, that's okay as no individual
+                // file in a DirectoryFilesProvider is required. Just skip it.
+                continue
+            }
             let isSecret = secretsSpecifier.isSecret(key: fileName, value: data)
             fileValues[fileName] = .init(data: data, isSecret: isSecret)
         }
