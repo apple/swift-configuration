@@ -162,7 +162,7 @@ struct ReloadingFileProviderTests {
 
             // Check empty value
             let result2 = try provider.value(forKey: ["key1"], type: .string)
-            #expect(try result2.value == nil)
+            #expect(result2.value == nil)
 
             // Update to a new valid file
             fileSystem.update(
