@@ -40,7 +40,7 @@
 ///
 /// - ``AbsoluteConfigKey`` - The structured key representation
 @available(Configuration 1.0, *)
-public protocol ConfigKeyEncoder: Sendable {
+internal protocol ConfigKeyEncoder: Sendable {
 
     /// Encodes a structured configuration key into its string representation.
     ///

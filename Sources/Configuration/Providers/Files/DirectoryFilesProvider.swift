@@ -28,15 +28,12 @@ public import SystemPackage
 ///
 /// ## Key mapping
 ///
-/// By default, configuration keys are transformed into file names using these rules:
-/// - Components are joined with dashes
-/// - Non-alphanumeric characters (except dashes) are replaced with underscores
+/// Configuration keys are transformed into file names using these rules:
+/// - Components are joined with dashes.
+/// - Non-alphanumeric characters (except dashes) are replaced with underscores.
 ///
 /// For example:
 /// - `database.password` -> `database-password`
-///
-/// You can customize this key mapping by providing a custom `ConfigKeyEncoder` implementation
-/// to the initializer.
 ///
 /// ## Value handling
 ///
@@ -103,24 +100,6 @@ public import SystemPackage
 /// // ["host1.example.com", "host2.example.com", "host3.example.com"]
 /// ```
 ///
-/// ### Custom key encoding
-///
-/// ```swift
-/// // Custom key encoder that uses underscores instead of dashes
-/// struct CustomKeyEncoder: ConfigKeyEncoder {
-///     func encode(_ key: AbsoluteConfigKey) -> String {
-///         key.components.joined(separator: "_")
-///     }
-/// }
-///
-/// let provider = try await DirectoryFilesProvider(
-///     directoryPath: "/etc/config",
-///     keyEncoder: CustomKeyEncoder()
-/// )
-///
-/// // Now "database.password" maps to file "database_password" instead of "database-password"
-/// ```
-///
 /// ## Configuration context
 ///
 /// This provider ignores the context passed in ``AbsoluteConfigKey/context``.
@@ -152,7 +131,7 @@ public struct DirectoryFilesProvider: Sendable {
         var arrayDecoder: DirectoryFilesValueArrayDecoder
 
         /// The key encoder for converting config keys to file names.
-        var keyEncoder: any ConfigKeyEncoder
+        var keyEncoder: any ConfigKeyEncoder = .directoryFiles
     }
 
     /// The underlying snapshot of the provider.
@@ -178,22 +157,19 @@ public struct DirectoryFilesProvider: Sendable {
     ///     - When `true`, if the directory is missing, treats it as empty.
     ///   - secretsSpecifier: Specifies which values should be treated as secrets.
     ///   - arraySeparator: The character used to separate elements in array values.
-    ///   - keyEncoder: The encoder to use for converting configuration keys to file names.
     /// - Throws: If the directory cannot be found or read.
     public init(
         directoryPath: FilePath,
         allowMissing: Bool = false,
         secretsSpecifier: SecretsSpecifier<String, Data> = .all,
-        arraySeparator: Character = ",",
-        keyEncoder: some ConfigKeyEncoder = .directoryFiles
+        arraySeparator: Character = ","
     ) async throws {
         try await self.init(
             directoryPath: directoryPath,
             allowMissing: allowMissing,
             fileSystem: LocalCommonProviderFileSystem(),
             secretsSpecifier: secretsSpecifier,
-            arraySeparator: arraySeparator,
-            keyEncoder: keyEncoder
+            arraySeparator: arraySeparator
         )
     }
 
@@ -210,15 +186,13 @@ public struct DirectoryFilesProvider: Sendable {
     ///   - fileSystem: The file system implementation to use.
     ///   - secretsSpecifier: Specifies which values should be treated as secrets. Defaults to `.all`.
     ///   - arraySeparator: The character used to separate elements in array values. Defaults to comma.
-    ///   - keyEncoder: The encoder to use for converting configuration keys to file names.
     /// - Throws: If the directory cannot be found or read.
     internal init(
         directoryPath: FilePath,
         allowMissing: Bool,
         fileSystem: some CommonProviderFileSystem,
         secretsSpecifier: SecretsSpecifier<String, Data> = .all,
-        arraySeparator: Character = ",",
-        keyEncoder: some ConfigKeyEncoder = .directoryFiles
+        arraySeparator: Character = ","
     ) async throws {
         let fileValues = try await Self.loadDirectory(
             at: directoryPath,
@@ -228,8 +202,7 @@ public struct DirectoryFilesProvider: Sendable {
         )
         self._snapshot = .init(
             fileValues: fileValues,
-            arrayDecoder: DirectoryFilesValueArrayDecoder(separator: arraySeparator),
-            keyEncoder: keyEncoder
+            arrayDecoder: DirectoryFilesValueArrayDecoder(separator: arraySeparator)
         )
     }
 
@@ -478,7 +451,7 @@ extension DirectoryFilesProvider: ConfigProvider {
 /// - Components are joined with dashes
 /// - Non-alphanumeric characters (except dashes) are replaced with underscores
 @available(Configuration 1.0, *)
-public struct DirectoryFileKeyEncoder {
+internal struct DirectoryFileKeyEncoder {
     /// Creates a default directory key encoder that follows standard file naming conventions.
     public init() {}
 }
@@ -486,7 +459,7 @@ public struct DirectoryFileKeyEncoder {
 @available(Configuration 1.0, *)
 extension DirectoryFileKeyEncoder: ConfigKeyEncoder {
     // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
-    public func encode(_ key: AbsoluteConfigKey) -> String {
+    func encode(_ key: AbsoluteConfigKey) -> String {
         key.components
             .map { component in
                 component
@@ -513,7 +486,7 @@ extension ConfigKeyEncoder where Self == DirectoryFileKeyEncoder {
     /// - Non-alphanumeric characters (except dashes) are replaced with underscores
     ///
     /// - Returns: A new key encoder.
-    public static var directoryFiles: Self {
+    static var directoryFiles: Self {
         DirectoryFileKeyEncoder()
     }
 }

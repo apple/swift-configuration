@@ -4,4 +4,4 @@
 
 ### Creating a directory files provider
 
-- ``init(directoryPath:allowMissing:secretsSpecifier:arraySeparator:keyEncoder:)``
+- ``init(directoryPath:allowMissing:secretsSpecifier:arraySeparator:)``
