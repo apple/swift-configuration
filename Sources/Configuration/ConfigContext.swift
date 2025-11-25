@@ -15,6 +15,7 @@
 /// A value that can be stored in a configuration context.
 ///
 /// Context values support common data types used for configuration metadata.
+@available(Configuration 1.0, *)
 public enum ConfigContextValue: Sendable, Equatable, Hashable {
 
     /// A string value.
@@ -30,6 +31,7 @@ public enum ConfigContextValue: Sendable, Equatable, Hashable {
     case bool(Bool)
 }
 
+@available(Configuration 1.0, *)
 extension ConfigContextValue: CustomStringConvertible {
     // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
     public var description: String {
@@ -46,6 +48,7 @@ extension ConfigContextValue: CustomStringConvertible {
     }
 }
 
+@available(Configuration 1.0, *)
 extension ConfigContextValue: ExpressibleByStringLiteral {
     // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
     public init(stringLiteral value: String) {
@@ -53,6 +56,7 @@ extension ConfigContextValue: ExpressibleByStringLiteral {
     }
 }
 
+@available(Configuration 1.0, *)
 extension ConfigContextValue: ExpressibleByIntegerLiteral {
     // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
     public init(integerLiteral value: Int) {
@@ -60,6 +64,7 @@ extension ConfigContextValue: ExpressibleByIntegerLiteral {
     }
 }
 
+@available(Configuration 1.0, *)
 extension ConfigContextValue: ExpressibleByFloatLiteral {
     // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
     public init(floatLiteral value: Double) {
@@ -67,6 +72,7 @@ extension ConfigContextValue: ExpressibleByFloatLiteral {
     }
 }
 
+@available(Configuration 1.0, *)
 extension ConfigContextValue: ExpressibleByBooleanLiteral {
     // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
     public init(booleanLiteral value: Bool) {
@@ -74,6 +80,7 @@ extension ConfigContextValue: ExpressibleByBooleanLiteral {
     }
 }
 
+@available(Configuration 1.0, *)
 extension [String: ConfigContextValue] {
     /// Creates a sorted string representation of the context, used primarily for sorting and logging.
     ///

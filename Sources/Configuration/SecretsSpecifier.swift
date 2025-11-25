@@ -71,6 +71,7 @@
 ///     secretsSpecifier: .none
 /// )
 /// ```
+@available(Configuration 1.0, *)
 public enum SecretsSpecifier<KeyType: Sendable & Hashable, ValueType: Sendable>: Sendable {
 
     /// The library treats all configuration values as secrets.
@@ -103,6 +104,7 @@ public enum SecretsSpecifier<KeyType: Sendable & Hashable, ValueType: Sendable>:
     case dynamic(@Sendable (KeyType, ValueType) -> Bool)
 }
 
+@available(Configuration 1.0, *)
 extension SecretsSpecifier {
     /// Determines whether a configuration value should be treated as secret.
     ///
