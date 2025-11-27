@@ -421,9 +421,6 @@ Any package can implement a ``ConfigProvider``, making the ecosystem extensible 
 - ``ConfigKey``
 - ``AbsoluteConfigKey``
 - ``ConfigContextValue``
-- ``ConfigKeyEncoder``
-- ``SeparatorKeyEncoder``
-- ``DirectoryFileKeyEncoder``
 
 ### Troubleshooting and access reporting
 - <doc:Troubleshooting>
