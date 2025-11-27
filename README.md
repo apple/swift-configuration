@@ -56,12 +56,10 @@ If both sources are unavailable, the fallback default of `60` is returned.
 
 ## Quick start
 
-> Important: While this library's API is still in development, use the `.upToNextMinor(from: "...")` dependency constraint to avoid unexpected build breakages. Before we reach 1.0, API-breaking changes may occur between minor `0.x` versions.
-
 Add the dependency to your `Package.swift`:
 
 ```swift
-.package(url: "https://github.com/apple/swift-configuration", .upToNextMinor(from: "0.2.0"))
+.package(url: "https://github.com/apple/swift-configuration", exact: "1.0.0-alpha.1")
 ```
 
 Add the library dependency to your target:
@@ -94,7 +92,7 @@ To enable an additional trait on the package, update the package dependency:
 ```diff
 .package(
     url: "https://github.com/apple/swift-configuration",
-    .upToNextMinor(from: "0.2.0"),
+    exact: "1.0.0-alpha.1",
 +   traits: [.defaults, "OtherFeatureSupport"]
 )
 ```
