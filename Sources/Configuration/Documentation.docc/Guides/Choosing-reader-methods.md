@@ -208,21 +208,27 @@ All variants support the same additional features:
 ```swift
 // Optional with context
 let timeout = config.int(
-    forKey: "service.timeout",
-    context: ["environment": "production", "region": "us-east-1"]
+    forKey: ConfigKey(
+        "service.timeout",
+        context: ["environment": "production", "region": "us-east-1"]
+    )
 )
 
 // Default with context
 let timeout = config.int(
-    forKey: "service.timeout",
-    context: ["environment": "production"],
+    forKey: ConfigKey(
+        "service.timeout",
+        context: ["environment": "production"]
+    ),
     default: 30
 )
 
 // Required with context
 let timeout = try config.requiredInt(
-    forKey: "service.timeout",
-    context: ["environment": "production"]
+    forKey: ConfigKey(
+        "service.timeout",
+        context: ["environment": "production"]
+    )
 )
 ```
 

@@ -60,12 +60,14 @@ let timeout = try await config.fetchInt(forKey: "http.timeout", default: 30)
 
 // Fetch with context for environment-specific configuration
 let dbConnectionString = try await config.fetchRequiredString(
-    forKey: "database.url",
-    context: [
-        "environment": "production",
-        "region": "us-west-2",
-        "service": "user-service"
-    ],
+    forKey: ConfigKey(
+        "database.url",
+        context: [
+            "environment": "production",
+            "region": "us-west-2",
+            "service": "user-service"
+        ]
+    ),
     isSecret: true
 )
 ```
@@ -145,15 +147,19 @@ let context: [String: ConfigContextValue] = [
 
 // Get environment-specific database configuration
 let dbConfig = try await config.fetchRequiredString(
-    forKey: "database.connection_string",
-    context: context,
+    forKey: ConfigKey(
+        "database.connection_string",
+        context: context,
+    )
     isSecret: true
 )
 
 // Watch for region-specific timeout adjustments
 try await config.watchInt(
-    forKey: "api.timeout",
-    context: ["region": "us-west-2"],
+    forKey: ConfigKey(
+        "api.timeout",
+        context: ["region": "us-west-2"]
+    ),
     default: 5000
 ) { updates in
     for await timeout in updates {

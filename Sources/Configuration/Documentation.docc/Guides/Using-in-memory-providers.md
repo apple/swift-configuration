@@ -69,12 +69,16 @@ With a provider configured this way, a config reader will return the following r
 let config = ConfigReader(provider: provider)
 config.double(forKey: "http.client.timeout") // nil
 config.double(
-    forKey: "http.client.timeout", 
-    context: ["upstream": "example1.org"]
+    forKey: ConfigKey(
+        "http.client.timeout", 
+        context: ["upstream": "example1.org"]
+    )
 ) // 15.0
 config.double(
-    forKey: "http.client.timeout",
-    context: ["upstream": "example2.org"]
+    forKey: ConfigKey(
+        "http.client.timeout",
+        context: ["upstream": "example2.org"]
+    )
 ) // 30.0
 ```
 
