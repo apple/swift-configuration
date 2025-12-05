@@ -150,21 +150,18 @@ public final class FileAccessLogger: Sendable {
         }
     }
 
-    /// The internal representation of the shared instance.
-    private enum SharedStorage {
-
-        /// The instance hasn't been requested yet.
-        case uninitialized
-
-        /// Failed to create a file access logger, the environment variable might be malformed.
-        case initializationFailed(any Error)
-
-        /// Successfully initialized (or skipped) the logger and stored the result.
-        case initialized(FileAccessLogger?)
-    }
-
     /// The locked storage for the singleton instance managed by the `detectedFromEnvironment()` method.
-    private static let shared: Mutex<SharedStorage> = .init(.uninitialized)
+    private static let shared: Result<FileAccessLogger?, any Error> = {
+        Result {
+            let newInstance: FileAccessLogger?
+            if let filePathString = ProcessInfo.processInfo.environment["CONFIG_ACCESS_LOG_FILE"] {
+                newInstance = try FileAccessLogger(filePath: FilePath(filePathString))
+            } else {
+                newInstance = nil
+            }
+            return newInstance
+        }
+    }()
 
     /// Returns a shared file access logger instance controlled by environment variables.
     ///
@@ -175,28 +172,7 @@ public final class FileAccessLogger: Sendable {
     /// - Returns: A file access logger if the environment variable is set, nil otherwise.
     /// - Throws: An error if the environment variable is set but the logger cannot be created.
     internal static func detectedFromEnvironment() throws -> FileAccessLogger? {
-        try shared.withLock { shared in
-            switch shared {
-            case .initialized(let existing):
-                return existing
-            case .initializationFailed(let error):
-                throw error
-            case .uninitialized:
-                do {
-                    let newInstance: FileAccessLogger?
-                    if let filePathString = ProcessInfo.processInfo.environment["CONFIG_ACCESS_LOG_FILE"] {
-                        newInstance = try FileAccessLogger(filePath: FilePath(filePathString))
-                    } else {
-                        newInstance = nil
-                    }
-                    shared = .initialized(newInstance)
-                    return newInstance
-                } catch {
-                    shared = .initializationFailed(error)
-                    throw error
-                }
-            }
-        }
+        try shared.get()
     }
 }
 
