@@ -59,7 +59,7 @@ If both sources are unavailable, the fallback default of `60` is returned.
 Add the dependency to your `Package.swift`:
 
 ```swift
-.package(url: "https://github.com/apple/swift-configuration", exact: "1.0.0-alpha.1")
+.package(url: "https://github.com/apple/swift-configuration", from: "1.0.0")
 ```
 
 Add the library dependency to your target:
@@ -92,7 +92,7 @@ To enable an additional trait on the package, update the package dependency:
 ```diff
 .package(
     url: "https://github.com/apple/swift-configuration",
-    exact: "1.0.0-alpha.1",
+    from: "1.0.0",
 +   traits: [.defaults, "OtherFeatureSupport"]
 )
 ```
@@ -106,9 +106,9 @@ Available traits:
 
 ## Supported platforms and minimum versions
 
-The library is supported on macOS, Linux, and Windows.
+The library is supported on Apple platforms and Linux.
 
-| Component     | macOS  | Linux, Windows | iOS    | tvOS   | watchOS | visionOS |
+| Component     | macOS  | Linux          | iOS    | tvOS   | watchOS | visionOS |
 | ------------- | -----  | -------------- | ---    | ----   | ------- | -------- |
 | Configuration | ✅ 15+ | ✅              | ✅ 18+ | ✅ 18+ | ✅ 11+   | ✅ 2+    |
 
