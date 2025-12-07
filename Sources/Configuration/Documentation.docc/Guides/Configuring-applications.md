@@ -4,16 +4,14 @@ Provide flexible and consistent configuration for your application.
 
 ## Overview
 
-Swift Configuration provides a consistent configuration system for your tools and applications, both server and client. 
-
-This guide shows how to:
+Swift Configuration provides consistent configuration for your tools and applications. This guide shows how to:
 
 1. Set up a configuration hierarchy with multiple providers.
 2. Configure your application's components.
-3. Access configuration values in your application and in libraries.
+3. Access configuration values in your application and libraries.
 4. Monitor configuration access with access reporting.
 
-This pattern works especially well for server applications where configuration might come from various sources such as environment variables, configuration files, and remote configuration services.
+This pattern works well for server applications where configuration comes from environment variables, configuration files, and remote services.
 
 ### Setting up a configuration hierarchy
 
@@ -188,4 +186,4 @@ export SERVICES_CUSTOMER_TIMEOUT=15.0
 
 For details about the key conversion logic, check out ``EnvironmentVariablesProvider``.
 
-For comprehensive configuration best practices, see <doc:Best-practices>. To understand different access patterns and reader methods, refer to <doc:Choosing-access-patterns> and <doc:Choosing-reader-methods>. For handling secrets securely, check out <doc:Handling-secrets-correctly>.
+For more configuration guidance, see <doc:Best-practices>. To understand different access patterns and reader methods, refer to <doc:Choosing-access-patterns> and <doc:Choosing-reader-methods>. For handling secrets securely, check out <doc:Handling-secrets-correctly>.

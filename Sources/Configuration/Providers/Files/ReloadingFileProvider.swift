@@ -286,12 +286,14 @@ public final class ReloadingFileProvider<Snapshot: FileConfigSnapshot>: Sendable
     /// Creates a reloading file provider using configuration from a reader.
     ///
     /// ## Configuration keys
+    ///
     /// - `filePath` (string, required): The path to the configuration file to monitor.
     /// - `allowMissing` (bool, optional, default: false): A flag controlling how
-    ///   the provider handles a missing file.
-    ///     - When `false` (the default), if the file is missing or malformed, throws an error.
-    ///     - When `true`, if the file is missing, treats it as empty. Malformed files still throw an error.
-    /// - `pollIntervalSeconds` (int, optional, default: 15): How often to check for file changes in seconds.
+    ///   the provider handles a missing file. When `false` (the default), if the file
+    ///   is missing or malformed, throws an error. When `true`, if the file is missing,
+    ///   treats it as empty. Malformed files still throw an error.
+    /// - `pollIntervalSeconds` (int, optional, default: 15): How often to check for file
+    ///   changes in seconds.
     ///
     /// - Parameters:
     ///   - snapshotType: The type of snapshot to create from the file contents.
@@ -320,12 +322,14 @@ public final class ReloadingFileProvider<Snapshot: FileConfigSnapshot>: Sendable
     /// Creates a reloading file provider using configuration from a reader.
     ///
     /// ## Configuration keys
+    ///
     /// - `filePath` (string, required): The path to the configuration file to monitor.
     /// - `allowMissing` (bool, optional, default: false): A flag controlling how
-    ///   the provider handles a missing file.
-    ///     - When `false` (the default), if the file is missing or malformed, throws an error.
-    ///     - When `true`, if the file is missing, treats it as empty. Malformed files still throw an error.
-    /// - `pollIntervalSeconds` (int, optional, default: 15): How often to check for file changes in seconds.
+    ///   the provider handles a missing file. When `false` (the default), if the file
+    ///   is missing or malformed, throws an error. When `true`, if the file is missing,
+    ///   treats it as empty. Malformed files still throw an error.
+    /// - `pollIntervalSeconds` (int, optional, default: 15): How often to check for file
+    ///   changes in seconds.
     ///
     /// - Parameters:
     ///   - snapshotType: The type of snapshot to create from the file contents.

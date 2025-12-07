@@ -16,24 +16,38 @@ import SystemPackage
 
 /// A type that provides parsing options for file configuration snapshots.
 ///
-/// This protocol defines the requirements for parsing options types used when creating
-/// file-based configuration snapshots. Types conforming to this protocol can provide
-/// additional configuration or processing parameters that affect how file data is
-/// interpreted and parsed.
+/// This protocol defines the requirements for parsing options types used with ``FileConfigSnapshot``
+/// implementations. Types conforming to this protocol provide configuration parameters that control
+/// how file data is interpreted and parsed during snapshot creation.
+///
+/// The parsing options are passed to the ``FileConfigSnapshot/init(data:providerName:parsingOptions:)``
+/// initializer, allowing custom file format implementations to access format-specific parsing
+/// settings such as character encoding, date formats, or validation rules.
 ///
 /// ## Usage
 ///
-/// Implement this protocol to provide parsing options:
+/// Implement this protocol to provide parsing options for your custom ``FileConfigSnapshot``:
 ///
 /// ```swift
 /// struct MyParsingOptions: FileParsingOptions {
 ///     let encoding: String.Encoding
 ///     let dateFormat: String?
+///     let strictValidation: Bool
 ///
 ///     static let `default` = MyParsingOptions(
 ///         encoding: .utf8,
-///         dateFormat: nil
+///         dateFormat: nil,
+///         strictValidation: false
 ///     )
+/// }
+///
+/// struct MyFormatSnapshot: FileConfigSnapshot {
+///     typealias ParsingOptions = MyParsingOptions
+///
+///     init(data: RawSpan, providerName: String, parsingOptions: ParsingOptions) throws {
+///         // Implementation that inspects `parsingOptions` properties like `encoding`,
+///         // `dateFormat`, and `strictValidation`.
+///     }
 /// }
 /// ```
 @available(Configuration 1.0, *)

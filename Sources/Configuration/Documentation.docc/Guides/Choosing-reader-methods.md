@@ -49,12 +49,13 @@ Use optional variants when:
 
 - **Truly optional features**: The configuration controls optional functionality.
 - **Gradual rollouts**: New configuration that might not be present everywhere.
-- **Conditional behavior**: Your code can operate differently based on presence/absence.
+- **Conditional behavior**: Your code can operate differently based on presence or absence.
 - **Debugging and diagnostics**: You want to detect missing configuration explicitly.
 
 #### Error handling behavior
 
 Optional variants handle errors gracefully by returning `nil`:
+
 - Missing values return `nil`.
 - Type conversion errors return `nil`.
 - Provider errors return `nil` (except for fetch variants, which always propagate provider errors).
@@ -128,6 +129,7 @@ let maxConnections = config.int(forKey: "pool.max", default: 10) // Conservative
 #### Error handling behavior
 
 Default variants handle errors by returning the default value:
+
 - Missing values return the default.
 - Type conversion errors return the default.
 - Provider errors return the default (except for fetch variants).
@@ -238,15 +240,18 @@ String configuration values can be automatically converted to other types using 
 This works with:
 
 **Built-in convertible types:**
-- `SystemPackage.FilePath` - Converts from file paths.
-- `Foundation.URL` - Converts from URL strings.
-- `Foundation.UUID` - Converts from UUID strings.
-- `Foundation.Date` - Converts from ISO8601 date strings.
+
+- `SystemPackage.FilePath`: Converts from file paths.
+- `Foundation.URL`: Converts from URL strings.
+- `Foundation.UUID`: Converts from UUID strings.
+- `Foundation.Date`: Converts from ISO8601 date strings.
 
 **String-backed enums:**
+
 - Types that conform to `RawRepresentable<String>`.
 
 **Custom types:**
+
 - Types that you explicitly conform to ``ExpressibleByConfigString``.
 
 ```swift
@@ -298,12 +303,9 @@ Also check out <doc:Handling-secrets-correctly>.
 ### Best practices
 
 1. **Use required variants** only for truly critical configuration.
-
-2. **Use default variants for user experience settings** where missing configuration shouldn't break functionality.
-
-3. **Use optional variants for feature flags and debugging** where the absence of configuration is meaningful.
-
+2. **Use default variants** for user experience settings where missing configuration shouldn't break functionality.
+3. **Use optional variants** for feature flags and debugging where the absence of configuration is meaningful.
 4. **Choose safe defaults** that won't cause security issues or performance problems if used in production.
 
-For guidance on selecting between get, fetch, and watch access patterns, see <doc:Choosing-access-patterns>. 
-For comprehensive best practices on configuration design, check out <doc:Best-practices>.
+For guidance on selecting between get, fetch, and watch access patterns, see <doc:Choosing-access-patterns>.
+For more configuration guidance, check out <doc:Best-practices>.

@@ -4,20 +4,18 @@ Follow these principles to make your code easily configurable and composable wit
 
 ## Overview
 
-When designing configuration for your Swift libraries and applications, following established patterns helps create
-a consistent and maintainable experience for developers. These best practices ensure your configuration integrates 
-well with the broader Swift ecosystem.
+When designing configuration for Swift libraries and applications, follow these patterns to create consistent, maintainable code that integrates well with the Swift ecosystem.
 
 ### Document configuration keys
 
-Include comprehensive documentation about what configuration keys your library reads. For each key, document:
+Include thorough documentation about what configuration keys your library reads. For each key, document:
 
-- The key name and its hierarchical structure
-- The expected data type
-- Whether the key is required or optional
-- Default values when applicable
-- Valid value ranges or constraints
-- Usage examples
+- The key name and its hierarchical structure.
+- The expected data type.
+- Whether the key is required or optional.
+- Default values when applicable.
+- Valid value ranges or constraints.
+- Usage examples.
 
 ```swift
 public struct HTTPClientConfiguration {
@@ -38,8 +36,7 @@ public struct HTTPClientConfiguration {
 
 ### Use sensible defaults
 
-Provide reasonable default values whenever possible to make your library work without extensive configuration. 
-This reduces the barrier to adoption and ensures your library works out of the box for common use cases.
+Provide reasonable default values to make your library work without extensive configuration.
 
 ```swift
 // Good: Provides sensible defaults
@@ -114,8 +111,7 @@ For more details, check out <doc:Choosing-reader-methods>.
 
 ### Validate configuration values
 
-Consider validating configuration values and throwing meaningful errors if they're invalid. This helps 
-developers catch configuration issues early.
+Validate configuration values and throw meaningful errors for invalid input to catch configuration issues early.
 
 ```swift
 public init(config: ConfigReader) throws {

@@ -161,6 +161,16 @@ public protocol ConfigSnapshot: Sendable {
 }
 
 /// The result of looking up a configuration value in a provider.
+///
+/// Providers return this result from value lookup methods, containing both the
+/// encoded key used for the lookup and the value found:
+///
+/// ```swift
+/// let result = try provider.value(forKey: key, type: .string)
+/// if let value = result.value {
+///     print("Found: \(value)")
+/// }
+/// ```
 @available(Configuration 1.0, *)
 public struct LookupResult: Sendable, Equatable, Hashable {
 
@@ -435,9 +445,14 @@ public struct LookupResult: Sendable, Equatable, Hashable {
 
 /// A configuration value that wraps content with metadata.
 ///
-/// Configuration values include the actual content and a flag indicating whether
-/// the value contains sensitive information. Secret values are protected from
-/// accidental disclosure in logs and debug output.
+/// Configuration values pair raw content with a flag indicating whether the value
+/// contains sensitive information. Secret values are protected from accidental
+/// disclosure in logs and debug output:
+///
+/// ```swift
+/// let apiKey = ConfigValue(.string("sk-abc123"), isSecret: true)
+/// print(apiKey)  // Prints: [string: <REDACTED>]
+/// ```
 @available(Configuration 1.0, *)
 public struct ConfigValue: Sendable, Equatable, Hashable {
 

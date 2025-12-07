@@ -59,11 +59,11 @@ import Synchronization
 /// ```
 ///
 /// The log entries include:
-/// - Status emoji (✅ success, 🟡 default/nil, ❌ error)
-/// - Configuration key that was accessed
-/// - Resolved value (redacted for secrets)
-/// - Provider that supplied the value or error information
-/// - Access metadata (operation type, value type, source location, timestamp)
+/// - Status emoji (✅ success, 🟡 default/nil, ❌ error).
+/// - Configuration key that was accessed.
+/// - Resolved value (redacted for secrets).
+/// - Provider that supplied the value or error information.
+/// - Access metadata (operation type, value type, source location, timestamp).
 @available(Configuration 1.0, *)
 public final class FileAccessLogger: Sendable {
 

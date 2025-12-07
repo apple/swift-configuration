@@ -4,7 +4,7 @@ Protect sensitive configuration values from accidental disclosure in logs and de
 
 ## Overview
 
-Swift Configuration provides built-in support for marking sensitive values as secrets. Secret values are automatically redacted by built-in access reporters and other components to prevent accidental disclosure of sensitive information like API keys, passwords, and tokens.
+Swift Configuration provides built-in support for marking sensitive values as secrets. Secret values are automatically redacted by access reporters to prevent accidental disclosure of API keys, passwords, and other sensitive information.
 
 ### Marking values as secret when reading
 
@@ -134,11 +134,8 @@ print(provider)
 ### Best practices
 
 1. **Mark all sensitive data as secret**: API keys, passwords, tokens, private keys, connection strings.
-
 2. **Use provider-level specification** when you know which keys are always secret.
-
 3. **Use reader-level marking** for context-specific secrets or when the same key might be secret in some contexts but not others.
-
-4. **Be conservative**: When in doubt, mark values as secret - it's safer than accidentally leaking sensitive data.
+4. **Be conservative**: When in doubt, mark values as secret. It's safer than accidentally leaking sensitive data.
 
 For additional guidance on configuration security and overall best practices, see <doc:Best-practices>. To debug issues with secret redaction in access logs, check out <doc:Troubleshooting>. When selecting between required, optional, and default method variants for secret values, refer to <doc:Choosing-reader-methods>.

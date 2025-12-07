@@ -247,5 +247,5 @@ let config = ConfigReader(provider: prefixedProvider)
 let databaseURL = config.string(forKey: "database.url", default: "localhost")
 ```
 
-For comprehensive configuration guidance and best practices, see <doc:Best-practices>. 
+For more configuration guidance, see <doc:Best-practices>.
 To understand different reader method variants, check out <doc:Choosing-reader-methods>.

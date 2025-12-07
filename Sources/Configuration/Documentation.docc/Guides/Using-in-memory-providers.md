@@ -180,4 +180,4 @@ class ConfigurationBridge {
 }
 ```
 
-For comparison with reloading providers, see <doc:Using-reloading-providers>. To understand different access patterns and when to use each provider type, check out <doc:Choosing-access-patterns>. For comprehensive configuration best practices, refer to <doc:Best-practices>.
+For comparison with reloading providers, see <doc:Using-reloading-providers>. To understand different access patterns and when to use each provider type, check out <doc:Choosing-access-patterns>. For more configuration guidance, refer to <doc:Best-practices>.

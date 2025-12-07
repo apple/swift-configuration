@@ -46,9 +46,14 @@ public protocol AccessReporter: Sendable {
 public struct AccessEvent: Sendable {
 
     /// Metadata describing the configuration access operation.
+    ///
+    /// Contains information about the type of access, the key accessed, value type,
+    /// source location, and timestamp.
     public struct Metadata: Sendable {
 
-        /// The source code location where the configuration access occurred.
+        /// The source code location where a configuration access occurred.
+        ///
+        /// Captures the file identifier and line number for debugging and auditing purposes.
         public struct SourceLocation: Sendable, CustomStringConvertible {
 
             /// The identifier of the source file where the access occurred.
@@ -73,6 +78,9 @@ public struct AccessEvent: Sendable {
         }
 
         /// The type of configuration access operation.
+        ///
+        /// Indicates whether the access was a synchronous get, asynchronous fetch,
+        /// or an async watch operation.
         @frozen public enum AccessKind: String, Sendable {
 
             /// A synchronous get operation that returns the current value.
@@ -126,6 +134,9 @@ public struct AccessEvent: Sendable {
     }
 
     /// The result of a configuration lookup from a specific provider.
+    ///
+    /// Contains the provider's name and the outcome of querying that provider,
+    /// which can be either a successful lookup result or an error.
     public struct ProviderResult: Sendable {
 
         /// The name of the configuration provider that processed the lookup.
@@ -186,6 +197,17 @@ public struct AccessEvent: Sendable {
 /// Use this reporter to send configuration access events to multiple destinations
 /// simultaneously. Each upstream reporter receives a copy of every event in the
 /// order they were provided during initialization.
+///
+/// ```swift
+/// let fileLogger = try FileAccessLogger(filePath: "/tmp/config.log")
+/// let accessLogger = AccessLogger(logger: logger)
+/// let broadcaster = BroadcastingAccessReporter(upstreams: [fileLogger, accessLogger])
+///
+/// let config = ConfigReader(
+///     provider: EnvironmentVariablesProvider(),
+///     accessReporter: broadcaster
+/// )
+/// ```
 @available(Configuration 1.0, *)
 public struct BroadcastingAccessReporter: Sendable {
 
