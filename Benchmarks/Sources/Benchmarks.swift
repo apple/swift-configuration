@@ -18,7 +18,7 @@ import Foundation
 
 let benchmarks: @Sendable () -> Void = {
     let defaultMetrics: [BenchmarkMetric] = [
-        .mallocCountTotal,
+        .mallocCountTotal
         // .contextSwitches,
         // .wallClock,
     ]
