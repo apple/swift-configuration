@@ -12,14 +12,24 @@
 //
 //===----------------------------------------------------------------------===//
 
-/// A configuration key that represents a relative path to a configuration value.
+/// A configuration key representing a relative path to a configuration value.
 ///
-/// Configuration keys consist of an array of string components that form a hierarchical
-/// path, similar to file system paths or JSON object keys. For example, the key
-/// `["http", "timeout"]` represents the value `timeout` nested underneath `http`.
+/// Configuration keys consist of hierarchical string components forming paths similar to
+/// file system paths or JSON object keys. For example, `["http", "timeout"]` represents
+/// the `timeout` value nested under `http`.
 ///
-/// Keys can include additional context information that some providers use to
-/// refine value lookups or provide more specific results.
+/// Keys support additional context information that providers can use to refine lookups
+/// or provide specialized behavior.
+///
+/// ## Usage
+///
+/// Create keys using string literals, arrays, or the initializers:
+///
+/// ```swift
+/// let key1: ConfigKey = "database.connection.timeout"
+/// let key2 = ConfigKey(["api", "endpoints", "primary"])
+/// let key3 = ConfigKey("server.port", context: ["environment": .string("production")])
+/// ```
 @available(Configuration 1.0, *)
 public struct ConfigKey: Sendable {
 
@@ -46,7 +56,7 @@ public struct ConfigKey: Sendable {
 
     /// Creates a new configuration key.
     /// - Parameters:
-    ///   - string: The string represenation of the key path, for example `"http.timeout"`.
+    ///   - string: The string representation of the key path, for example `"http.timeout"`.
     ///   - context: Additional context information for the key.
     public init(_ string: String, context: [String: ConfigContextValue] = [:]) {
         self = DotSeparatorKeyDecoder.decode(string, context: context)

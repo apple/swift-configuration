@@ -35,11 +35,11 @@
 ### Watching required Boolean values
 - ``ConfigReader/watchRequiredBool(forKey:isSecret:fileID:line:updatesHandler:)``
 
-### Watching lists Boolean values
+### Watching lists of Boolean values
 - ``ConfigReader/watchBoolArray(forKey:isSecret:fileID:line:updatesHandler:)``
 - ``ConfigReader/watchBoolArray(forKey:isSecret:default:fileID:line:updatesHandler:)``
 
-### Watching required lists Boolean values
+### Watching required lists of Boolean values
 - ``ConfigReader/watchRequiredBoolArray(forKey:isSecret:fileID:line:updatesHandler:)``
 
 ### Watching integer values
@@ -67,7 +67,7 @@
 - ``ConfigReader/watchDoubleArray(forKey:isSecret:fileID:line:updatesHandler:)``
 - ``ConfigReader/watchDoubleArray(forKey:isSecret:default:fileID:line:updatesHandler:)``
 
-### Watching required double of integer values
+### Watching required lists of double values
 - ``ConfigReader/watchRequiredDoubleArray(forKey:isSecret:fileID:line:updatesHandler:)``
 
 ### Watching bytes

@@ -101,7 +101,7 @@ try await config.watchSnapshot { updates in
 
 ### Handling missing files during reloading
 
-Reloading providers support the `allowMissing` parameter to handle cases where configuration files might be temporarily missing or optional. This is particularly useful for:
+Reloading providers support the `allowMissing` parameter to handle cases where configuration files might be temporarily missing or optional. This is useful for:
 
 - Optional configuration files that might not exist in all environments.
 - Configuration files that are created or removed dynamically.

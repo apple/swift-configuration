@@ -26,7 +26,7 @@ public import SystemPackage
 ///
 /// > Tip: If your type is a string-based enum, you don't need to explicitly conform it to
 /// > ``ExpressibleByConfigString``, as the same conversions work for types
-/// > that conform to `RawRepresentable<String>` automatically.
+/// > that conform to `RawRepresentable` with a `String` raw value automatically.
 ///
 /// ## Custom types
 ///

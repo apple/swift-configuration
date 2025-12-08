@@ -24,7 +24,14 @@ import Foundation
 /// This structure represents a point-in-time view of configuration values. It handles
 /// the conversion from JSON types to configuration value types.
 ///
-/// Commonly used with ``FileProvider`` and ``ReloadingFileProvider``.
+/// ## Usage
+///
+/// Use with ``FileProvider`` or ``ReloadingFileProvider``:
+///
+/// ```swift
+/// let provider = try await FileProvider<JSONSnapshot>(filePath: "/etc/config.json")
+/// let config = ConfigReader(provider: provider)
+/// ```
 @available(Configuration 1.0, *)
 public struct JSONSnapshot {
 

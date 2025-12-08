@@ -4,9 +4,9 @@ Provide a consistent and flexible way to configure your library.
 
 ## Overview
 
-Swift Configuration offers a pattern for configuring libraries that works across various configuration sources: be it from environment variables, a JSON file, or a remote configuration service. 
+Swift Configuration provides a pattern for configuring libraries that works across various configuration sources: environment variables, JSON files, and remote configuration services.
 
-This guide shows how to adopt this pattern in your own library, to make it easier to compose in a larger application.
+This guide shows how to adopt this pattern in your library to make it easier to compose in larger applications.
 
 Adopt this pattern in three steps:
 
@@ -126,4 +126,4 @@ extension HTTPClientConfiguration {
 
 Built-in ``AccessReporter`` types such as ``AccessLogger`` and ``FileAccessLogger`` automatically redact secret values to avoid leaking sensitive information.
 
-For more guidance on secrets handling, see <doc:Handling-secrets-correctly>. For comprehensive configuration best practices, check out <doc:Best-practices>. To understand different access patterns and reader methods, refer to <doc:Choosing-access-patterns> and <doc:Choosing-reader-methods>.
+For more guidance on secrets handling, see <doc:Handling-secrets-correctly>. For more configuration guidance, check out <doc:Best-practices>. To understand different access patterns and reader methods, refer to <doc:Choosing-access-patterns> and <doc:Choosing-reader-methods>.

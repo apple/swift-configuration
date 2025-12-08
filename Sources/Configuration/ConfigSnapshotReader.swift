@@ -16,14 +16,14 @@ import Synchronization
 
 /// A container type for reading config values from snapshots.
 ///
-/// A config snapshot reader provides read-only access to config values stored in an underlying snapshot.
-/// Unlike ``ConfigReader``, which can access live, changing config values from providers, a snapshot reader
-/// works with a fixed, immutable snapshot of the configuration data.
+/// A config snapshot reader provides read-only access to config values stored in an underlying
+/// ``ConfigSnapshot``. Unlike a config reader, which can access live, changing config values
+/// from providers, a snapshot reader works with a fixed, immutable snapshot of the configuration data.
 ///
 /// ## Usage
 ///
-/// Get a ``ConfigSnapshotReader`` from a ``ConfigReader`` by using ``ConfigReader/snapshot()``
-/// to retrieve a snapshot. All values in the snapshot are guaranteed to be from the same point in time:
+/// Get a snapshot reader from a config reader by using the ``ConfigReader/snapshot()`` method. All values in the
+/// snapshot are guaranteed to be from the same point in time:
 /// ```swift
 /// // Get a snapshot from a ConfigReader
 /// let config = ConfigReader(provider: EnvironmentVariablesProvider())
@@ -37,7 +37,7 @@ import Synchronization
 /// let identity = MyIdentity(cert: cert, privateKey: privateKey)
 /// ```
 ///
-/// Or you can watch for snapshot updates using the ``ConfigReader/watchSnapshot(fileID:line:updatesHandler:)``:
+/// Or you can watch for snapshot updates using the ``ConfigReader/watchSnapshot(fileID:line:updatesHandler:)`` method:
 ///
 /// ```swift
 /// try await config.watchSnapshot { snapshots in
@@ -211,7 +211,7 @@ public struct ConfigSnapshotReader: Sendable {
     /// let timeout = httpConfig.int(forKey: "timeout") // Reads from "client.http.timeout" in the snapshot
     /// ```
     ///
-    /// - Parameters configKey: The key to append to the current key prefix.
+    /// - Parameter configKey: The key to append to the current key prefix.
     /// - Returns: A reader for accessing scoped values.
     public func scoped(to configKey: ConfigKey)
         -> ConfigSnapshotReader

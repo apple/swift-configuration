@@ -47,12 +47,12 @@ import Synchronization
 /// ## Log format
 ///
 /// Each access event generates a structured log entry with metadata including:
-/// - `kind`: The type of access operation (get, fetch, watch)
-/// - `key`: The configuration key that was accessed
-/// - `location`: The source code location where the access occurred
-/// - `value`: The resolved configuration value (redacted for secrets)
-/// - `counter`: An incrementing counter for tracking access frequency
-/// - Provider-specific information for each provider in the hierarchy
+/// - `kind`: The type of access operation (get, fetch, watch).
+/// - `key`: The configuration key that was accessed.
+/// - `location`: The source code location where the access occurred.
+/// - `value`: The resolved configuration value (redacted for secrets).
+/// - `counter`: An incrementing counter for tracking access frequency.
+/// - Provider-specific information for each provider in the hierarchy.
 @available(Configuration 1.0, *)
 public final class AccessLogger: Sendable {
 

@@ -120,7 +120,7 @@ For example, to read the timeout configuration value for an HTTP client, check o
         ```swift
         // Environment variables consulted first, then JSON.
         let primaryProvider = EnvironmentVariablesProvider()
-        let secondaryProvider = try await JSONProvider(
+        let secondaryProvider = try await FileProvider<JSONSnapshot>(
             filePath: "/etc/config.json"
         )
         let config = ConfigReader(providers: [
@@ -246,8 +246,7 @@ You can also implement a custom ``ConfigProvider``.
 In addition to using providers individually, you can create fallback behavior using an array of providers.
 The first provider that returns a non-nil value wins.
 
-The following example illustrates a hierarchy of provides, with environmental variables overrides winning 
-over command line arguments, a file at `/etc/config.json`, and in-memory defaults:
+The following example shows a provider hierarchy where environment variables take precedence over command line arguments, a JSON file, and in-memory defaults:
 
 ```swift
 // Create a hierarchy of providers with fallback behavior.

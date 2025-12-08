@@ -98,11 +98,12 @@ public struct FileProvider<Snapshot: FileConfigSnapshot>: Sendable {
     /// and creates a snapshot from that file.
     ///
     /// ## Configuration keys
+    ///
     /// - `filePath` (string, required): The path to the configuration file to read.
     /// - `allowMissing` (bool, optional, default: false): A flag controlling how
-    ///   the provider handles a missing file.
-    ///     - When `false` (the default), if the file is missing or malformed, throws an error.
-    ///     - When `true`, if the file is missing, treats it as empty. Malformed files still throw an error.
+    ///   the provider handles a missing file. When `false` (the default), if the file
+    ///   is missing or malformed, throws an error. When `true`, if the file is missing,
+    ///   treats it as empty. Malformed files still throw an error.
     ///
     /// - Parameters:
     ///   - snapshotType: The type of snapshot to create from the file contents.
@@ -129,11 +130,12 @@ public struct FileProvider<Snapshot: FileConfigSnapshot>: Sendable {
     /// and creates a snapshot from that file.
     ///
     /// ## Configuration keys
+    ///
     /// - `filePath` (string, required): The path to the configuration file to read.
     /// - `allowMissing` (bool, optional, default: false): A flag controlling how
-    ///   the provider handles a missing file.
-    ///     - When `false` (the default), if the file is missing or malformed, throws an error.
-    ///     - When `true`, if the file is missing, treats it as empty. Malformed files still throw an error.
+    ///   the provider handles a missing file. When `false` (the default), if the file
+    ///   is missing or malformed, throws an error. When `true`, if the file is missing,
+    ///   treats it as empty. Malformed files still throw an error.
     ///
     /// - Parameters:
     ///   - snapshotType: The type of snapshot to create from the file contents.

@@ -28,7 +28,14 @@ import SystemPackage
 /// This class represents a point-in-time view of configuration values. It handles
 /// the conversion from YAML types to configuration value types.
 ///
-/// Commonly used with ``FileProvider`` and ``ReloadingFileProvider``.
+/// ## Usage
+///
+/// Use with ``FileProvider`` or ``ReloadingFileProvider``:
+///
+/// ```swift
+/// let provider = try await FileProvider<YAMLSnapshot>(filePath: "/etc/config.yaml")
+/// let config = ConfigReader(provider: provider)
+/// ```
 @available(Configuration 1.0, *)
 public final class YAMLSnapshot: Sendable {
 
