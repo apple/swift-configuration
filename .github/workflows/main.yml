@@ -122,3 +122,12 @@ jobs:
     with:
       name: "Example packages"
       matrix_string: '${{ needs.construct-example-packages-matrix.outputs.example-packages-matrix }}'
+
+  benchmarks:
+    name: Benchmarks
+    uses: apple/swift-nio/.github/workflows/benchmarks.yml@main
+    with:
+      benchmark_package_path: "Benchmarks"
+      linux_5_10_enabled: false
+      linux_6_0_enabled: false
+      linux_6_1_enabled: false
