@@ -12,7 +12,7 @@
 //
 //===----------------------------------------------------------------------===//
 
-#if LoggingSupport
+#if Logging
 
 package import Logging
 import Synchronization

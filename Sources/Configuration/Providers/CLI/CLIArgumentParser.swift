@@ -12,7 +12,7 @@
 //
 //===----------------------------------------------------------------------===//
 
-#if CommandLineArgumentsSupport
+#if CommandLineArguments
 
 #if canImport(FoundationEssentials)
 import FoundationEssentials

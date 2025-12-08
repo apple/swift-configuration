@@ -12,7 +12,7 @@
 //
 //===----------------------------------------------------------------------===//
 
-#if JSONSupport
+#if JSON
 
 import Testing
 import ConfigurationTestingInternal

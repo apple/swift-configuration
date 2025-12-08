@@ -12,7 +12,7 @@
 //
 //===----------------------------------------------------------------------===//
 
-#if YAMLSupport
+#if YAML
 
 #if canImport(FoundationEssentials)
 import FoundationEssentials

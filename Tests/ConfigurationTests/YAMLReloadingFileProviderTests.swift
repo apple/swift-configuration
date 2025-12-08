@@ -12,7 +12,7 @@
 //
 //===----------------------------------------------------------------------===//
 
-#if YAMLSupport && ReloadingSupport
+#if YAML && Reloading
 
 import Testing
 import ConfigurationTestingInternal

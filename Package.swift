@@ -8,32 +8,32 @@ import Foundation
 #endif
 
 let defaultTraits: Set<String> = [
-    "JSONSupport"
+    "JSON"
 ]
 
 var traits: Set<Trait> = [
     .trait(
-        name: "LoggingSupport",
+        name: "Logging",
         description: "Adds support for swift-log integration."
     ),
     .trait(
-        name: "JSONSupport",
+        name: "JSON",
         description: "Adds support for parsing JSON configuration files."
     ),
     .trait(
-        name: "ReloadingSupport",
+        name: "Reloading",
         description:
             "Adds support for reloading built-in provider variants, such as ReloadingFileProvider.",
         enabledTraits: [
-            "LoggingSupport"
+            "Logging"
         ]
     ),
     .trait(
-        name: "CommandLineArgumentsSupport",
+        name: "CommandLineArguments",
         description: "Adds support for parsing command line arguments."
     ),
     .trait(
-        name: "YAMLSupport",
+        name: "YAML",
         description: "Adds support for parsing YAML configuration files."
     ),
 ]
@@ -95,22 +95,22 @@ let package = Package(
                 .product(
                     name: "Logging",
                     package: "swift-log",
-                    condition: .when(traits: ["LoggingSupport"])
+                    condition: .when(traits: ["Logging"])
                 ),
                 .product(
                     name: "Metrics",
                     package: "swift-metrics",
-                    condition: .when(traits: ["ReloadingSupport"])
+                    condition: .when(traits: ["Reloading"])
                 ),
                 .product(
                     name: "ServiceLifecycle",
                     package: "swift-service-lifecycle",
-                    condition: .when(traits: ["ReloadingSupport"])
+                    condition: .when(traits: ["Reloading"])
                 ),
                 .product(
                     name: "Yams",
                     package: "Yams",
-                    condition: .when(traits: ["YAMLSupport"])
+                    condition: .when(traits: ["YAML"])
                 ),
             ],
             exclude: [
