@@ -12,7 +12,7 @@
 //
 //===----------------------------------------------------------------------===//
 
-#if CommandLineArgumentsSupport
+#if CommandLineArguments
 
 import Testing
 @testable import Configuration

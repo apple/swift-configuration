@@ -12,7 +12,7 @@
 //
 //===----------------------------------------------------------------------===//
 
-#if CommandLineArgumentsSupport
+#if CommandLineArguments
 
 /// A configuration provider that sources values from command-line arguments.
 ///

@@ -12,7 +12,7 @@
 //
 //===----------------------------------------------------------------------===//
 
-#if LoggingSupport
+#if Logging
 
 public import Logging
 
@@ -27,7 +27,7 @@ import Synchronization
 ///
 /// ## Package traits
 ///
-/// This type is guarded by the `LoggingSupport` package trait.
+/// This type is guarded by the `Logging` package trait.
 ///
 /// ## Usage
 ///

@@ -11,8 +11,8 @@ let package = Package(
         .package(
             url: "https://github.com/apple/swift-configuration",
             // TODO: Update once 1.0.0 is tagged.
-            exact: "1.0.0-alpha.1",
-            traits: [.defaults, "CommandLineArgumentsSupport"]
+            branch: "main",
+            traits: [.defaults, "CommandLineArguments"]
         )
     ],
     targets: [

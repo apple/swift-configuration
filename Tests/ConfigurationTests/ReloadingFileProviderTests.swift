@@ -12,7 +12,7 @@
 //
 //===----------------------------------------------------------------------===//
 
-#if ReloadingSupport
+#if Reloading
 
 import Testing
 import ConfigurationTestingInternal
