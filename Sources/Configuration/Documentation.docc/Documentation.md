@@ -180,16 +180,16 @@ To enable an additional trait on the package, update the package dependency:
 .package(
     url: "https://github.com/apple/swift-configuration",
     from: "1.0.0",
-+   traits: [.defaults, "OtherFeatureSupport"]
++   traits: [.defaults, "YAML"]
 )
 ```
 
 Available traits:
-- **`JSONSupport`** (default): Adds support for ``JSONSnapshot``, which enables using ``FileProvider`` and ``ReloadingFileProvider`` with JSON files.
-- **`LoggingSupport`** (opt-in): Adds support for ``AccessLogger``, a way to emit access events into a `SwiftLog.Logger`.
-- **`ReloadingSupport`** (opt-in): Adds support for ``ReloadingFileProvider``, which provides auto-reloading capability for file-based configuration.
-- **`CommandLineArgumentsSupport`** (opt-in): Adds support for ``CommandLineArgumentsProvider`` for parsing command line arguments.
-- **`YAMLSupport`** (opt-in): Adds support for ``YAMLSnapshot``, which enables using ``FileProvider`` and ``ReloadingFileProvider`` with YAML files.
+- **`JSON`** (default): Adds support for ``JSONSnapshot``, which enables using ``FileProvider`` and ``ReloadingFileProvider`` with JSON files.
+- **`Logging`** (opt-in): Adds support for ``AccessLogger``, a way to emit access events into a Swift Log `Logger`.
+- **`Reloading`** (opt-in): Adds support for ``ReloadingFileProvider``, which provides auto-reloading capability for file-based configuration.
+- **`CommandLineArguments`** (opt-in): Adds support for ``CommandLineArgumentsProvider`` for parsing command line arguments.
+- **`YAML`** (opt-in): Adds support for ``YAMLSnapshot``, which enables using ``FileProvider`` and ``ReloadingFileProvider`` with YAML files.
 
 ### Supported platforms and minimum versions
 

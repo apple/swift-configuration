@@ -93,16 +93,16 @@ To enable an additional trait on the package, update the package dependency:
 .package(
     url: "https://github.com/apple/swift-configuration",
     from: "1.0.0",
-+   traits: [.defaults, "OtherFeatureSupport"]
++   traits: [.defaults, "YAML"]
 )
 ```
 
 Available traits:
-- **`JSONSupport`** (default): Adds support for `FileProvider<JSONSnapshot>`, a `ConfigProvider` for reading JSON files.
-- **`LoggingSupport`** (opt-in): Adds support for `AccessLogger`, a way to emit access events into a `SwiftLog.Logger`.
-- **`ReloadingSupport`** (opt-in): Adds support for auto-reloading variants of file providers, such as `ReloadingFileProvider<JSONSnapshot>` (when `JSONSupport` is enabled) and `ReloadingFileProvider<YAMLSnapshot>` (when `YAMLSupport` is enabled).
-- **`CommandLineArgumentsSupport`** (opt-in): Adds support for `CommandLineArgumentsProvider` for parsing command line arguments.
-- **`YAMLSupport`** (opt-in): Adds support for `FileProvider<YAMLSnapshot>`, a `ConfigProvider` for reading YAML files.
+- **`JSON`** (default): Adds support for `FileProvider<JSONSnapshot>`, a `ConfigProvider` for reading JSON files.
+- **`Logging`** (opt-in): Adds support for `AccessLogger`, a way to emit access events into a `SwiftLog.Logger`.
+- **`Reloading`** (opt-in): Adds support for auto-reloading variants of file providers, such as `ReloadingFileProvider<JSONSnapshot>` (when `JSON` is enabled) and `ReloadingFileProvider<YAMLSnapshot>` (when `YAML` is enabled).
+- **`CommandLineArguments`** (opt-in): Adds support for `CommandLineArgumentsProvider` for parsing command line arguments.
+- **`YAML`** (opt-in): Adds support for `FileProvider<YAMLSnapshot>`, a `ConfigProvider` for reading YAML files.
 
 ## Supported platforms and minimum versions
 

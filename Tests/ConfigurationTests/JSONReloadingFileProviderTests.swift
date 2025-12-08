@@ -12,7 +12,7 @@
 //
 //===----------------------------------------------------------------------===//
 
-#if JSONSupport && ReloadingSupport
+#if JSON && Reloading
 
 import Testing
 import ConfigurationTestingInternal
