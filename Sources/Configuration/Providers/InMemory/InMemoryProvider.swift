@@ -63,15 +63,23 @@ public struct InMemoryProvider: Sendable {
         /// The name of this instance of the provider.
         ///
         /// The assumption is that there might be multiple instances in a given process.
-        var name: String?
+        let name: String?
 
         /// The provider name.
-        var providerName: String {
-            "InMemoryProvider[\(name ?? "")]"
-        }
+        let providerName: String
 
         /// The underlying config values.
         var values: [AbsoluteConfigKey: ConfigValue]
+
+        /// Create a new snapshot.
+        /// - Parameters:
+        ///   - name: The name of this instance of the provider.
+        ///   - values: The underlying config values.
+        init(name: String?, values: [AbsoluteConfigKey: ConfigValue]) {
+            self.name = name
+            self.providerName = "InMemoryProvider[\(name ?? "")]"
+            self.values = values
+        }
     }
 
     /// The underlying snapshot of the internal state.

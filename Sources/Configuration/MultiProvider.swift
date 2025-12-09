@@ -141,6 +141,7 @@ extension MultiProvider {
         type: ConfigType
     ) -> ([AccessEvent.ProviderResult], Result<ConfigValue?, any Error>) {
         var results: [AccessEvent.ProviderResult] = []
+        results.reserveCapacity(storage.providers.count)
         for childProvider in storage.providers {
             let providerName = childProvider.providerName
             let lookupResult: LookupResult
