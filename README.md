@@ -9,6 +9,7 @@ A Swift library for reading configuration in applications and libraries.
 
 - 📚 **Documentation** is available on the [Swift Package Index](https://swiftpackageindex.com/apple/swift-configuration/documentation/configuration).
 - 💻 **Examples** are available [just below](#Examples), in the [Examples](Examples/) directory, and on the [Example use cases](https://swiftpackageindex.com/apple/swift-configuration/documentation/configuration/example-use-cases) page.
+- 📺 **Video** introduction is available [on YouTube](https://www.youtube.com/watch?v=I3lYW6OEyIs).
 - 🚀 **Contributions** are welcome, please see [CONTRIBUTING.md](CONTRIBUTING.md).
 - 🪪 **License** is Apache 2.0, repeated in [LICENSE](LICENSE.txt).
 - 🔒 **Security** issues should be reported via the process in [SECURITY.md](SECURITY.md).
