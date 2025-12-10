@@ -145,6 +145,8 @@ For example, to read the timeout configuration value for an HTTP client, check o
 
 For a selection of more detailed examples, read through <doc:Example-use-cases>.
 
+For a video introduction, check out our [talk on YouTube](https://www.youtube.com/watch?v=I3lYW6OEyIs).
+
 These providers can be combined to form a hierarchy, for details check out <doc:Provider-hierarchy>.
 
 ### Quick start
