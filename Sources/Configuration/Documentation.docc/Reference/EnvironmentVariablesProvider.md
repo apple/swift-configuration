@@ -4,9 +4,9 @@
 
 ### Creating an environment variable provider
 
-- ``init(secretsSpecifier:bytesDecoder:arraySeparator:)``
-- ``init(environmentVariables:secretsSpecifier:bytesDecoder:arraySeparator:)``
-- ``init(environmentFilePath:allowMissing:secretsSpecifier:bytesDecoder:arraySeparator:)``
+- ``init(secretsSpecifier:bytesDecoder:boolDecoder:arraySeparator:)``
+- ``init(environmentVariables:secretsSpecifier:bytesDecoder:boolDecoder:arraySeparator:)``
+- ``init(environmentFilePath:allowMissing:secretsSpecifier:bytesDecoder:boolDecoder:arraySeparator:)``
 
 ### Inspecting an environment variable provider
 
