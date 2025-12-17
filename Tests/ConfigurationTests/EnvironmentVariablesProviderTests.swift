@@ -69,7 +69,7 @@ struct EnvironmentVariablesProviderTests {
     }
 
     @available(Configuration 1.0, *)
-    @Test func boolDecoderValuesForKeys() throws {
+    @Test func valueForKeyOfBoolAndBoolArrayTypes() throws {
         let ep = EnvironmentVariablesProvider(
             environmentVariables: [
                 "BOOL_TRUE": "true",
