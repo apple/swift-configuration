@@ -179,7 +179,6 @@ public struct EnvironmentVariablesProvider: Sendable {
     /// - Parameters:
     ///   - secretsSpecifier: Specifies which environment variables should be treated as secrets.
     ///   - bytesDecoder: The decoder used for converting string values to byte arrays.
-    ///   - boolDecoder: The decoder used for converting string values to bool values.
     ///   - arraySeparator: The character used to separate elements in array values.
     public init(
         secretsSpecifier: SecretsSpecifier<String, String> = .none,
@@ -215,7 +214,6 @@ public struct EnvironmentVariablesProvider: Sendable {
     ///   - environmentVariables: A dictionary of environment variable names and values.
     ///   - secretsSpecifier: Specifies which environment variables should be treated as secrets.
     ///   - bytesDecoder: The decoder used for converting string values to byte arrays.
-    ///   - boolDecoder: The decoder used for converting string to bool values.
     ///   - arraySeparator: The character used to separate elements in array values.
     public init(
         environmentVariables: [String: String],
@@ -261,7 +259,6 @@ public struct EnvironmentVariablesProvider: Sendable {
     ///     - When `true`, if the file is missing, treats it as empty. Malformed files still throw an error.
     ///   - secretsSpecifier: Specifies which environment variables should be treated as secrets.
     ///   - bytesDecoder: The decoder used for converting string values to byte arrays.
-    ///   - boolDecoder: The decoder used for converting string values to bool values.
     ///   - arraySeparator: The character used to separate elements in array values.
     /// - Throws: If the file is malformed, or if missing when allowMissing is `false`.
     public init(
@@ -290,7 +287,6 @@ public struct EnvironmentVariablesProvider: Sendable {
     ///   - fileSystem: The file system implementation to use.
     ///   - secretsSpecifier: Specifies which environment variables should be treated as secrets.
     ///   - bytesDecoder: The decoder used for converting string values to byte arrays.
-    ///   - boolDecoder: The decoder used for converting string values to bool values.
     ///   - arraySeparator: The character used to separate elements in array values.
     /// - Throws: If the file is malformed, or if missing when allowMissing is `false`.
     internal init(
