@@ -71,6 +71,7 @@ struct EnvironmentVariablesProviderTests {
     @Test()
     @available(Configuration 1.0, *)
     func decodeBoolFromString() throws {
+        let sut = EnvironmentVariablesProvider.Snapshot.decodeBool
         let cases: [(expected: Bool?, input: [String])] = [
             (true, ["1"]),
             (false, ["0"]),
@@ -80,17 +81,16 @@ struct EnvironmentVariablesProviderTests {
             (false, ["false", "FALSE", "faLse"]),
             (nil, ["", "_true_", "_false_", "_yes_", "_no_", "_1_", "_0_", "11", "00"])
         ]
-
         for (expected, inputs) in cases {
             for input in inputs {
-                #expect(EnvironmentVariablesProvider.Snapshot.decodeBool(from: input) == expected, "input: \(input)")
+                #expect(sut(input) == expected, "input: \(input)")
             }
         }
     }
 
     @available(Configuration 1.0, *)
     @Test func valueForKeyOfBoolAndBoolArrayTypes() throws {
-        let ep = EnvironmentVariablesProvider(
+        let sut = EnvironmentVariablesProvider(
             environmentVariables: [
                 "BOOL_TRUE": "true",
                 "BOOL_FALSE": "false",
@@ -105,18 +105,18 @@ struct EnvironmentVariablesProviderTests {
                 "BOOLY_ARRAY_THROWS_1": "true,1,YESS",
                 "BOOLY_ARRAY_THROWS_2": "false,00,no",
             ])
-        #expect(try ep.value(forKey: "BOOL_TRUE", type: .bool).value == true)
-        #expect(try ep.value(forKey: "BOOL_FALSE", type: .bool).value == false)
-        #expect(try ep.value(forKey: "BOOL_1", type: .bool).value == true)
-        #expect(try ep.value(forKey: "BOOL_0", type: .bool).value == false)
-        #expect(try ep.value(forKey: "BOOL_YES", type: .bool).value == true)
-        #expect(try ep.value(forKey: "BOOL_NO", type: .bool).value == false)
-        #expect(throws: ConfigError.self) { try ep.value(forKey: "BOOL_THROWS_ERROR_EMPTY", type: .bool) }
-        #expect(throws: ConfigError.self) { try ep.value(forKey: "BOOL_THROWS_ERROR_NOT_BOOL_STRING", type: .bool) }
-        #expect(try ep.value(forKey: "BOOLY_ARRAY_TRUE", type: .boolArray).value == .init([true, true, true], isSecret: false))
-        #expect(try ep.value(forKey: "BOOLY_ARRAY_FALSE", type: .boolArray).value == .init([false, false, false], isSecret: false))
-        #expect(throws: ConfigError.self) { try ep.value(forKey: "BOOLY_ARRAY_THROWS_1", type: .boolArray) }
-        #expect(throws: ConfigError.self) { try ep.value(forKey: "BOOLY_ARRAY_THROWS_2", type: .boolArray) }
+        #expect(try sut.value(forKey: "BOOL_TRUE", type: .bool).value == true)
+        #expect(try sut.value(forKey: "BOOL_FALSE", type: .bool).value == false)
+        #expect(try sut.value(forKey: "BOOL_1", type: .bool).value == true)
+        #expect(try sut.value(forKey: "BOOL_0", type: .bool).value == false)
+        #expect(try sut.value(forKey: "BOOL_YES", type: .bool).value == true)
+        #expect(try sut.value(forKey: "BOOL_NO", type: .bool).value == false)
+        #expect(throws: ConfigError.self) { try sut.value(forKey: "BOOL_THROWS_ERROR_EMPTY", type: .bool) }
+        #expect(throws: ConfigError.self) { try sut.value(forKey: "BOOL_THROWS_ERROR_NOT_BOOL_STRING", type: .bool) }
+        #expect(try sut.value(forKey: "BOOLY_ARRAY_TRUE", type: .boolArray).value == .init([true, true, true], isSecret: false))
+        #expect(try sut.value(forKey: "BOOLY_ARRAY_FALSE", type: .boolArray).value == .init([false, false, false], isSecret: false))
+        #expect(throws: ConfigError.self) { try sut.value(forKey: "BOOLY_ARRAY_THROWS_1", type: .boolArray) }
+        #expect(throws: ConfigError.self) { try sut.value(forKey: "BOOLY_ARRAY_THROWS_2", type: .boolArray) }
     }
 
     @available(Configuration 1.0, *)
