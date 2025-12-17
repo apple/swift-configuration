@@ -68,9 +68,8 @@ struct EnvironmentVariablesProviderTests {
         #expect(provider.debugDescription == expectedDebugDescription)
     }
 
-    @Test()
     @available(Configuration 1.0, *)
-    func decodeBoolFromString() throws {
+    @Test func decodeBoolFromString() throws {
         let sut = EnvironmentVariablesProvider.Snapshot.decodeBool
         let cases: [(expected: Bool?, input: [String])] = [
             (true, ["1"]),
