@@ -18,28 +18,24 @@ import Foundation
 
 struct ConfigBoolsFromStringDecoderTests {
 
+    @Test()
     @available(Configuration 1.0, *)
-    @Test("boolDecoder, all boolean strings enabled")
-    func boolDecoderAllBooleanStringsEnabled() throws {
-        let bd = BoolDecoder(booleanStrings: [.oneZero, .trueFalse, .yesNo])
-        #expect(bd.decodeBool(from: "1") == true)
-        #expect(bd.decodeBool(from: "0") == false)
-        #expect(["Yes", "yes", "YES", "yES"].allSatisfy { bd.decodeBool(from: $0) == true })
-        #expect(["No", "no", "NO", "nO"].allSatisfy { bd.decodeBool(from: $0) == false })
-        #expect(["true", "TRUE", "trUe"].allSatisfy { bd.decodeBool(from: $0) == true })
-        #expect(["false", "FALSE", "faLse"].allSatisfy { bd.decodeBool(from: $0) == false })
-        #expect(["_true_", "_false_", "11", "00"].allSatisfy { bd.decodeBool(from: $0) == nil })
-    }
+    func stringToBool() throws {
+        let bd = BoolDecoder()
+        let cases: [(expected: Bool?, input: [String])] = [
+            (true, ["1"]),
+            (false, ["0"]),
+            (true, ["Yes", "yes", "YES", "yES"]),
+            (false, ["No", "no", "NO", "nO"]),
+            (true, ["true", "TRUE", "trUe"]),
+            (false, ["false", "FALSE", "faLse"]),
+            (nil, ["", "_true_", "_false_", "_yes_", "_no_", "_1_", "_0_", "11", "00"])
+        ]
 
-    @available(Configuration 1.0, *)
-    @Test("boolDecoder, only .oneZero boolean strings enabled")
-    func boolDecoderOnlyOneZeroBooleanStringsEnabled() throws {
-        let bd = BoolDecoder(booleanStrings: [.oneZero])
-        #expect(bd.decodeBool(from: "1") == true)
-        #expect(bd.decodeBool(from: "0") == false)
-        #expect(bd.decodeBool(from: "true") == nil)
-        #expect(bd.decodeBool(from: "false") == nil)
-        #expect(bd.decodeBool(from: "yes") == nil)
-        #expect(bd.decodeBool(from: "no") == nil)
+        for (expected, inputs) in cases {
+            for input in inputs {
+                #expect(bd.decodeBool(from: input) == expected, "input: \(input)")
+            }
+        }
     }
 }

@@ -173,7 +173,7 @@ public struct EnvironmentVariablesProvider: Sendable {
     public init(
         secretsSpecifier: SecretsSpecifier<String, String> = .none,
         bytesDecoder: some ConfigBytesFromStringDecoder = .base64,
-        boolDecoder: BoolDecoder = .allBooleanStrings,
+        boolDecoder: BoolDecoder = .init(),
         arraySeparator: Character = ","
     ) {
         self.init(
@@ -212,7 +212,7 @@ public struct EnvironmentVariablesProvider: Sendable {
         environmentVariables: [String: String],
         secretsSpecifier: SecretsSpecifier<String, String> = .none,
         bytesDecoder: some ConfigBytesFromStringDecoder = .base64,
-        boolDecoder: BoolDecoder = .allBooleanStrings,
+        boolDecoder: BoolDecoder = .init(),
         arraySeparator: Character = ","
     ) {
         let tuples: [(String, EnvironmentValue)] = environmentVariables.map { key, value in
@@ -262,7 +262,7 @@ public struct EnvironmentVariablesProvider: Sendable {
         allowMissing: Bool = false,
         secretsSpecifier: SecretsSpecifier<String, String> = .none,
         bytesDecoder: some ConfigBytesFromStringDecoder = .base64,
-        boolDecoder: BoolDecoder = .allBooleanStrings,
+        boolDecoder: BoolDecoder = .init(),
         arraySeparator: Character = ","
     ) async throws {
         try await self.init(
@@ -294,7 +294,7 @@ public struct EnvironmentVariablesProvider: Sendable {
         fileSystem: some CommonProviderFileSystem,
         secretsSpecifier: SecretsSpecifier<String, String> = .none,
         bytesDecoder: some ConfigBytesFromStringDecoder = .base64,
-        boolDecoder: BoolDecoder = .allBooleanStrings,
+        boolDecoder: BoolDecoder = .init(),
         arraySeparator: Character = ","
     ) async throws {
         let loadedData = try await fileSystem.fileContents(atPath: environmentFilePath)

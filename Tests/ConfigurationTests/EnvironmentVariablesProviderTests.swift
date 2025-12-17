@@ -33,10 +33,6 @@ struct EnvironmentVariablesProviderTests {
                 "OTHER_DOUBLE": "2.72",
                 "BOOL": "true",
                 "OTHER_BOOL": "false",
-                "OTHER_BOOL_1": "1",
-                "OTHER_BOOL_0": "0",
-                "OTHER_BOOL_YES": "YES",
-                "OTHER_BOOL_NO": "NO",
                 "BYTES": "bWFnaWM=",
                 "OTHER_BYTES": "bWFnaWMy",
                 "STRINGY_ARRAY": "Hello,World",
@@ -47,8 +43,6 @@ struct EnvironmentVariablesProviderTests {
                 "OTHER_DOUBLY_ARRAY": "0.9,1.8",
                 "BOOLY_ARRAY": "true,false",
                 "OTHER_BOOLY_ARRAY": "false,true,true",
-                "OTHER_BOOLY_ARRAY_1_0": "0, 1, 1",
-                "OTHER_BOOLY_ARRAY_YES_NO": "NO, YES, YES",
                 "BYTE_CHUNKY_ARRAY": "bWFnaWM=,bWFnaWMy",
                 "OTHER_BYTE_CHUNKY_ARRAY": "bWFnaWM=,bWFnaWMy,bWFnaWM=",
             ],
@@ -61,7 +55,7 @@ struct EnvironmentVariablesProviderTests {
     @available(Configuration 1.0, *)
     @Test func printingDescription() throws {
         let expectedDescription = #"""
-            EnvironmentVariablesProvider[26 values]
+            EnvironmentVariablesProvider[20 values]
             """#
         #expect(provider.description == expectedDescription)
     }
@@ -69,38 +63,40 @@ struct EnvironmentVariablesProviderTests {
     @available(Configuration 1.0, *)
     @Test func printingDebugDescription() throws {
         let expectedDebugDescription = #"""
-            EnvironmentVariablesProvider[26 values: BOOL=true, BOOLY_ARRAY=true,false, BYTES=bWFnaWM=, BYTE_CHUNKY_ARRAY=bWFnaWM=,bWFnaWMy, DOUBLE=3.14, DOUBLY_ARRAY=3.14,2.72, INT=42, INTY_ARRAY=42,24, OTHER_BOOL=false, OTHER_BOOLY_ARRAY=false,true,true, OTHER_BOOLY_ARRAY_1_0=0, 1, 1, OTHER_BOOLY_ARRAY_YES_NO=NO, YES, YES, OTHER_BOOL_0=0, OTHER_BOOL_1=1, OTHER_BOOL_NO=NO, OTHER_BOOL_YES=YES, OTHER_BYTES=bWFnaWMy, OTHER_BYTE_CHUNKY_ARRAY=bWFnaWM=,bWFnaWMy,bWFnaWM=, OTHER_DOUBLE=2.72, OTHER_DOUBLY_ARRAY=0.9,1.8, OTHER_INT=24, OTHER_INTY_ARRAY=16,32, OTHER_STRING=Other Hello, OTHER_STRINGY_ARRAY=Hello,Swift, STRING=<REDACTED>, STRINGY_ARRAY=Hello,World]
+            EnvironmentVariablesProvider[20 values: BOOL=true, BOOLY_ARRAY=true,false, BYTES=bWFnaWM=, BYTE_CHUNKY_ARRAY=bWFnaWM=,bWFnaWMy, DOUBLE=3.14, DOUBLY_ARRAY=3.14,2.72, INT=42, INTY_ARRAY=42,24, OTHER_BOOL=false, OTHER_BOOLY_ARRAY=false,true,true, OTHER_BYTES=bWFnaWMy, OTHER_BYTE_CHUNKY_ARRAY=bWFnaWM=,bWFnaWMy,bWFnaWM=, OTHER_DOUBLE=2.72, OTHER_DOUBLY_ARRAY=0.9,1.8, OTHER_INT=24, OTHER_INTY_ARRAY=16,32, OTHER_STRING=Other Hello, OTHER_STRINGY_ARRAY=Hello,Swift, STRING=<REDACTED>, STRINGY_ARRAY=Hello,World]
             """#
         #expect(provider.debugDescription == expectedDebugDescription)
     }
 
     @available(Configuration 1.0, *)
-    @Test func valuesForKeys() throws {
-        #expect(try provider.value(forKey: "OTHER_BOOL_1", type: .bool).value == true)
-        #expect(try provider.value(forKey: "OTHER_BOOL_0", type: .bool).value == false)
-        #expect(try provider.value(forKey: "OTHER_BOOL_YES", type: .bool).value == true)
-        #expect(try provider.value(forKey: "OTHER_BOOL_NO", type: .bool).value == false)
-        #expect(
-            try provider
-                .value(forKey: "OTHER_BOOLY_ARRAY", type: .boolArray).value == .init(
-                    [false, true, true],
-                    isSecret: false
-                )
-        )
-        #expect(
-            try provider
-                .value(forKey: "OTHER_BOOLY_ARRAY_1_0", type: .boolArray).value == .init(
-                    [false, true, true],
-                    isSecret: false
-                )
-        )
-        #expect(
-            try provider
-                .value(forKey: "OTHER_BOOLY_ARRAY_YES_NO", type: .boolArray).value == .init(
-                    [false, true, true],
-                    isSecret: false
-                )
-        )
+    @Test func boolDecoderValuesForKeys() throws {
+        let ep = EnvironmentVariablesProvider(
+            environmentVariables: [
+                "BOOL_TRUE": "true",
+                "BOOL_FALSE": "false",
+                "BOOL_1": "1",
+                "BOOL_0": "0",
+                "BOOL_YES": "YES",
+                "BOOL_NO": "NO",
+                "BOOL_THROWS_ERROR_EMPTY": "",
+                "BOOL_THROWS_ERROR_NOT_BOOL_STRING": "2",
+                "BOOLY_ARRAY_TRUE": "true,1,,YES",
+                "BOOLY_ARRAY_FALSE": "false,0,NO",
+                "BOOLY_ARRAY_THROWS_1": "true,1,YESS",
+                "BOOLY_ARRAY_THROWS_2": "false,00,no",
+            ])
+        #expect(try ep.value(forKey: "BOOL_TRUE", type: .bool).value == true)
+        #expect(try ep.value(forKey: "BOOL_FALSE", type: .bool).value == false)
+        #expect(try ep.value(forKey: "BOOL_1", type: .bool).value == true)
+        #expect(try ep.value(forKey: "BOOL_0", type: .bool).value == false)
+        #expect(try ep.value(forKey: "BOOL_YES", type: .bool).value == true)
+        #expect(try ep.value(forKey: "BOOL_NO", type: .bool).value == false)
+        #expect(throws: ConfigError.self) { try ep.value(forKey: "BOOL_THROWS_ERROR_EMPTY", type: .bool) }
+        #expect(throws: ConfigError.self) { try ep.value(forKey: "BOOL_THROWS_ERROR_NOT_BOOL_STRING", type: .bool) }
+        #expect(try ep.value(forKey: "BOOLY_ARRAY_TRUE", type: .boolArray).value == .init([true, true, true], isSecret: false))
+        #expect(try ep.value(forKey: "BOOLY_ARRAY_FALSE", type: .boolArray).value == .init([false, false, false], isSecret: false))
+        #expect(throws: ConfigError.self) { try ep.value(forKey: "BOOLY_ARRAY_THROWS_1", type: .boolArray) }
+        #expect(throws: ConfigError.self) { try ep.value(forKey: "BOOLY_ARRAY_THROWS_2", type: .boolArray) }
     }
 
     @available(Configuration 1.0, *)
