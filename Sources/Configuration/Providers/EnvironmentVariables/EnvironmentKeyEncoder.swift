@@ -38,15 +38,15 @@ import Foundation
 /// let encoder = EnvironmentKeyEncoder()
 ///
 /// // Basic hierarchical key
-/// let key1 = AbsoluteConfigKey(components: ["http", "port"], context: context)
+/// let key1 = AbsoluteConfigKey(["http", "port"], context: context)
 /// encoder.encode(key1) // "HTTP_PORT"
 ///
 /// // CamelCase handling
-/// let key2 = AbsoluteConfigKey(components: ["http", "serverTimeout"], context: context)
+/// let key2 = AbsoluteConfigKey(["http", "serverTimeout"], context: context)
 /// encoder.encode(key2) // "HTTP_SERVER_TIMEOUT"
 ///
 /// // Special character handling
-/// let key3 = AbsoluteConfigKey(components: ["http", "user-agent"], context: context)
+/// let key3 = AbsoluteConfigKey(["http", "user-agent"], context: context)
 /// encoder.encode(key3) // "HTTP_USER_AGENT"
 /// ```
 ///
