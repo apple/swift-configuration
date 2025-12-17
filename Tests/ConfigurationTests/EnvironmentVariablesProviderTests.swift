@@ -68,6 +68,26 @@ struct EnvironmentVariablesProviderTests {
         #expect(provider.debugDescription == expectedDebugDescription)
     }
 
+    @Test()
+    @available(Configuration 1.0, *)
+    func decodeBoolFromString() throws {
+        let cases: [(expected: Bool?, input: [String])] = [
+            (true, ["1"]),
+            (false, ["0"]),
+            (true, ["Yes", "yes", "YES", "yES"]),
+            (false, ["No", "no", "NO", "nO"]),
+            (true, ["true", "TRUE", "trUe"]),
+            (false, ["false", "FALSE", "faLse"]),
+            (nil, ["", "_true_", "_false_", "_yes_", "_no_", "_1_", "_0_", "11", "00"])
+        ]
+
+        for (expected, inputs) in cases {
+            for input in inputs {
+                #expect(EnvironmentVariablesProvider.Snapshot.decodeBool(from: input) == expected, "input: \(input)")
+            }
+        }
+    }
+
     @available(Configuration 1.0, *)
     @Test func valueForKeyOfBoolAndBoolArrayTypes() throws {
         let ep = EnvironmentVariablesProvider(

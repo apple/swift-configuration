@@ -144,7 +144,18 @@ public struct EnvironmentVariablesProvider: Sendable {
         var arrayDecoder: EnvironmentValueArrayDecoder
 
         /// A decoder of bool values from a string
-        let boolDecoder: BoolDecoder
+        static func decodeBool(from string: String) -> Bool? {
+            let stringLowercased = string.lowercased()
+            return if ["true", "false"].contains(stringLowercased) {
+                stringLowercased == "true"
+            } else if ["yes", "no"].contains(stringLowercased) {
+                stringLowercased == "yes"
+            } else if ["1", "0"].contains(stringLowercased) {
+                stringLowercased == "1"
+            } else {
+                nil
+            }
+        }
     }
 
     /// The underlying snapshot of the provider.
@@ -173,14 +184,12 @@ public struct EnvironmentVariablesProvider: Sendable {
     public init(
         secretsSpecifier: SecretsSpecifier<String, String> = .none,
         bytesDecoder: some ConfigBytesFromStringDecoder = .base64,
-        boolDecoder: BoolDecoder = .init(),
         arraySeparator: Character = ","
     ) {
         self.init(
             environmentVariables: ProcessInfo.processInfo.environment,
             secretsSpecifier: secretsSpecifier,
             bytesDecoder: bytesDecoder,
-            boolDecoder: boolDecoder,
             arraySeparator: arraySeparator
         )
     }
@@ -212,7 +221,6 @@ public struct EnvironmentVariablesProvider: Sendable {
         environmentVariables: [String: String],
         secretsSpecifier: SecretsSpecifier<String, String> = .none,
         bytesDecoder: some ConfigBytesFromStringDecoder = .base64,
-        boolDecoder: BoolDecoder = .init(),
         arraySeparator: Character = ","
     ) {
         let tuples: [(String, EnvironmentValue)] = environmentVariables.map { key, value in
@@ -227,8 +235,7 @@ public struct EnvironmentVariablesProvider: Sendable {
         self._snapshot = .init(
             environmentVariables: Dictionary(uniqueKeysWithValues: tuples),
             bytesDecoder: bytesDecoder,
-            arrayDecoder: EnvironmentValueArrayDecoder(separator: arraySeparator),
-            boolDecoder: boolDecoder
+            arrayDecoder: EnvironmentValueArrayDecoder(separator: arraySeparator)
         )
     }
 
@@ -262,7 +269,6 @@ public struct EnvironmentVariablesProvider: Sendable {
         allowMissing: Bool = false,
         secretsSpecifier: SecretsSpecifier<String, String> = .none,
         bytesDecoder: some ConfigBytesFromStringDecoder = .base64,
-        boolDecoder: BoolDecoder = .init(),
         arraySeparator: Character = ","
     ) async throws {
         try await self.init(
@@ -271,7 +277,6 @@ public struct EnvironmentVariablesProvider: Sendable {
             fileSystem: LocalCommonProviderFileSystem(),
             secretsSpecifier: secretsSpecifier,
             bytesDecoder: bytesDecoder,
-            boolDecoder: boolDecoder,
             arraySeparator: arraySeparator
         )
     }
@@ -294,7 +299,6 @@ public struct EnvironmentVariablesProvider: Sendable {
         fileSystem: some CommonProviderFileSystem,
         secretsSpecifier: SecretsSpecifier<String, String> = .none,
         bytesDecoder: some ConfigBytesFromStringDecoder = .base64,
-        boolDecoder: BoolDecoder = .init(),
         arraySeparator: Character = ","
     ) async throws {
         let loadedData = try await fileSystem.fileContents(atPath: environmentFilePath)
@@ -311,7 +315,6 @@ public struct EnvironmentVariablesProvider: Sendable {
             environmentVariables: EnvironmentFileParser.parsed(contents),
             secretsSpecifier: secretsSpecifier,
             bytesDecoder: bytesDecoder,
-            boolDecoder: boolDecoder,
             arraySeparator: arraySeparator
         )
     }
@@ -408,7 +411,7 @@ extension EnvironmentVariablesProvider.Snapshot {
             }
             content = .double(doubleValue)
         case .bool:
-            guard let boolValue = boolDecoder.decodeBool(from: stringValue) else {
+            guard let boolValue = Self.decodeBool(from: stringValue) else {
                 try throwMismatch()
             }
             content = .bool(boolValue)
@@ -441,7 +444,7 @@ extension EnvironmentVariablesProvider.Snapshot {
         case .boolArray:
             let arrayValue = arrayDecoder.decode(stringValue)
             let boolArray = try arrayValue.map { stringValue in
-                guard let boolValue = boolDecoder.decodeBool(from: stringValue) else {
+                guard let boolValue = Self.decodeBool(from: stringValue) else {
                     try throwMismatch()
                 }
                 return boolValue
