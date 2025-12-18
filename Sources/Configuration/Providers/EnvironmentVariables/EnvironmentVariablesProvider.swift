@@ -145,10 +145,11 @@ public struct EnvironmentVariablesProvider: Sendable {
 
         /// A decoder of bool values from a string.
         static func decodeBool(from string: String) -> Bool? {
-            switch string.lowercased() {
-            case "true", "yes", "1": true
-            case "false", "no", "0": false
-            default: nil
+            let stringLowercased = string.lowercased()
+            return switch stringLowercased {
+            case "yes", "1": true
+            case "no", "0": false
+            default: Bool(stringLowercased)
             }
         }
     }
