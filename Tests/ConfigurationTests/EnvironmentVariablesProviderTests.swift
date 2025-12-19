@@ -78,7 +78,7 @@ struct EnvironmentVariablesProviderTests {
             (false, ["No", "no", "NO", "nO"]),
             (true, ["true", "TRUE", "trUe"]),
             (false, ["false", "FALSE", "faLse"]),
-            (nil, ["", " ", "_true_", "_false_", "_yes_", "_no_", "_1_", "_0_", "11", "00"])
+            (nil, ["", " ", "_true_", "_false_", "_yes_", "_no_", "_1_", "_0_", "11", "00"]),
         ]
         for (expected, inputs) in cases {
             for input in inputs {
@@ -113,8 +113,14 @@ struct EnvironmentVariablesProviderTests {
         #expect(try sut.value(forKey: "BOOL_NO", type: .bool).value == false)
         #expect(throws: ConfigError.self) { try sut.value(forKey: "BOOL_THROWS_ERROR_EMPTY", type: .bool) }
         #expect(throws: ConfigError.self) { try sut.value(forKey: "BOOL_THROWS_ERROR_NOT_BOOL_STRING", type: .bool) }
-        #expect(try sut.value(forKey: "BOOLY_ARRAY_TRUE", type: .boolArray).value == .init([true, true, true], isSecret: false))
-        #expect(try sut.value(forKey: "BOOLY_ARRAY_FALSE", type: .boolArray).value == .init([false, false, false], isSecret: false))
+        #expect(
+            try sut.value(forKey: "BOOLY_ARRAY_TRUE", type: .boolArray).value
+                == .init([true, true, true], isSecret: false)
+        )
+        #expect(
+            try sut.value(forKey: "BOOLY_ARRAY_FALSE", type: .boolArray).value
+                == .init([false, false, false], isSecret: false)
+        )
         #expect(throws: ConfigError.self) { try sut.value(forKey: "BOOLY_ARRAY_THROWS_1", type: .boolArray) }
         #expect(throws: ConfigError.self) { try sut.value(forKey: "BOOLY_ARRAY_THROWS_2", type: .boolArray) }
         #expect(throws: ConfigError.self) { try sut.value(forKey: "BOOLY_ARRAY_THROWS_3", type: .boolArray) }
