@@ -57,9 +57,7 @@
 ///
 /// ```swift
 /// let envProvider = EnvironmentVariablesProvider()
-/// let keyMappedEnvProvider = envProvider.mapKeys { key in
-///     key.prepending(["myapp", "prod"])
-/// }
+/// let keyMappedEnvProvider = envProvider.prefixKeys(with: ["myapp", "prod"])
 /// ```
 @available(Configuration 1.0, *)
 public struct KeyMappingProvider<Upstream: ConfigProvider>: Sendable {
