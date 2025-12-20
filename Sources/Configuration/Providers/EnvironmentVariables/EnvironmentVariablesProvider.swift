@@ -142,6 +142,16 @@ public struct EnvironmentVariablesProvider: Sendable {
 
         /// A decoder of arrays from a string.
         var arrayDecoder: EnvironmentValueArrayDecoder
+
+        /// A decoder of bool values from a string.
+        static func decodeBool(from string: String) -> Bool? {
+            let stringLowercased = string.lowercased()
+            return switch stringLowercased {
+            case "yes", "1": true
+            case "no", "0": false
+            default: Bool(stringLowercased)
+            }
+        }
     }
 
     /// The underlying snapshot of the provider.
@@ -393,7 +403,7 @@ extension EnvironmentVariablesProvider.Snapshot {
             }
             content = .double(doubleValue)
         case .bool:
-            guard let boolValue = Bool(stringValue) else {
+            guard let boolValue = Self.decodeBool(from: stringValue) else {
                 try throwMismatch()
             }
             content = .bool(boolValue)
@@ -426,7 +436,7 @@ extension EnvironmentVariablesProvider.Snapshot {
         case .boolArray:
             let arrayValue = arrayDecoder.decode(stringValue)
             let boolArray = try arrayValue.map { stringValue in
-                guard let boolValue = Bool(stringValue) else {
+                guard let boolValue = Self.decodeBool(from: stringValue) else {
                     try throwMismatch()
                 }
                 return boolValue

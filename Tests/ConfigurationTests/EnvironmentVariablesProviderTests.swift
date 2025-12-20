@@ -69,6 +69,64 @@ struct EnvironmentVariablesProviderTests {
     }
 
     @available(Configuration 1.0, *)
+    @Test func decodeBoolFromString() throws {
+        let sut = EnvironmentVariablesProvider.Snapshot.decodeBool
+        let cases: [(expected: Bool?, input: [String])] = [
+            (true, ["1"]),
+            (false, ["0"]),
+            (true, ["Yes", "yes", "YES", "yES"]),
+            (false, ["No", "no", "NO", "nO"]),
+            (true, ["true", "TRUE", "trUe"]),
+            (false, ["false", "FALSE", "faLse"]),
+            (nil, ["", " ", "_true_", "_false_", "_yes_", "_no_", "_1_", "_0_", "11", "00"]),
+        ]
+        for (expected, inputs) in cases {
+            for input in inputs {
+                #expect(sut(input) == expected, "input: \(input)")
+            }
+        }
+    }
+
+    @available(Configuration 1.0, *)
+    @Test func valueForKeyOfBoolAndBoolArrayTypes() throws {
+        let sut = EnvironmentVariablesProvider(
+            environmentVariables: [
+                "BOOL_TRUE": "true",
+                "BOOL_FALSE": "false",
+                "BOOL_1": "1",
+                "BOOL_0": "0",
+                "BOOL_YES": "YES",
+                "BOOL_NO": "NO",
+                "BOOL_THROWS_ERROR_EMPTY": "",
+                "BOOL_THROWS_ERROR_NOT_BOOL_STRING": "2",
+                "BOOLY_ARRAY_TRUE": "true,1,,YES",
+                "BOOLY_ARRAY_FALSE": "false,0,NO",
+                "BOOLY_ARRAY_THROWS_1": "true,1,YESS",
+                "BOOLY_ARRAY_THROWS_2": "false,00,no",
+                "BOOLY_ARRAY_THROWS_3": "false, ,no",
+            ])
+        #expect(try sut.value(forKey: "BOOL_TRUE", type: .bool).value == true)
+        #expect(try sut.value(forKey: "BOOL_FALSE", type: .bool).value == false)
+        #expect(try sut.value(forKey: "BOOL_1", type: .bool).value == true)
+        #expect(try sut.value(forKey: "BOOL_0", type: .bool).value == false)
+        #expect(try sut.value(forKey: "BOOL_YES", type: .bool).value == true)
+        #expect(try sut.value(forKey: "BOOL_NO", type: .bool).value == false)
+        #expect(throws: ConfigError.self) { try sut.value(forKey: "BOOL_THROWS_ERROR_EMPTY", type: .bool) }
+        #expect(throws: ConfigError.self) { try sut.value(forKey: "BOOL_THROWS_ERROR_NOT_BOOL_STRING", type: .bool) }
+        #expect(
+            try sut.value(forKey: "BOOLY_ARRAY_TRUE", type: .boolArray).value
+                == .init([true, true, true], isSecret: false)
+        )
+        #expect(
+            try sut.value(forKey: "BOOLY_ARRAY_FALSE", type: .boolArray).value
+                == .init([false, false, false], isSecret: false)
+        )
+        #expect(throws: ConfigError.self) { try sut.value(forKey: "BOOLY_ARRAY_THROWS_1", type: .boolArray) }
+        #expect(throws: ConfigError.self) { try sut.value(forKey: "BOOLY_ARRAY_THROWS_2", type: .boolArray) }
+        #expect(throws: ConfigError.self) { try sut.value(forKey: "BOOLY_ARRAY_THROWS_3", type: .boolArray) }
+    }
+
+    @available(Configuration 1.0, *)
     @Test func compat() async throws {
         try await ProviderCompatTest(provider: provider).runTest()
     }
