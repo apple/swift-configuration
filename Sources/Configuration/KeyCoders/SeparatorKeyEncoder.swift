@@ -25,7 +25,7 @@
 ///
 /// ```swift
 /// let encoder = SeparatorKeyEncoder(separator: ".")
-/// let key = AbsoluteConfigKey(components: ["database", "host", "port"], context: context)
+/// let key = AbsoluteConfigKey(["database", "host", "port"], context: context)
 /// let encoded = encoder.encode(key)
 /// // Results in "database.host.port"
 /// ```
@@ -64,7 +64,7 @@ extension ConfigKeyEncoder where Self == SeparatorKeyEncoder {
     ///
     /// ```swift
     /// let encoder = ConfigKeyEncoder.dotSeparated
-    /// let key = AbsoluteConfigKey(components: ["app", "database", "host"], context: context)
+    /// let key = AbsoluteConfigKey(["app", "database", "host"], context: context)
     /// let encoded = encoder.encode(key)
     /// // Results in "app.database.host"
     /// ```
@@ -79,7 +79,7 @@ extension ConfigKeyEncoder where Self == SeparatorKeyEncoder {
     ///
     /// ```swift
     /// let encoder = ConfigKeyEncoder.dashSeparated
-    /// let key = AbsoluteConfigKey(components: ["app", "database", "host"], context: context)
+    /// let key = AbsoluteConfigKey(["app", "database", "host"], context: context)
     /// let encoded = encoder.encode(key)
     /// // Results in "app-database-host"
     /// ```
