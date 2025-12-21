@@ -33,4 +33,22 @@ extension ConfigProvider {
     ) -> KeyMappingProvider<Self> {
         KeyMappingProvider(upstream: self, keyMapper: transform)
     }
+
+    /// Creates a provider that marks values as secrets based on the given predicate.
+    ///
+    /// - Parameter isSecretKey: A closure that returns `true` for keys whose values should be secrets.
+    /// - Returns: A provider that marks matching values as secrets.
+    public func markSecrets(
+        where isSecretKey: @Sendable @escaping (_ key: AbsoluteConfigKey) -> Bool
+    ) -> SecretMarkingProvider<Self> {
+        SecretMarkingProvider(upstream: self, isSecretKey: isSecretKey)
+    }
+
+    /// Creates a provider that marks values as secrets for the specified keys.
+    ///
+    /// - Parameter keys: Keys whose values should be marked as secrets.
+    /// - Returns: A provider that marks the specified keys' values as secrets.
+    public func markSecretsForKeys(_ keys: Set<AbsoluteConfigKey>) -> SecretMarkingProvider<Self> {
+        SecretMarkingProvider(upstream: self) { keys.contains($0) }
+    }
 }
