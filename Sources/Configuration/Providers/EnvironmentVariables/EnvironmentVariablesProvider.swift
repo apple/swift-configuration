@@ -345,7 +345,7 @@ internal struct EnvironmentValueArrayDecoder {
     /// - Parameter string: The source string to parse.
     /// - Returns: The parsed array.
     func decode(_ string: String) -> [String] {
-        string.split(separator: separator).map { $0.trimmed() }
+        string.split(separator: separator, omittingEmptySubsequences: false).map { $0.trimmed() }
     }
 }
 
