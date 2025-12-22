@@ -99,11 +99,12 @@ struct EnvironmentVariablesProviderTests {
                 "BOOL_NO": "NO",
                 "BOOL_THROWS_ERROR_EMPTY": "",
                 "BOOL_THROWS_ERROR_NOT_BOOL_STRING": "2",
-                "BOOLY_ARRAY_TRUE": "true,1,,YES",
+                "BOOLY_ARRAY_TRUE": "true,1,YES",
                 "BOOLY_ARRAY_FALSE": "false,0,NO",
                 "BOOLY_ARRAY_THROWS_1": "true,1,YESS",
                 "BOOLY_ARRAY_THROWS_2": "false,00,no",
-                "BOOLY_ARRAY_THROWS_3": "false, ,no",
+                "BOOLY_ARRAY_THROWS_3": " ,",
+                "BOOLY_ARRAY_THROWS_4": ",",
             ])
         #expect(try sut.value(forKey: "BOOL_TRUE", type: .bool).value == true)
         #expect(try sut.value(forKey: "BOOL_FALSE", type: .bool).value == false)
@@ -124,6 +125,7 @@ struct EnvironmentVariablesProviderTests {
         #expect(throws: ConfigError.self) { try sut.value(forKey: "BOOLY_ARRAY_THROWS_1", type: .boolArray) }
         #expect(throws: ConfigError.self) { try sut.value(forKey: "BOOLY_ARRAY_THROWS_2", type: .boolArray) }
         #expect(throws: ConfigError.self) { try sut.value(forKey: "BOOLY_ARRAY_THROWS_3", type: .boolArray) }
+        #expect(throws: ConfigError.self) { try sut.value(forKey: "BOOLY_ARRAY_THROWS_4", type: .boolArray) }
     }
 
     @available(Configuration 1.0, *)
