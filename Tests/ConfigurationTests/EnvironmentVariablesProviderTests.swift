@@ -129,6 +129,44 @@ struct EnvironmentVariablesProviderTests {
     }
 
     @available(Configuration 1.0, *)
+    @Test func valueForKeyOfIntArrayTypes() throws {
+        let sut = EnvironmentVariablesProvider(
+            environmentVariables: [
+                "INTLY_ARRAY_1": "",
+                "INTLY_ARRAY_2": " ",
+                "INTLY_ARRAY_3": ",",
+                "INTLY_ARRAY_4": " ,",
+                "INTLY_ARRAY_5": "1,,2",
+                "INTLY_ARRAY_6": "1, ,2",
+            ])
+        #expect(throws: ConfigError.self) { try sut.value(forKey: "INTLY_ARRAY_1", type: .intArray) }
+        #expect(throws: ConfigError.self) { try sut.value(forKey: "INTLY_ARRAY_2", type: .intArray) }
+        #expect(throws: ConfigError.self) { try sut.value(forKey: "INTLY_ARRAY_3", type: .intArray) }
+        #expect(throws: ConfigError.self) { try sut.value(forKey: "INTLY_ARRAY_4", type: .intArray) }
+        #expect(throws: ConfigError.self) { try sut.value(forKey: "INTLY_ARRAY_5", type: .intArray) }
+        #expect(throws: ConfigError.self) { try sut.value(forKey: "INTLY_ARRAY_6", type: .intArray) }
+    }
+
+    @available(Configuration 1.0, *)
+    @Test func valueForKeyOfDoubleArrayTypes() throws {
+        let sut = EnvironmentVariablesProvider(
+            environmentVariables: [
+                "DOUBLY_ARRAY_1": "",
+                "DOUBLY_ARRAY_2": " ",
+                "DOUBLY_ARRAY_3": ",",
+                "DOUBLY_ARRAY_4": " ,",
+                "DOUBLY_ARRAY_5": "1.1,,2.1",
+                "DOUBLY_ARRAY_6": "1.1, ,2.1",
+            ])
+        #expect(throws: ConfigError.self) { try sut.value(forKey: "DOUBLY_ARRAY_1", type: .doubleArray) }
+        #expect(throws: ConfigError.self) { try sut.value(forKey: "DOUBLY_ARRAY_2", type: .doubleArray) }
+        #expect(throws: ConfigError.self) { try sut.value(forKey: "DOUBLY_ARRAY_3", type: .doubleArray) }
+        #expect(throws: ConfigError.self) { try sut.value(forKey: "DOUBLY_ARRAY_4", type: .doubleArray) }
+        #expect(throws: ConfigError.self) { try sut.value(forKey: "DOUBLY_ARRAY_5", type: .doubleArray) }
+        #expect(throws: ConfigError.self) { try sut.value(forKey: "DOUBLY_ARRAY_6", type: .doubleArray) }
+    }
+
+    @available(Configuration 1.0, *)
     @Test func compat() async throws {
         try await ProviderCompatTest(provider: provider).runTest()
     }
