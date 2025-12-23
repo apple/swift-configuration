@@ -150,7 +150,7 @@ struct EnvironmentVariablesProviderTests {
         #expect(throws: ConfigError.self) { try sut.value(forKey: "INTLY_ARRAY_THROWS_5", type: .intArray) }
         #expect(throws: ConfigError.self) { try sut.value(forKey: "INTLY_ARRAY_THROWS_6", type: .intArray) }
     }
-    
+
     @available(Configuration 1.0, *)
     @Test func valueForKeyOfDoubleArrayTypes() throws {
         let sut = EnvironmentVariablesProvider(
@@ -164,9 +164,12 @@ struct EnvironmentVariablesProviderTests {
                 "DOUBLY_ARRAY_THROWS_5": "1.1,,2.1",
                 "DOUBLY_ARRAY_THROWS_6": "1.1, ,2.1",
             ])
-        #expect(try sut.value(forKey: "DOUBLY_ARRAY_1", type: .doubleArray).value == .init([-1.1, 0, 1.1], isSecret: false))
-        #expect(try sut.value(forKey: "DOUBLY_ARRAY_2", type: .doubleArray).value == .init([-1.1, 0, 1.1], isSecret: false))
-        #expect(throws: ConfigError.self) { try sut.value(forKey: "DOUBLY_ARRAY_THROWS_1", type: .doubleArray) }
+        #expect(
+            try sut.value(forKey: "DOUBLY_ARRAY_1", type: .doubleArray).value == .init([-1.1, 0, 1.1], isSecret: false)
+        )
+        #expect(
+            try sut.value(forKey: "DOUBLY_ARRAY_2", type: .doubleArray).value == .init([-1.1, 0, 1.1], isSecret: false)
+        )
         #expect(throws: ConfigError.self) { try sut.value(forKey: "DOUBLY_ARRAY_THROWS_1", type: .doubleArray) }
         #expect(throws: ConfigError.self) { try sut.value(forKey: "DOUBLY_ARRAY_THROWS_2", type: .doubleArray) }
         #expect(throws: ConfigError.self) { try sut.value(forKey: "DOUBLY_ARRAY_THROWS_3", type: .doubleArray) }
