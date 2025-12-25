@@ -115,6 +115,8 @@ The library is supported on Apple platforms and Linux.
 
 ## Configuration providers
 
+### Built-in providers
+
 The library includes comprehensive built-in provider support:
 
 - Environment variables: [`EnvironmentVariablesProvider`](https://swiftpackageindex.com/apple/swift-configuration/documentation/configuration/environmentvariablesprovider)
@@ -124,6 +126,10 @@ The library includes comprehensive built-in provider support:
 - Directory of files: [`DirectoryFilesProvider`](https://swiftpackageindex.com/apple/swift-configuration/documentation/configuration/directoryfilesprovider)
 - In-memory: [`InMemoryProvider`](https://swiftpackageindex.com/apple/swift-configuration/documentation/configuration/inmemoryprovider) and [`MutableInMemoryProvider`](https://swiftpackageindex.com/apple/swift-configuration/documentation/configuration/mutableinmemoryprovider)
 - Key transforming: [`KeyMappingProvider`](https://swiftpackageindex.com/apple/swift-configuration/documentation/configuration/keymappingprovider)
+
+### Community providers
+
+- TOML file: [mattt/swift-configuration-toml](https://github.com/mattt/swift-configuration-toml)
 
 You can also implement a custom [`ConfigProvider`](https://swiftpackageindex.com/apple/swift-configuration/documentation/configuration/configprovider) for specialized configuration formats and sources.
 
