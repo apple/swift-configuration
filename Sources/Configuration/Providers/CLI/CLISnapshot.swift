@@ -45,7 +45,7 @@ import Foundation
 @available(Configuration 1.0, *)
 internal struct CLISnapshot {
 
-    /// The name of the provider that created this snapshot.
+    /// The name of the provider that creates this snapshot.
     let providerName: String = "CommandLineArgumentsProvider"
 
     /// The key encoder.

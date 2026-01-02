@@ -68,7 +68,7 @@ import Synchronization
 /// ### Config keys and context
 ///
 /// The library requests config values using a canonical "config key", that represents a key path.
-/// You can provide additional context that was used by some providers when the snapshot was created.
+/// You can provide additional context that some providers use when creating the snapshot.
 ///
 /// ```swift
 /// let httpTimeout = snapshotReader.int(
@@ -142,8 +142,7 @@ public struct ConfigSnapshotReader: Sendable {
     /// the value just using the key `inner` at the call site.
     let keyPrefix: AbsoluteConfigKey?
 
-    /// The underlying storage that is shared with any transitive child configs created
-    /// from this one.
+    /// The underlying storage that any transitive child configs created from this reader share.
     final class Storage: Sendable {
 
         /// The underlying multi snapshot.
@@ -228,7 +227,7 @@ extension ConfigReader {
     /// Returns a snapshot of the current configuration state.
     ///
     /// The snapshot reader provides read-only access to the configuration's state
-    /// at the time the method was called.
+    /// at the time you call this method.
     ///
     /// ```swift
     /// let snapshot = config.snapshot()
@@ -312,8 +311,8 @@ extension ConfigSnapshotReader {
     ///   - isSecret: Whether the value is a secret.
     ///   - unwrap: A closure that unwraps the config content to the desired type.
     ///   - wrap: A closure that wraps the value in config content.
-    ///   - fileID: The file ID where this method was called from.
-    ///   - line: The line number where this method was called from.
+    ///   - fileID: The file ID of the call site.
+    ///   - line: The line number of the call site.
     /// - Returns: The unwrapped value if found and convertible, or nil otherwise.
     internal func value<Value>(
         forKey key: ConfigKey,
@@ -347,8 +346,8 @@ extension ConfigSnapshotReader {
     ///   - defaultValue: The default value to return if the value isn't found or can't be converted.
     ///   - unwrap: A closure that unwraps the config content to the desired type.
     ///   - wrap: A closure that wraps the value in config content.
-    ///   - fileID: The file ID where this method was called from.
-    ///   - line: The line number where this method was called from.
+    ///   - fileID: The file ID of the call site.
+    ///   - line: The line number of the call site.
     /// - Returns: The unwrapped value if found and convertible, or the default value otherwise.
     internal func value<Value>(
         forKey key: ConfigKey,
@@ -383,8 +382,8 @@ extension ConfigSnapshotReader {
     ///   - isSecret: Whether the value is a secret.
     ///   - unwrap: A closure that unwraps the config content to the desired type.
     ///   - wrap: A closure that wraps the value in config content.
-    ///   - fileID: The file ID where this method was called from.
-    ///   - line: The line number where this method was called from.
+    ///   - fileID: The file ID of the call site.
+    ///   - line: The line number of the call site.
     /// - Returns: The unwrapped value.
     /// - Throws: A `ConfigError` if the value isn't found or can't be converted.
     internal func requiredValue<Value>(

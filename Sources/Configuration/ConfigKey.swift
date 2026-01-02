@@ -123,8 +123,8 @@ extension ConfigKey: ExpressibleByArrayLiteral {
 /// A configuration key that represents an absolute path to a configuration value.
 ///
 /// Absolute configuration keys are similar to relative keys but represent complete
-/// paths from the root of the configuration hierarchy. They are used internally
-/// by the configuration system after resolving any key prefixes or scoping.
+/// paths from the root of the configuration hierarchy. The configuration system
+/// uses them internally after resolving key prefixes or scoping.
 ///
 /// Like relative keys, absolute keys consist of hierarchical components and
 /// optional context information.
@@ -225,7 +225,7 @@ extension AbsoluteConfigKey? {
 extension AbsoluteConfigKey {
     /// Returns a new absolute configuration key by prepending the given relative key.
     /// - Parameter prefix: The relative configuration key to prepend to this key.
-    /// - Returns: A new absolute configuration key with the prefix prepended.
+    /// - Returns: A new absolute configuration key that includes the prefix at the beginning.
     public func prepending(_ prefix: ConfigKey) -> AbsoluteConfigKey {
         var prefixedComponents = prefix.components
         prefixedComponents.append(contentsOf: self.components)
@@ -236,7 +236,7 @@ extension AbsoluteConfigKey {
 
     /// Returns a new absolute configuration key by appending the given relative key.
     /// - Parameter relative: The relative configuration key to append to this key.
-    /// - Returns: A new absolute configuration key with the relative key appended.
+    /// - Returns: A new absolute configuration key that includes the relative key at the end.
     public func appending(_ relative: ConfigKey) -> AbsoluteConfigKey {
         var appended = self
         appended.components.append(contentsOf: relative.components)

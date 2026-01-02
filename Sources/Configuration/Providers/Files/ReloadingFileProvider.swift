@@ -63,7 +63,7 @@ import Synchronization
 /// ```
 ///
 /// The provider monitors the file by polling at the specified interval (default: 15 seconds)
-/// and notifies any active watchers when changes are detected.
+/// and notifies any active watchers when it detects changes.
 ///
 /// ## Configuration from a reader
 ///
@@ -80,7 +80,7 @@ import Synchronization
 /// ## File monitoring
 ///
 /// The provider detects changes by monitoring both file timestamps and symlink target changes.
-/// When a change is detected, it reloads the file and notifies all active watchers of the
+/// When it detects a change, it reloads the file and notifies all active watchers of the
 /// updated configuration values.
 @available(Configuration 1.0, *)
 public final class ReloadingFileProvider<Snapshot: FileConfigSnapshot>: Sendable {
@@ -362,8 +362,8 @@ public final class ReloadingFileProvider<Snapshot: FileConfigSnapshot>: Sendable
     /// Checks if the file has changed and reloads it if necessary.
     ///
     /// This method performs the core file monitoring logic by checking both the file's
-    /// last modified timestamp and its resolved path (in case of symlinks). If changes
-    /// are detected, it reloads the file contents, creates a new snapshot, and notifies
+    /// last modified timestamp and its resolved path (in case of symlinks). When it detects
+    /// changes, it reloads the file contents, creates a new snapshot, and notifies
     /// any active watchers of the changes.
     ///
     /// - Parameter logger: The logger to use during the reload operation.

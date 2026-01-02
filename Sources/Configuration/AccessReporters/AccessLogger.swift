@@ -48,8 +48,8 @@ import Synchronization
 ///
 /// Each access event generates a structured log entry with metadata including:
 /// - `kind`: The type of access operation (get, fetch, watch).
-/// - `key`: The configuration key that was accessed.
-/// - `location`: The source code location where the access occurred.
+/// - `key`: The configuration key accessed.
+/// - `location`: The source code location of the access.
 /// - `value`: The resolved configuration value (redacted for secrets).
 /// - `counter`: An incrementing counter for tracking access frequency.
 /// - Provider-specific information for each provider in the hierarchy.

@@ -229,11 +229,10 @@ public struct ConfigReader: Sendable {
     /// with the prefix `outer.middle`, you can access the key`outer.middle.inner` using just `inner`.
     let keyPrefix: AbsoluteConfigKey?
 
-    /// The underlying storage that is shared with all the transitive child configs created
-    /// from this one.
+    /// The underlying storage that all transitive child configs created from this reader share.
     private final class Storage: Sendable {
 
-        /// The underlying multi provider.
+        /// The underlying multiprovider.
         let provider: MultiProvider
 
         /// The reporter of access events.
@@ -252,7 +251,7 @@ public struct ConfigReader: Sendable {
         }
     }
 
-    /// The underlying storage that is shared with all the transitive child configs created from this one.
+    /// The underlying storage that all transitive child configs created from this reader share.
     private let storage: Storage
 
     /// Creates a new config reader with shared storage.
