@@ -45,14 +45,15 @@ import Synchronization
 /// ## Execution Patterns
 ///
 /// - **Synchronous and asynchronous access** (`value`, `fetchValue`, `snapshot`): The library calls providers
-///   sequentially, returning the first value that is returned from the providers.
+///   sequentially, returning the first value from the providers.
 /// - **Watching for changes** (`watchValue`, `watchSnapshot`): The library monitors all providers in parallel and
 ///   returns the first non-nil value from their latest results.
 ///
 /// ## Error Handling
 ///
-/// When any nested provider throws an error, the error is immediately propagated to the caller rather than
-/// being ignored. This ensures predictable behavior and prevents silent failures that could mask configuration issues.
+/// When any nested provider throws an error, ``MultiProvider`` immediately propagates the error to the caller
+/// rather than ignoring it. This ensures predictable behavior and prevents silent failures that could mask
+/// configuration issues.
 @available(Configuration 1.0, *)
 internal struct MultiProvider: Sendable {
 
@@ -88,7 +89,7 @@ extension MultiProvider: CustomStringConvertible {
 @available(Configuration 1.0, *)
 struct MultiSnapshot {
 
-    /// The individual snapshots from each nested provider, maintained in precedence order.
+    /// The individual snapshots from each nested provider in precedence order.
     var snapshots: [any ConfigSnapshot]
 
     /// Resolves a configuration value by querying nested provider snapshots in precedence order.
@@ -129,7 +130,7 @@ extension MultiProvider {
 
     /// Synchronously resolves a configuration value from nested providers.
     ///
-    /// Queries each nested provider sequentially until a non-nil value is found or all providers
+    /// Queries each nested provider sequentially until a non-nil value appears or all providers
     /// have been exhausted. The first provider to return a non-nil value determines the final result.
     ///
     /// - Parameters:

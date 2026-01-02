@@ -43,11 +43,11 @@ import WASILibc
 ///
 /// ## Key transformation
 ///
-/// Configuration keys are transformed into environment variable names using these rules:
-/// - Components are joined with underscores
-/// - All characters are converted to uppercase
-/// - CamelCase is detected and word boundaries are marked with underscores
-/// - Non-alphanumeric characters are replaced with underscores
+/// This provider transforms configuration keys into environment variable names using these rules:
+/// - Joins components with underscores
+/// - Converts all characters to uppercase
+/// - Detects CamelCase and marks word boundaries with underscores
+/// - Replaces non-alphanumeric characters with underscores
 ///
 /// For example: `http.serverTimeout` becomes `HTTP_SERVER_TIMEOUT`
 ///
@@ -61,8 +61,8 @@ import WASILibc
 ///
 /// ## Secret handling
 ///
-/// Environment variables can be marked as secrets using a ``SecretsSpecifier``.
-/// Secret values are automatically redacted in debug output and logging.
+/// You can mark environment variables as secrets using a ``SecretsSpecifier``.
+/// The provider automatically redacts secret values in debug output and logging.
 ///
 /// > Important: This provider performs case-insensitive lookup of environment variable names.
 ///

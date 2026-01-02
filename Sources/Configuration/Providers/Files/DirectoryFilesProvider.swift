@@ -28,9 +28,9 @@ public import SystemPackage
 ///
 /// ## Key mapping
 ///
-/// Configuration keys are transformed into file names using these rules:
-/// - Components are joined with dashes.
-/// - Non-alphanumeric characters (except dashes) are replaced with underscores.
+/// This provider transforms configuration keys into file names using these rules:
+/// - Joins components with dashes.
+/// - Replaces non-alphanumeric characters (except dashes) with underscores.
 ///
 /// For example:
 /// - `database.password` -> `database-password`
@@ -39,7 +39,7 @@ public import SystemPackage
 ///
 /// The provider reads file contents as UTF-8 strings and converts them to the requested
 /// type. For binary data (bytes type), it reads raw file contents directly without
-/// string conversion. Leading and trailing whitespace is always trimmed from string values.
+/// string conversion. The provider always trims leading and trailing whitespace from string values.
 ///
 /// ## Supported data types
 ///
@@ -447,9 +447,9 @@ extension DirectoryFilesProvider: ConfigProvider {
 
 /// A key encoder that converts configuration keys to safe file names.
 ///
-/// Configuration keys are transformed into file names using these rules:
-/// - Components are joined with dashes
-/// - Non-alphanumeric characters (except dashes) are replaced with underscores
+/// This encoder transforms configuration keys into file names using these rules:
+/// - Joins components with dashes
+/// - Replaces non-alphanumeric characters (except dashes) with underscores
 @available(Configuration 1.0, *)
 internal struct DirectoryFileKeyEncoder {
     /// Creates a default directory key encoder that follows standard file naming conventions.
@@ -479,11 +479,11 @@ extension DirectoryFileKeyEncoder: ConfigKeyEncoder {
 
 @available(Configuration 1.0, *)
 extension ConfigKeyEncoder where Self == DirectoryFileKeyEncoder {
-    /// An encoder that uses directory paths for hierarachical key encoder.
+    /// An encoder that uses directory paths for hierarchical key encoder.
     ///
-    /// Configuration keys are transformed into file names using these rules:
-    /// - Components are joined with dashes
-    /// - Non-alphanumeric characters (except dashes) are replaced with underscores
+    /// This encoder transforms configuration keys into file names using these rules:
+    /// - Joins components with dashes
+    /// - Replaces non-alphanumeric characters (except dashes) with underscores
     ///
     /// - Returns: A new key encoder.
     static var directoryFiles: Self {
