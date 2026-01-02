@@ -4,10 +4,10 @@ Learn about the ``InMemoryProvider`` and ``MutableInMemoryProvider`` built-in ty
 
 ## Overview
 
-Swift Configuration provides two in-memory providers, which are directly instantiated with the desired keys and values, rather than being parsed from another representation. These providers are particularly useful for testing, providing fallback values, and bridging with other configuration systems.
+Swift Configuration provides two in-memory providers, which you directly instantiate with the desired keys and values, rather than parsing them from another representation. These providers are particularly useful for testing, providing fallback values, and bridging with other configuration systems.
 
 - ``InMemoryProvider`` is an immutable value type, and can be useful for defining overrides and fallbacks in a provider hierarchy.
-- ``MutableInMemoryProvider`` is a mutable reference type, allowing you to update values and get any watchers notified automatically. It can be used to bridge from other stateful, callback-based configuration sources.
+- ``MutableInMemoryProvider`` is a mutable reference type, allowing you to update values and automatically notifying any watchers. It can be used to bridge from other stateful, callback-based configuration sources.
 
 ### InMemoryProvider
 
@@ -63,7 +63,7 @@ let provider = InMemoryProvider(
 )
 ```
 
-With a provider configured this way, a config reader will return the following results:
+When you configure a provider this way, a config reader will return the following results:
 
 ```swift
 let config = ConfigReader(provider: provider)
@@ -99,7 +99,7 @@ let host = config.string(forKey: "database.host") // "localhost"
 
 #### Updating values
 
-You can update values after creation, and any watchers will be notified:
+You can update values after creation, and the provider notifies any watchers:
 
 ```swift
 // Initial setup

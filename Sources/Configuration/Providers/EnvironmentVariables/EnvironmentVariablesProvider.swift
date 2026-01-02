@@ -34,7 +34,7 @@ import WASILibc
 #error("Unsupported runtime")
 #endif
 
-/// A configuration provider that sources values from environment variables.
+/// A configuration provider that reads values from environment variables.
 ///
 /// This provider reads configuration values from environment variables, supporting both
 /// the current process environment and `.env` files. It automatically converts hierarchical
@@ -159,7 +159,7 @@ public struct EnvironmentVariablesProvider: Sendable {
 
     /// Creates a new provider that reads from the current process environment.
     ///
-    /// This initializer creates a provider that sources configuration values from
+    /// This initializer creates a provider that reads configuration values from
     /// the environment variables of the current process.
     ///
     /// ```swift

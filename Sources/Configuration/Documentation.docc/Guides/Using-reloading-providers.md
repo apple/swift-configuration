@@ -79,7 +79,7 @@ try await config.watchString(
 
 #### Configuration snapshots
 
-The following example reads the `database.host` and `database.password` key with the guarantee that they are read from the same update of the reloading file:
+The following example reads the `database.host` and `database.password` key with the guarantee that you read them from the same update of the reloading file:
 
 ```swift
 try await config.watchSnapshot { updates in
@@ -119,7 +119,7 @@ let provider = try await ReloadingFileProvider<JSONSnapshot>(
 // Will throw an error if config.json doesn't exist
 ```
 
-When `allowMissing` is `true`, missing files are treated as empty configuration:
+When `allowMissing` is `true`, the provider treats missing files as empty configuration:
 
 ```swift
 let provider = try await ReloadingFileProvider<JSONSnapshot>(
