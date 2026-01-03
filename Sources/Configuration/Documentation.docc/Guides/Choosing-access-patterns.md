@@ -91,7 +91,7 @@ Use the "fetch" pattern when:
 The "watch" pattern provides an async sequence of configuration updates, allowing you to react to changes in real-time.
 This is ideal for long-running services that need to adapt to configuration changes without restarting.
 
-The async sequence must provide the current value as the first element as quickly as possible—this is
+The async sequence must provide the current value as the first element as quickly as possible - this is
 part of the API contract with configuration providers (for details, check out ``ConfigProvider``).
 
 ```swift
