@@ -149,5 +149,15 @@ Use static providers when configuration doesn't change during runtime:
 - Containerized applications with immutable configuration.
 - Applications where configuration is set once at startup.
 
-For help choosing between different access patterns and reader method variants, see <doc:Choosing-access-patterns> 
+#### When to create custom providers
+
+If none of the providers (built-in or community ones) meet your needs, you can implement your own custom provider. Common scenarios include:
+
+- Integrating with external configuration services.
+- Reading from a custom file format.
+- Bridging an existing configuration system.
+
+For detailed guidance on implementing custom providers, see <doc:Implementing-a-provider>.
+
+For help choosing between different access patterns and reader method variants, see <doc:Choosing-access-patterns>
 and <doc:Choosing-reader-methods>. For troubleshooting configuration issues, refer to <doc:Troubleshooting>.
