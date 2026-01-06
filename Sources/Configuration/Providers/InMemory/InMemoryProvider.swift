@@ -92,8 +92,8 @@ public struct InMemoryProvider: Sendable {
     /// instances or when working with keys programmatically.
     ///
     /// ```swift
-    /// let key1 = AbsoluteConfigKey(components: ["database", "host"], context: [:])
-    /// let key2 = AbsoluteConfigKey(components: ["database", "port"], context: [:])
+    /// let key1 = AbsoluteConfigKey(["database", "host"], context: [:])
+    /// let key2 = AbsoluteConfigKey(["database", "port"], context: [:])
     ///
     /// let provider = InMemoryProvider(
     ///     name: "database-config",

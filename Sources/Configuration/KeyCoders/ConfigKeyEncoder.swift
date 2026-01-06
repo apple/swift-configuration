@@ -50,7 +50,7 @@ internal protocol ConfigKeyEncoder: Sendable {
     ///
     /// ```swift
     /// let encoder = SeparatorKeyEncoder(separator: ".")
-    /// let key = AbsoluteConfigKey(components: ["database", "host"], context: context)
+    /// let key = AbsoluteConfigKey(["database", "host"], context: context)
     /// let encoded = encoder.encode(key)
     /// // Results in "database.host"
     /// ```

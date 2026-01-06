@@ -122,7 +122,7 @@ internal struct CLIArgumentParser {
             if value.isEmpty {
                 return [""]
             }
-            return value.components(separatedBy: ",")
+            return value.split(separator: ",", omittingEmptySubsequences: false).map(String.init)
         }
     }
 }
