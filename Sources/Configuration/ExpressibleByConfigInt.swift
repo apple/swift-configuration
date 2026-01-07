@@ -12,16 +12,10 @@
 //
 //===----------------------------------------------------------------------===//
 
-#if canImport(FoundationEssentials)
-public import FoundationEssentials
-#else
-public import Foundation
-#endif
-
 /// A protocol for types that can be initialized from configuration integer values.
 ///
 /// Conform your custom types to this protocol to enable automatic conversion when using
-/// the `as:` parameter with configuration reader methods such as ``ConfigReader/string(forKey:as:isSecret:fileID:line:)-4oust``.
+/// the `as:` parameter with configuration reader methods such as ``ConfigReader/int(forKey:as:isSecret:fileID:line:)-11fn2``.
 ///
 /// > Tip: If your type is an integer-based enum, you don't need to explicitly conform it to
 /// > ``ExpressibleByConfigInt``, as the same conversions work for types
