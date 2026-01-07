@@ -116,7 +116,7 @@ let regularValue = ConfigValue("public-data", isSecret: false)
 
 Set the `isSecret` property to `true` when your provider reads the values from a secrets store and must not log them.
 
-### How secret values are protected
+### How the library protects secret values
 
 The library automatically handles secret values with:
 

@@ -147,7 +147,7 @@ let reloadingConfig = ConfigReader(
 Use multiple providers together to provide a configuration hierarchy that can override values at different levels.
 The following example uses both an environment variable provider and a JSON provider together, with values from 
 environment variables overriding values from the JSON file.
-In this example, the defaults are provided using an ``InMemoryProvider``, which are only read if the environment 
+In this example, an ``InMemoryProvider`` provides the defaults, which the reader only consults if the environment
 variable or the JSON key don't exist:
 
 ```swift

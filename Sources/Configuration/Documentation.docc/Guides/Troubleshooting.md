@@ -33,10 +33,10 @@ let timeout = config.double(forKey: "http.timeout", default: 30.0)
 
 This produces log entries showing:
 
-- Which configuration keys were accessed.
-- What values were returned (with secret values redacted).
+- Which configuration keys the code accessed.
+- What values the provider returned (with secret values redacted).
 - Which provider supplied the value.
-- Whether default values were used.
+- Whether the reader used default values.
 - The location of the code reading the config value.
 - The timestamp of the access.
 

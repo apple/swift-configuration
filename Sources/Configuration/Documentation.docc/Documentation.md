@@ -341,7 +341,7 @@ tail -f /var/log/myapp/config-access.log
 
 Check out the built-in ``AccessLogger``, ``FileAccessLogger``, and <doc:Troubleshooting>.
 
-#### Secrets handling
+#### Handling Secrets
 
 The library provides built-in support for handling sensitive configuration values securely:
 

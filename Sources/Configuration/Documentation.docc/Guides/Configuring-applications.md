@@ -15,7 +15,7 @@ This pattern works well for server applications where configuration comes from e
 
 ### Set up a configuration hierarchy
 
-Start by creating a configuration hierarchy in your application's entry point. This defines the order in which configuration sources are consulted when looking for values:
+Start by creating a configuration hierarchy in your application's entry point. This defines the order for consulting configuration sources when looking for values:
 
 ```swift
 import Configuration
