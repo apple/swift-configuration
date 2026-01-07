@@ -111,7 +111,7 @@ export DEBUG_LOGGING=true
 
 Your library now adapts to the user's environment without any code changes.
 
-### Working with secrets
+### Work with secrets
 
 Mark configuration values that contain sensitive information as secret to prevent them from being logged:
 

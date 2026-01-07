@@ -75,7 +75,7 @@ public struct FileProvider<Snapshot: FileConfigSnapshot>: Sendable {
     ///   - allowMissing: A flag controlling how the provider handles a missing file.
     ///     - When `false` (the default), if the file is missing or malformed, throws an error.
     ///     - When `true`, if the file is missing, treats it as empty. Malformed files still throw an error.
-    /// - Throws: If snapshot creation fails or if the file is malformed. Whether an error is throws
+    /// - Throws: If snapshot creation fails or if the file is malformed. Whether an error is thrown
     ///   when the file is missing is controlled by the `allowMissing` parameter.
     public init(
         snapshotType: Snapshot.Type = Snapshot.self,
@@ -109,7 +109,7 @@ public struct FileProvider<Snapshot: FileConfigSnapshot>: Sendable {
     ///   - snapshotType: The type of snapshot to create from the file contents.
     ///   - parsingOptions: Options used by the snapshot to parse the file data.
     ///   - config: A configuration reader that contains the required configuration keys.
-    /// - Throws: If snapshot creation fails or if the file is malformed. Whether an error is throws
+    /// - Throws: If snapshot creation fails or if the file is malformed. Whether an error is thrown
     ///   when the file is missing is controlled by the `allowMissing` configuration value.
     public init(
         snapshotType: Snapshot.Type = Snapshot.self,
@@ -142,7 +142,7 @@ public struct FileProvider<Snapshot: FileConfigSnapshot>: Sendable {
     ///   - parsingOptions: Options used by the snapshot to parse the file data.
     ///   - config: A configuration reader that contains the required configuration keys.
     ///   - fileSystem: The file system implementation to use for reading the file.
-    /// - Throws: If snapshot creation fails or if the file is malformed. Whether an error is throws
+    /// - Throws: If snapshot creation fails or if the file is malformed. Whether an error is thrown
     ///   when the file is missing is controlled by the `allowMissing` configuration value.
     internal init(
         snapshotType: Snapshot.Type = Snapshot.self,

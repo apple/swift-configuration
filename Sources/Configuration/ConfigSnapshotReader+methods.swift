@@ -58,8 +58,8 @@ extension ConfigSnapshotReader {
     /// Synchronously gets a config value for the given config key, with a default fallback.
     ///
     /// Use this method when you need a guaranteed non-nil result. If the configuration
-    /// value is missing or can't be converted to the expected type, the default value
-    /// is returned instead.
+    /// value is missing or can't be converted to the expected type, the method
+    /// returns the default value instead.
     ///
     /// ```swift
     /// let maxRetries = snapshot.int(forKey: ["network", "maxRetries"], default: 3)
@@ -106,7 +106,7 @@ extension ConfigSnapshotReader {
     ///   - fileID: The file ID where this call originates. Used for access reporting.
     ///   - line: The line number where this call originates. Used for access reporting.
     /// - Returns: The config value converted to the expected type.
-    /// - Throws: If the value is missing, or a conversion error if the value can't be converted to the expected type.
+    /// - Throws: An error if the value is missing or can't be converted to the expected type.
     public func requiredString(
         forKey key: ConfigKey,
         isSecret: Bool = false,
@@ -159,8 +159,8 @@ extension ConfigSnapshotReader {
     /// Synchronously gets a config value for the given config key, with a default fallback.
     ///
     /// Use this method when you need a guaranteed non-nil result. If the configuration
-    /// value is missing or can't be converted to the expected type, the default value
-    /// is returned instead.
+    /// value is missing or can't be converted to the expected type, the method
+    /// returns the default value instead.
     ///
     /// ```swift
     /// let maxRetries = snapshot.int(forKey: ["network", "maxRetries"], default: 3)
@@ -207,7 +207,7 @@ extension ConfigSnapshotReader {
     ///   - fileID: The file ID where this call originates. Used for access reporting.
     ///   - line: The line number where this call originates. Used for access reporting.
     /// - Returns: The config value converted to the expected type.
-    /// - Throws: If the value is missing, or a conversion error if the value can't be converted to the expected type.
+    /// - Throws: An error if the value is missing or can't be converted to the expected type.
     public func requiredInt(
         forKey key: ConfigKey,
         isSecret: Bool = false,
@@ -260,8 +260,8 @@ extension ConfigSnapshotReader {
     /// Synchronously gets a config value for the given config key, with a default fallback.
     ///
     /// Use this method when you need a guaranteed non-nil result. If the configuration
-    /// value is missing or can't be converted to the expected type, the default value
-    /// is returned instead.
+    /// value is missing or can't be converted to the expected type, the method
+    /// returns the default value instead.
     ///
     /// ```swift
     /// let maxRetries = snapshot.int(forKey: ["network", "maxRetries"], default: 3)
@@ -308,7 +308,7 @@ extension ConfigSnapshotReader {
     ///   - fileID: The file ID where this call originates. Used for access reporting.
     ///   - line: The line number where this call originates. Used for access reporting.
     /// - Returns: The config value converted to the expected type.
-    /// - Throws: If the value is missing, or a conversion error if the value can't be converted to the expected type.
+    /// - Throws: An error if the value is missing or can't be converted to the expected type.
     public func requiredDouble(
         forKey key: ConfigKey,
         isSecret: Bool = false,
@@ -361,8 +361,8 @@ extension ConfigSnapshotReader {
     /// Synchronously gets a config value for the given config key, with a default fallback.
     ///
     /// Use this method when you need a guaranteed non-nil result. If the configuration
-    /// value is missing or can't be converted to the expected type, the default value
-    /// is returned instead.
+    /// value is missing or can't be converted to the expected type, the method
+    /// returns the default value instead.
     ///
     /// ```swift
     /// let maxRetries = snapshot.int(forKey: ["network", "maxRetries"], default: 3)
@@ -409,7 +409,7 @@ extension ConfigSnapshotReader {
     ///   - fileID: The file ID where this call originates. Used for access reporting.
     ///   - line: The line number where this call originates. Used for access reporting.
     /// - Returns: The config value converted to the expected type.
-    /// - Throws: If the value is missing, or a conversion error if the value can't be converted to the expected type.
+    /// - Throws: An error if the value is missing or can't be converted to the expected type.
     public func requiredBool(
         forKey key: ConfigKey,
         isSecret: Bool = false,
@@ -462,8 +462,8 @@ extension ConfigSnapshotReader {
     /// Synchronously gets a config value for the given config key, with a default fallback.
     ///
     /// Use this method when you need a guaranteed non-nil result. If the configuration
-    /// value is missing or can't be converted to the expected type, the default value
-    /// is returned instead.
+    /// value is missing or can't be converted to the expected type, the method
+    /// returns the default value instead.
     ///
     /// ```swift
     /// let maxRetries = snapshot.int(forKey: ["network", "maxRetries"], default: 3)
@@ -510,7 +510,7 @@ extension ConfigSnapshotReader {
     ///   - fileID: The file ID where this call originates. Used for access reporting.
     ///   - line: The line number where this call originates. Used for access reporting.
     /// - Returns: The config value converted to the expected type.
-    /// - Throws: If the value is missing, or a conversion error if the value can't be converted to the expected type.
+    /// - Throws: An error if the value is missing or can't be converted to the expected type.
     public func requiredBytes(
         forKey key: ConfigKey,
         isSecret: Bool = false,
@@ -563,8 +563,8 @@ extension ConfigSnapshotReader {
     /// Synchronously gets a config value for the given config key, with a default fallback.
     ///
     /// Use this method when you need a guaranteed non-nil result. If the configuration
-    /// value is missing or can't be converted to the expected type, the default value
-    /// is returned instead.
+    /// value is missing or can't be converted to the expected type, the method
+    /// returns the default value instead.
     ///
     /// ```swift
     /// let maxRetries = snapshot.int(forKey: ["network", "maxRetries"], default: 3)
@@ -611,7 +611,7 @@ extension ConfigSnapshotReader {
     ///   - fileID: The file ID where this call originates. Used for access reporting.
     ///   - line: The line number where this call originates. Used for access reporting.
     /// - Returns: The config value converted to the expected type.
-    /// - Throws: If the value is missing, or a conversion error if the value can't be converted to the expected type.
+    /// - Throws: An error if the value is missing or can't be converted to the expected type.
     public func requiredStringArray(
         forKey key: ConfigKey,
         isSecret: Bool = false,
@@ -664,8 +664,8 @@ extension ConfigSnapshotReader {
     /// Synchronously gets a config value for the given config key, with a default fallback.
     ///
     /// Use this method when you need a guaranteed non-nil result. If the configuration
-    /// value is missing or can't be converted to the expected type, the default value
-    /// is returned instead.
+    /// value is missing or can't be converted to the expected type, the method
+    /// returns the default value instead.
     ///
     /// ```swift
     /// let maxRetries = snapshot.int(forKey: ["network", "maxRetries"], default: 3)
@@ -712,7 +712,7 @@ extension ConfigSnapshotReader {
     ///   - fileID: The file ID where this call originates. Used for access reporting.
     ///   - line: The line number where this call originates. Used for access reporting.
     /// - Returns: The config value converted to the expected type.
-    /// - Throws: If the value is missing, or a conversion error if the value can't be converted to the expected type.
+    /// - Throws: An error if the value is missing or can't be converted to the expected type.
     public func requiredIntArray(
         forKey key: ConfigKey,
         isSecret: Bool = false,
@@ -765,8 +765,8 @@ extension ConfigSnapshotReader {
     /// Synchronously gets a config value for the given config key, with a default fallback.
     ///
     /// Use this method when you need a guaranteed non-nil result. If the configuration
-    /// value is missing or can't be converted to the expected type, the default value
-    /// is returned instead.
+    /// value is missing or can't be converted to the expected type, the method
+    /// returns the default value instead.
     ///
     /// ```swift
     /// let maxRetries = snapshot.int(forKey: ["network", "maxRetries"], default: 3)
@@ -813,7 +813,7 @@ extension ConfigSnapshotReader {
     ///   - fileID: The file ID where this call originates. Used for access reporting.
     ///   - line: The line number where this call originates. Used for access reporting.
     /// - Returns: The config value converted to the expected type.
-    /// - Throws: If the value is missing, or a conversion error if the value can't be converted to the expected type.
+    /// - Throws: An error if the value is missing or can't be converted to the expected type.
     public func requiredDoubleArray(
         forKey key: ConfigKey,
         isSecret: Bool = false,
@@ -866,8 +866,8 @@ extension ConfigSnapshotReader {
     /// Synchronously gets a config value for the given config key, with a default fallback.
     ///
     /// Use this method when you need a guaranteed non-nil result. If the configuration
-    /// value is missing or can't be converted to the expected type, the default value
-    /// is returned instead.
+    /// value is missing or can't be converted to the expected type, the method
+    /// returns the default value instead.
     ///
     /// ```swift
     /// let maxRetries = snapshot.int(forKey: ["network", "maxRetries"], default: 3)
@@ -914,7 +914,7 @@ extension ConfigSnapshotReader {
     ///   - fileID: The file ID where this call originates. Used for access reporting.
     ///   - line: The line number where this call originates. Used for access reporting.
     /// - Returns: The config value converted to the expected type.
-    /// - Throws: If the value is missing, or a conversion error if the value can't be converted to the expected type.
+    /// - Throws: An error if the value is missing or can't be converted to the expected type.
     public func requiredBoolArray(
         forKey key: ConfigKey,
         isSecret: Bool = false,
@@ -967,8 +967,8 @@ extension ConfigSnapshotReader {
     /// Synchronously gets a config value for the given config key, with a default fallback.
     ///
     /// Use this method when you need a guaranteed non-nil result. If the configuration
-    /// value is missing or can't be converted to the expected type, the default value
-    /// is returned instead.
+    /// value is missing or can't be converted to the expected type, the method
+    /// returns the default value instead.
     ///
     /// ```swift
     /// let maxRetries = snapshot.int(forKey: ["network", "maxRetries"], default: 3)
@@ -1015,7 +1015,7 @@ extension ConfigSnapshotReader {
     ///   - fileID: The file ID where this call originates. Used for access reporting.
     ///   - line: The line number where this call originates. Used for access reporting.
     /// - Returns: The config value converted to the expected type.
-    /// - Throws: If the value is missing, or a conversion error if the value can't be converted to the expected type.
+    /// - Throws: An error if the value is missing or can't be converted to the expected type.
     public func requiredByteChunkArray(
         forKey key: ConfigKey,
         isSecret: Bool = false,
@@ -1072,7 +1072,7 @@ extension ConfigSnapshotReader {
     ///
     /// Use this method when you need a guaranteed non-nil result for string-convertible types.
     /// If the configuration value is missing or can't be converted to the expected type,
-    /// the default value is returned instead.
+    /// the method returns the default value instead.
     ///
     /// ```swift
     /// let serverMode = snapshot.string(forKey: ["server", "mode"], as: ServerMode.self, default: .production)
@@ -1122,7 +1122,7 @@ extension ConfigSnapshotReader {
     ///   - fileID: The file ID where this call originates. Used for access reporting.
     ///   - line: The line number where this call originates. Used for access reporting.
     /// - Returns: The config value converted to the expected type.
-    /// - Throws: If the value is missing, or a conversion error if the value can't be converted to the expected type.
+    /// - Throws: An error if the value is missing or can't be converted to the expected type.
     public func requiredString<Value: ExpressibleByConfigString>(
         forKey key: ConfigKey,
         as type: Value.Type = Value.self,
@@ -1179,7 +1179,7 @@ extension ConfigSnapshotReader {
     ///
     /// Use this method when you need a guaranteed non-nil result for string-convertible array types.
     /// If the configuration value is missing or can't be converted to the expected type,
-    /// the default value is returned instead.
+    /// the method returns the default value instead.
     ///
     /// ```swift
     /// let serverModes = snapshot.stringArray(forKey: ["server", "allowedModes"], as: ServerMode.self, default: [.production])
@@ -1229,7 +1229,7 @@ extension ConfigSnapshotReader {
     ///   - fileID: The file ID where this call originates. Used for access reporting.
     ///   - line: The line number where this call originates. Used for access reporting.
     /// - Returns: The config array converted to the expected type.
-    /// - Throws: If the value is missing, or a conversion error if the value can't be converted to the expected type.
+    /// - Throws: An error if the value is missing or can't be converted to the expected type.
     public func requiredStringArray<Value: ExpressibleByConfigString>(
         forKey key: ConfigKey,
         as type: Value.Type = Value.self,
@@ -1287,7 +1287,7 @@ extension ConfigSnapshotReader {
     ///
     /// Use this method when you need a guaranteed non-nil result for string-convertible types.
     /// If the configuration value is missing or can't be converted to the expected type,
-    /// the default value is returned instead.
+    /// the method returns the default value instead.
     ///
     /// ```swift
     /// let serverMode = snapshot.string(forKey: ["server", "mode"], as: ServerMode.self, default: .production)
@@ -1337,7 +1337,7 @@ extension ConfigSnapshotReader {
     ///   - fileID: The file ID where this call originates. Used for access reporting.
     ///   - line: The line number where this call originates. Used for access reporting.
     /// - Returns: The config value converted to the expected type.
-    /// - Throws: If the value is missing, or a conversion error if the value can't be converted to the expected type.
+    /// - Throws: An error if the value is missing or can't be converted to the expected type.
     public func requiredString<Value: RawRepresentable<String>>(
         forKey key: ConfigKey,
         as type: Value.Type = Value.self,
@@ -1394,7 +1394,7 @@ extension ConfigSnapshotReader {
     ///
     /// Use this method when you need a guaranteed non-nil result for string-convertible array types.
     /// If the configuration value is missing or can't be converted to the expected type,
-    /// the default value is returned instead.
+    /// the method returns the default value instead.
     ///
     /// ```swift
     /// let serverModes = snapshot.stringArray(forKey: ["server", "allowedModes"], as: ServerMode.self, default: [.production])
@@ -1444,7 +1444,7 @@ extension ConfigSnapshotReader {
     ///   - fileID: The file ID where this call originates. Used for access reporting.
     ///   - line: The line number where this call originates. Used for access reporting.
     /// - Returns: The config array converted to the expected type.
-    /// - Throws: If the value is missing, or a conversion error if the value can't be converted to the expected type.
+    /// - Throws: An error if the value is missing or can't be converted to the expected type.
     public func requiredStringArray<Value: RawRepresentable<String>>(
         forKey key: ConfigKey,
         as type: Value.Type = Value.self,
