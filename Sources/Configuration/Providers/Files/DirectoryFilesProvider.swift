@@ -448,8 +448,8 @@ extension DirectoryFilesProvider: ConfigProvider {
 /// A key encoder that converts configuration keys to safe file names.
 ///
 /// This encoder transforms configuration keys into file names using these rules:
-/// - Joins components with dashes
-/// - Replaces non-alphanumeric characters (except dashes) with underscores
+/// - Joins components with dashes.
+/// - Replaces non-alphanumeric characters (except dashes) with underscores.
 @available(Configuration 1.0, *)
 internal struct DirectoryFileKeyEncoder {
     /// Creates a default directory key encoder that follows standard file naming conventions.
@@ -482,8 +482,8 @@ extension ConfigKeyEncoder where Self == DirectoryFileKeyEncoder {
     /// An encoder that uses directory paths for hierarchical key encoder.
     ///
     /// This encoder transforms configuration keys into file names using these rules:
-    /// - Joins components with dashes
-    /// - Replaces non-alphanumeric characters (except dashes) with underscores
+    /// - Joins components with dashes.
+    /// - Replaces non-alphanumeric characters (except dashes) with underscores.
     ///
     /// - Returns: A new key encoder.
     static var directoryFiles: Self {

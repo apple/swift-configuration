@@ -44,10 +44,10 @@ import WASILibc
 /// ## Key transformation
 ///
 /// This provider transforms configuration keys into environment variable names using these rules:
-/// - Joins components with underscores
-/// - Converts all characters to uppercase
-/// - Detects CamelCase and marks word boundaries with underscores
-/// - Replaces non-alphanumeric characters with underscores
+/// - Joins components with underscores.
+/// - Converts all characters to uppercase.
+/// - Detects CamelCase and marks word boundaries with underscores.
+/// - Replaces non-alphanumeric characters with underscores.
 ///
 /// For example: `http.serverTimeout` becomes `HTTP_SERVER_TIMEOUT`
 ///

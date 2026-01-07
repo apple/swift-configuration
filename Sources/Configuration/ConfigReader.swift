@@ -232,7 +232,7 @@ public struct ConfigReader: Sendable {
     /// The underlying storage that all transitive child configs created from this reader share.
     private final class Storage: Sendable {
 
-        /// The underlying multiprovider.
+        /// The underlying multi provider.
         let provider: MultiProvider
 
         /// The reporter of access events.
