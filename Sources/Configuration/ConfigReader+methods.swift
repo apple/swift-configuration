@@ -58,7 +58,7 @@ extension ConfigReader {
     /// Synchronously gets a config value for the given config key, with a default fallback.
     ///
     /// Use this method when you need a guaranteed non-nil result. If the configuration
-    /// value is missing or can't be converted to the expected type, the default value
+    /// value is missing or can't be converted to the expected type, the method
     /// is returned instead.
     ///
     /// ```swift
@@ -106,7 +106,7 @@ extension ConfigReader {
     ///   - fileID: The file ID where this call originates. Used for access reporting.
     ///   - line: The line number where this call originates. Used for access reporting.
     /// - Returns: The config value converted to the expected type.
-    /// - Throws: If the value is missing, or a conversion error if the value can't be converted to the expected type.
+    /// - Throws: An error if the value is missing or can't be converted to the expected type.
     public func requiredString(
         forKey key: ConfigKey,
         isSecret: Bool = false,
@@ -159,7 +159,7 @@ extension ConfigReader {
     /// Synchronously gets a config value for the given config key, with a default fallback.
     ///
     /// Use this method when you need a guaranteed non-nil result. If the configuration
-    /// value is missing or can't be converted to the expected type, the default value
+    /// value is missing or can't be converted to the expected type, the method
     /// is returned instead.
     ///
     /// ```swift
@@ -207,7 +207,7 @@ extension ConfigReader {
     ///   - fileID: The file ID where this call originates. Used for access reporting.
     ///   - line: The line number where this call originates. Used for access reporting.
     /// - Returns: The config value converted to the expected type.
-    /// - Throws: If the value is missing, or a conversion error if the value can't be converted to the expected type.
+    /// - Throws: An error if the value is missing or can't be converted to the expected type.
     public func requiredInt(
         forKey key: ConfigKey,
         isSecret: Bool = false,
@@ -260,7 +260,7 @@ extension ConfigReader {
     /// Synchronously gets a config value for the given config key, with a default fallback.
     ///
     /// Use this method when you need a guaranteed non-nil result. If the configuration
-    /// value is missing or can't be converted to the expected type, the default value
+    /// value is missing or can't be converted to the expected type, the method
     /// is returned instead.
     ///
     /// ```swift
@@ -308,7 +308,7 @@ extension ConfigReader {
     ///   - fileID: The file ID where this call originates. Used for access reporting.
     ///   - line: The line number where this call originates. Used for access reporting.
     /// - Returns: The config value converted to the expected type.
-    /// - Throws: If the value is missing, or a conversion error if the value can't be converted to the expected type.
+    /// - Throws: An error if the value is missing or can't be converted to the expected type.
     public func requiredDouble(
         forKey key: ConfigKey,
         isSecret: Bool = false,
@@ -361,7 +361,7 @@ extension ConfigReader {
     /// Synchronously gets a config value for the given config key, with a default fallback.
     ///
     /// Use this method when you need a guaranteed non-nil result. If the configuration
-    /// value is missing or can't be converted to the expected type, the default value
+    /// value is missing or can't be converted to the expected type, the method
     /// is returned instead.
     ///
     /// ```swift
@@ -409,7 +409,7 @@ extension ConfigReader {
     ///   - fileID: The file ID where this call originates. Used for access reporting.
     ///   - line: The line number where this call originates. Used for access reporting.
     /// - Returns: The config value converted to the expected type.
-    /// - Throws: If the value is missing, or a conversion error if the value can't be converted to the expected type.
+    /// - Throws: An error if the value is missing or can't be converted to the expected type.
     public func requiredBool(
         forKey key: ConfigKey,
         isSecret: Bool = false,
@@ -462,7 +462,7 @@ extension ConfigReader {
     /// Synchronously gets a config value for the given config key, with a default fallback.
     ///
     /// Use this method when you need a guaranteed non-nil result. If the configuration
-    /// value is missing or can't be converted to the expected type, the default value
+    /// value is missing or can't be converted to the expected type, the method
     /// is returned instead.
     ///
     /// ```swift
@@ -510,7 +510,7 @@ extension ConfigReader {
     ///   - fileID: The file ID where this call originates. Used for access reporting.
     ///   - line: The line number where this call originates. Used for access reporting.
     /// - Returns: The config value converted to the expected type.
-    /// - Throws: If the value is missing, or a conversion error if the value can't be converted to the expected type.
+    /// - Throws: An error if the value is missing or can't be converted to the expected type.
     public func requiredBytes(
         forKey key: ConfigKey,
         isSecret: Bool = false,
@@ -563,7 +563,7 @@ extension ConfigReader {
     /// Synchronously gets a config value for the given config key, with a default fallback.
     ///
     /// Use this method when you need a guaranteed non-nil result. If the configuration
-    /// value is missing or can't be converted to the expected type, the default value
+    /// value is missing or can't be converted to the expected type, the method
     /// is returned instead.
     ///
     /// ```swift
@@ -611,7 +611,7 @@ extension ConfigReader {
     ///   - fileID: The file ID where this call originates. Used for access reporting.
     ///   - line: The line number where this call originates. Used for access reporting.
     /// - Returns: The config value converted to the expected type.
-    /// - Throws: If the value is missing, or a conversion error if the value can't be converted to the expected type.
+    /// - Throws: An error if the value is missing or can't be converted to the expected type.
     public func requiredStringArray(
         forKey key: ConfigKey,
         isSecret: Bool = false,
@@ -664,7 +664,7 @@ extension ConfigReader {
     /// Synchronously gets a config value for the given config key, with a default fallback.
     ///
     /// Use this method when you need a guaranteed non-nil result. If the configuration
-    /// value is missing or can't be converted to the expected type, the default value
+    /// value is missing or can't be converted to the expected type, the method
     /// is returned instead.
     ///
     /// ```swift
@@ -712,7 +712,7 @@ extension ConfigReader {
     ///   - fileID: The file ID where this call originates. Used for access reporting.
     ///   - line: The line number where this call originates. Used for access reporting.
     /// - Returns: The config value converted to the expected type.
-    /// - Throws: If the value is missing, or a conversion error if the value can't be converted to the expected type.
+    /// - Throws: An error if the value is missing or can't be converted to the expected type.
     public func requiredIntArray(
         forKey key: ConfigKey,
         isSecret: Bool = false,
@@ -765,7 +765,7 @@ extension ConfigReader {
     /// Synchronously gets a config value for the given config key, with a default fallback.
     ///
     /// Use this method when you need a guaranteed non-nil result. If the configuration
-    /// value is missing or can't be converted to the expected type, the default value
+    /// value is missing or can't be converted to the expected type, the method
     /// is returned instead.
     ///
     /// ```swift
@@ -813,7 +813,7 @@ extension ConfigReader {
     ///   - fileID: The file ID where this call originates. Used for access reporting.
     ///   - line: The line number where this call originates. Used for access reporting.
     /// - Returns: The config value converted to the expected type.
-    /// - Throws: If the value is missing, or a conversion error if the value can't be converted to the expected type.
+    /// - Throws: An error if the value is missing or can't be converted to the expected type.
     public func requiredDoubleArray(
         forKey key: ConfigKey,
         isSecret: Bool = false,
@@ -866,7 +866,7 @@ extension ConfigReader {
     /// Synchronously gets a config value for the given config key, with a default fallback.
     ///
     /// Use this method when you need a guaranteed non-nil result. If the configuration
-    /// value is missing or can't be converted to the expected type, the default value
+    /// value is missing or can't be converted to the expected type, the method
     /// is returned instead.
     ///
     /// ```swift
@@ -914,7 +914,7 @@ extension ConfigReader {
     ///   - fileID: The file ID where this call originates. Used for access reporting.
     ///   - line: The line number where this call originates. Used for access reporting.
     /// - Returns: The config value converted to the expected type.
-    /// - Throws: If the value is missing, or a conversion error if the value can't be converted to the expected type.
+    /// - Throws: An error if the value is missing or can't be converted to the expected type.
     public func requiredBoolArray(
         forKey key: ConfigKey,
         isSecret: Bool = false,
@@ -967,7 +967,7 @@ extension ConfigReader {
     /// Synchronously gets a config value for the given config key, with a default fallback.
     ///
     /// Use this method when you need a guaranteed non-nil result. If the configuration
-    /// value is missing or can't be converted to the expected type, the default value
+    /// value is missing or can't be converted to the expected type, the method
     /// is returned instead.
     ///
     /// ```swift
@@ -1015,7 +1015,7 @@ extension ConfigReader {
     ///   - fileID: The file ID where this call originates. Used for access reporting.
     ///   - line: The line number where this call originates. Used for access reporting.
     /// - Returns: The config value converted to the expected type.
-    /// - Throws: If the value is missing, or a conversion error if the value can't be converted to the expected type.
+    /// - Throws: An error if the value is missing or can't be converted to the expected type.
     public func requiredByteChunkArray(
         forKey key: ConfigKey,
         isSecret: Bool = false,
@@ -1072,7 +1072,7 @@ extension ConfigReader {
     ///
     /// Use this method when you need a guaranteed non-nil result for string-convertible types.
     /// If the configuration value is missing or can't be converted to the expected type,
-    /// the default value is returned instead.
+    /// the method returns the default value
     ///
     /// ```swift
     /// let serverMode = config.string(forKey: ["server", "mode"], as: ServerMode.self, default: .production)
@@ -1122,7 +1122,7 @@ extension ConfigReader {
     ///   - fileID: The file ID where this call originates. Used for access reporting.
     ///   - line: The line number where this call originates. Used for access reporting.
     /// - Returns: The config value converted to the expected type.
-    /// - Throws: If the value is missing, or a conversion error if the value can't be converted to the expected type.
+    /// - Throws: An error if the value is missing or can't be converted to the expected type.
     public func requiredString<Value: ExpressibleByConfigString>(
         forKey key: ConfigKey,
         as type: Value.Type = Value.self,
@@ -1229,7 +1229,7 @@ extension ConfigReader {
     ///   - fileID: The file ID where this call originates. Used for access reporting.
     ///   - line: The line number where this call originates. Used for access reporting.
     /// - Returns: The config array converted to the expected type.
-    /// - Throws: If the value is missing, or a conversion error if the value can't be converted to the expected type.
+    /// - Throws: An error if the value is missing or can't be converted to the expected type.
     public func requiredStringArray<Value: ExpressibleByConfigString>(
         forKey key: ConfigKey,
         as type: Value.Type = Value.self,
@@ -1287,7 +1287,7 @@ extension ConfigReader {
     ///
     /// Use this method when you need a guaranteed non-nil result for string-convertible types.
     /// If the configuration value is missing or can't be converted to the expected type,
-    /// the default value is returned instead.
+    /// the method returns the default value
     ///
     /// ```swift
     /// let serverMode = config.string(forKey: ["server", "mode"], as: ServerMode.self, default: .production)
@@ -1337,7 +1337,7 @@ extension ConfigReader {
     ///   - fileID: The file ID where this call originates. Used for access reporting.
     ///   - line: The line number where this call originates. Used for access reporting.
     /// - Returns: The config value converted to the expected type.
-    /// - Throws: If the value is missing, or a conversion error if the value can't be converted to the expected type.
+    /// - Throws: An error if the value is missing or can't be converted to the expected type.
     public func requiredString<Value: RawRepresentable<String>>(
         forKey key: ConfigKey,
         as type: Value.Type = Value.self,
@@ -1444,7 +1444,7 @@ extension ConfigReader {
     ///   - fileID: The file ID where this call originates. Used for access reporting.
     ///   - line: The line number where this call originates. Used for access reporting.
     /// - Returns: The config array converted to the expected type.
-    /// - Throws: If the value is missing, or a conversion error if the value can't be converted to the expected type.
+    /// - Throws: An error if the value is missing or can't be converted to the expected type.
     public func requiredStringArray<Value: RawRepresentable<String>>(
         forKey key: ConfigKey,
         as type: Value.Type = Value.self,
@@ -1502,7 +1502,7 @@ extension ConfigReader {
     ///
     /// Use this method when you need a guaranteed non-nil result for integer-convertible types.
     /// If the configuration value is missing or can't be converted to the expected type,
-    /// the default value is returned instead.
+    /// the method returns the default value
     ///
     /// ```swift
     /// let apiVersion = config.int(forKey: ["api", "version"], as: APIVersion.self, default: .version(1))
@@ -1552,7 +1552,7 @@ extension ConfigReader {
     ///   - fileID: The file ID where this call originates. Used for access reporting.
     ///   - line: The line number where this call originates. Used for access reporting.
     /// - Returns: The config value converted to the expected type.
-    /// - Throws: If the value is missing, or a conversion error if the value can't be converted to the expected type.
+    /// - Throws: An error if the value is missing or can't be converted to the expected type.
     public func requiredInt<Value: ExpressibleByConfigInt>(
         forKey key: ConfigKey,
         as type: Value.Type = Value.self,
@@ -1659,7 +1659,7 @@ extension ConfigReader {
     ///   - fileID: The file ID where this call originates. Used for access reporting.
     ///   - line: The line number where this call originates. Used for access reporting.
     /// - Returns: The config array converted to the expected type.
-    /// - Throws: If the value is missing, or a conversion error if the value can't be converted to the expected type.
+    /// - Throws: An error if the value is missing or can't be converted to the expected type.
     public func requiredIntArray<Value: ExpressibleByConfigInt>(
         forKey key: ConfigKey,
         as type: Value.Type = Value.self,
@@ -1716,7 +1716,7 @@ extension ConfigReader {
     ///
     /// Use this method when you need a guaranteed non-nil result for integer-convertible types.
     /// If the configuration value is missing or can't be converted to the expected type,
-    /// the default value is returned instead.
+    /// the method returns the default value
     ///
     /// ```swift
     /// let apiVersion = config.int(forKey: ["api", "version"], as: APIVersion.self, default: .version(1))
@@ -1766,7 +1766,7 @@ extension ConfigReader {
     ///   - fileID: The file ID where this call originates. Used for access reporting.
     ///   - line: The line number where this call originates. Used for access reporting.
     /// - Returns: The config value converted to the expected type.
-    /// - Throws: If the value is missing, or a conversion error if the value can't be converted to the expected type.
+    /// - Throws: An error if the value is missing or can't be converted to the expected type.
     public func requiredInt<Value: RawRepresentable<Int>>(
         forKey key: ConfigKey,
         as type: Value.Type = Value.self,
@@ -1873,7 +1873,7 @@ extension ConfigReader {
     ///   - fileID: The file ID where this call originates. Used for access reporting.
     ///   - line: The line number where this call originates. Used for access reporting.
     /// - Returns: The config array converted to the expected type.
-    /// - Throws: If the value is missing, or a conversion error if the value can't be converted to the expected type.
+    /// - Throws: An error if the value is missing or can't be converted to the expected type.
     public func requiredIntArray<Value: RawRepresentable<Int>>(
         forKey key: ConfigKey,
         as type: Value.Type = Value.self,

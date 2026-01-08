@@ -57,7 +57,7 @@ extension ConfigReader {
     /// Synchronously gets a config value for the given config key, with a default fallback.
     ///
     /// Use this method when you need a guaranteed non-nil result. If the configuration
-    /// value is missing or can't be converted to the expected type, the default value
+    /// value is missing or can't be converted to the expected type, the method
     /// is returned instead.
     ///
     /// ```swift
@@ -105,7 +105,7 @@ extension ConfigReader {
     ///   - fileID: The file ID where this call originates. Used for access reporting.
     ///   - line: The line number where this call originates. Used for access reporting.
     /// - Returns: The config value converted to the expected type.
-    /// - Throws: If the value is missing, or a conversion error if the value can't be converted to the expected type.
+    /// - Throws: An error if the value is missing or can't be converted to the expected type.
     public func required${primitive_type["name"]}(
         forKey key: ConfigKey,
         isSecret: Bool = false,
@@ -164,7 +164,7 @@ extension ConfigReader {
     ///
     /// Use this method when you need a guaranteed non-nil result for string-convertible types.
     /// If the configuration value is missing or can't be converted to the expected type,
-    /// the default value is returned instead.
+    /// the method returns the default value 
     ///
     /// ```swift
     /// let serverMode = config.string(forKey: ["server", "mode"], as: ServerMode.self, default: .production)
@@ -214,7 +214,7 @@ extension ConfigReader {
     ///   - fileID: The file ID where this call originates. Used for access reporting.
     ///   - line: The line number where this call originates. Used for access reporting.
     /// - Returns: The config value converted to the expected type.
-    /// - Throws: If the value is missing, or a conversion error if the value can't be converted to the expected type.
+    /// - Throws: An error if the value is missing or can't be converted to the expected type.
     public func requiredString<Value: ${string_convertible_type["protocol"]}>(
         forKey key: ConfigKey,
         as type: Value.Type = Value.self,
@@ -321,7 +321,7 @@ extension ConfigReader {
     ///   - fileID: The file ID where this call originates. Used for access reporting.
     ///   - line: The line number where this call originates. Used for access reporting.
     /// - Returns: The config array converted to the expected type.
-    /// - Throws: If the value is missing, or a conversion error if the value can't be converted to the expected type.
+    /// - Throws: An error if the value is missing or can't be converted to the expected type.
     public func requiredStringArray<Value: ${string_convertible_type["protocol"]}>(
         forKey key: ConfigKey,
         as type: Value.Type = Value.self,
@@ -381,7 +381,7 @@ extension ConfigReader {
     ///
     /// Use this method when you need a guaranteed non-nil result for integer-convertible types.
     /// If the configuration value is missing or can't be converted to the expected type,
-    /// the default value is returned instead.
+    /// the method returns the default value 
     ///
     /// ```swift
     /// let apiVersion = config.int(forKey: ["api", "version"], as: APIVersion.self, default: .version(1))
@@ -431,7 +431,7 @@ extension ConfigReader {
     ///   - fileID: The file ID where this call originates. Used for access reporting.
     ///   - line: The line number where this call originates. Used for access reporting.
     /// - Returns: The config value converted to the expected type.
-    /// - Throws: If the value is missing, or a conversion error if the value can't be converted to the expected type.
+    /// - Throws: An error if the value is missing or can't be converted to the expected type.
     public func requiredInt<Value: ${int_convertible_type["protocol"]}>(
         forKey key: ConfigKey,
         as type: Value.Type = Value.self,
@@ -538,7 +538,7 @@ extension ConfigReader {
     ///   - fileID: The file ID where this call originates. Used for access reporting.
     ///   - line: The line number where this call originates. Used for access reporting.
     /// - Returns: The config array converted to the expected type.
-    /// - Throws: If the value is missing, or a conversion error if the value can't be converted to the expected type.
+    /// - Throws: An error if the value is missing or can't be converted to the expected type.
     public func requiredIntArray<Value: ${int_convertible_type["protocol"]}>(
         forKey key: ConfigKey,
         as type: Value.Type = Value.self,
