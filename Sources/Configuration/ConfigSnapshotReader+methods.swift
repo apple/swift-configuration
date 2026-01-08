@@ -1463,4 +1463,434 @@ extension ConfigSnapshotReader {
         )
     }
 
+    /// Synchronously gets a config value for the given config key, converting from integer.
+    ///
+    /// Use this method to retrieve configuration values that can be converted from integers,
+    /// such as custom types conforming to int conversion protocols.
+    /// If the value doesn't exist or can't be converted to the expected type, the method returns `nil`.
+    ///
+    /// ```swift
+    /// let apiVersion = snapshot.int(forKey: ["api", "version"], as: APIVersion.self)
+    /// ```
+    ///
+    /// - Parameters:
+    ///   - key: The config key to look up.
+    ///   - type: The type to convert the int value to.
+    ///   - isSecret: Whether the value should be treated as secret for logging and debugging purposes.
+    ///   - fileID: The file ID where this call originates. Used for access reporting.
+    ///   - line: The line number where this call originates. Used for access reporting.
+    /// - Returns: The value converted to the expected type if found and convertible, otherwise `nil`.
+    public func int<Value: ExpressibleByConfigInt>(
+        forKey key: ConfigKey,
+        as type: Value.Type = Value.self,
+        isSecret: Bool = false,
+        fileID: String = #fileID,
+        line: UInt = #line
+    ) -> Value? {
+        value(
+            forKey: key,
+            type: .int,
+            isSecret: isSecret,
+            unwrap: { try cast($0.asInt, type: Value.self, key: key) },
+            wrap: { uncast($0) },
+            fileID: fileID,
+            line: line
+        )
+    }
+
+    /// Synchronously gets a config value for the given config key with default fallback, converting from integer.
+    ///
+    /// Use this method when you need a guaranteed non-nil result for integer-convertible types.
+    /// If the configuration value is missing or can't be converted to the expected type,
+    /// the default value is returned instead.
+    ///
+    /// ```swift
+    /// let apiVersion = snapshot.int(forKey: ["api", "version"], as: APIVersion.self, default: .one)
+    /// ```
+    ///
+    /// - Parameters:
+    ///   - key: The config key to look up.
+    ///   - type: The type to convert the int value to.
+    ///   - isSecret: Whether the value should be treated as secret for logging and debugging purposes.
+    ///   - defaultValue: The fallback value returned when the config value is missing or invalid.
+    ///   - fileID: The file ID where this call originates. Used for access reporting.
+    ///   - line: The line number where this call originates. Used for access reporting.
+    /// - Returns: The config value if found and convertible, otherwise the default value.
+    public func int<Value: ExpressibleByConfigInt>(
+        forKey key: ConfigKey,
+        as type: Value.Type = Value.self,
+        isSecret: Bool = false,
+        default defaultValue: Value,
+        fileID: String = #fileID,
+        line: UInt = #line
+    ) -> Value {
+        value(
+            forKey: key,
+            type: .int,
+            isSecret: isSecret,
+            default: defaultValue,
+            unwrap: { try cast($0.asInt, type: Value.self, key: key) },
+            wrap: { uncast($0) },
+            fileID: fileID,
+            line: line
+        )
+    }
+
+    /// Synchronously gets a required config value for the given config key, converting from integer.
+    ///
+    /// Use this method when a integer-convertible configuration value is mandatory for your application to function.
+    /// The method throws an error if the value is missing or can't be converted to the expected type.
+    ///
+    /// ```swift
+    /// let apiVersion = snapshot.requiredInt(forKey: ["api", "version"], as: APIVersion.self)
+    /// ```
+    ///
+    /// - Parameters:
+    ///   - key: The config key to look up.
+    ///   - type: The type to convert the int value to.
+    ///   - isSecret: Whether the value should be treated as secret for logging and debugging purposes.
+    ///   - fileID: The file ID where this call originates. Used for access reporting.
+    ///   - line: The line number where this call originates. Used for access reporting.
+    /// - Returns: The config value converted to the expected type.
+    /// - Throws: If the value is missing, or a conversion error if the value can't be converted to the expected type.
+    public func requiredInt<Value: ExpressibleByConfigInt>(
+        forKey key: ConfigKey,
+        as type: Value.Type = Value.self,
+        isSecret: Bool = false,
+        fileID: String = #fileID,
+        line: UInt = #line
+    ) throws -> Value {
+        try requiredValue(
+            forKey: key,
+            type: .int,
+            isSecret: isSecret,
+            unwrap: { try cast($0.asInt, type: Value.self, key: key) },
+            wrap: { uncast($0) },
+            fileID: fileID,
+            line: line
+        )
+    }
+
+    /// Synchronously gets an array of config values for the given config key, converting from integers.
+    ///
+    /// Use this method to retrieve configuration arrays where each element can be converted from integers.
+    /// If the value doesn't exist or can't be converted to the expected type, the method returns `nil`.
+    ///
+    /// ```swift
+    /// let apiVersions = snapshot.intArray(forKey: ["api", "versions"], as: APIVersion.self)
+    /// ```
+    ///
+    /// - Parameters:
+    ///   - key: The config key to look up.
+    ///   - type: The element type to convert each int value to.
+    ///   - isSecret: Whether the value should be treated as secret for logging and debugging purposes.
+    ///   - fileID: The file ID where this call originates. Used for access reporting.
+    ///   - line: The line number where this call originates. Used for access reporting.
+    /// - Returns: An array of values converted to the expected type if found and convertible, otherwise `nil`.
+    public func intArray<Value: ExpressibleByConfigInt>(
+        forKey key: ConfigKey,
+        as type: Value.Type = Value.self,
+        isSecret: Bool = false,
+        fileID: String = #fileID,
+        line: UInt = #line
+    ) -> [Value]? {
+        value(
+            forKey: key,
+            type: .intArray,
+            isSecret: isSecret,
+            unwrap: { try $0.asIntArray.map { try cast($0, type: Value.self, key: key) } },
+            wrap: { uncast($0) },
+            fileID: fileID,
+            line: line
+        )
+    }
+
+    /// Synchronously gets an array of config values for the given config key with default fallback, converting from integers.
+    ///
+    /// Use this method when you need a guaranteed non-nil result for integer-convertible array types.
+    /// If the configuration value is missing or can't be converted to the expected type,
+    /// the default value is returned instead.
+    ///
+    /// ```swift
+    /// let apiVersions = snapshot.intArray(forKey: ["api", "versions"], as: APIVersion.self, default: [.one])
+    /// ```
+    ///
+    /// - Parameters:
+    ///   - key: The config key to look up.
+    ///   - type: The element type to convert each int value to.
+    ///   - isSecret: Whether the value should be treated as secret for logging and debugging purposes.
+    ///   - defaultValue: The fallback array returned when the config value is missing or invalid.
+    ///   - fileID: The file ID where this call originates. Used for access reporting.
+    ///   - line: The line number where this call originates. Used for access reporting.
+    /// - Returns: The config array if found and convertible, otherwise the default array.
+    public func intArray<Value: ExpressibleByConfigInt>(
+        forKey key: ConfigKey,
+        as type: Value.Type = Value.self,
+        isSecret: Bool = false,
+        default defaultValue: [Value],
+        fileID: String = #fileID,
+        line: UInt = #line
+    ) -> [Value] {
+        value(
+            forKey: key,
+            type: .intArray,
+            isSecret: isSecret,
+            default: defaultValue,
+            unwrap: { try $0.asIntArray.map { try cast($0, type: Value.self, key: key) } },
+            wrap: { uncast($0) },
+            fileID: fileID,
+            line: line
+        )
+    }
+
+    /// Synchronously gets a required array of config values for the given config key, converting from integers.
+    ///
+    /// Use this method when a integer-convertible array configuration value is mandatory for your application to function.
+    /// The method throws an error if the value is missing or can't be converted to the expected type.
+    ///
+    /// ```swift
+    /// let apiVersion = snapshot.requiredIntArray(forKey: ["api", "versions"], as: APIVersion.self)
+    /// ```
+    ///
+    /// - Parameters:
+    ///   - key: The config key to look up.
+    ///   - type: The element type to convert each int value to.
+    ///   - isSecret: Whether the value should be treated as secret for logging and debugging purposes.
+    ///   - fileID: The file ID where this call originates. Used for access reporting.
+    ///   - line: The line number where this call originates. Used for access reporting.
+    /// - Returns: The config array converted to the expected type.
+    /// - Throws: If the value is missing, or a conversion error if the value can't be converted to the expected type.
+    public func requiredIntArray<Value: ExpressibleByConfigInt>(
+        forKey key: ConfigKey,
+        as type: Value.Type = Value.self,
+        isSecret: Bool = false,
+        fileID: String = #fileID,
+        line: UInt = #line
+    ) throws -> [Value] {
+        try requiredValue(
+            forKey: key,
+            type: .intArray,
+            isSecret: isSecret,
+            unwrap: { try $0.asIntArray.map { try cast($0, type: Value.self, key: key) } },
+            wrap: { uncast($0) },
+            fileID: fileID,
+            line: line
+        )
+    }
+
+    /// Synchronously gets a config value for the given config key, converting from integer.
+    ///
+    /// Use this method to retrieve configuration values that can be converted from integers,
+    /// such as custom types conforming to int conversion protocols.
+    /// If the value doesn't exist or can't be converted to the expected type, the method returns `nil`.
+    ///
+    /// ```swift
+    /// let apiVersion = snapshot.int(forKey: ["api", "version"], as: APIVersion.self)
+    /// ```
+    ///
+    /// - Parameters:
+    ///   - key: The config key to look up.
+    ///   - type: The type to convert the int value to.
+    ///   - isSecret: Whether the value should be treated as secret for logging and debugging purposes.
+    ///   - fileID: The file ID where this call originates. Used for access reporting.
+    ///   - line: The line number where this call originates. Used for access reporting.
+    /// - Returns: The value converted to the expected type if found and convertible, otherwise `nil`.
+    public func int<Value: RawRepresentable<Int>>(
+        forKey key: ConfigKey,
+        as type: Value.Type = Value.self,
+        isSecret: Bool = false,
+        fileID: String = #fileID,
+        line: UInt = #line
+    ) -> Value? {
+        value(
+            forKey: key,
+            type: .int,
+            isSecret: isSecret,
+            unwrap: { try cast($0.asInt, type: Value.self, key: key) },
+            wrap: { uncast($0) },
+            fileID: fileID,
+            line: line
+        )
+    }
+
+    /// Synchronously gets a config value for the given config key with default fallback, converting from integer.
+    ///
+    /// Use this method when you need a guaranteed non-nil result for integer-convertible types.
+    /// If the configuration value is missing or can't be converted to the expected type,
+    /// the default value is returned instead.
+    ///
+    /// ```swift
+    /// let apiVersion = snapshot.int(forKey: ["api", "version"], as: APIVersion.self, default: .one)
+    /// ```
+    ///
+    /// - Parameters:
+    ///   - key: The config key to look up.
+    ///   - type: The type to convert the int value to.
+    ///   - isSecret: Whether the value should be treated as secret for logging and debugging purposes.
+    ///   - defaultValue: The fallback value returned when the config value is missing or invalid.
+    ///   - fileID: The file ID where this call originates. Used for access reporting.
+    ///   - line: The line number where this call originates. Used for access reporting.
+    /// - Returns: The config value if found and convertible, otherwise the default value.
+    public func int<Value: RawRepresentable<Int>>(
+        forKey key: ConfigKey,
+        as type: Value.Type = Value.self,
+        isSecret: Bool = false,
+        default defaultValue: Value,
+        fileID: String = #fileID,
+        line: UInt = #line
+    ) -> Value {
+        value(
+            forKey: key,
+            type: .int,
+            isSecret: isSecret,
+            default: defaultValue,
+            unwrap: { try cast($0.asInt, type: Value.self, key: key) },
+            wrap: { uncast($0) },
+            fileID: fileID,
+            line: line
+        )
+    }
+
+    /// Synchronously gets a required config value for the given config key, converting from integer.
+    ///
+    /// Use this method when a integer-convertible configuration value is mandatory for your application to function.
+    /// The method throws an error if the value is missing or can't be converted to the expected type.
+    ///
+    /// ```swift
+    /// let apiVersion = snapshot.requiredInt(forKey: ["api", "version"], as: APIVersion.self)
+    /// ```
+    ///
+    /// - Parameters:
+    ///   - key: The config key to look up.
+    ///   - type: The type to convert the int value to.
+    ///   - isSecret: Whether the value should be treated as secret for logging and debugging purposes.
+    ///   - fileID: The file ID where this call originates. Used for access reporting.
+    ///   - line: The line number where this call originates. Used for access reporting.
+    /// - Returns: The config value converted to the expected type.
+    /// - Throws: If the value is missing, or a conversion error if the value can't be converted to the expected type.
+    public func requiredInt<Value: RawRepresentable<Int>>(
+        forKey key: ConfigKey,
+        as type: Value.Type = Value.self,
+        isSecret: Bool = false,
+        fileID: String = #fileID,
+        line: UInt = #line
+    ) throws -> Value {
+        try requiredValue(
+            forKey: key,
+            type: .int,
+            isSecret: isSecret,
+            unwrap: { try cast($0.asInt, type: Value.self, key: key) },
+            wrap: { uncast($0) },
+            fileID: fileID,
+            line: line
+        )
+    }
+
+    /// Synchronously gets an array of config values for the given config key, converting from integers.
+    ///
+    /// Use this method to retrieve configuration arrays where each element can be converted from integers.
+    /// If the value doesn't exist or can't be converted to the expected type, the method returns `nil`.
+    ///
+    /// ```swift
+    /// let apiVersions = snapshot.intArray(forKey: ["api", "versions"], as: APIVersion.self)
+    /// ```
+    ///
+    /// - Parameters:
+    ///   - key: The config key to look up.
+    ///   - type: The element type to convert each int value to.
+    ///   - isSecret: Whether the value should be treated as secret for logging and debugging purposes.
+    ///   - fileID: The file ID where this call originates. Used for access reporting.
+    ///   - line: The line number where this call originates. Used for access reporting.
+    /// - Returns: An array of values converted to the expected type if found and convertible, otherwise `nil`.
+    public func intArray<Value: RawRepresentable<Int>>(
+        forKey key: ConfigKey,
+        as type: Value.Type = Value.self,
+        isSecret: Bool = false,
+        fileID: String = #fileID,
+        line: UInt = #line
+    ) -> [Value]? {
+        value(
+            forKey: key,
+            type: .intArray,
+            isSecret: isSecret,
+            unwrap: { try $0.asIntArray.map { try cast($0, type: Value.self, key: key) } },
+            wrap: { uncast($0) },
+            fileID: fileID,
+            line: line
+        )
+    }
+
+    /// Synchronously gets an array of config values for the given config key with default fallback, converting from integers.
+    ///
+    /// Use this method when you need a guaranteed non-nil result for integer-convertible array types.
+    /// If the configuration value is missing or can't be converted to the expected type,
+    /// the default value is returned instead.
+    ///
+    /// ```swift
+    /// let apiVersions = snapshot.intArray(forKey: ["api", "versions"], as: APIVersion.self, default: [.one])
+    /// ```
+    ///
+    /// - Parameters:
+    ///   - key: The config key to look up.
+    ///   - type: The element type to convert each int value to.
+    ///   - isSecret: Whether the value should be treated as secret for logging and debugging purposes.
+    ///   - defaultValue: The fallback array returned when the config value is missing or invalid.
+    ///   - fileID: The file ID where this call originates. Used for access reporting.
+    ///   - line: The line number where this call originates. Used for access reporting.
+    /// - Returns: The config array if found and convertible, otherwise the default array.
+    public func intArray<Value: RawRepresentable<Int>>(
+        forKey key: ConfigKey,
+        as type: Value.Type = Value.self,
+        isSecret: Bool = false,
+        default defaultValue: [Value],
+        fileID: String = #fileID,
+        line: UInt = #line
+    ) -> [Value] {
+        value(
+            forKey: key,
+            type: .intArray,
+            isSecret: isSecret,
+            default: defaultValue,
+            unwrap: { try $0.asIntArray.map { try cast($0, type: Value.self, key: key) } },
+            wrap: { uncast($0) },
+            fileID: fileID,
+            line: line
+        )
+    }
+
+    /// Synchronously gets a required array of config values for the given config key, converting from integers.
+    ///
+    /// Use this method when a integer-convertible array configuration value is mandatory for your application to function.
+    /// The method throws an error if the value is missing or can't be converted to the expected type.
+    ///
+    /// ```swift
+    /// let apiVersion = snapshot.requiredIntArray(forKey: ["api", "versions"], as: APIVersion.self)
+    /// ```
+    ///
+    /// - Parameters:
+    ///   - key: The config key to look up.
+    ///   - type: The element type to convert each int value to.
+    ///   - isSecret: Whether the value should be treated as secret for logging and debugging purposes.
+    ///   - fileID: The file ID where this call originates. Used for access reporting.
+    ///   - line: The line number where this call originates. Used for access reporting.
+    /// - Returns: The config array converted to the expected type.
+    /// - Throws: If the value is missing, or a conversion error if the value can't be converted to the expected type.
+    public func requiredIntArray<Value: RawRepresentable<Int>>(
+        forKey key: ConfigKey,
+        as type: Value.Type = Value.self,
+        isSecret: Bool = false,
+        fileID: String = #fileID,
+        line: UInt = #line
+    ) throws -> [Value] {
+        try requiredValue(
+            forKey: key,
+            type: .intArray,
+            isSecret: isSecret,
+            unwrap: { try $0.asIntArray.map { try cast($0, type: Value.self, key: key) } },
+            wrap: { uncast($0) },
+            fileID: fileID,
+            line: line
+        )
+    }
+
 }
