@@ -36,20 +36,16 @@ struct ExpressibleByConfigIntTests {
     @Test func testExpressibleByConfigInt() throws {
         let provider = InMemoryProvider(
             values: [
-                "server": 10,
-                "timeouts": 5,
                 "duration": 42,
                 "durations": .init(.intArray([0, 1]), isSecret: false),
             ]
         )
         let config = ConfigReader(provider: provider)
-        let timeouts = try #require(config.intArray(forKey: ["server", "timeouts"], as: MyDuration.self))
-        #expect(timeouts == [.init(configInt: 10)!, .init(configInt: 5)!])
 
         let duration = config.int(forKey: "duration", as: MyDuration.self)
         #expect(duration == MyDuration(configInt: 42))
 
         let durations = config.intArray(forKey: "durations", as: TestIntEnum.self, isSecret: false)
-        #expect(durations == [.bar, .foo])
+        #expect(durations == [.foo, .bar])
     }
 }

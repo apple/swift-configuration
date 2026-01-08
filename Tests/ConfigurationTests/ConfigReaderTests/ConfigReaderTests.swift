@@ -127,7 +127,7 @@ struct ConfigReaderTests {
         static var stringConvertibleArray: [TestStringConvertible] { [.hello, .world] }
         static var otherStringConvertibleArray: [TestStringConvertible] { [.hello, .world, .hello] }
         static var intEnum: TestIntEnum { .zero }
-        static var otherIntEnum: TestEnum { .one }
+        static var otherIntEnum: TestIntEnum { .one }
         static var intConvertible: TestIntConvertible { .zero }
         static var otherIntConvertible: TestIntConvertible { .zero }
         static var intEnumArray: [TestIntEnum] { [.zero, .one] }
@@ -157,10 +157,10 @@ struct ConfigReaderTests {
                 ConfigValue(Defaults.stringConvertibleArray.map(\.description), isSecret: false)
             ),
             "intEnum": .success(ConfigValue(Defaults.intEnum.rawValue, isSecret: false)),
-            "intConvertible": .success(ConfigValue(Defaults.intConvertible.description, isSecret: false)),
+            "intConvertible": .success(ConfigValue(Defaults.intConvertible.integer, isSecret: false)),
             "intEnumArray": .success(ConfigValue(Defaults.intEnumArray.map(\.rawValue), isSecret: false)),
             "intConvertibleArray": .success(
-                ConfigValue(Defaults.intConvertibleArray.map(\.description), isSecret: false)
+                ConfigValue(Defaults.intConvertibleArray.map(\.integer), isSecret: false)
             ),
             "failure": .failure(TestProvider.TestError()),
         ])
