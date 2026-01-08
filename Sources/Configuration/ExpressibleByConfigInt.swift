@@ -28,10 +28,10 @@
 ///
 /// ```swift
 /// struct MyDuration: ExpressibleByConfigInt {
-///     let duration: Int
+///     let duration: Duration
 ///
 ///     init?(configInt: Int) {
-///         self.duration = configInt
+///         self.duration = .seconds(configInt)
 ///     }
 ///
 ///     var description: String { duration.description }
