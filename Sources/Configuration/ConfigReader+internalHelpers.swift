@@ -973,7 +973,10 @@ extension ConfigReader {
     internal func uncast<Value: ExpressibleByConfigInt>(
         _ value: Value
     ) -> ConfigContent {
-        .int(Int(value.description) ?? 0)
+        guard let int = Int(value.description) else {
+            preconditionFailure("Failed to convert \(value.description) to Int")
+        }
+        return .int(int)
     }
 
     /// Converts an array of int convertible values into raw config content.
@@ -983,7 +986,14 @@ extension ConfigReader {
     internal func uncast<Value: ExpressibleByConfigInt>(
         _ values: [Value]
     ) -> ConfigContent {
-        .intArray(values.map { Int($0.description) ?? 0 })
+        .intArray(
+            values.map {
+                guard let int = Int($0.description) else {
+                    preconditionFailure("Failed to convert \($0.description) to Int")
+                }
+                return int
+            }
+        )
     }
 
     /// Converts a raw representable type into raw config content.
