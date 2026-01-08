@@ -1463,7 +1463,6 @@ extension ConfigReader {
         )
     }
 
-
     /// Synchronously gets a config value for the given config key, converting from an integer.
     ///
     /// Use this method to retrieve configuration values that can be converted from integers,

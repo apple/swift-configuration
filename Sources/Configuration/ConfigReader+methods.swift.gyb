@@ -341,7 +341,6 @@ extension ConfigReader {
     }
 
     % end
-
     % for int_convertible_type in int_convertible_types:
     /// Synchronously gets a config value for the given config key, converting from an integer.
     ///
