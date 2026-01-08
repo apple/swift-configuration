@@ -52,16 +52,3 @@ int_convertible_types = [
         "testSuffix": "IntEnum"
     },
 ]
-
-int_convertible_types = [
-    {
-        "protocol": "ExpressibleByConfigInt",
-        "testType": "TestIntConvertible",
-        "testSuffix": "IntConvertible"
-    },
-    {
-        "protocol": "RawRepresentable<Int>",
-        "testType": "TestIntEnum",
-        "testSuffix": "IntEnum"
-    },
-]
