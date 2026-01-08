@@ -58,8 +58,8 @@ extension ConfigReader {
     /// Synchronously gets a config value for the given config key, with a default fallback.
     ///
     /// Use this method when you need a guaranteed non-nil result. If the configuration
-    /// value is missing or can't be converted to the expected type, the method
-    /// returns the default value instead.
+    /// value is missing or can't be converted to the expected type, the default value
+    /// is returned instead.
     ///
     /// ```swift
     /// let maxRetries = config.int(forKey: ["network", "maxRetries"], default: 3)
@@ -106,7 +106,7 @@ extension ConfigReader {
     ///   - fileID: The file ID where this call originates. Used for access reporting.
     ///   - line: The line number where this call originates. Used for access reporting.
     /// - Returns: The config value converted to the expected type.
-    /// - Throws: An error if the value is missing or can't be converted to the expected type.
+    /// - Throws: If the value is missing, or a conversion error if the value can't be converted to the expected type.
     public func requiredString(
         forKey key: ConfigKey,
         isSecret: Bool = false,
@@ -159,8 +159,8 @@ extension ConfigReader {
     /// Synchronously gets a config value for the given config key, with a default fallback.
     ///
     /// Use this method when you need a guaranteed non-nil result. If the configuration
-    /// value is missing or can't be converted to the expected type, the method
-    /// returns the default value instead.
+    /// value is missing or can't be converted to the expected type, the default value
+    /// is returned instead.
     ///
     /// ```swift
     /// let maxRetries = config.int(forKey: ["network", "maxRetries"], default: 3)
@@ -207,7 +207,7 @@ extension ConfigReader {
     ///   - fileID: The file ID where this call originates. Used for access reporting.
     ///   - line: The line number where this call originates. Used for access reporting.
     /// - Returns: The config value converted to the expected type.
-    /// - Throws: An error if the value is missing or can't be converted to the expected type.
+    /// - Throws: If the value is missing, or a conversion error if the value can't be converted to the expected type.
     public func requiredInt(
         forKey key: ConfigKey,
         isSecret: Bool = false,
@@ -260,8 +260,8 @@ extension ConfigReader {
     /// Synchronously gets a config value for the given config key, with a default fallback.
     ///
     /// Use this method when you need a guaranteed non-nil result. If the configuration
-    /// value is missing or can't be converted to the expected type, the method
-    /// returns the default value instead.
+    /// value is missing or can't be converted to the expected type, the default value
+    /// is returned instead.
     ///
     /// ```swift
     /// let maxRetries = config.int(forKey: ["network", "maxRetries"], default: 3)
@@ -308,7 +308,7 @@ extension ConfigReader {
     ///   - fileID: The file ID where this call originates. Used for access reporting.
     ///   - line: The line number where this call originates. Used for access reporting.
     /// - Returns: The config value converted to the expected type.
-    /// - Throws: An error if the value is missing or can't be converted to the expected type.
+    /// - Throws: If the value is missing, or a conversion error if the value can't be converted to the expected type.
     public func requiredDouble(
         forKey key: ConfigKey,
         isSecret: Bool = false,
@@ -361,8 +361,8 @@ extension ConfigReader {
     /// Synchronously gets a config value for the given config key, with a default fallback.
     ///
     /// Use this method when you need a guaranteed non-nil result. If the configuration
-    /// value is missing or can't be converted to the expected type, the method
-    /// returns the default value instead.
+    /// value is missing or can't be converted to the expected type, the default value
+    /// is returned instead.
     ///
     /// ```swift
     /// let maxRetries = config.int(forKey: ["network", "maxRetries"], default: 3)
@@ -409,7 +409,7 @@ extension ConfigReader {
     ///   - fileID: The file ID where this call originates. Used for access reporting.
     ///   - line: The line number where this call originates. Used for access reporting.
     /// - Returns: The config value converted to the expected type.
-    /// - Throws: An error if the value is missing or can't be converted to the expected type.
+    /// - Throws: If the value is missing, or a conversion error if the value can't be converted to the expected type.
     public func requiredBool(
         forKey key: ConfigKey,
         isSecret: Bool = false,
@@ -462,8 +462,8 @@ extension ConfigReader {
     /// Synchronously gets a config value for the given config key, with a default fallback.
     ///
     /// Use this method when you need a guaranteed non-nil result. If the configuration
-    /// value is missing or can't be converted to the expected type, the method
-    /// returns the default value instead.
+    /// value is missing or can't be converted to the expected type, the default value
+    /// is returned instead.
     ///
     /// ```swift
     /// let maxRetries = config.int(forKey: ["network", "maxRetries"], default: 3)
@@ -510,7 +510,7 @@ extension ConfigReader {
     ///   - fileID: The file ID where this call originates. Used for access reporting.
     ///   - line: The line number where this call originates. Used for access reporting.
     /// - Returns: The config value converted to the expected type.
-    /// - Throws: An error if the value is missing or can't be converted to the expected type.
+    /// - Throws: If the value is missing, or a conversion error if the value can't be converted to the expected type.
     public func requiredBytes(
         forKey key: ConfigKey,
         isSecret: Bool = false,
@@ -563,8 +563,8 @@ extension ConfigReader {
     /// Synchronously gets a config value for the given config key, with a default fallback.
     ///
     /// Use this method when you need a guaranteed non-nil result. If the configuration
-    /// value is missing or can't be converted to the expected type, the method
-    /// returns the default value instead.
+    /// value is missing or can't be converted to the expected type, the default value
+    /// is returned instead.
     ///
     /// ```swift
     /// let maxRetries = config.int(forKey: ["network", "maxRetries"], default: 3)
@@ -611,7 +611,7 @@ extension ConfigReader {
     ///   - fileID: The file ID where this call originates. Used for access reporting.
     ///   - line: The line number where this call originates. Used for access reporting.
     /// - Returns: The config value converted to the expected type.
-    /// - Throws: An error if the value is missing or can't be converted to the expected type.
+    /// - Throws: If the value is missing, or a conversion error if the value can't be converted to the expected type.
     public func requiredStringArray(
         forKey key: ConfigKey,
         isSecret: Bool = false,
@@ -664,8 +664,8 @@ extension ConfigReader {
     /// Synchronously gets a config value for the given config key, with a default fallback.
     ///
     /// Use this method when you need a guaranteed non-nil result. If the configuration
-    /// value is missing or can't be converted to the expected type, the method
-    /// returns the default value instead.
+    /// value is missing or can't be converted to the expected type, the default value
+    /// is returned instead.
     ///
     /// ```swift
     /// let maxRetries = config.int(forKey: ["network", "maxRetries"], default: 3)
@@ -712,7 +712,7 @@ extension ConfigReader {
     ///   - fileID: The file ID where this call originates. Used for access reporting.
     ///   - line: The line number where this call originates. Used for access reporting.
     /// - Returns: The config value converted to the expected type.
-    /// - Throws: An error if the value is missing or can't be converted to the expected type.
+    /// - Throws: If the value is missing, or a conversion error if the value can't be converted to the expected type.
     public func requiredIntArray(
         forKey key: ConfigKey,
         isSecret: Bool = false,
@@ -765,8 +765,8 @@ extension ConfigReader {
     /// Synchronously gets a config value for the given config key, with a default fallback.
     ///
     /// Use this method when you need a guaranteed non-nil result. If the configuration
-    /// value is missing or can't be converted to the expected type, the method
-    /// returns the default value instead.
+    /// value is missing or can't be converted to the expected type, the default value
+    /// is returned instead.
     ///
     /// ```swift
     /// let maxRetries = config.int(forKey: ["network", "maxRetries"], default: 3)
@@ -813,7 +813,7 @@ extension ConfigReader {
     ///   - fileID: The file ID where this call originates. Used for access reporting.
     ///   - line: The line number where this call originates. Used for access reporting.
     /// - Returns: The config value converted to the expected type.
-    /// - Throws: An error if the value is missing or can't be converted to the expected type.
+    /// - Throws: If the value is missing, or a conversion error if the value can't be converted to the expected type.
     public func requiredDoubleArray(
         forKey key: ConfigKey,
         isSecret: Bool = false,
@@ -866,8 +866,8 @@ extension ConfigReader {
     /// Synchronously gets a config value for the given config key, with a default fallback.
     ///
     /// Use this method when you need a guaranteed non-nil result. If the configuration
-    /// value is missing or can't be converted to the expected type, the method
-    /// returns the default value instead.
+    /// value is missing or can't be converted to the expected type, the default value
+    /// is returned instead.
     ///
     /// ```swift
     /// let maxRetries = config.int(forKey: ["network", "maxRetries"], default: 3)
@@ -914,7 +914,7 @@ extension ConfigReader {
     ///   - fileID: The file ID where this call originates. Used for access reporting.
     ///   - line: The line number where this call originates. Used for access reporting.
     /// - Returns: The config value converted to the expected type.
-    /// - Throws: An error if the value is missing or can't be converted to the expected type.
+    /// - Throws: If the value is missing, or a conversion error if the value can't be converted to the expected type.
     public func requiredBoolArray(
         forKey key: ConfigKey,
         isSecret: Bool = false,
@@ -967,8 +967,8 @@ extension ConfigReader {
     /// Synchronously gets a config value for the given config key, with a default fallback.
     ///
     /// Use this method when you need a guaranteed non-nil result. If the configuration
-    /// value is missing or can't be converted to the expected type, the method
-    /// returns the default value instead.
+    /// value is missing or can't be converted to the expected type, the default value
+    /// is returned instead.
     ///
     /// ```swift
     /// let maxRetries = config.int(forKey: ["network", "maxRetries"], default: 3)
@@ -1015,7 +1015,7 @@ extension ConfigReader {
     ///   - fileID: The file ID where this call originates. Used for access reporting.
     ///   - line: The line number where this call originates. Used for access reporting.
     /// - Returns: The config value converted to the expected type.
-    /// - Throws: An error if the value is missing or can't be converted to the expected type.
+    /// - Throws: If the value is missing, or a conversion error if the value can't be converted to the expected type.
     public func requiredByteChunkArray(
         forKey key: ConfigKey,
         isSecret: Bool = false,
@@ -1072,7 +1072,7 @@ extension ConfigReader {
     ///
     /// Use this method when you need a guaranteed non-nil result for string-convertible types.
     /// If the configuration value is missing or can't be converted to the expected type,
-    /// the method returns the default value instead.
+    /// the default value is returned instead.
     ///
     /// ```swift
     /// let serverMode = config.string(forKey: ["server", "mode"], as: ServerMode.self, default: .production)
@@ -1122,7 +1122,7 @@ extension ConfigReader {
     ///   - fileID: The file ID where this call originates. Used for access reporting.
     ///   - line: The line number where this call originates. Used for access reporting.
     /// - Returns: The config value converted to the expected type.
-    /// - Throws: An error if the value is missing or can't be converted to the expected type.
+    /// - Throws: If the value is missing, or a conversion error if the value can't be converted to the expected type.
     public func requiredString<Value: ExpressibleByConfigString>(
         forKey key: ConfigKey,
         as type: Value.Type = Value.self,
@@ -1229,7 +1229,7 @@ extension ConfigReader {
     ///   - fileID: The file ID where this call originates. Used for access reporting.
     ///   - line: The line number where this call originates. Used for access reporting.
     /// - Returns: The config array converted to the expected type.
-    /// - Throws: An error if the value is missing or can't be converted to the expected type.
+    /// - Throws: If the value is missing, or a conversion error if the value can't be converted to the expected type.
     public func requiredStringArray<Value: ExpressibleByConfigString>(
         forKey key: ConfigKey,
         as type: Value.Type = Value.self,
@@ -1287,7 +1287,7 @@ extension ConfigReader {
     ///
     /// Use this method when you need a guaranteed non-nil result for string-convertible types.
     /// If the configuration value is missing or can't be converted to the expected type,
-    /// the method returns the default value instead.
+    /// the default value is returned instead.
     ///
     /// ```swift
     /// let serverMode = config.string(forKey: ["server", "mode"], as: ServerMode.self, default: .production)
@@ -1337,7 +1337,7 @@ extension ConfigReader {
     ///   - fileID: The file ID where this call originates. Used for access reporting.
     ///   - line: The line number where this call originates. Used for access reporting.
     /// - Returns: The config value converted to the expected type.
-    /// - Throws: An error if the value is missing or can't be converted to the expected type.
+    /// - Throws: If the value is missing, or a conversion error if the value can't be converted to the expected type.
     public func requiredString<Value: RawRepresentable<String>>(
         forKey key: ConfigKey,
         as type: Value.Type = Value.self,
@@ -1444,7 +1444,7 @@ extension ConfigReader {
     ///   - fileID: The file ID where this call originates. Used for access reporting.
     ///   - line: The line number where this call originates. Used for access reporting.
     /// - Returns: The config array converted to the expected type.
-    /// - Throws: An error if the value is missing or can't be converted to the expected type.
+    /// - Throws: If the value is missing, or a conversion error if the value can't be converted to the expected type.
     public func requiredStringArray<Value: RawRepresentable<String>>(
         forKey key: ConfigKey,
         as type: Value.Type = Value.self,
@@ -1470,7 +1470,7 @@ extension ConfigReader {
     /// If the value doesn't exist or can't be converted to the expected type, the method returns `nil`.
     ///
     /// ```swift
-    /// let timeout = config.int(forKey: ["server", "timeout"], as: MyDuration.self)
+    /// let apiVersion = config.int(forKey: ["api", "version"], as: APIVersion.self)
     /// ```
     ///
     /// - Parameters:
@@ -1505,7 +1505,7 @@ extension ConfigReader {
     /// the default value is returned instead.
     ///
     /// ```swift
-    /// let timeout = config.int(forKey: ["server", "timeout"], as: MyDuration.self, default: .seconds(5))
+    /// let apiVersion = config.int(forKey: ["api", "version"], as: APIVersion.self, default: .version(1))
     /// ```
     ///
     /// - Parameters:
@@ -1542,7 +1542,7 @@ extension ConfigReader {
     /// The method throws an error if the value is missing or can't be converted to the expected type.
     ///
     /// ```swift
-    /// let timeout = try config.requiredInt(forKey: ["server", "timeout"], as: MyDuration.self)
+    /// let apiVersion = try config.requiredInt(forKey: ["api", "version"], as: APIVersion.self)
     /// ```
     ///
     /// - Parameters:
@@ -1552,7 +1552,7 @@ extension ConfigReader {
     ///   - fileID: The file ID where this call originates. Used for access reporting.
     ///   - line: The line number where this call originates. Used for access reporting.
     /// - Returns: The config value converted to the expected type.
-    /// - Throws: An error if the value is missing or can't be converted to the expected type.
+    /// - Throws: If the value is missing, or a conversion error if the value can't be converted to the expected type.
     public func requiredInt<Value: ExpressibleByConfigInt>(
         forKey key: ConfigKey,
         as type: Value.Type = Value.self,
@@ -1577,7 +1577,7 @@ extension ConfigReader {
     /// If the value doesn't exist or can't be converted to the expected type, the method returns `nil`.
     ///
     /// ```swift
-    /// let timeouts = config.intArray(forKey: ["server", "timeouts"], as: MyDuration.self)
+    /// let apiVersions = config.intArray(forKey: ["api", "versions"], as: APIVersion.self)
     /// ```
     ///
     /// - Parameters:
@@ -1609,10 +1609,10 @@ extension ConfigReader {
     ///
     /// Use this method when you need a guaranteed non-nil result for integer-convertible array types.
     /// If the configuration value is missing or can't be converted to the expected type,
-    /// the default value is returned instead.
+    /// the method returns the default value instead.
     ///
     /// ```swift
-    /// let timeouts = config.intArray(forKey: ["server", "timeouts"], as: MyDuration.self, default: [.seconds(5)])
+    /// let apiVersions = config.intArray(forKey: ["api", "version"], as: APIVersion.self, default: [.version(1)])
     /// ```
     ///
     /// - Parameters:
@@ -1649,7 +1649,7 @@ extension ConfigReader {
     /// The method throws an error if the value is missing or can't be converted to the expected type.
     ///
     /// ```swift
-    /// let requiredTimeouts = try config.requiredIntArray(forKey: ["server", "timeouts"], as: MyDuration.self)
+    /// let apiVersions = try config.requiredIntArray(forKey: ["api", "versions"], as: APIVersion.self)
     /// ```
     ///
     /// - Parameters:
@@ -1659,7 +1659,7 @@ extension ConfigReader {
     ///   - fileID: The file ID where this call originates. Used for access reporting.
     ///   - line: The line number where this call originates. Used for access reporting.
     /// - Returns: The config array converted to the expected type.
-    /// - Throws: An error if the value is missing or can't be converted to the expected type.
+    /// - Throws: If the value is missing, or a conversion error if the value can't be converted to the expected type.
     public func requiredIntArray<Value: ExpressibleByConfigInt>(
         forKey key: ConfigKey,
         as type: Value.Type = Value.self,
@@ -1684,7 +1684,7 @@ extension ConfigReader {
     /// If the value doesn't exist or can't be converted to the expected type, the method returns `nil`.
     ///
     /// ```swift
-    /// let timeout = config.int(forKey: ["server", "timeout"], as: MyDuration.self)
+    /// let apiVersion = config.int(forKey: ["api", "version"], as: APIVersion.self)
     /// ```
     ///
     /// - Parameters:
@@ -1719,7 +1719,7 @@ extension ConfigReader {
     /// the default value is returned instead.
     ///
     /// ```swift
-    /// let timeout = config.int(forKey: ["server", "timeout"], as: MyDuration.self, default: .seconds(5))
+    /// let apiVersion = config.int(forKey: ["api", "version"], as: APIVersion.self, default: .version(1))
     /// ```
     ///
     /// - Parameters:
@@ -1756,7 +1756,7 @@ extension ConfigReader {
     /// The method throws an error if the value is missing or can't be converted to the expected type.
     ///
     /// ```swift
-    /// let timeout = try config.requiredInt(forKey: ["server", "timeout"], as: MyDuration.self)
+    /// let apiVersion = try config.requiredInt(forKey: ["api", "version"], as: APIVersion.self)
     /// ```
     ///
     /// - Parameters:
@@ -1766,7 +1766,7 @@ extension ConfigReader {
     ///   - fileID: The file ID where this call originates. Used for access reporting.
     ///   - line: The line number where this call originates. Used for access reporting.
     /// - Returns: The config value converted to the expected type.
-    /// - Throws: An error if the value is missing or can't be converted to the expected type.
+    /// - Throws: If the value is missing, or a conversion error if the value can't be converted to the expected type.
     public func requiredInt<Value: RawRepresentable<Int>>(
         forKey key: ConfigKey,
         as type: Value.Type = Value.self,
@@ -1791,7 +1791,7 @@ extension ConfigReader {
     /// If the value doesn't exist or can't be converted to the expected type, the method returns `nil`.
     ///
     /// ```swift
-    /// let timeouts = config.intArray(forKey: ["server", "timeouts"], as: MyDuration.self)
+    /// let apiVersions = config.intArray(forKey: ["api", "versions"], as: APIVersion.self)
     /// ```
     ///
     /// - Parameters:
@@ -1823,10 +1823,10 @@ extension ConfigReader {
     ///
     /// Use this method when you need a guaranteed non-nil result for integer-convertible array types.
     /// If the configuration value is missing or can't be converted to the expected type,
-    /// the default value is returned instead.
+    /// the method returns the default value instead.
     ///
     /// ```swift
-    /// let timeouts = config.intArray(forKey: ["server", "timeouts"], as: MyDuration.self, default: [.seconds(5)])
+    /// let apiVersions = config.intArray(forKey: ["api", "version"], as: APIVersion.self, default: [.version(1)])
     /// ```
     ///
     /// - Parameters:
@@ -1863,7 +1863,7 @@ extension ConfigReader {
     /// The method throws an error if the value is missing or can't be converted to the expected type.
     ///
     /// ```swift
-    /// let requiredTimeouts = try config.requiredIntArray(forKey: ["server", "timeouts"], as: MyDuration.self)
+    /// let apiVersions = try config.requiredIntArray(forKey: ["api", "versions"], as: APIVersion.self)
     /// ```
     ///
     /// - Parameters:
@@ -1873,7 +1873,7 @@ extension ConfigReader {
     ///   - fileID: The file ID where this call originates. Used for access reporting.
     ///   - line: The line number where this call originates. Used for access reporting.
     /// - Returns: The config array converted to the expected type.
-    /// - Throws: An error if the value is missing or can't be converted to the expected type.
+    /// - Throws: If the value is missing, or a conversion error if the value can't be converted to the expected type.
     public func requiredIntArray<Value: RawRepresentable<Int>>(
         forKey key: ConfigKey,
         as type: Value.Type = Value.self,
@@ -1910,7 +1910,7 @@ extension ConfigReader {
     ///   - fileID: The file ID where this call originates. Used for access reporting.
     ///   - line: The line number where this call originates. Used for access reporting.
     /// - Returns: The value converted to the expected type if found and convertible, otherwise `nil`.
-    /// - Throws: An error if the underlying provider throws or if the value can't be converted to the expected type.
+    /// - Throws: If the underlying provider throws, or if the value can't be converted to the expected type.
     public func fetchString(
         forKey key: ConfigKey,
         isSecret: Bool = false,
@@ -1931,7 +1931,7 @@ extension ConfigReader {
     /// Asynchronously fetches a config value for the given config key, with a default fallback.
     ///
     /// Use this method when you need a guaranteed non-nil result from an async provider.
-    /// If the configuration value is missing, the method returns the default value instead.
+    /// If the configuration value is missing, the default value is returned instead.
     ///
     /// ```swift
     /// let maxRetries = try await config.fetchInt(forKey: ["network", "maxRetries"], default: 3)
@@ -1944,7 +1944,7 @@ extension ConfigReader {
     ///   - fileID: The file ID where this call originates. Used for access reporting.
     ///   - line: The line number where this call originates. Used for access reporting.
     /// - Returns: The config value if found and convertible, otherwise the default value.
-    /// - Throws: An error if the underlying provider throws or if the value can't be converted to the expected type.
+    /// - Throws: If the underlying provider throws, or if the value can't be converted to the expected type.
     public func fetchString(
         forKey key: ConfigKey,
         isSecret: Bool = false,
@@ -1980,7 +1980,7 @@ extension ConfigReader {
     ///   - fileID: The file ID where this call originates. Used for access reporting.
     ///   - line: The line number where this call originates. Used for access reporting.
     /// - Returns: The config value converted to the expected type.
-    /// - Throws: An error if the underlying provider throws, the value is missing, or can't be converted to the expected type.
+    /// - Throws: If the underlying provider throws, the value is missing, or can't be converted to the expected type.
     public func fetchRequiredString(
         forKey key: ConfigKey,
         isSecret: Bool = false,
@@ -2015,7 +2015,7 @@ extension ConfigReader {
     ///   - fileID: The file ID where this call originates. Used for access reporting.
     ///   - line: The line number where this call originates. Used for access reporting.
     /// - Returns: The value converted to the expected type if found and convertible, otherwise `nil`.
-    /// - Throws: An error if the underlying provider throws or if the value can't be converted to the expected type.
+    /// - Throws: If the underlying provider throws, or if the value can't be converted to the expected type.
     public func fetchInt(
         forKey key: ConfigKey,
         isSecret: Bool = false,
@@ -2036,7 +2036,7 @@ extension ConfigReader {
     /// Asynchronously fetches a config value for the given config key, with a default fallback.
     ///
     /// Use this method when you need a guaranteed non-nil result from an async provider.
-    /// If the configuration value is missing, the method returns the default value instead.
+    /// If the configuration value is missing, the default value is returned instead.
     ///
     /// ```swift
     /// let maxRetries = try await config.fetchInt(forKey: ["network", "maxRetries"], default: 3)
@@ -2049,7 +2049,7 @@ extension ConfigReader {
     ///   - fileID: The file ID where this call originates. Used for access reporting.
     ///   - line: The line number where this call originates. Used for access reporting.
     /// - Returns: The config value if found and convertible, otherwise the default value.
-    /// - Throws: An error if the underlying provider throws or if the value can't be converted to the expected type.
+    /// - Throws: If the underlying provider throws, or if the value can't be converted to the expected type.
     public func fetchInt(
         forKey key: ConfigKey,
         isSecret: Bool = false,
@@ -2085,7 +2085,7 @@ extension ConfigReader {
     ///   - fileID: The file ID where this call originates. Used for access reporting.
     ///   - line: The line number where this call originates. Used for access reporting.
     /// - Returns: The config value converted to the expected type.
-    /// - Throws: An error if the underlying provider throws, the value is missing, or can't be converted to the expected type.
+    /// - Throws: If the underlying provider throws, the value is missing, or can't be converted to the expected type.
     public func fetchRequiredInt(
         forKey key: ConfigKey,
         isSecret: Bool = false,
@@ -2120,7 +2120,7 @@ extension ConfigReader {
     ///   - fileID: The file ID where this call originates. Used for access reporting.
     ///   - line: The line number where this call originates. Used for access reporting.
     /// - Returns: The value converted to the expected type if found and convertible, otherwise `nil`.
-    /// - Throws: An error if the underlying provider throws or if the value can't be converted to the expected type.
+    /// - Throws: If the underlying provider throws, or if the value can't be converted to the expected type.
     public func fetchDouble(
         forKey key: ConfigKey,
         isSecret: Bool = false,
@@ -2141,7 +2141,7 @@ extension ConfigReader {
     /// Asynchronously fetches a config value for the given config key, with a default fallback.
     ///
     /// Use this method when you need a guaranteed non-nil result from an async provider.
-    /// If the configuration value is missing, the method returns the default value instead.
+    /// If the configuration value is missing, the default value is returned instead.
     ///
     /// ```swift
     /// let maxRetries = try await config.fetchInt(forKey: ["network", "maxRetries"], default: 3)
@@ -2154,7 +2154,7 @@ extension ConfigReader {
     ///   - fileID: The file ID where this call originates. Used for access reporting.
     ///   - line: The line number where this call originates. Used for access reporting.
     /// - Returns: The config value if found and convertible, otherwise the default value.
-    /// - Throws: An error if the underlying provider throws or if the value can't be converted to the expected type.
+    /// - Throws: If the underlying provider throws, or if the value can't be converted to the expected type.
     public func fetchDouble(
         forKey key: ConfigKey,
         isSecret: Bool = false,
@@ -2190,7 +2190,7 @@ extension ConfigReader {
     ///   - fileID: The file ID where this call originates. Used for access reporting.
     ///   - line: The line number where this call originates. Used for access reporting.
     /// - Returns: The config value converted to the expected type.
-    /// - Throws: An error if the underlying provider throws, the value is missing, or can't be converted to the expected type.
+    /// - Throws: If the underlying provider throws, the value is missing, or can't be converted to the expected type.
     public func fetchRequiredDouble(
         forKey key: ConfigKey,
         isSecret: Bool = false,
@@ -2225,7 +2225,7 @@ extension ConfigReader {
     ///   - fileID: The file ID where this call originates. Used for access reporting.
     ///   - line: The line number where this call originates. Used for access reporting.
     /// - Returns: The value converted to the expected type if found and convertible, otherwise `nil`.
-    /// - Throws: An error if the underlying provider throws or if the value can't be converted to the expected type.
+    /// - Throws: If the underlying provider throws, or if the value can't be converted to the expected type.
     public func fetchBool(
         forKey key: ConfigKey,
         isSecret: Bool = false,
@@ -2246,7 +2246,7 @@ extension ConfigReader {
     /// Asynchronously fetches a config value for the given config key, with a default fallback.
     ///
     /// Use this method when you need a guaranteed non-nil result from an async provider.
-    /// If the configuration value is missing, the method returns the default value instead.
+    /// If the configuration value is missing, the default value is returned instead.
     ///
     /// ```swift
     /// let maxRetries = try await config.fetchInt(forKey: ["network", "maxRetries"], default: 3)
@@ -2259,7 +2259,7 @@ extension ConfigReader {
     ///   - fileID: The file ID where this call originates. Used for access reporting.
     ///   - line: The line number where this call originates. Used for access reporting.
     /// - Returns: The config value if found and convertible, otherwise the default value.
-    /// - Throws: An error if the underlying provider throws or if the value can't be converted to the expected type.
+    /// - Throws: If the underlying provider throws, or if the value can't be converted to the expected type.
     public func fetchBool(
         forKey key: ConfigKey,
         isSecret: Bool = false,
@@ -2295,7 +2295,7 @@ extension ConfigReader {
     ///   - fileID: The file ID where this call originates. Used for access reporting.
     ///   - line: The line number where this call originates. Used for access reporting.
     /// - Returns: The config value converted to the expected type.
-    /// - Throws: An error if the underlying provider throws, the value is missing, or can't be converted to the expected type.
+    /// - Throws: If the underlying provider throws, the value is missing, or can't be converted to the expected type.
     public func fetchRequiredBool(
         forKey key: ConfigKey,
         isSecret: Bool = false,
@@ -2330,7 +2330,7 @@ extension ConfigReader {
     ///   - fileID: The file ID where this call originates. Used for access reporting.
     ///   - line: The line number where this call originates. Used for access reporting.
     /// - Returns: The value converted to the expected type if found and convertible, otherwise `nil`.
-    /// - Throws: An error if the underlying provider throws or if the value can't be converted to the expected type.
+    /// - Throws: If the underlying provider throws, or if the value can't be converted to the expected type.
     public func fetchBytes(
         forKey key: ConfigKey,
         isSecret: Bool = false,
@@ -2351,7 +2351,7 @@ extension ConfigReader {
     /// Asynchronously fetches a config value for the given config key, with a default fallback.
     ///
     /// Use this method when you need a guaranteed non-nil result from an async provider.
-    /// If the configuration value is missing, the method returns the default value instead.
+    /// If the configuration value is missing, the default value is returned instead.
     ///
     /// ```swift
     /// let maxRetries = try await config.fetchInt(forKey: ["network", "maxRetries"], default: 3)
@@ -2364,7 +2364,7 @@ extension ConfigReader {
     ///   - fileID: The file ID where this call originates. Used for access reporting.
     ///   - line: The line number where this call originates. Used for access reporting.
     /// - Returns: The config value if found and convertible, otherwise the default value.
-    /// - Throws: An error if the underlying provider throws or if the value can't be converted to the expected type.
+    /// - Throws: If the underlying provider throws, or if the value can't be converted to the expected type.
     public func fetchBytes(
         forKey key: ConfigKey,
         isSecret: Bool = false,
@@ -2400,7 +2400,7 @@ extension ConfigReader {
     ///   - fileID: The file ID where this call originates. Used for access reporting.
     ///   - line: The line number where this call originates. Used for access reporting.
     /// - Returns: The config value converted to the expected type.
-    /// - Throws: An error if the underlying provider throws, the value is missing, or can't be converted to the expected type.
+    /// - Throws: If the underlying provider throws, the value is missing, or can't be converted to the expected type.
     public func fetchRequiredBytes(
         forKey key: ConfigKey,
         isSecret: Bool = false,
@@ -2435,7 +2435,7 @@ extension ConfigReader {
     ///   - fileID: The file ID where this call originates. Used for access reporting.
     ///   - line: The line number where this call originates. Used for access reporting.
     /// - Returns: The value converted to the expected type if found and convertible, otherwise `nil`.
-    /// - Throws: An error if the underlying provider throws or if the value can't be converted to the expected type.
+    /// - Throws: If the underlying provider throws, or if the value can't be converted to the expected type.
     public func fetchStringArray(
         forKey key: ConfigKey,
         isSecret: Bool = false,
@@ -2456,7 +2456,7 @@ extension ConfigReader {
     /// Asynchronously fetches a config value for the given config key, with a default fallback.
     ///
     /// Use this method when you need a guaranteed non-nil result from an async provider.
-    /// If the configuration value is missing, the method returns the default value instead.
+    /// If the configuration value is missing, the default value is returned instead.
     ///
     /// ```swift
     /// let maxRetries = try await config.fetchInt(forKey: ["network", "maxRetries"], default: 3)
@@ -2469,7 +2469,7 @@ extension ConfigReader {
     ///   - fileID: The file ID where this call originates. Used for access reporting.
     ///   - line: The line number where this call originates. Used for access reporting.
     /// - Returns: The config value if found and convertible, otherwise the default value.
-    /// - Throws: An error if the underlying provider throws or if the value can't be converted to the expected type.
+    /// - Throws: If the underlying provider throws, or if the value can't be converted to the expected type.
     public func fetchStringArray(
         forKey key: ConfigKey,
         isSecret: Bool = false,
@@ -2505,7 +2505,7 @@ extension ConfigReader {
     ///   - fileID: The file ID where this call originates. Used for access reporting.
     ///   - line: The line number where this call originates. Used for access reporting.
     /// - Returns: The config value converted to the expected type.
-    /// - Throws: An error if the underlying provider throws, the value is missing, or can't be converted to the expected type.
+    /// - Throws: If the underlying provider throws, the value is missing, or can't be converted to the expected type.
     public func fetchRequiredStringArray(
         forKey key: ConfigKey,
         isSecret: Bool = false,
@@ -2540,7 +2540,7 @@ extension ConfigReader {
     ///   - fileID: The file ID where this call originates. Used for access reporting.
     ///   - line: The line number where this call originates. Used for access reporting.
     /// - Returns: The value converted to the expected type if found and convertible, otherwise `nil`.
-    /// - Throws: An error if the underlying provider throws or if the value can't be converted to the expected type.
+    /// - Throws: If the underlying provider throws, or if the value can't be converted to the expected type.
     public func fetchIntArray(
         forKey key: ConfigKey,
         isSecret: Bool = false,
@@ -2561,7 +2561,7 @@ extension ConfigReader {
     /// Asynchronously fetches a config value for the given config key, with a default fallback.
     ///
     /// Use this method when you need a guaranteed non-nil result from an async provider.
-    /// If the configuration value is missing, the method returns the default value instead.
+    /// If the configuration value is missing, the default value is returned instead.
     ///
     /// ```swift
     /// let maxRetries = try await config.fetchInt(forKey: ["network", "maxRetries"], default: 3)
@@ -2574,7 +2574,7 @@ extension ConfigReader {
     ///   - fileID: The file ID where this call originates. Used for access reporting.
     ///   - line: The line number where this call originates. Used for access reporting.
     /// - Returns: The config value if found and convertible, otherwise the default value.
-    /// - Throws: An error if the underlying provider throws or if the value can't be converted to the expected type.
+    /// - Throws: If the underlying provider throws, or if the value can't be converted to the expected type.
     public func fetchIntArray(
         forKey key: ConfigKey,
         isSecret: Bool = false,
@@ -2610,7 +2610,7 @@ extension ConfigReader {
     ///   - fileID: The file ID where this call originates. Used for access reporting.
     ///   - line: The line number where this call originates. Used for access reporting.
     /// - Returns: The config value converted to the expected type.
-    /// - Throws: An error if the underlying provider throws, the value is missing, or can't be converted to the expected type.
+    /// - Throws: If the underlying provider throws, the value is missing, or can't be converted to the expected type.
     public func fetchRequiredIntArray(
         forKey key: ConfigKey,
         isSecret: Bool = false,
@@ -2645,7 +2645,7 @@ extension ConfigReader {
     ///   - fileID: The file ID where this call originates. Used for access reporting.
     ///   - line: The line number where this call originates. Used for access reporting.
     /// - Returns: The value converted to the expected type if found and convertible, otherwise `nil`.
-    /// - Throws: An error if the underlying provider throws or if the value can't be converted to the expected type.
+    /// - Throws: If the underlying provider throws, or if the value can't be converted to the expected type.
     public func fetchDoubleArray(
         forKey key: ConfigKey,
         isSecret: Bool = false,
@@ -2666,7 +2666,7 @@ extension ConfigReader {
     /// Asynchronously fetches a config value for the given config key, with a default fallback.
     ///
     /// Use this method when you need a guaranteed non-nil result from an async provider.
-    /// If the configuration value is missing, the method returns the default value instead.
+    /// If the configuration value is missing, the default value is returned instead.
     ///
     /// ```swift
     /// let maxRetries = try await config.fetchInt(forKey: ["network", "maxRetries"], default: 3)
@@ -2679,7 +2679,7 @@ extension ConfigReader {
     ///   - fileID: The file ID where this call originates. Used for access reporting.
     ///   - line: The line number where this call originates. Used for access reporting.
     /// - Returns: The config value if found and convertible, otherwise the default value.
-    /// - Throws: An error if the underlying provider throws or if the value can't be converted to the expected type.
+    /// - Throws: If the underlying provider throws, or if the value can't be converted to the expected type.
     public func fetchDoubleArray(
         forKey key: ConfigKey,
         isSecret: Bool = false,
@@ -2715,7 +2715,7 @@ extension ConfigReader {
     ///   - fileID: The file ID where this call originates. Used for access reporting.
     ///   - line: The line number where this call originates. Used for access reporting.
     /// - Returns: The config value converted to the expected type.
-    /// - Throws: An error if the underlying provider throws, the value is missing, or can't be converted to the expected type.
+    /// - Throws: If the underlying provider throws, the value is missing, or can't be converted to the expected type.
     public func fetchRequiredDoubleArray(
         forKey key: ConfigKey,
         isSecret: Bool = false,
@@ -2750,7 +2750,7 @@ extension ConfigReader {
     ///   - fileID: The file ID where this call originates. Used for access reporting.
     ///   - line: The line number where this call originates. Used for access reporting.
     /// - Returns: The value converted to the expected type if found and convertible, otherwise `nil`.
-    /// - Throws: An error if the underlying provider throws or if the value can't be converted to the expected type.
+    /// - Throws: If the underlying provider throws, or if the value can't be converted to the expected type.
     public func fetchBoolArray(
         forKey key: ConfigKey,
         isSecret: Bool = false,
@@ -2771,7 +2771,7 @@ extension ConfigReader {
     /// Asynchronously fetches a config value for the given config key, with a default fallback.
     ///
     /// Use this method when you need a guaranteed non-nil result from an async provider.
-    /// If the configuration value is missing, the method returns the default value instead.
+    /// If the configuration value is missing, the default value is returned instead.
     ///
     /// ```swift
     /// let maxRetries = try await config.fetchInt(forKey: ["network", "maxRetries"], default: 3)
@@ -2784,7 +2784,7 @@ extension ConfigReader {
     ///   - fileID: The file ID where this call originates. Used for access reporting.
     ///   - line: The line number where this call originates. Used for access reporting.
     /// - Returns: The config value if found and convertible, otherwise the default value.
-    /// - Throws: An error if the underlying provider throws or if the value can't be converted to the expected type.
+    /// - Throws: If the underlying provider throws, or if the value can't be converted to the expected type.
     public func fetchBoolArray(
         forKey key: ConfigKey,
         isSecret: Bool = false,
@@ -2820,7 +2820,7 @@ extension ConfigReader {
     ///   - fileID: The file ID where this call originates. Used for access reporting.
     ///   - line: The line number where this call originates. Used for access reporting.
     /// - Returns: The config value converted to the expected type.
-    /// - Throws: An error if the underlying provider throws, the value is missing, or can't be converted to the expected type.
+    /// - Throws: If the underlying provider throws, the value is missing, or can't be converted to the expected type.
     public func fetchRequiredBoolArray(
         forKey key: ConfigKey,
         isSecret: Bool = false,
@@ -2855,7 +2855,7 @@ extension ConfigReader {
     ///   - fileID: The file ID where this call originates. Used for access reporting.
     ///   - line: The line number where this call originates. Used for access reporting.
     /// - Returns: The value converted to the expected type if found and convertible, otherwise `nil`.
-    /// - Throws: An error if the underlying provider throws or if the value can't be converted to the expected type.
+    /// - Throws: If the underlying provider throws, or if the value can't be converted to the expected type.
     public func fetchByteChunkArray(
         forKey key: ConfigKey,
         isSecret: Bool = false,
@@ -2876,7 +2876,7 @@ extension ConfigReader {
     /// Asynchronously fetches a config value for the given config key, with a default fallback.
     ///
     /// Use this method when you need a guaranteed non-nil result from an async provider.
-    /// If the configuration value is missing, the method returns the default value instead.
+    /// If the configuration value is missing, the default value is returned instead.
     ///
     /// ```swift
     /// let maxRetries = try await config.fetchInt(forKey: ["network", "maxRetries"], default: 3)
@@ -2889,7 +2889,7 @@ extension ConfigReader {
     ///   - fileID: The file ID where this call originates. Used for access reporting.
     ///   - line: The line number where this call originates. Used for access reporting.
     /// - Returns: The config value if found and convertible, otherwise the default value.
-    /// - Throws: An error if the underlying provider throws or if the value can't be converted to the expected type.
+    /// - Throws: If the underlying provider throws, or if the value can't be converted to the expected type.
     public func fetchByteChunkArray(
         forKey key: ConfigKey,
         isSecret: Bool = false,
@@ -2925,7 +2925,7 @@ extension ConfigReader {
     ///   - fileID: The file ID where this call originates. Used for access reporting.
     ///   - line: The line number where this call originates. Used for access reporting.
     /// - Returns: The config value converted to the expected type.
-    /// - Throws: An error if the underlying provider throws, the value is missing, or can't be converted to the expected type.
+    /// - Throws: If the underlying provider throws, the value is missing, or can't be converted to the expected type.
     public func fetchRequiredByteChunkArray(
         forKey key: ConfigKey,
         isSecret: Bool = false,
@@ -2959,7 +2959,7 @@ extension ConfigReader {
     ///   - fileID: The file ID where this call originates. Used for access reporting.
     ///   - line: The line number where this call originates. Used for access reporting.
     /// - Returns: The value converted to the expected type if found and convertible, otherwise `nil`.
-    /// - Throws: An error if the underlying provider throws or if the value can't be converted to the expected type.
+    /// - Throws: If the underlying provider throws, or if the value can't be converted to the expected type.
     public func fetchString<Value: ExpressibleByConfigString>(
         forKey key: ConfigKey,
         as type: Value.Type = Value.self,
@@ -2981,7 +2981,7 @@ extension ConfigReader {
     /// Asynchronously fetches a config value for the given config key with default fallback, converting from string.
     ///
     /// Use this method when you need a guaranteed non-nil result from an async provider for string-convertible types.
-    /// If the configuration value is missing, the method returns the default value instead.
+    /// If the configuration value is missing, the default value is returned instead.
     ///
     /// ```swift
     /// let serverMode = try await config.fetchString(forKey: ["server", "mode"], as: ServerMode.self, default: .production)
@@ -2995,7 +2995,7 @@ extension ConfigReader {
     ///   - fileID: The file ID where this call originates. Used for access reporting.
     ///   - line: The line number where this call originates. Used for access reporting.
     /// - Returns: The config value if found and convertible, otherwise the default value.
-    /// - Throws: An error if the underlying provider throws or if the value can't be converted to the expected type.
+    /// - Throws: If the underlying provider throws, or if the value can't be converted to the expected type.
     public func fetchString<Value: ExpressibleByConfigString>(
         forKey key: ConfigKey,
         as type: Value.Type = Value.self,
@@ -3032,7 +3032,7 @@ extension ConfigReader {
     ///   - fileID: The file ID where this call originates. Used for access reporting.
     ///   - line: The line number where this call originates. Used for access reporting.
     /// - Returns: The config value converted to the expected type.
-    /// - Throws: An error if the underlying provider throws, the value is missing, or can't be converted to the expected type.
+    /// - Throws: If the underlying provider throws, the value is missing, or can't be converted to the expected type.
     public func fetchRequiredString<Value: ExpressibleByConfigString>(
         forKey key: ConfigKey,
         as type: Value.Type = Value.self,
@@ -3067,7 +3067,7 @@ extension ConfigReader {
     ///   - fileID: The file ID where this call originates. Used for access reporting.
     ///   - line: The line number where this call originates. Used for access reporting.
     /// - Returns: An array of values converted to the expected type if found and convertible, otherwise `nil`.
-    /// - Throws: An error if the underlying provider throws or if the value can't be converted to the expected type.
+    /// - Throws: If the underlying provider throws, or if the value can't be converted to the expected type.
     public func fetchStringArray<Value: ExpressibleByConfigString>(
         forKey key: ConfigKey,
         as type: Value.Type = Value.self,
@@ -3089,7 +3089,7 @@ extension ConfigReader {
     /// Asynchronously fetches an array of config values for the given config key with default fallback, converting from strings.
     ///
     /// Use this method when you need a guaranteed non-nil result for string-convertible array types from async providers.
-    /// If the configuration value is missing, the method returns the default value instead.
+    /// If the configuration value is missing, the default value is returned instead.
     ///
     /// ```swift
     /// let serverModes = try await config.fetchStringArray(forKey: ["server", "allowedModes"], as: ServerMode.self, default: [.production])
@@ -3103,7 +3103,7 @@ extension ConfigReader {
     ///   - fileID: The file ID where this call originates. Used for access reporting.
     ///   - line: The line number where this call originates. Used for access reporting.
     /// - Returns: The config array if found and convertible, otherwise the default array.
-    /// - Throws: An error if the underlying provider throws or if the value can't be converted to the expected type.
+    /// - Throws: If the underlying provider throws, or if the value can't be converted to the expected type.
     public func fetchStringArray<Value: ExpressibleByConfigString>(
         forKey key: ConfigKey,
         as type: Value.Type = Value.self,
@@ -3140,7 +3140,7 @@ extension ConfigReader {
     ///   - fileID: The file ID where this call originates. Used for access reporting.
     ///   - line: The line number where this call originates. Used for access reporting.
     /// - Returns: The config array converted to the expected type.
-    /// - Throws: An error if the underlying provider throws, the value is missing, or can't be converted to the expected type.
+    /// - Throws: If the underlying provider throws, the value is missing, or can't be converted to the expected type.
     public func fetchRequiredStringArray<Value: ExpressibleByConfigString>(
         forKey key: ConfigKey,
         as type: Value.Type = Value.self,
@@ -3175,7 +3175,7 @@ extension ConfigReader {
     ///   - fileID: The file ID where this call originates. Used for access reporting.
     ///   - line: The line number where this call originates. Used for access reporting.
     /// - Returns: The value converted to the expected type if found and convertible, otherwise `nil`.
-    /// - Throws: An error if the underlying provider throws or if the value can't be converted to the expected type.
+    /// - Throws: If the underlying provider throws, or if the value can't be converted to the expected type.
     public func fetchString<Value: RawRepresentable<String>>(
         forKey key: ConfigKey,
         as type: Value.Type = Value.self,
@@ -3197,7 +3197,7 @@ extension ConfigReader {
     /// Asynchronously fetches a config value for the given config key with default fallback, converting from string.
     ///
     /// Use this method when you need a guaranteed non-nil result from an async provider for string-convertible types.
-    /// If the configuration value is missing, the method returns the default value instead.
+    /// If the configuration value is missing, the default value is returned instead.
     ///
     /// ```swift
     /// let serverMode = try await config.fetchString(forKey: ["server", "mode"], as: ServerMode.self, default: .production)
@@ -3211,7 +3211,7 @@ extension ConfigReader {
     ///   - fileID: The file ID where this call originates. Used for access reporting.
     ///   - line: The line number where this call originates. Used for access reporting.
     /// - Returns: The config value if found and convertible, otherwise the default value.
-    /// - Throws: An error if the underlying provider throws or if the value can't be converted to the expected type.
+    /// - Throws: If the underlying provider throws, or if the value can't be converted to the expected type.
     public func fetchString<Value: RawRepresentable<String>>(
         forKey key: ConfigKey,
         as type: Value.Type = Value.self,
@@ -3248,7 +3248,7 @@ extension ConfigReader {
     ///   - fileID: The file ID where this call originates. Used for access reporting.
     ///   - line: The line number where this call originates. Used for access reporting.
     /// - Returns: The config value converted to the expected type.
-    /// - Throws: An error if the underlying provider throws, the value is missing, or can't be converted to the expected type.
+    /// - Throws: If the underlying provider throws, the value is missing, or can't be converted to the expected type.
     public func fetchRequiredString<Value: RawRepresentable<String>>(
         forKey key: ConfigKey,
         as type: Value.Type = Value.self,
@@ -3283,7 +3283,7 @@ extension ConfigReader {
     ///   - fileID: The file ID where this call originates. Used for access reporting.
     ///   - line: The line number where this call originates. Used for access reporting.
     /// - Returns: An array of values converted to the expected type if found and convertible, otherwise `nil`.
-    /// - Throws: An error if the underlying provider throws or if the value can't be converted to the expected type.
+    /// - Throws: If the underlying provider throws, or if the value can't be converted to the expected type.
     public func fetchStringArray<Value: RawRepresentable<String>>(
         forKey key: ConfigKey,
         as type: Value.Type = Value.self,
@@ -3305,7 +3305,7 @@ extension ConfigReader {
     /// Asynchronously fetches an array of config values for the given config key with default fallback, converting from strings.
     ///
     /// Use this method when you need a guaranteed non-nil result for string-convertible array types from async providers.
-    /// If the configuration value is missing, the method returns the default value instead.
+    /// If the configuration value is missing, the default value is returned instead.
     ///
     /// ```swift
     /// let serverModes = try await config.fetchStringArray(forKey: ["server", "allowedModes"], as: ServerMode.self, default: [.production])
@@ -3319,7 +3319,7 @@ extension ConfigReader {
     ///   - fileID: The file ID where this call originates. Used for access reporting.
     ///   - line: The line number where this call originates. Used for access reporting.
     /// - Returns: The config array if found and convertible, otherwise the default array.
-    /// - Throws: An error if the underlying provider throws or if the value can't be converted to the expected type.
+    /// - Throws: If the underlying provider throws, or if the value can't be converted to the expected type.
     public func fetchStringArray<Value: RawRepresentable<String>>(
         forKey key: ConfigKey,
         as type: Value.Type = Value.self,
@@ -3356,7 +3356,7 @@ extension ConfigReader {
     ///   - fileID: The file ID where this call originates. Used for access reporting.
     ///   - line: The line number where this call originates. Used for access reporting.
     /// - Returns: The config array converted to the expected type.
-    /// - Throws: An error if the underlying provider throws, the value is missing, or can't be converted to the expected type.
+    /// - Throws: If the underlying provider throws, the value is missing, or can't be converted to the expected type.
     public func fetchRequiredStringArray<Value: RawRepresentable<String>>(
         forKey key: ConfigKey,
         as type: Value.Type = Value.self,
@@ -3381,7 +3381,7 @@ extension ConfigReader {
     /// If the value doesn't exist, the method returns `nil`.
     ///
     /// ```swift
-    /// let timeout = try await config.fetchInt(forKey: ["server", "timeout"], as: MyDuration.self)
+    /// let apiVersion = try await config.fetchInt(forKey: ["api", "version"], as: APIVersion.self)
     /// ```
     ///
     /// - Parameters:
@@ -3416,7 +3416,7 @@ extension ConfigReader {
     /// If the configuration value is missing, the default value is returned instead.
     ///
     /// ```swift
-    /// let timeout = try await config.fetchInt(forKey: ["server", "timeout"], as: MyDuration.self, default: .seconds(5))
+    /// let apiVersion = try await config.fetchInt(forKey: ["api", "version"], as: APIVersion.self, default: .version(1))
     /// ```
     ///
     /// - Parameters:
@@ -3454,7 +3454,7 @@ extension ConfigReader {
     /// and you're working with async providers. The method throws an error if the value is missing or can't be converted to the expected type.
     ///
     /// ```swift
-    /// let timeout = try await config.fetchRequiredInt(forKey: ["server", "timeout"], as: MyDuration.self)
+    /// let apiVersion = try await config.fetchRequiredInt(forKey: ["api", "version"], as: APIVersion.self)
     /// ```
     ///
     /// - Parameters:
@@ -3489,7 +3489,7 @@ extension ConfigReader {
     /// using async providers. If the value doesn't exist, the method returns `nil`.
     ///
     /// ```swift
-    /// let timeouts = try await config.fetchIntArray(forKey: ["server", "timeouts"], as: MyDuration.self)
+    /// let apiVersions = try await config.fetchIntArray(forKey: ["api", "versions"], as: APIVersion.self)
     /// ```
     ///
     /// - Parameters:
@@ -3524,7 +3524,7 @@ extension ConfigReader {
     /// If the configuration value is missing, the default value is returned instead.
     ///
     /// ```swift
-    /// let timeouts = try await config.fetchIntArray(forKey: ["server", "timeouts"], as: MyDuration.self, default: [.seconds(5)])
+    /// let apiVersions = try await config.fetchIntArray(forKey: ["api", "versions"], as: APIVersion.self, default: [.version(1)])
     /// ```
     ///
     /// - Parameters:
@@ -3562,7 +3562,7 @@ extension ConfigReader {
     /// and you're working with async providers. The method throws an error if the value is missing or can't be converted to the expected type.
     ///
     /// ```swift
-    /// let requiredTimeouts = try await config.fetchRequiredIntArray(forKey: ["server", "timeouts"], as: MyDuration.self)
+    /// let requiredVersions = try await config.fetchRequiredIntArray(forKey: ["api", "versions"], as: APIVersion.self)
     /// ```
     ///
     /// - Parameters:
@@ -3596,7 +3596,7 @@ extension ConfigReader {
     /// If the value doesn't exist, the method returns `nil`.
     ///
     /// ```swift
-    /// let timeout = try await config.fetchInt(forKey: ["server", "timeout"], as: MyDuration.self)
+    /// let apiVersion = try await config.fetchInt(forKey: ["api", "version"], as: APIVersion.self)
     /// ```
     ///
     /// - Parameters:
@@ -3631,7 +3631,7 @@ extension ConfigReader {
     /// If the configuration value is missing, the default value is returned instead.
     ///
     /// ```swift
-    /// let timeout = try await config.fetchInt(forKey: ["server", "timeout"], as: MyDuration.self, default: .seconds(5))
+    /// let apiVersion = try await config.fetchInt(forKey: ["api", "version"], as: APIVersion.self, default: .version(1))
     /// ```
     ///
     /// - Parameters:
@@ -3669,7 +3669,7 @@ extension ConfigReader {
     /// and you're working with async providers. The method throws an error if the value is missing or can't be converted to the expected type.
     ///
     /// ```swift
-    /// let timeout = try await config.fetchRequiredInt(forKey: ["server", "timeout"], as: MyDuration.self)
+    /// let apiVersion = try await config.fetchRequiredInt(forKey: ["api", "version"], as: APIVersion.self)
     /// ```
     ///
     /// - Parameters:
@@ -3704,7 +3704,7 @@ extension ConfigReader {
     /// using async providers. If the value doesn't exist, the method returns `nil`.
     ///
     /// ```swift
-    /// let timeouts = try await config.fetchIntArray(forKey: ["server", "timeouts"], as: MyDuration.self)
+    /// let apiVersions = try await config.fetchIntArray(forKey: ["api", "versions"], as: APIVersion.self)
     /// ```
     ///
     /// - Parameters:
@@ -3739,7 +3739,7 @@ extension ConfigReader {
     /// If the configuration value is missing, the default value is returned instead.
     ///
     /// ```swift
-    /// let timeouts = try await config.fetchIntArray(forKey: ["server", "timeouts"], as: MyDuration.self, default: [.seconds(5)])
+    /// let apiVersions = try await config.fetchIntArray(forKey: ["api", "versions"], as: APIVersion.self, default: [.version(1)])
     /// ```
     ///
     /// - Parameters:
@@ -3777,7 +3777,7 @@ extension ConfigReader {
     /// and you're working with async providers. The method throws an error if the value is missing or can't be converted to the expected type.
     ///
     /// ```swift
-    /// let requiredTimeouts = try await config.fetchRequiredIntArray(forKey: ["server", "timeouts"], as: MyDuration.self)
+    /// let requiredVersions = try await config.fetchRequiredIntArray(forKey: ["api", "versions"], as: APIVersion.self)
     /// ```
     ///
     /// - Parameters:
@@ -5700,12 +5700,12 @@ extension ConfigReader {
     /// or `nil` if the value is missing or can't be converted.
     ///
     /// ```swift
-    /// try await config.watchInt(forKey: ["server", "timeout"], as: MyDuration.self) { updates in
-    ///     for await timeout in updates {
-    ///         if let timeout = timeout {
-    ///             print("Server timeout is: \(timeout.description)")
+    /// try await config.watchInt(forKey: ["api", "version"], as: APIVersion.self) { updates in
+    ///     for await version in updates {
+    ///         if let version = version {
+    ///             print("Api version is: \(version.description)")
     ///         } else {
-    ///             print("No server timeout configured")
+    ///             print("No api version configured")
     ///         }
     ///     }
     /// }
@@ -5748,9 +5748,9 @@ extension ConfigReader {
     /// or the default value if the configuration value is missing or can't be converted.
     ///
     /// ```swift
-    /// try await config.watchInt(forKey: ["server", "timeout"], as: MyDuration.self, default: .seconds(5)) { updates in
-    ///     for await timeout in updates {
-    ///         print("Server timeout is: \(timeout.description)")
+    /// try await config.watchInt(forKey: ["api", "version"], as: APIVersion.self, default: .version(1)) { updates in
+    ///     for await version in updates {
+    ///         print("Api version is: \(version.description)")
     ///     }
     /// }
     /// ```
@@ -5795,9 +5795,9 @@ extension ConfigReader {
     /// or an error if the value is missing or can't be converted.
     ///
     /// ```swift
-    /// try await config.watchRequiredInt(forKey: ["server", "timeout"], as: MyDuration.self) { updates in
-    ///     for try await timeout in updates {
-    ///         print("Server timeout is: \(timeout.description)")
+    /// try await config.watchRequiredInt(forKey: ["api", "version"], as: APIVersion.self) { updates in
+    ///     for try await version in updates {
+    ///         print("Api version is: \(version.description)")
     ///     }
     /// }
     /// ```
@@ -5839,12 +5839,12 @@ extension ConfigReader {
     /// or `nil` if the value is missing or can't be converted.
     ///
     /// ```swift
-    /// try await config.watchIntArray(forKey: ["server", "timeouts"], as: MyDuration.self) { updates in
-    ///     for await timeouts in updates {
-    ///         if let timeouts = timeouts {
-    ///             print("Server timeouts: \(timeouts.map(\.description).joined(separator: ", "))")
+    /// try await config.watchIntArray(forKey: ["api", "versions"], as: APIVersion.self) { updates in
+    ///     for await versions in updates {
+    ///         if let versions = versions {
+    ///             print("Api versions: \(versions.map(\.description).joined(separator: ", "))")
     ///         } else {
-    ///             print("No server timeouts configured")
+    ///             print("No api versions configured")
     ///         }
     ///     }
     /// }
@@ -5887,9 +5887,9 @@ extension ConfigReader {
     /// or the default value if the configuration value is missing or can't be converted.
     ///
     /// ```swift
-    /// try await config.watchIntArray(forKey: ["server", "timeouts"], as: MyDuration.self, default: [.seconds(5)]) { updates in
-    ///     for await timeouts in updates {
-    ///         print("Server timeouts: \(timeouts.map(\.description).joined(separator: ", "))")
+    /// try await config.watchIntArray(forKey: ["api", "versions"], as: APIVersion.self, default: [.version(1)]) { updates in
+    ///     for await versions in updates {
+    ///         print("Api versions: \(versions.map(\.description).joined(separator: ", "))")
     ///     }
     /// }
     /// ```
@@ -5934,9 +5934,9 @@ extension ConfigReader {
     /// or throws an error if the value is missing or can't be converted.
     ///
     /// ```swift
-    /// try await config.watchRequiredIntArray(forKey: ["server", "timeouts"], as: MyDuration.self) { updates in
-    ///     for try await timeouts in updates {
-    ///         print("Server timeouts: \(timeouts.map(\.description).joined(separator: ", "))")
+    /// try await config.watchRequiredIntArray(forKey: ["api", "versions"], as: APIVersion.self) { updates in
+    ///     for try await versions in updates {
+    ///         print("Api versions: \(versions.map(\.description).joined(separator: ", "))")
     ///     }
     /// }
     /// ```
@@ -5977,12 +5977,12 @@ extension ConfigReader {
     /// or `nil` if the value is missing or can't be converted.
     ///
     /// ```swift
-    /// try await config.watchInt(forKey: ["server", "timeout"], as: MyDuration.self) { updates in
-    ///     for await timeout in updates {
-    ///         if let timeout = timeout {
-    ///             print("Server timeout is: \(timeout.description)")
+    /// try await config.watchInt(forKey: ["api", "version"], as: APIVersion.self) { updates in
+    ///     for await version in updates {
+    ///         if let version = version {
+    ///             print("Api version is: \(version.description)")
     ///         } else {
-    ///             print("No server timeout configured")
+    ///             print("No api version configured")
     ///         }
     ///     }
     /// }
@@ -6025,9 +6025,9 @@ extension ConfigReader {
     /// or the default value if the configuration value is missing or can't be converted.
     ///
     /// ```swift
-    /// try await config.watchInt(forKey: ["server", "timeout"], as: MyDuration.self, default: .seconds(5)) { updates in
-    ///     for await timeout in updates {
-    ///         print("Server timeout is: \(timeout.description)")
+    /// try await config.watchInt(forKey: ["api", "version"], as: APIVersion.self, default: .version(1)) { updates in
+    ///     for await version in updates {
+    ///         print("Api version is: \(version.description)")
     ///     }
     /// }
     /// ```
@@ -6072,9 +6072,9 @@ extension ConfigReader {
     /// or an error if the value is missing or can't be converted.
     ///
     /// ```swift
-    /// try await config.watchRequiredInt(forKey: ["server", "timeout"], as: MyDuration.self) { updates in
-    ///     for try await timeout in updates {
-    ///         print("Server timeout is: \(timeout.description)")
+    /// try await config.watchRequiredInt(forKey: ["api", "version"], as: APIVersion.self) { updates in
+    ///     for try await version in updates {
+    ///         print("Api version is: \(version.description)")
     ///     }
     /// }
     /// ```
@@ -6116,12 +6116,12 @@ extension ConfigReader {
     /// or `nil` if the value is missing or can't be converted.
     ///
     /// ```swift
-    /// try await config.watchIntArray(forKey: ["server", "timeouts"], as: MyDuration.self) { updates in
-    ///     for await timeouts in updates {
-    ///         if let timeouts = timeouts {
-    ///             print("Server timeouts: \(timeouts.map(\.description).joined(separator: ", "))")
+    /// try await config.watchIntArray(forKey: ["api", "versions"], as: APIVersion.self) { updates in
+    ///     for await versions in updates {
+    ///         if let versions = versions {
+    ///             print("Api versions: \(versions.map(\.description).joined(separator: ", "))")
     ///         } else {
-    ///             print("No server timeouts configured")
+    ///             print("No api versions configured")
     ///         }
     ///     }
     /// }
@@ -6164,9 +6164,9 @@ extension ConfigReader {
     /// or the default value if the configuration value is missing or can't be converted.
     ///
     /// ```swift
-    /// try await config.watchIntArray(forKey: ["server", "timeouts"], as: MyDuration.self, default: [.seconds(5)]) { updates in
-    ///     for await timeouts in updates {
-    ///         print("Server timeouts: \(timeouts.map(\.description).joined(separator: ", "))")
+    /// try await config.watchIntArray(forKey: ["api", "versions"], as: APIVersion.self, default: [.version(1)]) { updates in
+    ///     for await versions in updates {
+    ///         print("Api versions: \(versions.map(\.description).joined(separator: ", "))")
     ///     }
     /// }
     /// ```
@@ -6211,9 +6211,9 @@ extension ConfigReader {
     /// or throws an error if the value is missing or can't be converted.
     ///
     /// ```swift
-    /// try await config.watchRequiredIntArray(forKey: ["server", "timeouts"], as: MyDuration.self) { updates in
-    ///     for try await timeouts in updates {
-    ///         print("Server timeouts: \(timeouts.map(\.description).joined(separator: ", "))")
+    /// try await config.watchRequiredIntArray(forKey: ["api", "versions"], as: APIVersion.self) { updates in
+    ///     for try await versions in updates {
+    ///         print("Api versions: \(versions.map(\.description).joined(separator: ", "))")
     ///     }
     /// }
     /// ```
