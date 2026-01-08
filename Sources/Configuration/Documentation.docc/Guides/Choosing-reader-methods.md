@@ -107,7 +107,7 @@ Use default variants when:
 - **Required functionality**: The feature needs a value to operate, but can use defaults.
 - **Configuration evolution**: New settings that should work with older deployments.
 
-#### Choosing good defaults
+#### Choose good defaults
 
 Consider these principles when choosing default values:
 
@@ -167,11 +167,11 @@ do {
 Use required variants when:
 
 - **Essential service configuration**: Server ports, database hosts, service endpoints.
-- **Application startup**: Values needed before the application can function properly.
+- **Application startup**: Values you need before the application can function properly.
 - **Critical functionality**: Configuration that must be present for core features to work.
 - **Fail-fast behavior**: You want immediate errors for missing critical configuration.
 
-### Choosing the right variant
+### Choose the right variant
 
 Use this decision tree to select the appropriate variant:
 
@@ -236,7 +236,7 @@ let timeout = try config.requiredInt(
 
 #### Type conversion
 
-String configuration values can be automatically converted to other types using the `as:` parameter. 
+You can automatically convert string configuration values to other types using the `as:` parameter. 
 This works with:
 
 **Built-in convertible types:**
@@ -289,7 +289,7 @@ struct DatabaseURL: ExpressibleByConfigString {
 let dbUrl = config.string(forKey: "database.url", as: DatabaseURL.self)
 ```
 
-Int configuration values can be automatically converted to other types using the `as:` parameter. 
+You can automatically convert integer configuration values to other types using the `as:` parameter. 
 This works with:
 
 **Built-in convertible types:**
