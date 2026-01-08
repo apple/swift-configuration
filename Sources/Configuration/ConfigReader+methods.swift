@@ -1980,7 +1980,7 @@ extension ConfigReader {
     ///   - fileID: The file ID where this call originates. Used for access reporting.
     ///   - line: The line number where this call originates. Used for access reporting.
     /// - Returns: The config value converted to the expected type.
-    /// - Throws: If the underlying provider throws, the value is missing, or can't be converted to the expected type.
+    /// - Throws: An error if the underlying provider throws, the value is missing, or can't be converted to the expected type.
     public func fetchRequiredString(
         forKey key: ConfigKey,
         isSecret: Bool = false,
@@ -2085,7 +2085,7 @@ extension ConfigReader {
     ///   - fileID: The file ID where this call originates. Used for access reporting.
     ///   - line: The line number where this call originates. Used for access reporting.
     /// - Returns: The config value converted to the expected type.
-    /// - Throws: If the underlying provider throws, the value is missing, or can't be converted to the expected type.
+    /// - Throws: An error if the underlying provider throws, the value is missing, or can't be converted to the expected type.
     public func fetchRequiredInt(
         forKey key: ConfigKey,
         isSecret: Bool = false,
@@ -2190,7 +2190,7 @@ extension ConfigReader {
     ///   - fileID: The file ID where this call originates. Used for access reporting.
     ///   - line: The line number where this call originates. Used for access reporting.
     /// - Returns: The config value converted to the expected type.
-    /// - Throws: If the underlying provider throws, the value is missing, or can't be converted to the expected type.
+    /// - Throws: An error if the underlying provider throws, the value is missing, or can't be converted to the expected type.
     public func fetchRequiredDouble(
         forKey key: ConfigKey,
         isSecret: Bool = false,
@@ -2295,7 +2295,7 @@ extension ConfigReader {
     ///   - fileID: The file ID where this call originates. Used for access reporting.
     ///   - line: The line number where this call originates. Used for access reporting.
     /// - Returns: The config value converted to the expected type.
-    /// - Throws: If the underlying provider throws, the value is missing, or can't be converted to the expected type.
+    /// - Throws: An error if the underlying provider throws, the value is missing, or can't be converted to the expected type.
     public func fetchRequiredBool(
         forKey key: ConfigKey,
         isSecret: Bool = false,
@@ -2400,7 +2400,7 @@ extension ConfigReader {
     ///   - fileID: The file ID where this call originates. Used for access reporting.
     ///   - line: The line number where this call originates. Used for access reporting.
     /// - Returns: The config value converted to the expected type.
-    /// - Throws: If the underlying provider throws, the value is missing, or can't be converted to the expected type.
+    /// - Throws: An error if the underlying provider throws, the value is missing, or can't be converted to the expected type.
     public func fetchRequiredBytes(
         forKey key: ConfigKey,
         isSecret: Bool = false,
@@ -2505,7 +2505,7 @@ extension ConfigReader {
     ///   - fileID: The file ID where this call originates. Used for access reporting.
     ///   - line: The line number where this call originates. Used for access reporting.
     /// - Returns: The config value converted to the expected type.
-    /// - Throws: If the underlying provider throws, the value is missing, or can't be converted to the expected type.
+    /// - Throws: An error if the underlying provider throws, the value is missing, or can't be converted to the expected type.
     public func fetchRequiredStringArray(
         forKey key: ConfigKey,
         isSecret: Bool = false,
@@ -2610,7 +2610,7 @@ extension ConfigReader {
     ///   - fileID: The file ID where this call originates. Used for access reporting.
     ///   - line: The line number where this call originates. Used for access reporting.
     /// - Returns: The config value converted to the expected type.
-    /// - Throws: If the underlying provider throws, the value is missing, or can't be converted to the expected type.
+    /// - Throws: An error if the underlying provider throws, the value is missing, or can't be converted to the expected type.
     public func fetchRequiredIntArray(
         forKey key: ConfigKey,
         isSecret: Bool = false,
@@ -2715,7 +2715,7 @@ extension ConfigReader {
     ///   - fileID: The file ID where this call originates. Used for access reporting.
     ///   - line: The line number where this call originates. Used for access reporting.
     /// - Returns: The config value converted to the expected type.
-    /// - Throws: If the underlying provider throws, the value is missing, or can't be converted to the expected type.
+    /// - Throws: An error if the underlying provider throws, the value is missing, or can't be converted to the expected type.
     public func fetchRequiredDoubleArray(
         forKey key: ConfigKey,
         isSecret: Bool = false,
@@ -2820,7 +2820,7 @@ extension ConfigReader {
     ///   - fileID: The file ID where this call originates. Used for access reporting.
     ///   - line: The line number where this call originates. Used for access reporting.
     /// - Returns: The config value converted to the expected type.
-    /// - Throws: If the underlying provider throws, the value is missing, or can't be converted to the expected type.
+    /// - Throws: An error if the underlying provider throws, the value is missing, or can't be converted to the expected type.
     public func fetchRequiredBoolArray(
         forKey key: ConfigKey,
         isSecret: Bool = false,
@@ -2925,7 +2925,7 @@ extension ConfigReader {
     ///   - fileID: The file ID where this call originates. Used for access reporting.
     ///   - line: The line number where this call originates. Used for access reporting.
     /// - Returns: The config value converted to the expected type.
-    /// - Throws: If the underlying provider throws, the value is missing, or can't be converted to the expected type.
+    /// - Throws: An error if the underlying provider throws, the value is missing, or can't be converted to the expected type.
     public func fetchRequiredByteChunkArray(
         forKey key: ConfigKey,
         isSecret: Bool = false,
@@ -3032,7 +3032,7 @@ extension ConfigReader {
     ///   - fileID: The file ID where this call originates. Used for access reporting.
     ///   - line: The line number where this call originates. Used for access reporting.
     /// - Returns: The config value converted to the expected type.
-    /// - Throws: If the underlying provider throws, the value is missing, or can't be converted to the expected type.
+    /// - Throws: An error if the underlying provider throws, the value is missing, or can't be converted to the expected type.
     public func fetchRequiredString<Value: ExpressibleByConfigString>(
         forKey key: ConfigKey,
         as type: Value.Type = Value.self,
@@ -3140,7 +3140,7 @@ extension ConfigReader {
     ///   - fileID: The file ID where this call originates. Used for access reporting.
     ///   - line: The line number where this call originates. Used for access reporting.
     /// - Returns: The config array converted to the expected type.
-    /// - Throws: If the underlying provider throws, the value is missing, or can't be converted to the expected type.
+    /// - Throws: An error if the underlying provider throws, the value is missing, or can't be converted to the expected type.
     public func fetchRequiredStringArray<Value: ExpressibleByConfigString>(
         forKey key: ConfigKey,
         as type: Value.Type = Value.self,
@@ -3248,7 +3248,7 @@ extension ConfigReader {
     ///   - fileID: The file ID where this call originates. Used for access reporting.
     ///   - line: The line number where this call originates. Used for access reporting.
     /// - Returns: The config value converted to the expected type.
-    /// - Throws: If the underlying provider throws, the value is missing, or can't be converted to the expected type.
+    /// - Throws: An error if the underlying provider throws, the value is missing, or can't be converted to the expected type.
     public func fetchRequiredString<Value: RawRepresentable<String>>(
         forKey key: ConfigKey,
         as type: Value.Type = Value.self,
@@ -3356,7 +3356,7 @@ extension ConfigReader {
     ///   - fileID: The file ID where this call originates. Used for access reporting.
     ///   - line: The line number where this call originates. Used for access reporting.
     /// - Returns: The config array converted to the expected type.
-    /// - Throws: If the underlying provider throws, the value is missing, or can't be converted to the expected type.
+    /// - Throws: An error if the underlying provider throws, the value is missing, or can't be converted to the expected type.
     public func fetchRequiredStringArray<Value: RawRepresentable<String>>(
         forKey key: ConfigKey,
         as type: Value.Type = Value.self,
@@ -3464,7 +3464,7 @@ extension ConfigReader {
     ///   - fileID: The file ID where this call originates. Used for access reporting.
     ///   - line: The line number where this call originates. Used for access reporting.
     /// - Returns: The config value converted to the expected type.
-    /// - Throws: If the underlying provider throws, the value is missing, or can't be converted to the expected type.
+    /// - Throws: An error if the underlying provider throws, the value is missing, or can't be converted to the expected type.
     public func fetchRequiredInt<Value: ExpressibleByConfigInt>(
         forKey key: ConfigKey,
         as type: Value.Type = Value.self,
@@ -3572,7 +3572,7 @@ extension ConfigReader {
     ///   - fileID: The file ID where this call originates. Used for access reporting.
     ///   - line: The line number where this call originates. Used for access reporting.
     /// - Returns: The config array converted to the expected type.
-    /// - Throws: If the underlying provider throws, the value is missing, or can't be converted to the expected type.
+    /// - Throws: An error if the underlying provider throws, the value is missing, or can't be converted to the expected type.
     public func fetchRequiredIntArray<Value: ExpressibleByConfigInt>(
         forKey key: ConfigKey,
         as type: Value.Type = Value.self,
@@ -3679,7 +3679,7 @@ extension ConfigReader {
     ///   - fileID: The file ID where this call originates. Used for access reporting.
     ///   - line: The line number where this call originates. Used for access reporting.
     /// - Returns: The config value converted to the expected type.
-    /// - Throws: If the underlying provider throws, the value is missing, or can't be converted to the expected type.
+    /// - Throws: An error if the underlying provider throws, the value is missing, or can't be converted to the expected type.
     public func fetchRequiredInt<Value: RawRepresentable<Int>>(
         forKey key: ConfigKey,
         as type: Value.Type = Value.self,
@@ -3787,7 +3787,7 @@ extension ConfigReader {
     ///   - fileID: The file ID where this call originates. Used for access reporting.
     ///   - line: The line number where this call originates. Used for access reporting.
     /// - Returns: The config array converted to the expected type.
-    /// - Throws: If the underlying provider throws, the value is missing, or can't be converted to the expected type.
+    /// - Throws: An error if the underlying provider throws, the value is missing, or can't be converted to the expected type.
     public func fetchRequiredIntArray<Value: RawRepresentable<Int>>(
         forKey key: ConfigKey,
         as type: Value.Type = Value.self,
