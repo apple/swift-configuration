@@ -28,10 +28,10 @@
 ///
 /// ```swift
 /// struct MyDuration: ExpressibleByConfigInt {
-///     let duration: Duration
+///     let duration: Int
 ///
 ///     init?(configInt: Int) {
-///         self.duration = .seconds(configInt)
+///         self.duration = configInt
 ///     }
 ///
 ///     var description: String { duration.description }
@@ -39,7 +39,7 @@
 ///
 /// // Now you can use it with automatic conversion
 /// let config = ConfigReader(provider: EnvironmentVariablesProvider())
-/// let dbUrl = config.int(forKey: "database.timeout", as: MyDuration.self)
+/// let dbTimeout = config.int(forKey: "database.timeout", as: MyDuration.self)
 /// ```
 @available(Configuration 1.0, *)
 public protocol ExpressibleByConfigInt: CustomStringConvertible {
