@@ -289,6 +289,62 @@ struct DatabaseURL: ExpressibleByConfigString {
 let dbUrl = config.string(forKey: "database.url", as: DatabaseURL.self)
 ```
 
+Int configuration values can be automatically converted to other types using the `as:` parameter. 
+This works with:
+
+**Built-in convertible types:**
+
+- `Swift.Duration`: Converts from an integer value to a Duration measured in seconds.
+
+**Int-backed enums:**
+
+- Types that conform to `RawRepresentable<Int>`.
+
+**Custom types:**
+
+- Types that you explicitly conform to ``ExpressibleByConfigInt``.
+
+```swift
+// Built-in type conversion
+let durationInSeconds = config.int(forKey: "api.url", as: Duration.self)
+
+// Int-backed enum conversion (RawRepresentable<Int>)
+enum LogLevel: Int {
+    case zero, one
+}
+
+// Optional conversion
+let level: LogLevel? = config.int(forKey: "log.level", as: LogLevel.self)
+
+// Default conversion
+let level = config.int(forKey: "log.level", as: LogLevel.self, default: .zero)
+
+// Required conversion
+let level = try config.requiredInt(forKey: "log.level", as: LogLevel.self)
+
+// Custom type conversion (ExpressibleByConfigInt)
+struct Version {
+    var value: Int
+    init?(_ value: Int) {
+        guard value > 0 else { return nil }
+        self.value = value
+    }
+    var description: String { "\(value)"}
+}
+
+struct APIVersion: ExpressibleByConfigInt {
+    let version: Version
+
+    init?(configInt: Int) {
+        guard let version = Version(configInt) else { return nil }
+        self.version = version
+    }
+
+    var description: String { version.description }
+}
+let apiVersion = config.int(forKey: "api.version", as: APIVersion.self)
+```
+
 #### Secret handling
 
 ```swift
