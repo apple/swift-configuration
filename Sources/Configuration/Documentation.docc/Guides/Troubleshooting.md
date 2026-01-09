@@ -6,10 +6,10 @@ Check out some techniques to debug unexpected issues and to increase visibility 
 
 ### Debugging configuration issues
 
-If your configuration values aren't being read correctly, check:
+If you can't read your configuration values correctly, check:
 
-1. **Environment variable naming**: When using ``EnvironmentVariablesProvider``, keys are automatically converted to uppercase with dots replaced by underscores. For example, `database.url` becomes `DATABASE_URL`.
-2. **Provider ordering**: When using multiple providers, they're checked in order and the first one that returns a value wins.
+1. **Environment variable naming**: When using ``EnvironmentVariablesProvider``, the provider automatically converts keys to uppercase and replaces dots with underscores. For example, `database.url` becomes `DATABASE_URL`.
+2. **Provider ordering**: When using multiple providers, the library checks them in order and the first one that returns a value wins.
 3. **Debug with an access reporter**: Use access reporting to see which keys are being queried and what values (if any) are being returned. See the next section for details.
 
 For guidance on selecting the right configuration access patterns and reader methods, check out <doc:Choosing-access-patterns> and <doc:Choosing-reader-methods>.
@@ -33,10 +33,10 @@ let timeout = config.double(forKey: "http.timeout", default: 30.0)
 
 This produces log entries showing:
 
-- Which configuration keys were accessed.
-- What values were returned (with secret values redacted).
+- Which configuration keys the code accessed.
+- What values the provider returned (with secret values redacted).
 - Which provider supplied the value.
-- Whether default values were used.
+- Whether the reader used default values.
 - The location of the code reading the config value.
 - The timestamp of the access.
 
@@ -70,8 +70,8 @@ tail -f /var/log/myapp/config-access.log
 
 If any provider throws an error during lookup:
 
-- **Required methods** (`requiredString`, etc.): Error is immediately thrown to the caller.
-- **Optional methods** (with or without defaults): Error is handled gracefully; `nil` or the default value is returned.
+- **Required methods** (`requiredString`, etc.): The method immediately throws the error to the caller.
+- **Optional methods** (with or without defaults): The library handles the error gracefully, returning `nil` or the default value.
 
 > Tip: Even when an error gets handled gracefully, you can log it using an ``AccessReporter``.
 
@@ -128,7 +128,7 @@ let provider = try await ReloadingFileProvider<JSONSnapshot>(
 
 If your reloading provider isn't detecting file changes:
 
-1. **Check ServiceGroup**: Ensure the provider is running in a `ServiceGroup`.
+1. **Check ServiceGroup**: Run the provider in a `ServiceGroup`.
 2. **Enable verbose logging**: The built-in providers use Swift Log for detailed logging, which can help spot issues.
 3. **Verify file path**: Confirm the file path is correct, the file exists, and file permissions are correct.
 4. **Check poll interval**: Consider if your poll interval is appropriate for your use case.

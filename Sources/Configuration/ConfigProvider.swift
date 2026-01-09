@@ -345,7 +345,7 @@ public struct LookupResult: Sendable, Equatable, Hashable {
         /// The actual type of the configuration value.
         var actualType: ConfigType
 
-        /// The type that was requested.
+        /// The requested type.
         var requestedType: ConfigType
     }
 

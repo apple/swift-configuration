@@ -130,7 +130,7 @@ public init(config: ConfigReader) throws {
 }
 ```
 
-### Choosing provider types
+### Choose provider types
 
 #### When to use reloading providers
 
@@ -147,7 +147,7 @@ Check out <doc:Using-reloading-providers> to learn more.
 Use static providers when configuration doesn't change during runtime:
 
 - Containerized applications with immutable configuration.
-- Applications where configuration is set once at startup.
+- Applications where you set configuration once at startup.
 
 #### When to create custom providers
 

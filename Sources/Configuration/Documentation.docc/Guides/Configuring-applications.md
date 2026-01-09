@@ -13,9 +13,9 @@ Swift Configuration provides consistent configuration for your tools and applica
 
 This pattern works well for server applications where configuration comes from environment variables, configuration files, and remote services.
 
-### Setting up a configuration hierarchy
+### Set up a configuration hierarchy
 
-Start by creating a configuration hierarchy in your application's entry point. This defines the order in which configuration sources are consulted when looking for values:
+Start by creating a configuration hierarchy in your application's entry point. This defines the order for consulting configuration sources when looking for values:
 
 ```swift
 import Configuration
@@ -138,7 +138,7 @@ And using ``InMemoryProvider``:
 
 In practice, you'd only specify a subset of the config keys in each location, to match the needs of your service's operators.
 
-### Using scoped configuration
+### Use scoped configuration
 
 For services with multiple instances of the same component, but with different settings, use scoped configuration:
 
@@ -170,7 +170,7 @@ let customerTimeout = customerConfig.double(
 )
 ```
 
-This can be configured via environment variables as follows:
+You can configure this via environment variables as follows:
 
 ```bash
 # Admin API configuration

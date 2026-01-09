@@ -52,8 +52,8 @@ import Foundation
 ///
 /// ## Character handling
 ///
-/// Only alphanumeric characters (A-Z, a-z, 0-9) are preserved in the final environment
-/// variable name. All other characters are converted to underscores, ensuring compatibility
+/// The encoder preserves only alphanumeric characters (A-Z, a-z, 0-9) in the final environment
+/// variable name. It converts all other characters to underscores, ensuring compatibility
 /// with environment variable naming conventions across different systems.
 @available(Configuration 1.0, *)
 internal struct EnvironmentKeyEncoder {}
