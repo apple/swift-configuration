@@ -186,4 +186,4 @@ export SERVICES_CUSTOMER_TIMEOUT=15.0
 
 For details about the key conversion logic, check out ``EnvironmentVariablesProvider``.
 
-For more configuration guidance, see <doc:Best-practices>. To understand different access patterns and reader methods, refer to <doc:Choosing-access-patterns> and <doc:Choosing-reader-methods>. For handling secrets securely, check out <doc:Handling-secrets-correctly>.
+For more configuration guidance, see <doc:Best-practices>. To understand different access patterns and reader methods, refer to <doc:Choosing-access-patterns> and <doc:Choosing-reader-methods>. For handling secrets securely, check out <doc:Handling-secrets-correctly>. If you need to integrate with a custom configuration source, see <doc:Implementing-a-provider>.

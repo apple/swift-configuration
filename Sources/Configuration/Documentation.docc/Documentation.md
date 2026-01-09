@@ -405,7 +405,9 @@ Any package can implement a ``ConfigProvider``, making the ecosystem extensible 
 - ``KeyMappingProvider``
 
 ### Creating a custom provider
+- <doc:Implementing-a-provider>
 - ``ConfigSnapshot``
+- ``FileConfigSnapshot``
 - ``FileParsingOptions``
 - ``ConfigProvider``
 - ``ConfigContent``
