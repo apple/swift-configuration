@@ -38,22 +38,22 @@ import Foundation
 /// let encoder = EnvironmentKeyEncoder()
 ///
 /// // Basic hierarchical key
-/// let key1 = AbsoluteConfigKey(components: ["http", "port"], context: context)
+/// let key1 = AbsoluteConfigKey(["http", "port"], context: context)
 /// encoder.encode(key1) // "HTTP_PORT"
 ///
 /// // CamelCase handling
-/// let key2 = AbsoluteConfigKey(components: ["http", "serverTimeout"], context: context)
+/// let key2 = AbsoluteConfigKey(["http", "serverTimeout"], context: context)
 /// encoder.encode(key2) // "HTTP_SERVER_TIMEOUT"
 ///
 /// // Special character handling
-/// let key3 = AbsoluteConfigKey(components: ["http", "user-agent"], context: context)
+/// let key3 = AbsoluteConfigKey(["http", "user-agent"], context: context)
 /// encoder.encode(key3) // "HTTP_USER_AGENT"
 /// ```
 ///
 /// ## Character handling
 ///
-/// Only alphanumeric characters (A-Z, a-z, 0-9) are preserved in the final environment
-/// variable name. All other characters are converted to underscores, ensuring compatibility
+/// The encoder preserves only alphanumeric characters (A-Z, a-z, 0-9) in the final environment
+/// variable name. It converts all other characters to underscores, ensuring compatibility
 /// with environment variable naming conventions across different systems.
 @available(Configuration 1.0, *)
 internal struct EnvironmentKeyEncoder {}

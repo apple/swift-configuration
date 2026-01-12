@@ -14,7 +14,7 @@
 
 /// A value that can be stored in a configuration context.
 ///
-/// Context values support common data types used for configuration metadata.
+/// Context values support common data types for configuration metadata.
 @available(Configuration 1.0, *)
 public enum ConfigContextValue: Sendable, Equatable, Hashable {
 
@@ -82,7 +82,7 @@ extension ConfigContextValue: ExpressibleByBooleanLiteral {
 
 @available(Configuration 1.0, *)
 extension [String: ConfigContextValue] {
-    /// Creates a sorted string representation of the context, used primarily for sorting and logging.
+    /// Creates a sorted string representation of the context for sorting and logging.
     ///
     /// This method creates a deterministic string by:
     /// 1. Sorting keys alphabetically.

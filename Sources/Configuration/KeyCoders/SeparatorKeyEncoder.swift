@@ -25,7 +25,7 @@
 ///
 /// ```swift
 /// let encoder = SeparatorKeyEncoder(separator: ".")
-/// let key = AbsoluteConfigKey(components: ["database", "host", "port"], context: context)
+/// let key = AbsoluteConfigKey(["database", "host", "port"], context: context)
 /// let encoded = encoder.encode(key)
 /// // Results in "database.host.port"
 /// ```
@@ -41,7 +41,7 @@ internal struct SeparatorKeyEncoder {
 
     /// The string used to join key components.
     ///
-    /// This separator is inserted between each component when encoding hierarchical
+    /// The encoder inserts this separator between each component when encoding hierarchical
     /// keys into flat strings. Common separators include "." for dot notation and
     /// "-" for dash notation.
     var separator: String
@@ -64,7 +64,7 @@ extension ConfigKeyEncoder where Self == SeparatorKeyEncoder {
     ///
     /// ```swift
     /// let encoder = ConfigKeyEncoder.dotSeparated
-    /// let key = AbsoluteConfigKey(components: ["app", "database", "host"], context: context)
+    /// let key = AbsoluteConfigKey(["app", "database", "host"], context: context)
     /// let encoded = encoder.encode(key)
     /// // Results in "app.database.host"
     /// ```
@@ -79,7 +79,7 @@ extension ConfigKeyEncoder where Self == SeparatorKeyEncoder {
     ///
     /// ```swift
     /// let encoder = ConfigKeyEncoder.dashSeparated
-    /// let key = AbsoluteConfigKey(components: ["app", "database", "host"], context: context)
+    /// let key = AbsoluteConfigKey(["app", "database", "host"], context: context)
     /// let encoded = encoder.encode(key)
     /// // Results in "app-database-host"
     /// ```

@@ -108,8 +108,8 @@ public final class MutableInMemoryProvider: Sendable {
     /// the ``setValue(_:forKey:)`` methods.
     ///
     /// ```swift
-    /// let key1 = AbsoluteConfigKey(components: ["database", "host"], context: [:])
-    /// let key2 = AbsoluteConfigKey(components: ["database", "port"], context: [:])
+    /// let key1 = AbsoluteConfigKey(["database", "host"], context: [:])
+    /// let key2 = AbsoluteConfigKey(["database", "port"], context: [:])
     ///
     /// let provider = MutableInMemoryProvider(
     ///     name: "dynamic-config",
@@ -155,7 +155,7 @@ extension MutableInMemoryProvider {
     ///
     /// ```swift
     /// let provider = MutableInMemoryProvider(initialValues: [:])
-    /// let key = AbsoluteConfigKey(components: ["api", "enabled"], context: [:])
+    /// let key = AbsoluteConfigKey(["api", "enabled"], context: [:])
     ///
     /// // Set a new value
     /// provider.setValue(true, forKey: key)

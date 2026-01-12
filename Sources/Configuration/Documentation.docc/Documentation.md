@@ -6,7 +6,7 @@ A Swift library for reading configuration in applications and libraries.
 
 Swift Configuration defines an abstraction between configuration _readers_ and _providers_.
 
-Applications and libraries _read_ configuration through a consistent API, while the actual _provider_ is set up once at the application's entry point.
+Applications and libraries _read_ configuration through a consistent API, while you set up the actual _provider_ once at your application's entry point.
 
 For example, to read the timeout configuration value for an HTTP client, check out the following examples using different providers:
 
@@ -147,7 +147,7 @@ For a selection of more detailed examples, read through <doc:Example-use-cases>.
 
 For a video introduction, check out our [talk on YouTube](https://www.youtube.com/watch?v=I3lYW6OEyIs).
 
-These providers can be combined to form a hierarchy, for details check out <doc:Provider-hierarchy>.
+You can combine these providers to form a hierarchy. For details, check out <doc:Provider-hierarchy>.
 
 ### Quick start
 
@@ -277,7 +277,7 @@ let timeout = config.int(forKey: "http.timeout", default: 15)
 
 #### Hot reloading
 
-Long-running services can periodically reload configuration with ``ReloadingFileProvider``:
+You can periodically reload configuration in long-running services with ``ReloadingFileProvider``:
 
 ```swift
 let provider = try await ReloadingFileProvider<JSONSnapshot>(filePath: "/etc/config.json")
@@ -322,7 +322,7 @@ let timeout = httpConfig.int(forKey: "timeout")
 
 #### Debugging and troubleshooting
 
-Debugging with ``AccessReporter`` makes it possible to log all accesses to a config reader:
+Use ``AccessReporter`` to log all accesses to a config reader:
 
 ```swift
 let logger = Logger(label: "config")
@@ -333,7 +333,7 @@ let config = ConfigReader(
 // Now all configuration access is logged, with secret values redacted
 ```
 
-You can also add the following environment variable, and emit log accesses into a file without any code changes:
+You can also add the following environment variable to emit access logs to a file without any code changes:
 
 ```env
 CONFIG_ACCESS_LOG_FILE=/var/log/myapp/config-access.log
@@ -347,7 +347,7 @@ tail -f /var/log/myapp/config-access.log
 
 Check out the built-in ``AccessLogger``, ``FileAccessLogger``, and <doc:Troubleshooting>.
 
-#### Secrets handling
+#### Handling Secrets
 
 The library provides built-in support for handling sensitive configuration values securely:
 
@@ -357,15 +357,14 @@ let privateKey = try snapshot.requiredString(forKey: "mtls.privateKey", isSecret
 let optionalAPIToken = config.string(forKey: "api.token", isSecret: true)
 ```
 
-When values are marked as secrets, they are automatically redacted from access logs and debugging output. 
+When you mark values as secrets, the library automatically redacts them from access logs and debugging output. 
 Read <doc:Handling-secrets-correctly> for guidance on best practices for secrets management.
 
 #### Consistent snapshots
 
-Retrieve related values from a consistent snapshot using ``ConfigSnapshotReader``, which you
-get by calling ``ConfigReader/snapshot()``.
+Retrieve related values from a consistent snapshot using ``ConfigSnapshotReader``, which ``ConfigReader/snapshot()`` returns.
 
-This ensures that multiple values are read from a single snapshot inside each provider, even when using
+This ensures that you read multiple values from a single snapshot inside each provider, even when using
 providers that update their internal values.
 For example by downloading new data periodically:
 

@@ -28,7 +28,7 @@ import Foundation
 ///
 /// - `--key value`: A key-value pair with separate arguments.
 /// - `--key=value`: A key-value pair with an equals sign.
-/// - `--flag`: A Boolean flag, followed by no values.
+/// - `--flag`: A Boolean flag with no values.
 /// - `--key val1 val2`: A key with multiple values (an array).
 ///
 /// ## Usage
@@ -47,7 +47,7 @@ internal struct CLIArgumentParser {
     /// Parses command-line arguments into key-value pairs.
     ///
     /// Processes the arguments array and extracts CLI options with their values.
-    /// The program name (first argument) is automatically skipped.
+    /// The parser automatically skips the program name (first argument).
     ///
     /// ```swift
     /// let args = ["program", "--verbose", "--host", "localhost", "--ports", "8080", "8443"]
@@ -122,7 +122,7 @@ internal struct CLIArgumentParser {
             if value.isEmpty {
                 return [""]
             }
-            return value.components(separatedBy: ",")
+            return value.split(separator: ",", omittingEmptySubsequences: false).map(String.init)
         }
     }
 }
