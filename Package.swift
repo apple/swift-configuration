@@ -73,7 +73,7 @@ let package = Package(
     dependencies: [
         .package(url: "https://github.com/apple/swift-system", from: "1.5.0"),
         .package(url: "https://github.com/apple/swift-collections", from: "1.3.0"),
-        .package(url: "https://github.com/swift-server/swift-service-lifecycle", from: "2.7.0"),
+        .package(url: "https://github.com/swift-server/swift-service-lifecycle", from: "2.8.0"),
         .package(url: "https://github.com/apple/swift-log", from: "1.6.3"),
         .package(url: "https://github.com/apple/swift-metrics", from: "2.7.0"),
         .package(url: "https://github.com/jpsim/Yams", "5.4.0"..<"7.0.0"),
