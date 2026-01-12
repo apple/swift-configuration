@@ -15,3 +15,6 @@
 - ``ConfigProvider/watchSnapshotFromSnapshot(updatesHandler:)``
 - ``ConfigProvider/mapKeys(_:)``
 - ``ConfigProvider/prefixKeys(with:)``
+
+### Related guides
+- <doc:Implementing-a-provider>
