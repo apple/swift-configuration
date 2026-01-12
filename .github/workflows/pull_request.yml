@@ -45,7 +45,7 @@ jobs:
     uses: apple/swift-nio/.github/workflows/static_sdk.yml@main
     with:
       env_vars: '{"ENABLE_ALL_TRAITS":"1"}'
-      command_arguments: '--swift-sdk x86_64-swift-linux-musl --product Configuration'
+      command_arguments: '--swift-sdk x86_64-swift-linux-musl --target Configuration'
 
   macos-tests:
     name: macOS tests
