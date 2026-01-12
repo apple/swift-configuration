@@ -231,6 +231,8 @@ To understand the choices available, see <doc:Choosing-reader-methods>.
 
 #### Providers
 
+##### Built-in providers
+
 The library includes comprehensive built-in provider support:
 
 - Environment variables: ``EnvironmentVariablesProvider``
@@ -240,6 +242,10 @@ The library includes comprehensive built-in provider support:
 - Directory of files: ``DirectoryFilesProvider``
 - In-memory: ``InMemoryProvider`` and ``MutableInMemoryProvider``
 - Key transforming: ``KeyMappingProvider``
+
+##### Community providers
+
+- TOML file: [mattt/swift-configuration-toml](https://github.com/mattt/swift-configuration-toml)
 
 You can also implement a custom ``ConfigProvider``.
 
