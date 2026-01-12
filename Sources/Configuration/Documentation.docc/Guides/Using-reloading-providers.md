@@ -96,7 +96,7 @@ try await config.watchSnapshot { updates in
 | Feature | Static providers | Reloading providers |
 |---------|------------------|---------------------|
 | **File reading** | Load once at startup | Reloading on change |
-| **Service lifecycle** | Not required | Conforms to `Service` and must run in a `ServiceGroup` |
+| **Service lifecycle** | Not required | Conforms to `Service` and you must run in a `ServiceGroup` |
 | **Configuration updates** | Require restart | Automatic reload |
 
 ### Handling missing files during reloading
