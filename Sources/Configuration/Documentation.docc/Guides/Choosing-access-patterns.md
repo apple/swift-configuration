@@ -43,7 +43,7 @@ Use the "get" pattern when:
 
 - Returns the currently cached value from the provider.
 - No network or I/O operations occur during the call.
-- Values may become stale if the underlying data source changes and the provider is either non-reloading, or has a long reload interval.
+- Values may become stale if the underlying data source changes and you use either a non-reloading provider or one with a long reload interval.
 
 ### Fetch: Asynchronous fresh access
 
@@ -83,7 +83,7 @@ Use the "fetch" pattern when:
 
 - Always contacts the authoritative data source.
 - May involve network calls, file system access, or database queries.
-- Providers may (but are not required to) cache the fetched value for subsequent "get" calls.
+- Providers may cache the fetched value for subsequent "get" calls, but don't have to.
 - Throws an error if the provider fails to reach the source.
 
 ### Watch: Reactive continuous updates
@@ -91,8 +91,8 @@ Use the "fetch" pattern when:
 The "watch" pattern provides an async sequence of configuration updates, allowing you to react to changes in real-time.
 This is ideal for long-running services that need to adapt to configuration changes without restarting.
 
-The async sequence is required to receive the current value as the first element as quickly as possible - this is 
-part of the API contract with configuration providers (for details, check out ``ConfigProvider``.)
+The async sequence must provide the current value as the first element as quickly as possible - this is
+part of the API contract with configuration providers (for details, check out ``ConfigProvider``).
 
 ```swift
 let config = ConfigReader(provider: reloadingProvider)
@@ -119,7 +119,7 @@ Use the "watch" pattern when:
 #### Behavior characteristics
 
 - Immediately emits the initial value, then subsequent updates.
-- Continues monitoring until the task is cancelled.
+- Continues monitoring until you cancel the task.
 - Works with providers like ``ReloadingFileProvider``.
 
 For details on reloading providers, check out <doc:Using-reloading-providers>.
@@ -130,7 +130,7 @@ All access patterns support configuration context, which provides additional met
 more specific values. Context is particularly useful with the "fetch" and "watch" patterns when working with 
 dynamic or environment-aware providers.
 
-#### Filtering watch updates using context
+#### Filter watch updates using context
 
 ```swift
 let context: [String: ConfigContextValue] = [

@@ -51,15 +51,15 @@ public struct AccessEvent: Sendable {
     /// source location, and timestamp.
     public struct Metadata: Sendable {
 
-        /// The source code location where a configuration access occurred.
+        /// The source code location where a configuration access occurs.
         ///
         /// Captures the file identifier and line number for debugging and auditing purposes.
         public struct SourceLocation: Sendable, CustomStringConvertible {
 
-            /// The identifier of the source file where the access occurred.
+            /// The identifier of the source file where the access occurs.
             public var fileID: String
 
-            /// The line number within the source file where the access occurred.
+            /// The line number within the source file where the access occurs.
             public var line: UInt
 
             /// Creates a new source location.
@@ -79,7 +79,7 @@ public struct AccessEvent: Sendable {
 
         /// The type of configuration access operation.
         ///
-        /// Indicates whether the access was a synchronous get, asynchronous fetch,
+        /// Indicates whether the access is a synchronous get, asynchronous fetch,
         /// or an async watch operation.
         @frozen public enum AccessKind: String, Sendable {
 
@@ -91,8 +91,7 @@ public struct AccessEvent: Sendable {
 
             /// An asynchronous watch operation that monitors value changes.
             ///
-            /// A separate event is generated for each value update received
-            /// from the async sequence.
+            /// The async sequence generates a separate event for each value update.
             case watch
         }
 
@@ -105,10 +104,10 @@ public struct AccessEvent: Sendable {
         /// The expected type of the configuration value.
         public var valueType: ConfigType
 
-        /// The source code location where the access occurred.
+        /// The source code location where the access occurs.
         public var sourceLocation: SourceLocation
 
-        /// The timestamp when the configuration access occurred.
+        /// The timestamp when the configuration access occurs.
         public var accessTimestamp: Date
 
         /// Creates access event metadata.
@@ -116,8 +115,8 @@ public struct AccessEvent: Sendable {
         ///   - accessKind: The type of configuration access operation.
         ///   - key: The configuration key accessed.
         ///   - valueType: The expected type of the configuration value.
-        ///   - sourceLocation: The source code location where the access occurred.
-        ///   - accessTimestamp: The timestamp when the access occurred.
+        ///   - sourceLocation: The source code location where the access occurs.
+        ///   - accessTimestamp: The timestamp when the access occurs.
         public init(
             accessKind: AccessKind,
             key: AbsoluteConfigKey,
@@ -139,7 +138,7 @@ public struct AccessEvent: Sendable {
     /// which can be either a successful lookup result or an error.
     public struct ProviderResult: Sendable {
 
-        /// The name of the configuration provider that processed the lookup.
+        /// The name of the configuration provider that processes the lookup.
         public var providerName: String
 
         /// The outcome of the configuration lookup operation.
@@ -161,7 +160,7 @@ public struct AccessEvent: Sendable {
     /// Metadata that describes the configuration access operation.
     public var metadata: Metadata
 
-    /// The results from each configuration provider that was queried.
+    /// The results from each configuration provider queried.
     public var providerResults: [ProviderResult]
 
     /// An error that occurred when converting the raw config value into another type, for example `RawRepresentable`.
@@ -196,7 +195,7 @@ public struct AccessEvent: Sendable {
 ///
 /// Use this reporter to send configuration access events to multiple destinations
 /// simultaneously. Each upstream reporter receives a copy of every event in the
-/// order they were provided during initialization.
+/// order you provide during initialization.
 ///
 /// ```swift
 /// let fileLogger = try FileAccessLogger(filePath: "/tmp/config.log")
