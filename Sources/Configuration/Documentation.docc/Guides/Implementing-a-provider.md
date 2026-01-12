@@ -63,7 +63,7 @@ The three access patterns serve different needs:
 To support custom file formats like TOML or XML, you don't need to implement a whole provider yourself - the library comes with the following generic file providers that handle any format implementing the ``FileConfigSnapshot`` protocol:
 
 - ``FileProvider``: An immutable file provider, loads the file once at initialization time, then never changes again.
-- ``ReloadingFileProvider``: A mutable file provider that loads the file once at initialization time, and then periodically checks the file for changes, reloading it again as necessary. Since it runs continuously, unlike ``FileProvider``, it conforms to Service Lifecycle's [`Service`](https://swiftpackageindex.com/swift-server/swift-service-lifecycle/documentation/servicelifecycle/service) protocol, and must be run inside a [`ServiceGroup`](https://swiftpackageindex.com/swift-server/swift-service-lifecycle/documentation/servicelifecycle/servicegroup).
+- ``ReloadingFileProvider``: A mutable file provider that loads the file once at initialization time, and then periodically checks the file for changes, reloading it again as necessary. Since it runs continuously, unlike ``FileProvider``, it conforms to Service Lifecycle's [`Service`](https://swiftpackageindex.com/swift-server/swift-service-lifecycle/documentation/servicelifecycle/service) protocol, and you must run it inside a [`ServiceGroup`](https://swiftpackageindex.com/swift-server/swift-service-lifecycle/documentation/servicelifecycle/servicegroup).
 
 These existing file providers simplify the task of adding support for a new file format to Swift Configuration by only requiring you to implement the parsing logic wrapped in a type conforming to ``FileConfigSnapshot``.
 
@@ -114,7 +114,7 @@ public struct TOMLSnapshot: FileConfigSnapshot {
         self.values = flatValues
     }
 
-    /// Second requirement: a value that returns a value for the provided key.
+    /// Second requirement: a method that returns a value for the provided key.
     public func value(forKey key: AbsoluteConfigKey, type: ConfigType) throws -> LookupResult {
         // Use dot-separated encoding for hierarchical keys.
         let encodedKey = key.components.joined(separator: ".")
@@ -285,7 +285,7 @@ public final class RemoteConfigProvider: ConfigProvider {
     private func refreshCache() async throws {
         // 1. Call fetchChangedSnapshot with the current etag.
         // 2a. If unchanged, return.
-        // 2b. If a changed snapshot is returned, notify all active watchers.
+        // 2b. If fetchChangedSnapshot returns a changed snapshot, notify all active watchers.
     }
 
     public func value(forKey key: AbsoluteConfigKey, type: ConfigType) throws -> LookupResult {
@@ -419,20 +419,20 @@ import ConfigurationTesting
 
 > Tip: For file-based providers, create a test fixture file containing the required test data and load it during tests using temporary files or bundle resources.
 
-### Naming recommendations
+### Name your provider
 
 Use the `Provider` suffix for all providers.
 
 When implementing both an immutable and a dynamic variant, use the following prefixes:
 
-- The immutable variant should have no prefix, for example, `InMemoryProvider`.
-- The dynamic variant should have the `Reloading` prefix when reading from disk, and the `Refetching` prefix when fetching from the network.
+- Don't use a prefix for the immutable variant, for example, `InMemoryProvider`.
+- Use the `Reloading` prefix for the dynamic variant when reading from disk, and the `Refetching` prefix when fetching from the network.
 
-> Note: You don't have to follow these recommendations, always prefer to follow correct Swift API design guidelines, whever in conflict with the above recommendations.
+> Note: You don't have to follow these recommendations, always prefer to follow correct Swift API design guidelines, whenever in conflict with the above recommendations.
 
-### Thread safety considerations
+### Ensure thread safety
 
-All providers must be `Sendable` because configuration can be accessed from multiple isolation domains. Follow these patterns:
+Make all providers `Sendable` because configuration can be accessed from multiple isolation domains. Follow these patterns:
 
 - **Immutable providers**: Use a trivial `struct` for providers whose values never change.
 - **Mutex-based providers**: Use a final `class` for mutable providers.
