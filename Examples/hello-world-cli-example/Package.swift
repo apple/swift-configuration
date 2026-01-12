@@ -10,8 +10,7 @@ let package = Package(
     dependencies: [
         .package(
             url: "https://github.com/apple/swift-configuration",
-            // TODO: Update once 1.0.0 is tagged.
-            branch: "main",
+            from: "1.0.0",
             traits: [.defaults, "CommandLineArguments"]
         )
     ],
