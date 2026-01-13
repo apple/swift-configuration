@@ -155,7 +155,7 @@ let reloadingProvider = try await ReloadingFileProvider<TOMLSnapshot>(
 )
 ```
 
-> Tip: For examples of file snapshot types, check out ``JSONSnapshot`` and ``YAMLSnapshot``.
+> Tip: For examples of file snapshot types, check out [the source for JSONSnapshot](https://github.com/apple/swift-configuration/blob/main/Sources/Configuration/Providers/Files/JSONSnapshot.swift) or [the source for YAMLSnapshot](https://github.com/apple/swift-configuration/blob/main/Sources/Configuration/Providers/Files/YAMLSnapshot.swift).
 
 ### Implement an immutable provider
 
@@ -163,7 +163,7 @@ For non-file-based providers that represent immutable data in memory, the implem
 
 1. Implement a custom snapshot type with its ``ConfigSnapshot/value(forKey:type:)`` method, conforming to ``ConfigSnapshot``.
 2. Implement the provider type, conforming to ``ConfigProvider``.
-3. For the "fetch" method, just call the equivalent "get" method. This is acceptable, as "fetch" is supposed to reach out to the source of truth, and in the case of this provider, the in-memory representation is the source of truth.
+3. For the "fetch" method, call the equivalent "get" method. This is acceptable, as "fetch" is supposed to reach out to the source of truth, and in the case of this provider, the in-memory representation is the source of truth.
 4. For the "watch" methods, use the helpers that emit the current value or snapshot once, and never emit another update. This is a valid implementation of "watch" in an immutable provider:
     - ``ConfigProvider/watchValueFromValue(forKey:type:updatesHandler:)``
     - ``ConfigProvider/watchSnapshotFromSnapshot(updatesHandler:)``
@@ -233,7 +233,7 @@ struct ImmutableDictionarySnapshot: ConfigSnapshot {
 }
 ```
 
-> Tip: For examples of immutable providers, check out ``EnvironmentVariablesProvider``, ``CommandLineArgumentsProvider``, and ``InMemoryProvider``.
+> Tip: For examples of immutable providers, check out [the source for EnvironmentVariablesProvider](https://github.com/apple/swift-configuration/blob/main/Sources/Configuration/Providers/EnvironmentVariables/EnvironmentVariablesProvider.swift), [the source for CommandLineArgumentsProvider](https://github.com/apple/swift-configuration/blob/main/Sources/Configuration/Providers/CLI/CommandLineArgumentsProvider.swift), or [the source for  InMemoryProvider](https://github.com/apple/swift-configuration/blob/main/Sources/Configuration/Providers/InMemory/MutableInMemoryProvider.swift).
 
 ### Implement a dynamic provider
 
@@ -351,7 +351,7 @@ struct RemoteConfigSnapshot: ConfigSnapshot {
 }
 ```
 
-> Tip: For examples of dynamic providers, check out ``ReloadingFileProvider`` and ``MutableInMemoryProvider``.
+> Tip: For examples of dynamic providers, check out [the source for ReloadingFileProvider](https://github.com/apple/swift-configuration/blob/main/Sources/Configuration/Providers/Files/ReloadingFileProvider.swift) or [the source for MutableInMemoryProvider](https://github.com/apple/swift-configuration/blob/main/Sources/Configuration/Providers/InMemory/MutableInMemoryProvider.swift).
 
 ### Integrate with Service Lifecycle
 
