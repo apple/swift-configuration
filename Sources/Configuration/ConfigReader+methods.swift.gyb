@@ -340,6 +340,114 @@ extension ConfigReader {
         )
     }
 
+    /// Synchronously gets a config value for the given config key, converting from a string array.
+    ///
+    /// Use this method to retrieve configuration values that are represented as arrays of strings,
+    /// but should be interpreted as a single domain type (for example, HTTP header collections).
+    /// If the value doesn't exist or can't be converted to the expected type, the method returns `nil`.
+    ///
+    /// ```swift
+    /// let headers = config.stringArray(forKey: ["network", "headers"], as: HTTPHeaders.self)
+    /// ```
+    ///
+    /// - Parameters:
+    ///   - key: The config key to look up.
+    ///   - type: The type to convert the string array value to.
+    ///   - isSecret: Whether the value should be treated as secret for logging and debugging purposes.
+    ///   - fileID: The file ID where this call originates. Used for access reporting.
+    ///   - line: The line number where this call originates. Used for access reporting.
+    /// - Returns: The value converted to the expected type if found and convertible, otherwise `nil`.
+    public func stringArray<Value: ExpressibleByConfigStringArray>(
+        forKey key: ConfigKey,
+        as type: Value.Type = Value.self,
+        isSecret: Bool = false,
+        fileID: String = #fileID,
+        line: UInt = #line
+    ) -> Value? {
+        value(
+            forKey: key,
+            type: .stringArray,
+            isSecret: isSecret,
+            unwrap: { try cast($0.asStringArray, type: Value.self, key: key) },
+            wrap: { uncast($0) },
+            fileID: fileID,
+            line: line
+        )
+    }
+
+    /// Synchronously gets a config value for the given config key with default fallback, converting from a string array.
+    ///
+    /// Use this method when you need a guaranteed non-nil result for string-array-convertible types.
+    /// If the configuration value is missing or can't be converted to the expected type,
+    /// the method returns the default value instead.
+    ///
+    /// ```swift
+    /// let headers = config.stringArray(forKey: ["network", "headers"], as: HTTPHeaders.self, default: .init())
+    /// ```
+    ///
+    /// - Parameters:
+    ///   - key: The config key to look up.
+    ///   - type: The type to convert the string array value to.
+    ///   - isSecret: Whether the value should be treated as secret for logging and debugging purposes.
+    ///   - defaultValue: The fallback value returned when the config value is missing or invalid.
+    ///   - fileID: The file ID where this call originates. Used for access reporting.
+    ///   - line: The line number where this call originates. Used for access reporting.
+    /// - Returns: The config value if found and convertible, otherwise the default value.
+    public func stringArray<Value: ExpressibleByConfigStringArray>(
+        forKey key: ConfigKey,
+        as type: Value.Type = Value.self,
+        isSecret: Bool = false,
+        default defaultValue: Value,
+        fileID: String = #fileID,
+        line: UInt = #line
+    ) -> Value {
+        value(
+            forKey: key,
+            type: .stringArray,
+            isSecret: isSecret,
+            default: defaultValue,
+            unwrap: { try cast($0.asStringArray, type: Value.self, key: key) },
+            wrap: { uncast($0) },
+            fileID: fileID,
+            line: line
+        )
+    }
+
+    /// Synchronously gets a required config value for the given config key, converting from a string array.
+    ///
+    /// Use this method when a string-array-convertible configuration value is mandatory for your application to function.
+    /// The method throws an error if the value is missing or can't be converted to the expected type.
+    ///
+    /// ```swift
+    /// let headers = try config.requiredStringArray(forKey: ["network", "headers"], as: HTTPHeaders.self)
+    /// ```
+    ///
+    /// - Parameters:
+    ///   - key: The config key to look up.
+    ///   - type: The type to convert the string array value to.
+    ///   - isSecret: Whether the value should be treated as secret for logging and debugging purposes.
+    ///   - fileID: The file ID where this call originates. Used for access reporting.
+    ///   - line: The line number where this call originates. Used for access reporting.
+    /// - Returns: The config value converted to the expected type.
+    /// - Throws: An error if the value is missing or can't be converted to the expected type.
+    public func requiredStringArray<Value: ExpressibleByConfigStringArray>(
+        forKey key: ConfigKey,
+        as type: Value.Type = Value.self,
+        isSecret: Bool = false,
+        fileID: String = #fileID,
+        line: UInt = #line
+    ) throws -> Value {
+        try requiredValue(
+            forKey: key,
+            type: .stringArray,
+            isSecret: isSecret,
+            unwrap: { try cast($0.asStringArray, type: Value.self, key: key) },
+            wrap: { uncast($0) },
+            fileID: fileID,
+            line: line
+        )
+    }
+    
     % end
     // MARK: - Fetch
 
@@ -667,6 +775,116 @@ extension ConfigReader {
         )
     }
 
+    /// Asynchronously fetches a config value for the given config key, converting from a string array.
+    ///
+    /// Use this method to retrieve configuration values that are represented as arrays of strings,
+    /// but should be interpreted as a single domain type (for example, HTTP header collections)
+    /// using async providers. If the value doesn't exist, the method returns `nil`.
+    ///
+    /// ```swift
+    /// let headers = try await config.fetchStringArray(forKey: ["network", "headers"], as: HTTPHeaders.self)
+    /// ```
+    ///
+    /// - Parameters:
+    ///   - key: The config key to look up.
+    ///   - type: The type to convert the string array value to.
+    ///   - isSecret: Whether the value should be treated as secret for logging and debugging purposes.
+    ///   - fileID: The file ID where this call originates. Used for access reporting.
+    ///   - line: The line number where this call originates. Used for access reporting.
+    /// - Returns: The value converted to the expected type if found and convertible, otherwise `nil`.
+    /// - Throws: An error if the underlying provider throws or if the value can't be converted to the expected type.
+    public func fetchStringArray<Value: ExpressibleByConfigStringArray>(
+        forKey key: ConfigKey,
+        as type: Value.Type = Value.self,
+        isSecret: Bool = false,
+        fileID: String = #fileID,
+        line: UInt = #line
+    ) async throws -> Value? {
+        try await fetchValue(
+            forKey: key,
+            type: .stringArray,
+            isSecret: isSecret,
+            unwrap: { try cast($0.asStringArray, type: Value.self, key: key) },
+            wrap: { uncast($0) },
+            fileID: fileID,
+            line: line
+        )
+    }
+
+    /// Asynchronously fetches a config value for the given config key with default fallback, converting from a string array.
+    ///
+    /// Use this method when you need a guaranteed non-nil result for string-array-convertible types from async providers.
+    /// If the configuration value is missing or can't be converted to the expected type,
+    /// the method returns the default value instead.
+    ///
+    /// ```swift
+    /// let headers = try await config.fetchStringArray(forKey: ["network", "headers"], as: HTTPHeaders.self, default: .init())
+    /// ```
+    ///
+    /// - Parameters:
+    ///   - key: The config key to look up.
+    ///   - type: The type to convert the string array value to.
+    ///   - isSecret: Whether the value should be treated as secret for logging and debugging purposes.
+    ///   - defaultValue: The fallback value returned when the config value is missing or invalid.
+    ///   - fileID: The file ID where this call originates. Used for access reporting.
+    ///   - line: The line number where this call originates. Used for access reporting.
+    /// - Returns: The config value if found and convertible, otherwise the default value.
+    /// - Throws: An error if the underlying provider throws or if the value can't be converted to the expected type.
+    public func fetchStringArray<Value: ExpressibleByConfigStringArray>(
+        forKey key: ConfigKey,
+        as type: Value.Type = Value.self,
+        isSecret: Bool = false,
+        default defaultValue: Value,
+        fileID: String = #fileID,
+        line: UInt = #line
+    ) async throws -> Value {
+        try await fetchValue(
+            forKey: key,
+            type: .stringArray,
+            isSecret: isSecret,
+            default: defaultValue,
+            unwrap: { try cast($0.asStringArray, type: Value.self, key: key) },
+            wrap: { uncast($0) },
+            fileID: fileID,
+            line: line
+        )
+    }
+
+    /// Asynchronously fetches a required config value for the given config key, converting from a string array.
+    ///
+    /// Use this method when a string-array-convertible configuration value is mandatory for your application to function
+    /// and you're working with async providers. The method throws an error if the value is missing or can't be converted to the expected type.
+    ///
+    /// ```swift
+    /// let headers = try await config.fetchRequiredStringArray(forKey: ["network", "headers"], as: HTTPHeaders.self)
+    /// ```
+    ///
+    /// - Parameters:
+    ///   - key: The config key to look up.
+    ///   - type: The type to convert the string array value to.
+    ///   - isSecret: Whether the value should be treated as secret for logging and debugging purposes.
+    ///   - fileID: The file ID where this call originates. Used for access reporting.
+    ///   - line: The line number where this call originates. Used for access reporting.
+    /// - Returns: The config value converted to the expected type.
+    /// - Throws: An error if the underlying provider throws, the value is missing, or can't be converted to the expected type.
+    public func fetchRequiredStringArray<Value: ExpressibleByConfigStringArray>(
+        forKey key: ConfigKey,
+        as type: Value.Type = Value.self,
+        isSecret: Bool = false,
+        fileID: String = #fileID,
+        line: UInt = #line
+    ) async throws -> Value {
+        try await fetchRequiredValue(
+            forKey: key,
+            type: .stringArray,
+            isSecret: isSecret,
+            unwrap: { try cast($0.asStringArray, type: Value.self, key: key) },
+            wrap: { uncast($0) },
+            fileID: fileID,
+            line: line
+        )
+    }
+    
     % end
     // MARK: - Watch
 
@@ -1084,5 +1302,145 @@ extension ConfigReader {
         )
     }
 
+    /// Watches for updates to a config value for the given config key, converting from a string array.
+    ///
+    /// Use this method to observe changes to configuration values that are represented as arrays of strings,
+    /// but should be interpreted as a single domain type (for example, HTTP header collections).
+    /// The handler receives an async sequence that produces the current value whenever it changes,
+    /// or `nil` if the value is missing or can't be converted.
+    ///
+    /// ```swift
+    /// try await config.watchStringArray(forKey: ["network", "headers"], as: HTTPHeaders.self) { updates in
+    ///     for await headers in updates {
+    ///         if let headers = headers {
+    ///             print("Headers updated: \(headers)")
+    ///         } else {
+    ///             print("No headers configured")
+    ///         }
+    ///     }
+    /// }
+    /// ```
+    ///
+    /// - Parameters:
+    ///   - key: The config key to watch.
+    ///   - type: The type to convert the string array value to.
+    ///   - isSecret: Whether the value should be treated as secret for logging and debugging purposes.
+    ///   - fileID: The file ID where this call originates. Used for access reporting.
+    ///   - line: The line number where this call originates. Used for access reporting.
+    ///   - updatesHandler: A closure that handles an async sequence of updates to the value. The sequence
+    ///     produces `nil` if the value is missing or can't be converted.
+    /// - Returns: The result produced by the handler.
+    /// - Throws: Rethrows any error thrown by the handler or the underlying watch operation.
+    public func watchStringArray<Value: ExpressibleByConfigStringArray & Sendable, Return: ~Copyable>(
+        forKey key: ConfigKey,
+        as type: Value.Type = Value.self,
+        isSecret: Bool = false,
+        fileID: String = #fileID,
+        line: UInt = #line,
+        updatesHandler: (_ updates: ConfigUpdatesAsyncSequence<Value?, Never>) async throws -> Return
+    ) async throws -> Return {
+        try await watchValue(
+            forKey: key,
+            type: .stringArray,
+            isSecret: isSecret,
+            unwrap: { try cast($0.asStringArray, type: Value.self, key: key) },
+            wrap: { uncast($0) },
+            fileID: fileID,
+            line: line,
+            updatesHandler: updatesHandler
+        )
+    }
+
+    /// Watches for updates to a config value for the given config key with default fallback, converting from a string array.
+    ///
+    /// Use this method to observe changes to string-array-convertible configuration values over time with a guaranteed fallback.
+    /// The handler receives an async sequence that produces the current value whenever it changes,
+    /// or the default value if the configuration value is missing or can't be converted.
+    ///
+    /// ```swift
+    /// try await config.watchStringArray(forKey: ["network", "headers"], as: HTTPHeaders.self, default: .init()) { updates in
+    ///     for await headers in updates {
+    ///         print("Headers updated: \(headers)")
+    ///     }
+    /// }
+    /// ```
+    ///
+    /// - Parameters:
+    ///   - key: The config key to watch.
+    ///   - type: The type to convert the string array value to.
+    ///   - isSecret: Whether the value should be treated as secret for logging and debugging purposes.
+    ///   - defaultValue: The fallback value used when the config value is missing or invalid.
+    ///   - fileID: The file ID where this call originates. Used for access reporting.
+    ///   - line: The line number where this call originates. Used for access reporting.
+    ///   - updatesHandler: A closure that handles an async sequence of updates to the value. The sequence
+    ///     produces the default value if the provider returned a `nil` value or conversion failed.
+    /// - Returns: The result produced by the handler.
+    /// - Throws: Rethrows any error thrown by the handler or the underlying watch operation.
+    public func watchStringArray<Value: ExpressibleByConfigStringArray & Sendable, Return: ~Copyable>(
+        forKey key: ConfigKey,
+        as type: Value.Type = Value.self,
+        isSecret: Bool = false,
+        default defaultValue: Value,
+        fileID: String = #fileID,
+        line: UInt = #line,
+        updatesHandler: (_ updates: ConfigUpdatesAsyncSequence<Value, Never>) async throws -> Return
+    ) async throws -> Return {
+        try await watchValue(
+            forKey: key,
+            type: .stringArray,
+            isSecret: isSecret,
+            default: defaultValue,
+            unwrap: { try cast($0.asStringArray, type: Value.self, key: key) },
+            wrap: { uncast($0) },
+            fileID: fileID,
+            line: line,
+            updatesHandler: updatesHandler
+        )
+    }
+
+    /// Watches for updates to a required config value for the given config key, converting from a string array.
+    ///
+    /// Use this method to observe changes to mandatory string-array-convertible configuration values over time.
+    /// The handler receives an async sequence that produces the current value whenever it changes,
+    /// or an error if the value is missing or can't be converted.
+    ///
+    /// ```swift
+    /// try await config.watchRequiredStringArray(forKey: ["network", "headers"], as: HTTPHeaders.self) { updates in
+    ///     for try await headers in updates {
+    ///         print("Headers updated: \(headers)")
+    ///     }
+    /// }
+    /// ```
+    ///
+    /// - Parameters:
+    ///   - key: The config key to watch.
+    ///   - type: The type to convert the string array value to.
+    ///   - isSecret: Whether the value should be treated as secret for logging and debugging purposes.
+    ///   - fileID: The file ID where this call originates. Used for access reporting.
+    ///   - line: The line number where this call originates. Used for access reporting.
+    ///   - updatesHandler: A closure that handles an async sequence of updates to the value. The sequence
+    ///     produces an error if the provider returned a `nil` value or if the value was of an incorrect type.
+    /// - Returns: The result produced by the handler.
+    /// - Throws: Rethrows any error thrown by the handler or the underlying watch operation.
+    public func watchRequiredStringArray<Value: ExpressibleByConfigStringArray & Sendable, Return: ~Copyable>(
+        forKey key: ConfigKey,
+        as type: Value.Type = Value.self,
+        isSecret: Bool = false,
+        fileID: String = #fileID,
+        line: UInt = #line,
+        updatesHandler: (_ updates: ConfigUpdatesAsyncSequence<Value, any Error>) async throws -> Return
+    ) async throws -> Return {
+        try await watchRequiredValue(
+            forKey: key,
+            type: .stringArray,
+            isSecret: isSecret,
+            unwrap: { try cast($0.asStringArray, type: Value.self, key: key) },
+            wrap: { uncast($0) },
+            fileID: fileID,
+            line: line,
+            updatesHandler: updatesHandler
+        )
+    }
+    
     % end
 }
