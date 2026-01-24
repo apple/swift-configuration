@@ -59,4 +59,4 @@ My system has IPv6 disabled.
 
 ## Automated release process
 
-This repository uses automated releases based on semantic versioning labels. See the [swift-temporal-sdk Auto Release Workflow documentation](https://github.com/apple/swift-temporal-sdk/blob/main/.github/workflows/README.md) for details.
+This repository uses automated releases based on semantic versioning labels. See the [Auto Release Workflow documentation](https://github.com/apple/swift-temporal-sdk/blob/main/.github/workflows/README.md) for details.
