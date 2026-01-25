@@ -2,12 +2,6 @@
 //
 // This source file is part of the SwiftConfiguration open source project
 //
-// Copyright (c) 2025 Apple Inc. and the SwiftConfiguration project authors
-// Licensed under Apache License v2.0
-//
-// See LICENSE.txt for license information
-// See CONTRIBUTORS.txt for the list of SwiftConfiguration project authors
-//
 // SPDX-License-Identifier: Apache-2.0
 //
 //===----------------------------------------------------------------------===//
@@ -21,48 +15,107 @@ import Testing
 import ConfigurationTestingInternal
 
 struct ConfigReaderMethodTestsGet4 {
-    
+
     typealias Defaults = ConfigReaderTests.Defaults
-    typealias TestIntEnum = ConfigReaderTests.TestIntEnum
-    typealias TestIntConvertible = ConfigReaderTests.TestIntConvertible
+    typealias TestHTTPHeaders = ConfigReaderTests.TestHTTPHeaders
 
     @available(Configuration 1.0, *)
-    @Test func get() async throws {
+    @Test func get() throws {
         let config = ConfigReaderTests.config
-        
-        % for int_convertible_type in int_convertible_types:
-        % test_type = int_convertible_type["testType"]
-        % test_suffix = int_convertible_type["testSuffix"]
-        % lower_test_suffix = lower_first(test_suffix)
+
         do {
+            // --------------------------------------------------
+            // Optional
+            // --------------------------------------------------
+
             // Optional - success
-            #expect(config.int(forKey: "${lower_test_suffix}", as: ${test_type}.self) == Defaults.${lower_test_suffix})
+            #expect(
+                config.stringArray(
+                    forKey: "httpHeaders",
+                    as: TestHTTPHeaders.self
+                ) == Defaults.httpHeaders
+            )
 
             // Optional - missing
-            #expect(config.int(forKey: "absent${test_suffix}", as: ${test_type}.self) == nil)
+            #expect(
+                config.stringArray(
+                    forKey: "absentHTTPHeaders",
+                    as: TestHTTPHeaders.self
+                ) == nil
+            )
 
-            // Optional - failing
-            #expect(config.int(forKey: "failure", as: ${test_type}.self) == nil)
+            // Optional - failing (returns nil, does NOT throw)
+            #expect(
+                config.stringArray(
+                    forKey: "failure",
+                    as: TestHTTPHeaders.self
+                ) == nil
+            )
+
+            // --------------------------------------------------
+            // Defaulted
+            // --------------------------------------------------
 
             // Defaulted - success
-            #expect(config.int(forKey: "${lower_test_suffix}", as: ${test_type}.self, default: Defaults.other${test_suffix}) == Defaults.${lower_test_suffix})
+            #expect(
+                config.stringArray(
+                    forKey: "httpHeaders",
+                    as: TestHTTPHeaders.self,
+                    default: Defaults.otherHTTPHeaders
+                ) == Defaults.httpHeaders
+            )
 
             // Defaulted - missing
-            #expect(config.int(forKey: "absent${test_suffix}", as: ${test_type}.self, default: Defaults.other${test_suffix}) == Defaults.other${test_suffix})
+            #expect(
+                config.stringArray(
+                    forKey: "absentHTTPHeaders",
+                    as: TestHTTPHeaders.self,
+                    default: Defaults.otherHTTPHeaders
+                ) == Defaults.otherHTTPHeaders
+            )
 
-            // Defaulted - failing
-            #expect(config.int(forKey: "failure", as: ${test_type}.self, default: Defaults.other${test_suffix}) == Defaults.other${test_suffix})
+            // Defaulted - failing (returns default, does NOT throw)
+            #expect(
+                config.stringArray(
+                    forKey: "failure",
+                    as: TestHTTPHeaders.self,
+                    default: Defaults.otherHTTPHeaders
+                ) == Defaults.otherHTTPHeaders
+            )
+
+            // --------------------------------------------------
+            // Required
+            // --------------------------------------------------
 
             // Required - success
-            #expect(try config.requiredInt(forKey: "${lower_test_suffix}", as: ${test_type}.self) == Defaults.${lower_test_suffix})
+            #expect(
+                try config.requiredStringArray(
+                    forKey: "httpHeaders",
+                    as: TestHTTPHeaders.self
+                ) == Defaults.httpHeaders
+            )
 
-            // Required - missing
-            let error1 = #expect(throws: ConfigError.self) { try config.requiredInt(forKey: "absent${test_suffix}", as: ${test_type}.self) }
-            #expect(error1 == .missingRequiredConfigValue(AbsoluteConfigKey(["absent${test_suffix}"])))
+            // Required - missing (throws ConfigError)
+            let error1 = #expect(throws: ConfigError.self) {
+                try config.requiredStringArray(
+                    forKey: "absentHTTPHeaders",
+                    as: TestHTTPHeaders.self
+                )
+            }
+            #expect(
+                error1 == .missingRequiredConfigValue(
+                    AbsoluteConfigKey(["absentHTTPHeaders"])
+                )
+            )
 
-            // Required - failing
-            #expect(throws: TestProvider.TestError.self) { try config.requiredInt(forKey: "failure", as: ${test_type}.self) }
+            // Required - failing (throws provider error)
+            #expect(throws: TestProvider.TestError.self) {
+                try config.requiredStringArray(
+                    forKey: "failure",
+                    as: TestHTTPHeaders.self
+                )
+            }
         }
-        % end
     }
 }
+
