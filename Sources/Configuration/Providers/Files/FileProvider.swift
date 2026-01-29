@@ -84,7 +84,7 @@ public struct FileProvider<Snapshot: FileConfigSnapshot>: Sendable {
         allowMissing: Bool = false
     ) async throws {
         try await self.init(
-            snapshotTypes: snapshotType,
+            snapshotType: snapshotType,
             parsingOptions: parsingOptions,
             filePath: filePath,
             allowMissing: allowMissing,
@@ -151,7 +151,7 @@ public struct FileProvider<Snapshot: FileConfigSnapshot>: Sendable {
         fileSystem: some CommonProviderFileSystem
     ) async throws {
         try await self.init(
-            snapshotTypes: snapshotType,
+            snapshotType: snapshotType,
             parsingOptions: parsingOptions,
             filePath: config.requiredString(forKey: "filePath", as: FilePath.self),
             allowMissing: config.bool(forKey: "allowMissing", default: false),
@@ -173,17 +173,17 @@ public struct FileProvider<Snapshot: FileConfigSnapshot>: Sendable {
     ///     - When `true`, if the file is missing, treats it as empty. Malformed files still throw an error.
     ///   - fileSystem: The file system implementation to use for reading the file.
     /// - Throws: If the file cannot be read or if snapshot creation fails.
-    internal init<FileSystem: CommonProviderFileSystem>(
-        snapshotTypes: Snapshot.Type = Snapshot.self,
+    internal init(
+        snapshotType: Snapshot.Type = Snapshot.self,
         parsingOptions: Snapshot.ParsingOptions,
         filePath: FilePath,
         allowMissing: Bool,
-        fileSystem: FileSystem
+        fileSystem: some CommonProviderFileSystem
     ) async throws {
         let fileContents = try await fileSystem.fileContents(atPath: filePath)
         let providerName = "FileProvider<\(Snapshot.self)>"
         if fileContents != nil {
-            self._snapshot = try snapshotTypes.init(
+            self._snapshot = try snapshotType.init(
                 data: fileContents!.bytes,
                 providerName: providerName,
                 parsingOptions: parsingOptions
