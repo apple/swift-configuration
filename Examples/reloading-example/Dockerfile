@@ -20,8 +20,9 @@ WORKDIR /build
 COPY ./Package.* ./
 RUN swift package resolve
 
-# Copy entire repo into container
-COPY . .
+# Copy source files and public content
+COPY ./Sources ./Sources
+COPY ./Public ./Public
 
 # Build the application, with optimizations, with static linking, and using jemalloc
 RUN swift build -c release \
