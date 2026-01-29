@@ -182,6 +182,8 @@ public struct FileProvider<Snapshot: FileConfigSnapshot>: Sendable {
     ) async throws {
         let fileContents = try await fileSystem.fileContents(atPath: filePath)
         let providerName = "FileProvider<\(Snapshot.self)>"
+        /// Debug swift 6.2.3 compiler crashes is we shadow fileContents
+        #if compiler(<6.3)
         if fileContents != nil {
             self._snapshot = try snapshotType.init(
                 data: fileContents!.bytes,
@@ -193,6 +195,19 @@ public struct FileProvider<Snapshot: FileConfigSnapshot>: Sendable {
         } else {
             throw FileSystemError.fileNotFound(path: filePath)
         }
+        #else
+        if let fileContents {
+            self._snapshot = try snapshotType.init(
+                data: fileContents.bytes,
+                providerName: providerName,
+                parsingOptions: parsingOptions
+            )
+        } else if allowMissing {
+            self._snapshot = EmptyFileConfigSnapshot(providerName: providerName)
+        } else {
+            throw FileSystemError.fileNotFound(path: filePath)
+        }
+        #endif
     }
 }
 
