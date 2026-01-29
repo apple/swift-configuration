@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: http-server
+spec:
+  selector:
+    matchLabels:
+      app: http-server
+  template:
+    metadata:
+      labels:
+        app: http-server
+    spec:
+      containers:
+      - name: http-server
+        image: kind-registry.vsl:5000/reloading-example:latest
+        env:
+        - name: LOG_LEVEL
+          value: "debug"
+        ports:
+        - containerPort: 8080
+        volumeMounts:
+        - name: config-volume
+          mountPath: /etc/config
+      volumes:
+      - name: config-volume
+        configMap:
+          name: reloading-example-configmap
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: http-server
+spec:
+  selector:
+    app: http-server
+  ports:
+  - protocol: TCP
+    port: 8080
+    targetPort: 8080
