@@ -868,7 +868,7 @@ extension ConfigReader {
         }
         return typedValue
     }
-
+    
     /// Casts a string into a raw representable type.
     ///
     /// - Parameters:
@@ -888,6 +888,25 @@ extension ConfigReader {
         return typedValue
     }
 
+    /// Casts a string array into a config string array convertible type.
+    ///
+    /// - Parameters:
+    ///   - strings: The string array to cast.
+    ///   - type: The target type.
+    ///   - key: The config key.
+    /// - Throws: A `ConfigError` if conversion fails.
+    /// - Returns: The typed value.
+    internal func cast<Value: ExpressibleByConfigStringArray>(
+        _ strings: [String],
+        type: Value.Type,
+        key: ConfigKey
+    ) throws -> Value {
+        guard let typedValue = Value(configStringArray: strings) else {
+            throw ConfigError.configValueFailedToCast(name: keyPrefix.appending(key).description, type: "\(type)")
+        }
+        return typedValue
+    }
+    
     /// Converts a string convertible type into raw config content.
     ///
     /// - Parameter value: The typed value.
@@ -926,5 +945,15 @@ extension ConfigReader {
         _ values: [Value]
     ) -> ConfigContent {
         .stringArray(values.map(\.rawValue))
+    }
+    
+    /// Converts a string array convertible type into raw config content.
+    ///
+    /// - Parameter value: The typed value.
+    /// - Returns: The wrapped config content as a string array.
+    internal func uncast<Value: ExpressibleByConfigStringArray>(
+        _ value: Value
+    ) -> ConfigContent {
+        .stringArray(value.configStringArray)
     }
 }

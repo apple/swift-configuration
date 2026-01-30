@@ -75,6 +75,43 @@ struct ConfigReaderTests {
             .init(string: "World")
         }
     }
+    
+    struct TestHTTPHeaders: ExpressibleByConfigStringArray, CustomStringConvertible, Equatable, Sendable {
+        var configStringArray: [String]
+        let headers: [(String, String)]
+
+        init?(configStringArray: [String]) {
+            var parsed: [(String, String)] = []
+            parsed.reserveCapacity(configStringArray.count)
+
+            for item in configStringArray {
+                let parts = item.split(separator: ":", maxSplits: 1, omittingEmptySubsequences: false)
+                guard parts.count == 2 else { return nil }
+
+                let name = String(parts[0])
+                let value = String(parts[1])
+                guard !name.isEmpty else { return nil }
+
+                parsed.append((name, value))
+            }
+
+            self.configStringArray = configStringArray
+            self.headers = parsed
+        }
+
+        init(headers: [(String, String)]) {
+            self.headers = headers
+            self.configStringArray = headers.map { "\($0.0):\($0.1)" }
+        }
+
+        var description: String {
+            headers.map { "\($0.0):\($0.1)" }.joined(separator: ",")
+        }
+
+        static func == (lhs: Self, rhs: Self) -> Bool {
+            lhs.headers.elementsEqual(rhs.headers) { $0.0 == $1.0 && $0.1 == $1.1 }
+        }
+    }
 
     enum Defaults {
         static var string: String { "Hello" }
@@ -105,6 +142,11 @@ struct ConfigReaderTests {
         static var otherStringEnumArray: [TestEnum] { [.one, .two, .one] }
         static var stringConvertibleArray: [TestStringConvertible] { [.hello, .world] }
         static var otherStringConvertibleArray: [TestStringConvertible] { [.hello, .world, .hello] }
+        static var httpHeadersRaw: [String] { ["A:1", "B:2"] }
+                static var otherHTTPHeadersRaw: [String] { ["X:9"] }
+
+                static var httpHeaders: TestHTTPHeaders { .init(configStringArray: httpHeadersRaw)! }
+                static var otherHTTPHeaders: TestHTTPHeaders { .init(configStringArray: otherHTTPHeadersRaw)! }
     }
 
     @available(Configuration 1.0, *)
@@ -128,6 +170,7 @@ struct ConfigReaderTests {
                 ConfigValue(Defaults.stringConvertibleArray.map(\.description), isSecret: false)
             ),
 
+            "httpHeaders": .success(ConfigValue(Defaults.httpHeadersRaw, isSecret: false)),
             "failure": .failure(TestProvider.TestError()),
         ])
     }
