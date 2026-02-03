@@ -20,7 +20,7 @@ import Foundation
 /// A snapshot of configuration values parsed from property list (plist) data.
 ///
 /// This structure represents a point-in-time view of configuration values. It handles
-/// the conversion from plist types to configuration value types.
+/// the conversion from property list types to configuration value types.
 ///
 /// ## Usage
 ///
@@ -33,7 +33,7 @@ import Foundation
 @available(Configuration 1.0, *)
 public struct PropertyListSnapshot {
 
-    /// Parsing options for plist snapshot creation.
+    /// Parsing options for property list snapshot creation.
     ///
     /// This struct provides configuration options for parsing plist data into configuration snapshots,
     /// including byte decoding and secrets specification.
