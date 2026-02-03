@@ -36,6 +36,10 @@ var traits: Set<Trait> = [
         name: "YAML",
         description: "Adds support for parsing YAML configuration files."
     ),
+    .trait(
+        name: "Plist",
+        description: "Adds support for parsing property list configuration files."
+    ),
 ]
 
 // Workaround to ensure that all traits are included in documentation. Swift Package Index adds
