@@ -138,12 +138,12 @@ let plistTestFileContents = """
     </plist>
     """
 
-struct PlistFileProviderTests {
+struct PropertyListFileProviderTests {
 
     @available(Configuration 1.0, *)
-    var provider: PlistSnapshot {
+    var provider: PropertyListSnapshot {
         get throws {
-            try PlistSnapshot(
+            try PropertyListSnapshot(
                 data: Data(plistTestFileContents.utf8).bytes,
                 providerName: "TestProvider",
                 parsingOptions: .default
@@ -173,7 +173,7 @@ struct PlistFileProviderTests {
             "/etc/config.plist": .file(timestamp: .now, contents: plistTestFileContents)
         ])
         try await ProviderCompatTest(
-            provider: FileProvider<PlistSnapshot>(
+            provider: FileProvider<PropertyListSnapshot>(
                 parsingOptions: .default,
                 filePath: "/etc/config.plist",
                 allowMissing: false,
@@ -181,6 +181,21 @@ struct PlistFileProviderTests {
             )
         )
         .runTest()
+    }
+
+    @available(Configuration 1.0, *)
+    @Test func binaryPlist() async throws {
+        // Create binary plist from the same test data
+        let xmlData = Data(plistTestFileContents.utf8)
+        let plist = try PropertyListSerialization.propertyList(from: xmlData, format: nil)
+        let binaryData = try PropertyListSerialization.data(fromPropertyList: plist, format: .binary, options: 0)
+
+        let provider = try PropertyListSnapshot(
+            data: binaryData.bytes,
+            providerName: "BinaryTestProvider",
+            parsingOptions: .default
+        )
+        #expect(provider.description == "BinaryTestProvider[20 values]")
     }
 }
 
