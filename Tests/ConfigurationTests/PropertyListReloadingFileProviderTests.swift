@@ -23,15 +23,15 @@ import Logging
 import Metrics
 import SystemPackage
 
-struct PlistReloadingFileProviderTests {
+struct PropertyListReloadingFileProviderTests {
 
     @available(Configuration 1.0, *)
-    var provider: ReloadingFileProvider<PlistSnapshot> {
+    var provider: ReloadingFileProvider<PropertyListSnapshot> {
         get async throws {
             let fileSystem = InMemoryFileSystem(files: [
                 "/etc/config.plist": .file(timestamp: .now, contents: plistTestFileContents)
             ])
-            return try await ReloadingFileProvider<PlistSnapshot>(
+            return try await ReloadingFileProvider<PropertyListSnapshot>(
                 parsingOptions: .default,
                 filePath: "/etc/config.plist",
                 allowMissing: false,
@@ -46,7 +46,7 @@ struct PlistReloadingFileProviderTests {
     @available(Configuration 1.0, *)
     @Test func printingDescription() async throws {
         let expectedDescription = #"""
-            ReloadingFileProvider<PlistSnapshot>[20 values]
+            ReloadingFileProvider<PropertyListSnapshot>[20 values]
             """#
         #expect(try await provider.description == expectedDescription)
     }
@@ -54,7 +54,7 @@ struct PlistReloadingFileProviderTests {
     @available(Configuration 1.0, *)
     @Test func printingDebugDescription() async throws {
         let expectedDebugDescription = #"""
-            ReloadingFileProvider<PlistSnapshot>[20 values: bool=1, booly.array=1,0, byteChunky.array=bWFnaWM=,bWFnaWMy, bytes=bWFnaWM=, double=3.14, doubly.array=3.14,2.72, int=42, inty.array=42,24, other.bool=0, other.booly.array=0,1,1, other.byteChunky.array=bWFnaWM=,bWFnaWMy,bWFnaWM=, other.bytes=bWFnaWMy, other.double=2.72, other.doubly.array=0.9,1.8, other.int=24, other.inty.array=16,32, other.string=Other Hello, other.stringy.array=Hello,Swift, string=Hello, stringy.array=Hello,World]
+            ReloadingFileProvider<PropertyListSnapshot>[20 values: bool=1, booly.array=1,0, byteChunky.array=bWFnaWM=,bWFnaWMy, bytes=bWFnaWM=, double=3.14, doubly.array=3.14,2.72, int=42, inty.array=42,24, other.bool=0, other.booly.array=0,1,1, other.byteChunky.array=bWFnaWM=,bWFnaWMy,bWFnaWM=, other.bytes=bWFnaWMy, other.double=2.72, other.doubly.array=0.9,1.8, other.int=24, other.inty.array=16,32, other.string=Other Hello, other.stringy.array=Hello,Swift, string=Hello, stringy.array=Hello,World]
             """#
         #expect(try await provider.debugDescription == expectedDebugDescription)
     }

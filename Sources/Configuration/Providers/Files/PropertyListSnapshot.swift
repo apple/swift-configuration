@@ -27,11 +27,11 @@ import Foundation
 /// Use with ``FileProvider`` or ``ReloadingFileProvider``:
 ///
 /// ```swift
-/// let provider = try await FileProvider<PlistSnapshot>(filePath: "/etc/config.plist")
+/// let provider = try await FileProvider<PropertyListSnapshot>(filePath: "/etc/config.plist")
 /// let config = ConfigReader(provider: provider)
 /// ```
 @available(Configuration 1.0, *)
-public struct PlistSnapshot {
+public struct PropertyListSnapshot {
 
     /// Parsing options for plist snapshot creation.
     ///
@@ -69,7 +69,7 @@ public struct PlistSnapshot {
     static let keyEncoder: SeparatorKeyEncoder = .dotSeparated
 
     /// A plist number-like value: an int, double, or a bool.            
-    enum PlistNumberIsh: CustomStringConvertible {
+    internal enum PlistNumberIsh: CustomStringConvertible {
 
         /// A Boolean value.
         case bool(Bool)
@@ -93,7 +93,7 @@ public struct PlistSnapshot {
     }
 
     /// A parsed plist value compatible with the config system.
-    enum PlistValue: CustomStringConvertible {
+    internal enum PlistValue: CustomStringConvertible {
 
         /// A string value.
         case string(String)
@@ -313,7 +313,7 @@ public struct PlistSnapshot {
 }
 
 @available(Configuration 1.0, *)
-extension PlistSnapshot: FileConfigSnapshot {
+extension PropertyListSnapshot: FileConfigSnapshot {
     // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
     public init(data: RawSpan, providerName: String, parsingOptions: ParsingOptions) throws {
         let plistData = data.withUnsafeBytes { buffer in
@@ -339,7 +339,7 @@ extension PlistSnapshot: FileConfigSnapshot {
 }
 
 @available(Configuration 1.0, *)
-extension PlistSnapshot: ConfigSnapshot {
+extension PropertyListSnapshot: ConfigSnapshot {
     // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
     public func value(forKey key: AbsoluteConfigKey, type: ConfigType) throws -> LookupResult {
         let encodedKey = Self.keyEncoder.encode(key)
@@ -353,7 +353,7 @@ extension PlistSnapshot: ConfigSnapshot {
 }
 
 @available(Configuration 1.0, *)
-extension PlistSnapshot: CustomStringConvertible {
+extension PropertyListSnapshot: CustomStringConvertible {
     // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
     public var description: String {
         "\(providerName)[\(values.count) values]"
@@ -361,7 +361,7 @@ extension PlistSnapshot: CustomStringConvertible {
 }
 
 @available(Configuration 1.0, *)
-extension PlistSnapshot: CustomDebugStringConvertible {
+extension PropertyListSnapshot: CustomDebugStringConvertible {
     // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
     public var debugDescription: String {
         let prettyValues =
@@ -385,15 +385,15 @@ internal func parsePlistValues(
     _ parsedDictionary: [String: any Sendable],
     keyEncoder: some ConfigKeyEncoder,
     secretsSpecifier: SecretsSpecifier<String, any Sendable>
-) throws -> [String: PlistSnapshot.ValueWrapper] {
-    var values: [String: PlistSnapshot.ValueWrapper] = [:]
+) throws -> [String: PropertyListSnapshot.ValueWrapper] {
+    var values: [String: PropertyListSnapshot.ValueWrapper] = [:]
     var valuesToIterate: [([String], any Sendable)] = parsedDictionary.map { ([$0], $1) }
     while !valuesToIterate.isEmpty {
         let (keyComponents, value) = valuesToIterate.removeFirst()
         if let dictionary = value as? [String: any Sendable] {
             valuesToIterate.append(contentsOf: dictionary.map { (keyComponents + [$0], $1) })
         } else {
-            let primitiveValue: PlistSnapshot.PlistValue?
+            let primitiveValue: PropertyListSnapshot.PlistValue?
             if let array = value as? [any Sendable] {
                 if array.isEmpty {
                     primitiveValue = .emptyArray
@@ -404,7 +404,7 @@ internal func parsePlistValues(
                             try array.enumerated()
                                 .map { index, value in
                                     guard let string = value as? String else {
-                                        throw PlistSnapshot.PlistConfigError.unexpectedValueInArray(
+                                        throw PropertyListSnapshot.PlistConfigError.unexpectedValueInArray(
                                             keyComponents + ["\(index)"],
                                             "\(type(of: value))"
                                         )
@@ -423,7 +423,7 @@ internal func parsePlistValues(
                                     } else if let bool = value as? Bool {
                                         return .bool(bool)
                                     } else {
-                                        throw PlistSnapshot.PlistConfigError.unexpectedValueInArray(
+                                        throw PropertyListSnapshot.PlistConfigError.unexpectedValueInArray(
                                             keyComponents + ["\(index)"],
                                             "\(type(of: value))"
                                         )
@@ -435,7 +435,7 @@ internal func parsePlistValues(
                             try array.enumerated()
                                 .map { index, value in
                                     guard let data = value as? Data else {
-                                        throw PlistSnapshot.PlistConfigError.unexpectedValueInArray(
+                                        throw PropertyListSnapshot.PlistConfigError.unexpectedValueInArray(
                                             keyComponents + ["\(index)"],
                                             "\(type(of: value))"
                                         )
@@ -444,7 +444,7 @@ internal func parsePlistValues(
                                 }
                         )
                     } else {
-                        throw PlistSnapshot.PlistConfigError.unsupportedPrimitiveValue(
+                        throw PropertyListSnapshot.PlistConfigError.unsupportedPrimitiveValue(
                             keyComponents + ["0"],
                             "\(type(of: firstValue))"
                         )
@@ -462,7 +462,7 @@ internal func parsePlistValues(
                 } else if let data = value as? Data {
                     primitiveValue = .data(data)
                 } else {
-                    throw PlistSnapshot.PlistConfigError.unsupportedPrimitiveValue(
+                    throw PropertyListSnapshot.PlistConfigError.unsupportedPrimitiveValue(
                         keyComponents,
                         "\(type(of: value))"
                     )
