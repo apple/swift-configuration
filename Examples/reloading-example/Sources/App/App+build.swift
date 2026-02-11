@@ -14,14 +14,14 @@ func buildApplication(reader: ConfigReader) async throws -> some ApplicationProt
         return logger
     }()
 
-    let dynamicConfig = try await ReloadingFileProvider<JSONSnapshot>(config: reader)
     // https://swiftpackageindex.com/apple/swift-configuration/1.0.1/documentation/configuration
-    // default reload - checks every 15 seconds (polling)
+    let dynamicConfig = try await ReloadingFileProvider<JSONSnapshot>(config: reader)
+    
     let dynamicConfigReader = ConfigReader(provider: dynamicConfig)
     
     let router = try buildRouter(config: reader, dynamicConfig: dynamicConfigReader)
 
-    // Alt - create app and add a service to it...
+    // Create the app and add a service to it.
     // https://docs.hummingbird.codes/2.0/documentation/hummingbird/servicelifecycle#Hummingbird-Integration
     let app = Application(
         router: router,
