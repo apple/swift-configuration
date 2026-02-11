@@ -37,7 +37,7 @@ var traits: Set<Trait> = [
         description: "Adds support for parsing YAML configuration files."
     ),
     .trait(
-        name: "Plist",
+        name: "PropertyList",
         description: "Adds support for parsing property list configuration files."
     ),
 ]

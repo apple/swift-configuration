@@ -12,7 +12,7 @@
 //
 //===----------------------------------------------------------------------===//
 
-#if Plist
+#if PropertyList
 
 // Needs full Foundation for PropertyListSerialization.
 import Foundation
@@ -35,31 +35,24 @@ public struct PropertyListSnapshot {
 
     /// Parsing options for property list snapshot creation.
     ///
-    /// This struct provides configuration options for parsing plist data into configuration snapshots,
-    /// including byte decoding and secrets specification.
+    /// This struct provides configuration options for parsing plist data into configuration snapshots.
     public struct ParsingOptions: FileParsingOptions {
-        /// A decoder of bytes from a string.
-        public var bytesDecoder: any ConfigBytesFromStringDecoder
-
         /// A specifier for determining which configuration values should be treated as secrets.
         public var secretsSpecifier: SecretsSpecifier<String, any Sendable>
 
         /// Creates parsing options for plist snapshots.
         ///
         /// - Parameters:
-        ///   - bytesDecoder: The decoder to use for converting string values to byte arrays.
         ///   - secretsSpecifier: The specifier for identifying secret values.
         public init(
-            bytesDecoder: some ConfigBytesFromStringDecoder = .base64,
             secretsSpecifier: SecretsSpecifier<String, any Sendable> = .none
         ) {
-            self.bytesDecoder = bytesDecoder
             self.secretsSpecifier = secretsSpecifier
         }
 
         /// The default parsing options.
         ///
-        /// Uses base64 byte decoding and treats no values as secrets.
+        /// Treats no values as secrets.
         public static var `default`: Self {
             .init()
         }
@@ -183,9 +176,6 @@ public struct PropertyListSnapshot {
     /// The name of the provider that created this snapshot.
     public let providerName: String
 
-    /// A decoder of bytes from a string.
-    var bytesDecoder: any ConfigBytesFromStringDecoder
-
     /// Parses config content from the provided plist value.
     /// - Parameters:
     ///   - valueWrapper: The wrapped plist value.
@@ -261,17 +251,10 @@ public struct PropertyListSnapshot {
             }
             content = .bool(try getBoolIsh(number))
         case .bytes:
-            switch value {
-            case .data(let data):
-                content = .bytes([UInt8](data))
-            case .string(let string):
-                guard let bytesValue = bytesDecoder.decode(string) else {
-                    try throwMismatch()
-                }
-                content = .bytes(bytesValue)
-            default:
+            guard case .data(let data) = value else {
                 try throwMismatch()
             }
+            content = .bytes([UInt8](data))
         case .stringArray:
             guard case .stringArray(let array) = value else {
                 try throwMismatch()
@@ -293,20 +276,10 @@ public struct PropertyListSnapshot {
             }
             content = .boolArray(try array.map(getBoolIsh))
         case .byteChunkArray:
-            switch value {
-            case .dataArray(let array):
-                content = .byteChunkArray(array.map { [UInt8]($0) })
-            case .stringArray(let array):
-                let byteChunkArray = try array.map { stringValue in
-                    guard let bytesValue = bytesDecoder.decode(stringValue) else {
-                        try throwMismatch()
-                    }
-                    return bytesValue
-                }
-                content = .byteChunkArray(byteChunkArray)
-            default:
+            guard case .dataArray(let array) = value else {
                 try throwMismatch()
             }
+            content = .byteChunkArray(array.map { [UInt8]($0) })
         }
         return ConfigValue(content, isSecret: valueWrapper.isSecret)
     }
@@ -332,8 +305,7 @@ extension PropertyListSnapshot: FileConfigSnapshot {
         )
         self.init(
             values: values,
-            providerName: providerName,
-            bytesDecoder: parsingOptions.bytesDecoder
+            providerName: providerName
         )
     }
 }

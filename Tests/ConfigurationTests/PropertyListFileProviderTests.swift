@@ -12,7 +12,7 @@
 //
 //===----------------------------------------------------------------------===//
 
-#if Plist
+#if PropertyList
 
 import Testing
 import ConfigurationTestingInternal
