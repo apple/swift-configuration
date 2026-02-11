@@ -195,11 +195,11 @@ Available traits:
 
 ### Supported platforms and minimum versions
 
-The library is supported on Apple platforms and Linux.
+The library is supported on Apple platforms, Linux, and Android.
 
-| Component     | macOS  | Linux          | iOS    | tvOS   | watchOS | visionOS |
-| ------------- | -----  | -------------- | ---    | ----   | ------- | -------- |
-| Configuration | ✅ 15+ | ✅              | ✅ 18+ | ✅ 18+ | ✅ 11+   | ✅ 2+    |
+| Component     | macOS  | Android    | Linux | iOS    | tvOS   | watchOS | visionOS |
+| ------------- | -----  | -------    | ----- | ---    | ----   | ------- | -------- |
+| Configuration | ✅ 15+ | ✅ API 28+ | ✅    | ✅ 18+ | ✅ 18+ | ✅ 11+  | ✅ 2+    |
 
 ### Key features
 
@@ -411,7 +411,9 @@ Any package can implement a ``ConfigProvider``, making the ecosystem extensible 
 - ``KeyMappingProvider``
 
 ### Creating a custom provider
+- <doc:Implementing-a-provider>
 - ``ConfigSnapshot``
+- ``FileConfigSnapshot``
 - ``FileParsingOptions``
 - ``ConfigProvider``
 - ``ConfigContent``

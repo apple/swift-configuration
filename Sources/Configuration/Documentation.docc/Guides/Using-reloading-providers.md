@@ -96,7 +96,7 @@ try await config.watchSnapshot { updates in
 | Feature | Static providers | Reloading providers |
 |---------|------------------|---------------------|
 | **File reading** | Load once at startup | Reloading on change |
-| **Service lifecycle** | Not required | Conforms to `Service` and must run in a `ServiceGroup` |
+| **Service lifecycle** | Not required | Conforms to `Service` and you must run in a `ServiceGroup` |
 | **Configuration updates** | Require restart | Automatic reload |
 
 ### Handling missing files during reloading
@@ -198,5 +198,5 @@ let jsonProvider = try await ReloadingFileProvider<JSONSnapshot>(
    let timeout = config.double(forKey: "timeout", default: 60.0)
    ```
 
-For guidance on choosing between get, fetch, and watch access patterns with reloading providers, see <doc:Choosing-access-patterns>. For troubleshooting reloading provider issues, check out <doc:Troubleshooting>. To learn about in-memory providers as an alternative, see <doc:Using-in-memory-providers>.
+For guidance on choosing between get, fetch, and watch access patterns with reloading providers, see <doc:Choosing-access-patterns>. For troubleshooting reloading provider issues, check out <doc:Troubleshooting>. To learn about in-memory providers as an alternative, see <doc:Using-in-memory-providers>. If you need to create your own reloading provider for a custom data source, see <doc:Implementing-a-provider>.
 
