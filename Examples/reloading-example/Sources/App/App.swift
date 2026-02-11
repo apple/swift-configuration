@@ -16,6 +16,7 @@ struct App {
             InMemoryProvider(values: [
                 "log.level": "info",
                 "filePath": "/etc/config/appsettings.json", // default dynamic configuration location
+                "pollIntervalSeconds": "1", // default reload interval is 15 seconds, set to 1 second for the example
                 "http.serverName": "config-reload-example"
             ])
         ])
