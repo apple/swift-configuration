@@ -74,8 +74,8 @@ import Synchronization
 /// let provider = try await ReloadingFileProvider<JSONSnapshot>(config: envConfig)
 /// ```
 ///
-/// This expects a `filePath` key in the configuration that specifies the path to the file.
-/// For a full list of configuration keys, check out ``FileProvider/init(snapshotType:parsingOptions:config:)``.
+/// This expects configuration keys that specify the file path and reloading behavior.
+/// For a full list of configuration keys, see ``ReloadingFileProvider/init(snapshotType:parsingOptions:config:logger:metrics:)``.
 ///
 /// ## File monitoring
 ///
@@ -292,8 +292,8 @@ public final class ReloadingFileProvider<Snapshot: FileConfigSnapshot>: Sendable
     ///   the provider handles a missing file. When `false` (the default), if the file
     ///   is missing or malformed, throws an error. When `true`, if the file is missing,
     ///   treats it as empty. Malformed files still throw an error.
-    /// - `pollIntervalSeconds` (int, optional, default: 15): How often to check for file
-    ///   changes in seconds.
+    /// - `pollIntervalSeconds` (int, optional, default: 15): How often, in seconds, to check for file
+    ///   changes.
     ///
     /// - Parameters:
     ///   - snapshotType: The type of snapshot to create from the file contents.
