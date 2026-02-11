@@ -426,7 +426,15 @@ Use the `Provider` suffix for all providers.
 When implementing both an immutable and a dynamic variant, use the following prefixes:
 
 - Don't use a prefix for the immutable variant, for example, `InMemoryProvider`.
-- Use the `Reloading` prefix for the dynamic variant when reading from disk, and the `Refetching` prefix when fetching from the network.
+- Use the `Reloading` prefix for the dynamic variant when reading from disk or the `Refetching` prefix when fetching from the network.
+
+For example, if you create a provider for a configuration service and format named Lunar, you might name:
+
+- your package: `swift-configuration-lunar`
+- the provider: `LunarProvider`
+- the module it provides: `ConfigurationLunar`
+
+If this provider offered a provider that fetched updates from a Lunar service, that provider might be named `RefetchingLunarProvider` and offer a snapshot type named `LunarSnapshot`.
 
 > Note: You don't have to follow these recommendations, always prefer to follow correct Swift API design guidelines, whenever in conflict with the above recommendations.
 
