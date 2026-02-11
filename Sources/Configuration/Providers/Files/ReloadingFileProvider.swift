@@ -74,7 +74,7 @@ import Synchronization
 /// let provider = try await ReloadingFileProvider<JSONSnapshot>(config: envConfig)
 /// ```
 ///
-/// This expects configuration keys that specify the file path and may include keys the specify the reloading behavior.
+/// This expects configuration keys that specify the file path and optionally other format-specific values.
 /// For a full list of configuration keys, see ``ReloadingFileProvider/init(snapshotType:parsingOptions:config:logger:metrics:)``.
 ///
 /// ## File monitoring
