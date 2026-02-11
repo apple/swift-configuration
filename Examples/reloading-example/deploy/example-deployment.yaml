@@ -17,6 +17,8 @@ spec:
         env:
         - name: LOG_LEVEL
           value: "debug"
+        - name: filePath # location of the configuration file mounted from the ConfigMap
+          value: "/etc/config/appsettings.json"
         ports:
         - containerPort: 8080
         volumeMounts:

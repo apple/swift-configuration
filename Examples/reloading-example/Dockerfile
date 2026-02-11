@@ -20,9 +20,8 @@ WORKDIR /build
 COPY ./Package.* ./
 RUN swift package resolve
 
-# Copy source files and public content
+# Copy source files
 COPY ./Sources ./Sources
-COPY ./Public ./Public
 
 # Build the application, with optimizations, with static linking, and using jemalloc
 RUN swift build -c release \
@@ -41,10 +40,6 @@ RUN cp "/usr/libexec/swift/linux/swift-backtrace-static" ./
 
 # Copy resources bundled by SPM to staging area
 RUN find -L "$(swift build --package-path /build -c release --show-bin-path)/" -regex '.*\.resources$' -exec cp -Ra {} ./ \;
-
-# Copy any resouces from the public directory and views directory if the directories exist
-# Ensure that by default, neither the directory nor any of its contents are writable.
-RUN [ -d /build/public ] && { mv /build/public ./public && chmod -R a-w ./public; } || true
 
 # ================================
 # Run image
