@@ -532,7 +532,7 @@ extension ConfigSnapshotReader {
     internal func uncast<Value: ExpressibleByConfigInt>(
         _ value: Value
     ) -> ConfigContent {
-        .int(Int(value.description) ?? 0)
+        .int(value.configInt)
     }
 
     /// Converts an array of `ExpressibleByConfigInt` values to content.
@@ -542,7 +542,7 @@ extension ConfigSnapshotReader {
     internal func uncast<Value: ExpressibleByConfigInt>(
         _ values: [Value]
     ) -> ConfigContent {
-        .intArray(values.map { Int($0.description) ?? 0 })
+        .intArray(values.map(\.configInt))
     }
 
     /// Converts a `RawRepresentable` value with an `Int` raw value to content.
