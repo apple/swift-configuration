@@ -82,12 +82,10 @@ struct ConfigReaderTests {
     }
 
     struct TestIntConvertible: ExpressibleByConfigInt, Equatable {
-        var integer: Int
-        var description: String {
-            "\(integer)"
-        }
+        var configInt: Int
+        var description: String { "\(configInt)" }
         init?(configInt: Int) {
-            self.integer = configInt
+            self.configInt = configInt
         }
         static var zero: Self {
             .init(configInt: 0)!
@@ -157,10 +155,10 @@ struct ConfigReaderTests {
                 ConfigValue(Defaults.stringConvertibleArray.map(\.description), isSecret: false)
             ),
             "intEnum": .success(ConfigValue(Defaults.intEnum.rawValue, isSecret: false)),
-            "intConvertible": .success(ConfigValue(Defaults.intConvertible.integer, isSecret: false)),
+            "intConvertible": .success(ConfigValue(Defaults.intConvertible.configInt, isSecret: false)),
             "intEnumArray": .success(ConfigValue(Defaults.intEnumArray.map(\.rawValue), isSecret: false)),
             "intConvertibleArray": .success(
-                ConfigValue(Defaults.intConvertibleArray.map(\.integer), isSecret: false)
+                ConfigValue(Defaults.intConvertibleArray.map(\.configInt), isSecret: false)
             ),
             "failure": .failure(TestProvider.TestError()),
         ])
