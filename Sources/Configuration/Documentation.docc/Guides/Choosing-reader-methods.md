@@ -236,6 +236,9 @@ let timeout = try config.requiredInt(
 
 #### Type conversion
 
+
+##### String-representable types
+
 You can automatically convert string configuration values to other types using the `as:` parameter. 
 This works with:
 
