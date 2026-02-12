@@ -48,6 +48,15 @@ public protocol ExpressibleByConfigInt: CustomStringConvertible {
     ///
     /// - Parameter configInt: The integer value from the configuration provider.
     init?(configInt: Int)
+    
+    /// The underlying raw integer value.
+    var configInt: Int { get }
+}
+
+extension ExpressibleByConfigInt {
+    public var description: String {
+        "\(configInt)"
+    }
 }
 
 @available(macOS 13.0, iOS 16.0, watchOS 9.0, tvOS 16.0, *)
