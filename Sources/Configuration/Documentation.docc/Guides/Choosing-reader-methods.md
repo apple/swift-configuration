@@ -292,7 +292,9 @@ struct DatabaseURL: ExpressibleByConfigString {
 let dbUrl = config.string(forKey: "database.url", as: DatabaseURL.self)
 ```
 
-You can automatically convert integer configuration values to other types using the `as:` parameter. 
+##### Integer-representable types
+
+You can also automatically convert integer configuration values to other types using the `as:` parameter. 
 This works with:
 
 **Built-in convertible types:**
