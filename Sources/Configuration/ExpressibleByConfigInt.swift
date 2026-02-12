@@ -29,12 +29,12 @@
 /// ```swift
 /// struct MyDuration: ExpressibleByConfigInt {
 ///     let duration: Duration
+///     let configInt: Int
 ///
 ///     init?(configInt: Int) {
+///         self.configInt = configInt
 ///         self.duration = .seconds(configInt)
 ///     }
-///
-///     var description: String { duration.description }
 /// }
 ///
 /// // Now you can use it with automatic conversion
@@ -53,15 +53,23 @@ public protocol ExpressibleByConfigInt: CustomStringConvertible {
     var configInt: Int { get }
 }
 
+@available(Configuration 1.0, *)
 extension ExpressibleByConfigInt {
     public var description: String {
         "\(configInt)"
     }
 }
 
-@available(macOS 13.0, iOS 16.0, watchOS 9.0, tvOS 16.0, *)
 @available(Configuration 1.0, *)
 extension Duration: ExpressibleByConfigInt {
+    public var configInt: Int {
+        precondition(
+            components.seconds <= Int64(Int.max) && components.seconds >= Int64(Int.min),
+            "Duration seconds out of Int range"
+        )
+        return .init(components.seconds)
+    }
+
     // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
     public init?(configInt: Int) {
         self = .seconds(configInt)
