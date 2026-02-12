@@ -299,7 +299,7 @@ This works with:
 
 **Built-in convertible types:**
 
-- `Swift.Duration`: Converts from an integer value to a Duration measured in seconds.
+- `Swift.Duration`: Converts from an integer value to a duration measured in seconds.
 
 **Int-backed enums:**
 
