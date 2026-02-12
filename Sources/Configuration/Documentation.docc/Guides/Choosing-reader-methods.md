@@ -315,7 +315,8 @@ let timeout = config.int(forKey: "api.timeout", as: Duration.self)
 
 // Int-backed enum conversion (RawRepresentable<Int>)
 enum LogLevel: Int {
-    case zero, one
+    case error = 1
+    case warning = 2
 }
 
 // Optional conversion
