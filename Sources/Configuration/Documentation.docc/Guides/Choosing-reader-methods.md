@@ -329,21 +329,12 @@ let level = config.int(forKey: "log.level", as: LogLevel.self, default: .zero)
 let level = try config.requiredInt(forKey: "log.level", as: LogLevel.self)
 
 // Custom type conversion (ExpressibleByConfigInt)
-struct Version {
-    var value: Int
-    init?(_ value: Int) {
-        guard value > 0 else { return nil }
-        self.value = value
-    }
-    var description: String { "\(value)"}
-}
-
 struct APIVersion: ExpressibleByConfigInt {
-    let version: Version
+    let version: Int
 
-    init?(configInt: Int) {
-        guard let version = Version(configInt) else { return nil }
-        self.version = version
+    init?(configInt value: Int) {
+        guard value > 0 else { return nil }
+        self.version = value
     }
 
     var description: String { version.description }
