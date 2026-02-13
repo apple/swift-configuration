@@ -65,11 +65,7 @@ extension ExpressibleByConfigInt {
 @available(Configuration 1.0, *)
 extension Duration: ExpressibleByConfigInt {
     public var configInt: Int {
-        precondition(
-            components.seconds <= Int64(Int.max) && components.seconds >= Int64(Int.min),
-            "Duration seconds out of Int range"
-        )
-        return .init(components.seconds)
+        .init(components.seconds)
     }
 
     // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
