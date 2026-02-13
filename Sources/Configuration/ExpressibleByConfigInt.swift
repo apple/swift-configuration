@@ -48,7 +48,7 @@ public protocol ExpressibleByConfigInt: CustomStringConvertible {
     ///
     /// - Parameter configInt: The integer value from the configuration provider.
     init?(configInt: Int)
-    
+
     /// The underlying raw integer value.
     var configInt: Int { get }
 }
