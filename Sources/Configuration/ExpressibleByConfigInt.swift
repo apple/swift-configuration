@@ -24,7 +24,7 @@
 /// ## Custom types
 ///
 /// For other custom types, conform to the protocol ``ExpressibleByConfigInt`` by providing a failable initializer
-/// and the `description` property:
+/// and the `configInt` property:
 ///
 /// ```swift
 /// struct MyDuration: ExpressibleByConfigInt {
