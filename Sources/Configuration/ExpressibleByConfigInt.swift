@@ -57,6 +57,7 @@ public protocol ExpressibleByConfigInt: CustomStringConvertible {
 
 @available(Configuration 1.0, *)
 extension ExpressibleByConfigInt {
+    // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
     public var description: String {
         "\(configInt)"
     }
@@ -64,6 +65,7 @@ extension ExpressibleByConfigInt {
 
 @available(Configuration 1.0, *)
 extension Duration: ExpressibleByConfigInt {
+    // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
     public var configInt: Int {
         .init(components.seconds)
     }
