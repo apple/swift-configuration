@@ -84,14 +84,17 @@ struct ConfigReaderTests {
     struct TestIntConvertible: ExpressibleByConfigInt, Equatable {
         var configInt: Int
         var description: String { "\(configInt)" }
+        init(_ int: Int) {
+            self.configInt = int
+        }
         init?(configInt: Int) {
             self.configInt = configInt
         }
         static var zero: Self {
-            .init(configInt: 0)!
+            .init(0)
         }
         static var one: Self {
-            .init(configInt: 1)!
+            .init(1)
         }
     }
 
