@@ -323,7 +323,7 @@ enum LogLevel: Int {
 let level: LogLevel? = config.int(forKey: "log.level", as: LogLevel.self)
 
 // Default conversion
-let level = config.int(forKey: "log.level", as: LogLevel.self, default: .zero)
+let level = config.int(forKey: "log.level", as: LogLevel.self, default: .error)
 
 // Required conversion
 let level = try config.requiredInt(forKey: "log.level", as: LogLevel.self)
