@@ -556,6 +556,7 @@ extension ConfigReader {
             line: line
         )
     }
+
     % end
     // MARK: - Fetch
 
@@ -1100,6 +1101,7 @@ extension ConfigReader {
             line: line
         )
     }
+
     % end
     // MARK: - Watch
 
@@ -1796,5 +1798,6 @@ extension ConfigReader {
             updatesHandler: updatesHandler
         )
     }
+
     % end
 }

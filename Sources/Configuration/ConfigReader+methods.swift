@@ -1677,6 +1677,7 @@ extension ConfigReader {
             line: line
         )
     }
+
     /// Synchronously gets a config value for the given config key, converting from an integer.
     ///
     /// Use this method to retrieve configuration values that can be converted from integers,
@@ -1891,6 +1892,7 @@ extension ConfigReader {
             line: line
         )
     }
+
     // MARK: - Fetch
 
     /// Asynchronously fetches a config value for the given config key.
@@ -3590,6 +3592,7 @@ extension ConfigReader {
             line: line
         )
     }
+
     /// Asynchronously fetches a config value for the given config key, converting from an integer.
     ///
     /// Use this method to retrieve integer-convertible configuration values from async providers.
@@ -3805,6 +3808,7 @@ extension ConfigReader {
             line: line
         )
     }
+
     // MARK: - Watch
 
     /// Watches for updates to a config value for the given config key.
@@ -5970,6 +5974,7 @@ extension ConfigReader {
             updatesHandler: updatesHandler
         )
     }
+
     /// Watches for updates to a config value for the given config key, converting from an integer.
     ///
     /// Use this method to observe changes to optional integer-convertible configuration values over time.
@@ -6247,4 +6252,5 @@ extension ConfigReader {
             updatesHandler: updatesHandler
         )
     }
+
 }
