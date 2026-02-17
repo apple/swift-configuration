@@ -6,4 +6,4 @@ metadata:
 data:
   # The key name becomes the filename by default if mounted as a directory
   appsettings.yaml: |
-    name: "Swift"
+    name: "CNCF"
