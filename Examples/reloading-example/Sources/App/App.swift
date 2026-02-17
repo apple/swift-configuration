@@ -1,7 +1,3 @@
-import Configuration
-import Hummingbird
-import Logging
-
 //===----------------------------------------------------------------------===//
 //
 // This source file is part of the SwiftConfiguration open source project
@@ -15,6 +11,10 @@ import Logging
 // SPDX-License-Identifier: Apache-2.0
 //
 //===----------------------------------------------------------------------===//
+
+import Configuration
+import Hummingbird
+import Logging
 
 @main
 struct App {

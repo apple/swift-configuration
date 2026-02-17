@@ -1,9 +1,3 @@
-import Configuration
-import Hummingbird
-import HummingbirdTesting
-import Logging
-import Testing
-
 //===----------------------------------------------------------------------===//
 //
 // This source file is part of the SwiftConfiguration open source project
@@ -17,6 +11,12 @@ import Testing
 // SPDX-License-Identifier: Apache-2.0
 //
 //===----------------------------------------------------------------------===//
+
+import Configuration
+import Hummingbird
+import HummingbirdTesting
+import Logging
+import Testing
 
 @testable import App
 

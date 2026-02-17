@@ -1,8 +1,3 @@
-import Configuration
-import Hummingbird
-import Logging
-import ServiceLifecycle
-
 //===----------------------------------------------------------------------===//
 //
 // This source file is part of the SwiftConfiguration open source project
@@ -16,6 +11,11 @@ import ServiceLifecycle
 // SPDX-License-Identifier: Apache-2.0
 //
 //===----------------------------------------------------------------------===//
+
+import Configuration
+import Hummingbird
+import Logging
+import ServiceLifecycle
 
 // Request context used by application
 typealias AppRequestContext = BasicRequestContext
