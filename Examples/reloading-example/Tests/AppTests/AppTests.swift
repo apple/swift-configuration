@@ -10,7 +10,7 @@ private let reader = ConfigReader(providers: [
     InMemoryProvider(values: [
         "http.host": "127.0.0.1",
         "http.port": "0",
-        "log.level": "trace"
+        "log.level": "trace",
     ])
 ])
 

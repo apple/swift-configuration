@@ -20,7 +20,7 @@ struct App {
                 "http.serverName": "config-reload-example"
             ])
         ])
-        let app = try await buildApplication(reader: reader) // <-- this is a service, and you can add other
+        let app = try await buildApplication(reader: reader)  // <-- this is a service, and you can add other
 
         try await app.runService()
     }
