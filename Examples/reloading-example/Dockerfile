@@ -1,8 +1,3 @@
-# ================================
-# Build image
-# ================================
-FROM swift:6.2-noble AS build
-
 ##===----------------------------------------------------------------------===##
 ##
 ## This source file is part of the SwiftConfiguration open source project
@@ -16,6 +11,11 @@ FROM swift:6.2-noble AS build
 ## SPDX-License-Identifier: Apache-2.0
 ##
 ##===----------------------------------------------------------------------===
+
+# ================================
+# Build image
+# ================================
+FROM swift:6.2-noble AS build
 
 # Install OS updates
 RUN export DEBIAN_FRONTEND=noninteractive DEBCONF_NONINTERACTIVE_SEEN=true \
