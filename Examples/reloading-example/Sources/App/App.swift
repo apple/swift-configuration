@@ -29,10 +29,10 @@ struct App {
             EnvironmentVariablesProvider(environmentFilePath: ".env", allowMissing: true),
             InMemoryProvider(values: [
                 "log.level": "info",
-                "filePath": "/etc/config/appsettings.yaml", // the default, expected dynamic configuration location
-                "pollIntervalSeconds": 1, // default reload interval is 15 seconds, set to 1 second for the example
-                "http.serverName": "config-reload-example"
-            ])
+                "filePath": "/etc/config/appsettings.yaml",  // the default, expected dynamic configuration location
+                "pollIntervalSeconds": 1,  // default reload interval is 15 seconds, set to 1 second for the example
+                "http.serverName": "config-reload-example",
+            ]),
         ])
         let app = try await buildApplication(reader: reader)  // <-- this is a service, and you can add other
 

@@ -24,11 +24,6 @@ struct ConfigWatchReporter: Service {
     let dynamicConfig: ConfigReader
     let logger: Logger
 
-    init(dynamicConfig: ConfigReader, logger: Logger) {
-        self.dynamicConfig = dynamicConfig
-        self.logger = logger
-    }
-
     func run() async throws {
         try await self.dynamicConfig.watchString(forKey: "name", default: "unset") { updates in
             for try await update in updates {
@@ -38,8 +33,11 @@ struct ConfigWatchReporter: Service {
     }
 }
 
-///  Build application
+/// Build application.
+///
 /// - Parameter reader: configuration reader
+/// - Throws: Configuration or application setup errors
+/// - Returns: Configured application instance
 func buildApplication(reader: ConfigReader) async throws -> some ApplicationProtocol {
     let logger = {
         var logger = Logger(label: reader.string(forKey: "http.serverName", default: "default-HB-server"))
@@ -66,7 +64,7 @@ func buildApplication(reader: ConfigReader) async throws -> some ApplicationProt
     return app
 }
 
-/// Build router
+/// Build router.
 func buildRouter(config: ConfigReader, dynamicConfig: ConfigReader) throws -> Router<AppRequestContext> {
     let router = Router(context: AppRequestContext.self)
     // Add middleware
