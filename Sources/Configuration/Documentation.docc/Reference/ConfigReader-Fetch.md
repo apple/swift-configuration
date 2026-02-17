@@ -45,16 +45,28 @@
 ### Asynchronously fetching integer values
 - ``ConfigReader/fetchInt(forKey:isSecret:fileID:line:)``
 - ``ConfigReader/fetchInt(forKey:isSecret:default:fileID:line:)``
+- ``ConfigReader/fetchInt(forKey:as:isSecret:fileID:line:)-107qe``
+- ``ConfigReader/fetchInt(forKey:as:isSecret:fileID:line:)-6tdet``
+- ``ConfigReader/fetchInt(forKey:as:isSecret:default:fileID:line:)-3161u``
+- ``ConfigReader/fetchInt(forKey:as:isSecret:default:fileID:line:)-41vzw``
 
 ### Asynchronously fetching required integer values
 - ``ConfigReader/fetchRequiredInt(forKey:isSecret:fileID:line:)``
+- ``ConfigReader/fetchRequiredInt(forKey:as:isSecret:fileID:line:)-12gf``
+- ``ConfigReader/fetchRequiredInt(forKey:as:isSecret:fileID:line:)-8b0sw``
 
 ### Asynchronously fetching lists of integer values
 - ``ConfigReader/fetchIntArray(forKey:isSecret:fileID:line:)``
 - ``ConfigReader/fetchIntArray(forKey:isSecret:default:fileID:line:)``
+- ``ConfigReader/fetchIntArray(forKey:as:isSecret:fileID:line:)-16vlr``
+- ``ConfigReader/fetchIntArray(forKey:as:isSecret:fileID:line:)-6rhh4``
+- ``ConfigReader/fetchIntArray(forKey:as:isSecret:default:fileID:line:)-79l2m``
+- ``ConfigReader/fetchIntArray(forKey:as:isSecret:default:fileID:line:)-8ldio``
 
 ### Asynchronously fetching required lists of integer values
 - ``ConfigReader/fetchRequiredIntArray(forKey:isSecret:fileID:line:)``
+- ``ConfigReader/fetchRequiredIntArray(forKey:as:isSecret:fileID:line:)-6a1e3``
+- ``ConfigReader/fetchRequiredIntArray(forKey:as:isSecret:fileID:line:)-599c5``
 
 ### Asynchronously fetching double values
 - ``ConfigReader/fetchDouble(forKey:isSecret:fileID:line:)``

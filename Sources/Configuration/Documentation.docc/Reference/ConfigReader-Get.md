@@ -45,16 +45,28 @@
 ### Synchronously reading integer values
 - ``ConfigReader/int(forKey:isSecret:fileID:line:)``
 - ``ConfigReader/int(forKey:isSecret:default:fileID:line:)``
+- ``ConfigReader/int(forKey:as:isSecret:fileID:line:)-6ng32``
+- ``ConfigReader/int(forKey:as:isSecret:fileID:line:)-11fn2``
+- ``ConfigReader/int(forKey:as:isSecret:default:fileID:line:)-4zrhi``
+- ``ConfigReader/int(forKey:as:isSecret:default:fileID:line:)-4ie6l``
 
 ### Synchronously reading required integer values
 - ``ConfigReader/requiredInt(forKey:isSecret:fileID:line:)``
+- ``ConfigReader/requiredInt(forKey:as:isSecret:fileID:line:)-3dzjk``
+- ``ConfigReader/requiredInt(forKey:as:isSecret:fileID:line:)-2xiji``
 
 ### Synchronously reading lists of integer values
 - ``ConfigReader/intArray(forKey:isSecret:fileID:line:)``
 - ``ConfigReader/intArray(forKey:isSecret:default:fileID:line:)``
+- ``ConfigReader/intArray(forKey:as:isSecret:fileID:line:)-3goaq``
+- ``ConfigReader/intArray(forKey:as:isSecret:fileID:line:)-9sp0s``
+- ``ConfigReader/intArray(forKey:as:isSecret:default:fileID:line:)-9ini5``
+- ``ConfigReader/intArray(forKey:as:isSecret:default:fileID:line:)-1so32``
 
 ### Synchronously reading required lists of integer values
 - ``ConfigReader/requiredIntArray(forKey:isSecret:fileID:line:)``
+- ``ConfigReader/requiredIntArray(forKey:as:isSecret:fileID:line:)-cyh0``
+- ``ConfigReader/requiredIntArray(forKey:as:isSecret:fileID:line:)-1car4``
 
 ### Synchronously reading double values
 - ``ConfigReader/double(forKey:isSecret:fileID:line:)``
