@@ -13,12 +13,13 @@ spec:
     spec:
       containers:
       - name: http-server
-        image: kind-registry.vsl:5000/reloading-example:latest
+        image: reloading-example:latest
+        imagePullPolicy: IfNotPresent # CRITICAL for kind deployment via loaded image
         env:
         - name: LOG_LEVEL
           value: "debug"
         - name: filePath # location of the configuration file mounted from the ConfigMap
-          value: "/etc/config/appsettings.json"
+          value: "/etc/config/appsettings.yaml"
         ports:
         - containerPort: 8080
         volumeMounts:

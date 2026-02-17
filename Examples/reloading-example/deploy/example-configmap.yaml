@@ -4,7 +4,6 @@ metadata:
   name: reloading-example-configmap
 data:
   # The key name becomes the filename by default if mounted as a directory
-  appsettings.json: |
-    {
-      "name": "Swift"
-    }
+  appsettings.yaml: |
+    name: "CNCF"
+

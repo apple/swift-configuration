@@ -22,6 +22,7 @@ RUN swift package resolve
 
 # Copy source files
 COPY ./Sources ./Sources
+COPY ./Tests ./Tests
 
 # Build the application, with optimizations, with static linking, and using jemalloc
 RUN swift build -c release \

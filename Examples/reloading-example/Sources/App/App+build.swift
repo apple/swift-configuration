@@ -15,7 +15,7 @@ func buildApplication(reader: ConfigReader) async throws -> some ApplicationProt
     }()
 
     // https://swiftpackageindex.com/apple/swift-configuration/1.0.1/documentation/configuration
-    let dynamicConfig = try await ReloadingFileProvider<JSONSnapshot>(config: reader)
+    let dynamicConfig = try await ReloadingFileProvider<YAMLSnapshot>(config: reader)
     
     let dynamicConfigReader = ConfigReader(provider: dynamicConfig)
     
