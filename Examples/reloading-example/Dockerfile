@@ -3,6 +3,20 @@
 # ================================
 FROM swift:6.2-noble AS build
 
+##===----------------------------------------------------------------------===##
+##
+## This source file is part of the SwiftConfiguration open source project
+##
+## Copyright (c) YEARS Apple Inc. and the SwiftConfiguration project authors
+## Licensed under Apache License v2.0
+##
+## See LICENSE.txt for license information
+## See CONTRIBUTORS.txt for the list of SwiftConfiguration project authors
+##
+## SPDX-License-Identifier: Apache-2.0
+##
+##===----------------------------------------------------------------------===
+
 # Install OS updates
 RUN export DEBIAN_FRONTEND=noninteractive DEBCONF_NONINTERACTIVE_SEEN=true \
     && apt-get -q update \
