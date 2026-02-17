@@ -341,6 +341,223 @@ extension ConfigReader {
     }
 
     % end
+    % for int_convertible_type in int_convertible_types:
+    /// Synchronously gets a config value for the given config key, converting from an integer.
+    ///
+    /// Use this method to retrieve configuration values that can be converted from integers,
+    /// such as custom types conforming to integer conversion protocols.
+    /// If the value doesn't exist or can't be converted to the expected type, the method returns `nil`.
+    ///
+    /// ```swift
+    /// let apiVersion = config.int(forKey: ["api", "version"], as: APIVersion.self)
+    /// ```
+    ///
+    /// - Parameters:
+    ///   - key: The config key to look up.
+    ///   - type: The type to convert the integer value to.
+    ///   - isSecret: Whether the value should be treated as secret for logging and debugging purposes.
+    ///   - fileID: The file ID where this call originates. Used for access reporting.
+    ///   - line: The line number where this call originates. Used for access reporting.
+    /// - Returns: The value converted to the expected type if found and convertible, otherwise `nil`.
+    public func int<Value: ${int_convertible_type["protocol"]}>(
+        forKey key: ConfigKey,
+        as type: Value.Type = Value.self,
+        isSecret: Bool = false,
+        fileID: String = #fileID,
+        line: UInt = #line
+    ) -> Value? {
+        value(
+            forKey: key,
+            type: .int,
+            isSecret: isSecret,
+            unwrap: { try cast($0.asInt, type: Value.self, key: key) },
+            wrap: { uncast($0) },
+            fileID: fileID,
+            line: line
+        )
+    }
+
+    /// Synchronously gets a config value for the given config key with default fallback, converting from an integer.
+    ///
+    /// Use this method when you need a guaranteed non-nil result for integer-convertible types.
+    /// If the configuration value is missing or can't be converted to the expected type,
+    /// the method returns the default value 
+    ///
+    /// ```swift
+    /// let apiVersion = config.int(forKey: ["api", "version"], as: APIVersion.self, default: .version(1))
+    /// ```
+    ///
+    /// - Parameters:
+    ///   - key: The config key to look up.
+    ///   - type: The type to convert the integer value to.
+    ///   - isSecret: Whether the value should be treated as secret for logging and debugging purposes.
+    ///   - defaultValue: The fallback value returned when the config value is missing or invalid.
+    ///   - fileID: The file ID where this call originates. Used for access reporting.
+    ///   - line: The line number where this call originates. Used for access reporting.
+    /// - Returns: The config value if found and convertible, otherwise the default value.
+    public func int<Value: ${int_convertible_type["protocol"]}>(
+        forKey key: ConfigKey,
+        as type: Value.Type = Value.self,
+        isSecret: Bool = false,
+        default defaultValue: Value,
+        fileID: String = #fileID,
+        line: UInt = #line
+    ) -> Value {
+        value(
+            forKey: key,
+            type: .int,
+            isSecret: isSecret,
+            default: defaultValue,
+            unwrap: { try cast($0.asInt, type: Value.self, key: key) },
+            wrap: { uncast($0) },
+            fileID: fileID,
+            line: line
+        )
+    }
+
+    /// Synchronously gets a required config value for the given config key, converting from an integer.
+    ///
+    /// Use this method when an integer-convertible configuration value is mandatory for your application to function.
+    /// The method throws an error if the value is missing or can't be converted to the expected type.
+    ///
+    /// ```swift
+    /// let apiVersion = try config.requiredInt(forKey: ["api", "version"], as: APIVersion.self)
+    /// ```
+    ///
+    /// - Parameters:
+    ///   - key: The config key to look up.
+    ///   - type: The type to convert the integer value to.
+    ///   - isSecret: Whether the value should be treated as secret for logging and debugging purposes.
+    ///   - fileID: The file ID where this call originates. Used for access reporting.
+    ///   - line: The line number where this call originates. Used for access reporting.
+    /// - Returns: The config value converted to the expected type.
+    /// - Throws: An error if the value is missing or can't be converted to the expected type.
+    public func requiredInt<Value: ${int_convertible_type["protocol"]}>(
+        forKey key: ConfigKey,
+        as type: Value.Type = Value.self,
+        isSecret: Bool = false,
+        fileID: String = #fileID,
+        line: UInt = #line
+    ) throws -> Value {
+        try requiredValue(
+            forKey: key,
+            type: .int,
+            isSecret: isSecret,
+            unwrap: { try cast($0.asInt, type: Value.self, key: key) },
+            wrap: { uncast($0) },
+            fileID: fileID,
+            line: line
+        )
+    }
+
+    /// Synchronously gets an array of config values for the given config key, converting from integers.
+    ///
+    /// Use this method to retrieve configuration arrays where each element can be converted from integers.
+    /// If the value doesn't exist or can't be converted to the expected type, the method returns `nil`.
+    ///
+    /// ```swift
+    /// let apiVersions = config.intArray(forKey: ["api", "versions"], as: APIVersion.self)
+    /// ```
+    ///
+    /// - Parameters:
+    ///   - key: The config key to look up.
+    ///   - type: The element type to convert each integer value to.
+    ///   - isSecret: Whether the value should be treated as secret for logging and debugging purposes.
+    ///   - fileID: The file ID where this call originates. Used for access reporting.
+    ///   - line: The line number where this call originates. Used for access reporting.
+    /// - Returns: An array of values converted to the expected type if found and convertible, otherwise `nil`.
+    public func intArray<Value: ${int_convertible_type["protocol"]}>(
+        forKey key: ConfigKey,
+        as type: Value.Type = Value.self,
+        isSecret: Bool = false,
+        fileID: String = #fileID,
+        line: UInt = #line
+    ) -> [Value]? {
+        value(
+            forKey: key,
+            type: .intArray,
+            isSecret: isSecret,
+            unwrap: { try $0.asIntArray.map { try cast($0, type: Value.self, key: key) } },
+            wrap: { uncast($0) },
+            fileID: fileID,
+            line: line
+        )
+    }
+
+    /// Synchronously gets an array of config values for the given config key with default fallback, converting from integers.
+    ///
+    /// Use this method when you need a guaranteed non-nil result for integer-convertible array types.
+    /// If the configuration value is missing or can't be converted to the expected type,
+    /// the method returns the default value instead.
+    ///
+    /// ```swift
+    /// let apiVersions = config.intArray(forKey: ["api", "version"], as: APIVersion.self, default: [.version(1)])
+    /// ```
+    ///
+    /// - Parameters:
+    ///   - key: The config key to look up.
+    ///   - type: The element type to convert each integer value to.
+    ///   - isSecret: Whether the value should be treated as secret for logging and debugging purposes.
+    ///   - defaultValue: The fallback array returned when the config value is missing or invalid.
+    ///   - fileID: The file ID where this call originates. Used for access reporting.
+    ///   - line: The line number where this call originates. Used for access reporting.
+    /// - Returns: The config array if found and convertible, otherwise the default array.
+    public func intArray<Value: ${int_convertible_type["protocol"]}>(
+        forKey key: ConfigKey,
+        as type: Value.Type = Value.self,
+        isSecret: Bool = false,
+        default defaultValue: [Value],
+        fileID: String = #fileID,
+        line: UInt = #line
+    ) -> [Value] {
+        value(
+            forKey: key,
+            type: .intArray,
+            isSecret: isSecret,
+            default: defaultValue,
+            unwrap: { try $0.asIntArray.map { try cast($0, type: Value.self, key: key) } },
+            wrap: { uncast($0) },
+            fileID: fileID,
+            line: line
+        )
+    }
+
+    /// Synchronously gets a required array of config values for the given config key, converting from integers.
+    ///
+    /// Use this method when an integer-convertible array configuration value is mandatory for your application to function.
+    /// The method throws an error if the value is missing or can't be converted to the expected type.
+    ///
+    /// ```swift
+    /// let apiVersions = try config.requiredIntArray(forKey: ["api", "versions"], as: APIVersion.self)
+    /// ```
+    ///
+    /// - Parameters:
+    ///   - key: The config key to look up.
+    ///   - type: The element type to convert each integer value to.
+    ///   - isSecret: Whether the value should be treated as secret for logging and debugging purposes.
+    ///   - fileID: The file ID where this call originates. Used for access reporting.
+    ///   - line: The line number where this call originates. Used for access reporting.
+    /// - Returns: The config array converted to the expected type.
+    /// - Throws: An error if the value is missing or can't be converted to the expected type.
+    public func requiredIntArray<Value: ${int_convertible_type["protocol"]}>(
+        forKey key: ConfigKey,
+        as type: Value.Type = Value.self,
+        isSecret: Bool = false,
+        fileID: String = #fileID,
+        line: UInt = #line
+    ) throws -> [Value] {
+        try requiredValue(
+            forKey: key,
+            type: .intArray,
+            isSecret: isSecret,
+            unwrap: { try $0.asIntArray.map { try cast($0, type: Value.self, key: key) } },
+            wrap: { uncast($0) },
+            fileID: fileID,
+            line: line
+        )
+    }
+
+    % end
     // MARK: - Fetch
 
     % for primitive_type in primitive_types:
@@ -661,6 +878,224 @@ extension ConfigReader {
             type: .stringArray,
             isSecret: isSecret,
             unwrap: { try $0.asStringArray.map { try cast($0, type: Value.self, key: key) } },
+            wrap: { uncast($0) },
+            fileID: fileID,
+            line: line
+        )
+    }
+
+    % end
+    % for int_convertible_type in int_convertible_types:
+    /// Asynchronously fetches a config value for the given config key, converting from an integer.
+    ///
+    /// Use this method to retrieve integer-convertible configuration values from async providers.
+    /// If the value doesn't exist, the method returns `nil`.
+    ///
+    /// ```swift
+    /// let apiVersion = try await config.fetchInt(forKey: ["api", "version"], as: APIVersion.self)
+    /// ```
+    ///
+    /// - Parameters:
+    ///   - key: The config key to look up.
+    ///   - type: The type to convert the integer value to.
+    ///   - isSecret: Whether the value should be treated as secret for logging and debugging purposes.
+    ///   - fileID: The file ID where this call originates. Used for access reporting.
+    ///   - line: The line number where this call originates. Used for access reporting.
+    /// - Returns: The value converted to the expected type if found and convertible, otherwise `nil`.
+    /// - Throws: An error if the underlying provider throws or if the value can't be converted to the expected type.
+    public func fetchInt<Value: ${int_convertible_type["protocol"]}>(
+        forKey key: ConfigKey,
+        as type: Value.Type = Value.self,
+        isSecret: Bool = false,
+        fileID: String = #fileID,
+        line: UInt = #line
+    ) async throws -> Value? {
+        try await fetchValue(
+            forKey: key,
+            type: .int,
+            isSecret: isSecret,
+            unwrap: { try cast($0.asInt, type: Value.self, key: key) },
+            wrap: { uncast($0) },
+            fileID: fileID,
+            line: line
+        )
+    }
+
+    /// Asynchronously fetches a config value for the given config key with default fallback, converting from an integer.
+    ///
+    /// Use this method when you need a guaranteed non-nil result from an async provider for integer-convertible types.
+    /// If the configuration value is missing, the method returns the default value instead.
+    ///
+    /// ```swift
+    /// let apiVersion = try await config.fetchInt(forKey: ["api", "version"], as: APIVersion.self, default: .version(1))
+    /// ```
+    ///
+    /// - Parameters:
+    ///   - key: The config key to look up.
+    ///   - type: The type to convert the integer value to.
+    ///   - isSecret: Whether the value should be treated as secret for logging and debugging purposes.
+    ///   - defaultValue: The fallback value returned when the config value is missing or invalid.
+    ///   - fileID: The file ID where this call originates. Used for access reporting.
+    ///   - line: The line number where this call originates. Used for access reporting.
+    /// - Returns: The config value if found and convertible, otherwise the default value.
+    /// - Throws: An error if the underlying provider throws or if the value can't be converted to the expected type.
+    public func fetchInt<Value: ${int_convertible_type["protocol"]}>(
+        forKey key: ConfigKey,
+        as type: Value.Type = Value.self,
+        isSecret: Bool = false,
+        default defaultValue: Value,
+        fileID: String = #fileID,
+        line: UInt = #line
+    ) async throws -> Value {
+        try await fetchValue(
+            forKey: key,
+            type: .int,
+            isSecret: isSecret,
+            default: defaultValue,
+            unwrap: { try cast($0.asInt, type: Value.self, key: key) },
+            wrap: { uncast($0) },
+            fileID: fileID,
+            line: line
+        )
+    }
+
+    /// Asynchronously fetches a required config value for the given config key, converting from an integer.
+    ///
+    /// Use this method when an integer-convertible configuration value is mandatory for your application to function
+    /// and you're working with async providers. The method throws an error if the value is missing or can't be converted to the expected type.
+    ///
+    /// ```swift
+    /// let apiVersion = try await config.fetchRequiredInt(forKey: ["api", "version"], as: APIVersion.self)
+    /// ```
+    ///
+    /// - Parameters:
+    ///   - key: The config key to look up.
+    ///   - type: The type to convert the integer value to.
+    ///   - isSecret: Whether the value should be treated as secret for logging and debugging purposes.
+    ///   - fileID: The file ID where this call originates. Used for access reporting.
+    ///   - line: The line number where this call originates. Used for access reporting.
+    /// - Returns: The config value converted to the expected type.
+    /// - Throws: An error if the underlying provider throws, the value is missing, or can't be converted to the expected type.
+    public func fetchRequiredInt<Value: ${int_convertible_type["protocol"]}>(
+        forKey key: ConfigKey,
+        as type: Value.Type = Value.self,
+        isSecret: Bool = false,
+        fileID: String = #fileID,
+        line: UInt = #line
+    ) async throws -> Value {
+        try await fetchRequiredValue(
+            forKey: key,
+            type: .int,
+            isSecret: isSecret,
+            unwrap: { try cast($0.asInt, type: Value.self, key: key) },
+            wrap: { uncast($0) },
+            fileID: fileID,
+            line: line
+        )
+    }
+
+    /// Asynchronously fetches an array of config values for the given config key, converting from integers.
+    ///
+    /// Use this method to retrieve configuration arrays where each element can be converted from integers
+    /// using async providers. If the value doesn't exist, the method returns `nil`.
+    ///
+    /// ```swift
+    /// let apiVersions = try await config.fetchIntArray(forKey: ["api", "versions"], as: APIVersion.self)
+    /// ```
+    ///
+    /// - Parameters:
+    ///   - key: The config key to look up.
+    ///   - type: The element type to convert each integer value to.
+    ///   - isSecret: Whether the value should be treated as secret for logging and debugging purposes.
+    ///   - fileID: The file ID where this call originates. Used for access reporting.
+    ///   - line: The line number where this call originates. Used for access reporting.
+    /// - Returns: An array of values converted to the expected type if found and convertible, otherwise `nil`.
+    /// - Throws: An error if the underlying provider throws or if the value can't be converted to the expected type.
+    public func fetchIntArray<Value: ${int_convertible_type["protocol"]}>(
+        forKey key: ConfigKey,
+        as type: Value.Type = Value.self,
+        isSecret: Bool = false,
+        fileID: String = #fileID,
+        line: UInt = #line
+    ) async throws -> [Value]? {
+        try await fetchValue(
+            forKey: key,
+            type: .intArray,
+            isSecret: isSecret,
+            unwrap: { try $0.asIntArray.map { try cast($0, type: Value.self, key: key) } },
+            wrap: { uncast($0) },
+            fileID: fileID,
+            line: line
+        )
+    }
+
+    /// Asynchronously fetches an array of config values for the given config key with default fallback, converting from integers.
+    ///
+    /// Use this method when you need a guaranteed non-nil result for integer-convertible array types from async providers.
+    /// If the configuration value is missing, the method returns the default value instead.
+    ///
+    /// ```swift
+    /// let apiVersions = try await config.fetchIntArray(forKey: ["api", "versions"], as: APIVersion.self, default: [.version(1)])
+    /// ```
+    ///
+    /// - Parameters:
+    ///   - key: The config key to look up.
+    ///   - type: The element type to convert each integer value to.
+    ///   - isSecret: Whether the value should be treated as secret for logging and debugging purposes.
+    ///   - defaultValue: The fallback array returned when the config value is missing or invalid.
+    ///   - fileID: The file ID where this call originates. Used for access reporting.
+    ///   - line: The line number where this call originates. Used for access reporting.
+    /// - Returns: The config array if found and convertible, otherwise the default array.
+    /// - Throws: An error if the underlying provider throws or if the value can't be converted to the expected type.
+    public func fetchIntArray<Value: ${int_convertible_type["protocol"]}>(
+        forKey key: ConfigKey,
+        as type: Value.Type = Value.self,
+        isSecret: Bool = false,
+        default defaultValue: [Value],
+        fileID: String = #fileID,
+        line: UInt = #line
+    ) async throws -> [Value] {
+        try await fetchValue(
+            forKey: key,
+            type: .intArray,
+            isSecret: isSecret,
+            default: defaultValue,
+            unwrap: { try $0.asIntArray.map { try cast($0, type: Value.self, key: key) } },
+            wrap: { uncast($0) },
+            fileID: fileID,
+            line: line
+        )
+    }
+
+    /// Asynchronously fetches a required array of config values for the given config key, converting from integers.
+    ///
+    /// Use this method when an integer-convertible array configuration value is mandatory for your application to function
+    /// and you're working with async providers. The method throws an error if the value is missing or can't be converted to the expected type.
+    ///
+    /// ```swift
+    /// let requiredVersions = try await config.fetchRequiredIntArray(forKey: ["api", "versions"], as: APIVersion.self)
+    /// ```
+    ///
+    /// - Parameters:
+    ///   - key: The config key to look up.
+    ///   - type: The element type to convert each integer value to.
+    ///   - isSecret: Whether the value should be treated as secret for logging and debugging purposes.
+    ///   - fileID: The file ID where this call originates. Used for access reporting.
+    ///   - line: The line number where this call originates. Used for access reporting.
+    /// - Returns: The config array converted to the expected type.
+    /// - Throws: An error if the underlying provider throws, the value is missing, or can't be converted to the expected type.
+    public func fetchRequiredIntArray<Value: ${int_convertible_type["protocol"]}>(
+        forKey key: ConfigKey,
+        as type: Value.Type = Value.self,
+        isSecret: Bool = false,
+        fileID: String = #fileID,
+        line: UInt = #line
+    ) async throws -> [Value] {
+        try await fetchRequiredValue(
+            forKey: key,
+            type: .intArray,
+            isSecret: isSecret,
+            unwrap: { try $0.asIntArray.map { try cast($0, type: Value.self, key: key) } },
             wrap: { uncast($0) },
             fileID: fileID,
             line: line
@@ -1077,6 +1512,286 @@ extension ConfigReader {
             type: .stringArray,
             isSecret: isSecret,
             unwrap: { try $0.asStringArray.map { try cast($0, type: Value.self, key: key) } },
+            wrap: { uncast($0) },
+            fileID: fileID,
+            line: line,
+            updatesHandler: updatesHandler
+        )
+    }
+
+    % end
+    % for int_convertible_type in int_convertible_types:
+    /// Watches for updates to a config value for the given config key, converting from an integer.
+    ///
+    /// Use this method to observe changes to optional integer-convertible configuration values over time.
+    /// The handler receives an async sequence that produces the current value whenever it changes,
+    /// or `nil` if the value is missing or can't be converted.
+    ///
+    /// ```swift
+    /// try await config.watchInt(forKey: ["api", "version"], as: APIVersion.self) { updates in
+    ///     for await version in updates {
+    ///         if let version = version {
+    ///             print("Api version is: \(version.description)")
+    ///         } else {
+    ///             print("No api version configured")
+    ///         }
+    ///     }
+    /// }
+    /// ```
+    ///
+    /// - Parameters:
+    ///   - key: The config key to watch.
+    ///   - type: The type to convert the integer value to.
+    ///   - isSecret: Whether the value should be treated as secret for logging and debugging purposes.
+    ///   - fileID: The file ID where this call originates. Used for access reporting.
+    ///   - line: The line number where this call originates. Used for access reporting.
+    ///   - updatesHandler: A closure that handles an async sequence of updates to the value. The sequence
+    ///     produces `nil` if the value is missing or can't be converted.
+    /// - Returns: The result produced by the handler.
+    /// - Throws: Rethrows any error thrown by the handler or the underlying watch operation.
+    public func watchInt<Value: ${int_convertible_type["protocol"]} & Sendable, Return: ~Copyable>(
+        forKey key: ConfigKey,
+        as type: Value.Type = Value.self,
+        isSecret: Bool = false,
+        fileID: String = #fileID,
+        line: UInt = #line,
+        updatesHandler: (_ updates: ConfigUpdatesAsyncSequence<Value?, Never>) async throws -> Return
+    ) async throws -> Return {
+        try await watchValue(
+            forKey: key,
+            type: .int,
+            isSecret: isSecret,
+            unwrap: { try cast($0.asInt, type: Value.self, key: key) },
+            wrap: { uncast($0) },
+            fileID: fileID,
+            line: line,
+            updatesHandler: updatesHandler
+        )
+    }
+
+    /// Watches for updates to a config value for the given config key with default fallback, converting from an integer.
+    ///
+    /// Use this method to observe changes to integer-convertible configuration values over time with a guaranteed fallback.
+    /// The handler receives an async sequence that produces the current value whenever it changes,
+    /// or the default value if the configuration value is missing or can't be converted.
+    ///
+    /// ```swift
+    /// try await config.watchInt(forKey: ["api", "version"], as: APIVersion.self, default: .version(1)) { updates in
+    ///     for await version in updates {
+    ///         print("Api version is: \(version.description)")
+    ///     }
+    /// }
+    /// ```
+    ///
+    /// - Parameters:
+    ///   - key: The config key to watch.
+    ///   - type: The type to convert the integer value to.
+    ///   - isSecret: Whether the value should be treated as secret for logging and debugging purposes.
+    ///   - defaultValue: The fallback value used when the config value is missing or invalid.
+    ///   - fileID: The file ID where this call originates. Used for access reporting.
+    ///   - line: The line number where this call originates. Used for access reporting.
+    ///   - updatesHandler: A closure that handles an async sequence of updates to the value. The sequence
+    ///     produces the default value if the provider returned a `nil` value or conversion failed.
+    /// - Returns: The result produced by the handler.
+    /// - Throws: Rethrows any error thrown by the handler or the underlying watch operation.
+    public func watchInt<Value: ${int_convertible_type["protocol"]} & Sendable, Return: ~Copyable>(
+        forKey key: ConfigKey,
+        as type: Value.Type = Value.self,
+        isSecret: Bool = false,
+        default defaultValue: Value,
+        fileID: String = #fileID,
+        line: UInt = #line,
+        updatesHandler: (_ updates: ConfigUpdatesAsyncSequence<Value, Never>) async throws -> Return
+    ) async throws -> Return {
+        try await watchValue(
+            forKey: key,
+            type: .int,
+            isSecret: isSecret,
+            default: defaultValue,
+            unwrap: { try cast($0.asInt, type: Value.self, key: key) },
+            wrap: { uncast($0) },
+            fileID: fileID,
+            line: line,
+            updatesHandler: updatesHandler
+        )
+    }
+
+    /// Watches for updates to a required config value for the given config key, converting from an integer.
+    ///
+    /// Use this method to observe changes to mandatory integer-convertible configuration values over time.
+    /// The handler receives an async sequence that produces the current value whenever it changes,
+    /// or an error if the value is missing or can't be converted.
+    ///
+    /// ```swift
+    /// try await config.watchRequiredInt(forKey: ["api", "version"], as: APIVersion.self) { updates in
+    ///     for try await version in updates {
+    ///         print("Api version is: \(version.description)")
+    ///     }
+    /// }
+    /// ```
+    ///
+    /// - Parameters:
+    ///   - key: The config key to watch.
+    ///   - type: The type to convert the integer value to.
+    ///   - isSecret: Whether the value should be treated as secret for logging and debugging purposes.
+    ///   - fileID: The file ID where this call originates. Used for access reporting.
+    ///   - line: The line number where this call originates. Used for access reporting.
+    ///   - updatesHandler: A closure that handles an async sequence of updates to the value. The sequence
+    ///     produces an error if the provider returned a `nil` value or if the value was of an incorrect type.
+    /// - Returns: The result produced by the handler.
+    /// - Throws: Rethrows any error thrown by the handler or the underlying watch operation.
+    public func watchRequiredInt<Value: ${int_convertible_type["protocol"]} & Sendable, Return: ~Copyable>(
+        forKey key: ConfigKey,
+        as type: Value.Type = Value.self,
+        isSecret: Bool = false,
+        fileID: String = #fileID,
+        line: UInt = #line,
+        updatesHandler: (_ updates: ConfigUpdatesAsyncSequence<Value, any Error>) async throws -> Return
+    ) async throws -> Return {
+        try await watchRequiredValue(
+            forKey: key,
+            type: .int,
+            isSecret: isSecret,
+            unwrap: { try cast($0.asInt, type: Value.self, key: key) },
+            wrap: { uncast($0) },
+            fileID: fileID,
+            line: line,
+            updatesHandler: updatesHandler
+        )
+    }
+
+    /// Watches for updates to an array of config values for the given config key, converting from integers.
+    ///
+    /// Use this method to observe changes to optional integer-convertible array configuration values over time.
+    /// The handler receives an async sequence that produces the current array whenever it changes,
+    /// or `nil` if the value is missing or can't be converted.
+    ///
+    /// ```swift
+    /// try await config.watchIntArray(forKey: ["api", "versions"], as: APIVersion.self) { updates in
+    ///     for await versions in updates {
+    ///         if let versions = versions {
+    ///             print("Api versions: \(versions.map(\.description).joined(separator: ", "))")
+    ///         } else {
+    ///             print("No api versions configured")
+    ///         }
+    ///     }
+    /// }
+    /// ```
+    ///
+    /// - Parameters:
+    ///   - key: The config key to watch.
+    ///   - type: The element type to convert each integer value to.
+    ///   - isSecret: Whether the value should be treated as secret for logging and debugging purposes.
+    ///   - fileID: The file ID where this call originates. Used for access reporting.
+    ///   - line: The line number where this call originates. Used for access reporting.
+    ///   - updatesHandler: A closure that handles an async sequence of updates to the value. The sequence
+    ///     produces `nil` if the value is missing or can't be converted.
+    /// - Returns: The result produced by the handler.
+    /// - Throws: Rethrows any error thrown by the handler or the underlying watch operation.
+    public func watchIntArray<Value: ${int_convertible_type["protocol"]} & Sendable, Return: ~Copyable>(
+        forKey key: ConfigKey,
+        as type: Value.Type = Value.self,
+        isSecret: Bool = false,
+        fileID: String = #fileID,
+        line: UInt = #line,
+        updatesHandler: (_ updates: ConfigUpdatesAsyncSequence<[Value]?, Never>) async throws -> Return
+    ) async throws -> Return {
+        try await watchValue(
+            forKey: key,
+            type: .intArray,
+            isSecret: isSecret,
+            unwrap: { try $0.asIntArray.map { try cast($0, type: Value.self, key: key) } },
+            wrap: { uncast($0) },
+            fileID: fileID,
+            line: line,
+            updatesHandler: updatesHandler
+        )
+    }
+
+    /// Watches for updates to an array of config values for the given config key with default fallback, converting from integers.
+    ///
+    /// Use this method to observe changes to integer-convertible array configuration values over time with a guaranteed fallback.
+    /// The handler receives an async sequence that produces the current array whenever it changes,
+    /// or the default value if the configuration value is missing or can't be converted.
+    ///
+    /// ```swift
+    /// try await config.watchIntArray(forKey: ["api", "versions"], as: APIVersion.self, default: [.version(1)]) { updates in
+    ///     for await versions in updates {
+    ///         print("Api versions: \(versions.map(\.description).joined(separator: ", "))")
+    ///     }
+    /// }
+    /// ```
+    ///
+    /// - Parameters:
+    ///   - key: The config key to watch.
+    ///   - type: The element type to convert each integer value to.
+    ///   - isSecret: Whether the value should be treated as secret for logging and debugging purposes.
+    ///   - defaultValue: The fallback array used when the config value is missing or invalid.
+    ///   - fileID: The file ID where this call originates. Used for access reporting.
+    ///   - line: The line number where this call originates. Used for access reporting.
+    ///   - updatesHandler: A closure that handles an async sequence of updates to the value. The sequence
+    ///     produces the default value if the provider returned a `nil` value or conversion failed.
+    /// - Returns: The result produced by the handler.
+    /// - Throws: Rethrows any error thrown by the handler or the underlying watch operation.
+    public func watchIntArray<Value: ${int_convertible_type["protocol"]} & Sendable, Return: ~Copyable>(
+        forKey key: ConfigKey,
+        as type: Value.Type = Value.self,
+        isSecret: Bool = false,
+        default defaultValue: [Value],
+        fileID: String = #fileID,
+        line: UInt = #line,
+        updatesHandler: (_ updates: ConfigUpdatesAsyncSequence<[Value], Never>) async throws -> Return
+    ) async throws -> Return {
+        try await watchValue(
+            forKey: key,
+            type: .intArray,
+            isSecret: isSecret,
+            default: defaultValue,
+            unwrap: { try $0.asIntArray.map { try cast($0, type: Value.self, key: key) } },
+            wrap: { uncast($0) },
+            fileID: fileID,
+            line: line,
+            updatesHandler: updatesHandler
+        )
+    }
+
+    /// Watches for updates to a required array of config values for the given config key, converting from integers.
+    ///
+    /// Use this method to observe changes to mandatory integer-convertible array configuration values over time.
+    /// The handler receives an async sequence that produces the current array whenever it changes,
+    /// or throws an error if the value is missing or can't be converted.
+    ///
+    /// ```swift
+    /// try await config.watchRequiredIntArray(forKey: ["api", "versions"], as: APIVersion.self) { updates in
+    ///     for try await versions in updates {
+    ///         print("Api versions: \(versions.map(\.description).joined(separator: ", "))")
+    ///     }
+    /// }
+    /// ```
+    ///
+    /// - Parameters:
+    ///   - key: The config key to watch.
+    ///   - type: The element type to convert each integer value to.
+    ///   - isSecret: Whether the value should be treated as secret for logging and debugging purposes.
+    ///   - fileID: The file ID where this call originates. Used for access reporting.
+    ///   - line: The line number where this call originates. Used for access reporting.
+    ///   - updatesHandler: A closure that handles an async sequence of updates to the value. The sequence
+    ///     produces an error if the provider returned a `nil` value or if the value was of an incorrect type.
+    /// - Returns: The result produced by the handler.
+    /// - Throws: Rethrows any error thrown by the handler or the underlying watch operation.
+    public func watchRequiredIntArray<Value: ${int_convertible_type["protocol"]} & Sendable, Return: ~Copyable>(
+        forKey key: ConfigKey,
+        as type: Value.Type = Value.self,
+        isSecret: Bool = false,
+        fileID: String = #fileID,
+        line: UInt = #line,
+        updatesHandler: (_ updates: ConfigUpdatesAsyncSequence<[Value], any Error>) async throws -> Return
+    ) async throws -> Return {
+        try await watchRequiredValue(
+            forKey: key,
+            type: .intArray,
+            isSecret: isSecret,
+            unwrap: { try $0.asIntArray.map { try cast($0, type: Value.self, key: key) } },
             wrap: { uncast($0) },
             fileID: fileID,
             line: line,

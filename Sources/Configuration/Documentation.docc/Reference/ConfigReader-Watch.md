@@ -45,16 +45,28 @@
 ### Watching integer values
 - ``ConfigReader/watchInt(forKey:isSecret:fileID:line:updatesHandler:)``
 - ``ConfigReader/watchInt(forKey:isSecret:default:fileID:line:updatesHandler:)``
+- ``ConfigReader/watchInt(forKey:as:isSecret:fileID:line:updatesHandler:)-1jgbh``
+- ``ConfigReader/watchInt(forKey:as:isSecret:fileID:line:updatesHandler:)-8ybja``
+- ``ConfigReader/watchInt(forKey:as:isSecret:default:fileID:line:updatesHandler:)-933s1``
+- ``ConfigReader/watchInt(forKey:as:isSecret:default:fileID:line:updatesHandler:)-4fnhy``
 
 ### Watching required integer values
 - ``ConfigReader/watchRequiredInt(forKey:isSecret:fileID:line:updatesHandler:)``
+- ``ConfigReader/watchRequiredInt(forKey:as:isSecret:fileID:line:updatesHandler:)-9s54e``
+- ``ConfigReader/watchRequiredInt(forKey:as:isSecret:fileID:line:updatesHandler:)-8ydgp``
 
 ### Watching lists of integer values
 - ``ConfigReader/watchIntArray(forKey:isSecret:fileID:line:updatesHandler:)``
 - ``ConfigReader/watchIntArray(forKey:isSecret:default:fileID:line:updatesHandler:)``
+- ``ConfigReader/watchIntArray(forKey:as:isSecret:fileID:line:updatesHandler:)-getl``
+- ``ConfigReader/watchIntArray(forKey:as:isSecret:fileID:line:updatesHandler:)-3wh9t``
+- ``ConfigReader/watchIntArray(forKey:as:isSecret:default:fileID:line:updatesHandler:)-1qrsh``
+- ``ConfigReader/watchIntArray(forKey:as:isSecret:default:fileID:line:updatesHandler:)-3987h``
 
 ### Watching required lists of integer values
 - ``ConfigReader/watchRequiredIntArray(forKey:isSecret:fileID:line:updatesHandler:)``
+- ``ConfigReader/watchRequiredIntArray(forKey:as:isSecret:fileID:line:updatesHandler:)-84hp3``
+- ``ConfigReader/watchRequiredIntArray(forKey:as:isSecret:fileID:line:updatesHandler:)-6r3y7``
 
 ### Watching double values
 - ``ConfigReader/watchDouble(forKey:isSecret:fileID:line:updatesHandler:)``

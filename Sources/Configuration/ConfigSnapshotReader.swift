@@ -486,4 +486,82 @@ extension ConfigSnapshotReader {
     ) -> ConfigContent {
         .stringArray(values.map(\.rawValue))
     }
+
+    /// Casts an integer value to a `ExpressibleByConfigInt` type.
+    ///
+    /// - Parameters:
+    ///   - int: The integer to cast.
+    ///   - type: The type to cast to.
+    ///   - key: The config key for error reporting.
+    /// - Returns: The cast value.
+    /// - Throws: A `ConfigError` if the integer can't be cast to the type.
+    internal func cast<Value: ExpressibleByConfigInt>(
+        _ int: Int,
+        type: Value.Type,
+        key: ConfigKey
+    ) throws -> Value {
+        guard let typedValue = Value.init(configInt: int) else {
+            throw ConfigError.configValueFailedToCast(name: keyPrefix.appending(key).description, type: "\(type)")
+        }
+        return typedValue
+    }
+
+    /// Casts an integer value to a `RawRepresentable` type with an `Int` raw value.
+    ///
+    /// - Parameters:
+    ///   - int: The integer to cast.
+    ///   - type: The type to cast to.
+    ///   - key: The config key for error reporting.
+    /// - Returns: The cast value.
+    /// - Throws: A `ConfigError` if the integer can't be cast to the type.
+    internal func cast<Value: RawRepresentable<Int>>(
+        _ int: Int,
+        type: Value.Type,
+        key: ConfigKey
+    ) throws -> Value {
+        guard let typedValue = Value.init(rawValue: int) else {
+            throw ConfigError.configValueFailedToCast(name: keyPrefix.appending(key).description, type: "\(type)")
+        }
+        return typedValue
+    }
+
+    /// Converts a `ExpressibleByConfigInt` value to content.
+    ///
+    /// - Parameter value: The value to convert.
+    /// - Returns: The config content.
+    internal func uncast<Value: ExpressibleByConfigInt>(
+        _ value: Value
+    ) -> ConfigContent {
+        .int(value.configInt)
+    }
+
+    /// Converts an array of `ExpressibleByConfigInt` values to content.
+    ///
+    /// - Parameter values: The values to convert.
+    /// - Returns: The config content.
+    internal func uncast<Value: ExpressibleByConfigInt>(
+        _ values: [Value]
+    ) -> ConfigContent {
+        .intArray(values.map(\.configInt))
+    }
+
+    /// Converts a `RawRepresentable` value with an `Int` raw value to content.
+    ///
+    /// - Parameter value: The value to convert.
+    /// - Returns: The config content.
+    internal func uncast<Value: RawRepresentable<Int>>(
+        _ value: Value
+    ) -> ConfigContent {
+        .int(value.rawValue)
+    }
+
+    /// Converts an array of `RawRepresentable` values with `Int` raw values to content.
+    ///
+    /// - Parameter values: The values to convert.
+    /// - Returns: The config content.
+    internal func uncast<Value: RawRepresentable<Int>>(
+        _ values: [Value]
+    ) -> ConfigContent {
+        .intArray(values.map(\.rawValue))
+    }
 }

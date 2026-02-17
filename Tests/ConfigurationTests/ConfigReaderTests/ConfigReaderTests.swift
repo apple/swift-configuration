@@ -76,6 +76,28 @@ struct ConfigReaderTests {
         }
     }
 
+    enum TestIntEnum: Int, Equatable {
+        case zero
+        case one
+    }
+
+    struct TestIntConvertible: ExpressibleByConfigInt, Equatable {
+        var configInt: Int
+        var description: String { "\(configInt)" }
+        init(_ int: Int) {
+            self.configInt = int
+        }
+        init?(configInt: Int) {
+            self.configInt = configInt
+        }
+        static var zero: Self {
+            .init(0)
+        }
+        static var one: Self {
+            .init(1)
+        }
+    }
+
     enum Defaults {
         static var string: String { "Hello" }
         static var otherString: String { "Other Hello" }
@@ -105,6 +127,14 @@ struct ConfigReaderTests {
         static var otherStringEnumArray: [TestEnum] { [.one, .two, .one] }
         static var stringConvertibleArray: [TestStringConvertible] { [.hello, .world] }
         static var otherStringConvertibleArray: [TestStringConvertible] { [.hello, .world, .hello] }
+        static var intEnum: TestIntEnum { .zero }
+        static var otherIntEnum: TestIntEnum { .one }
+        static var intConvertible: TestIntConvertible { .zero }
+        static var otherIntConvertible: TestIntConvertible { .zero }
+        static var intEnumArray: [TestIntEnum] { [.zero, .one] }
+        static var otherIntEnumArray: [TestIntEnum] { [.zero, .one, .zero] }
+        static var intConvertibleArray: [TestIntConvertible] { [.zero, .one] }
+        static var otherIntConvertibleArray: [TestIntConvertible] { [.zero, .one, .zero] }
     }
 
     @available(Configuration 1.0, *)
@@ -127,7 +157,12 @@ struct ConfigReaderTests {
             "stringConvertibleArray": .success(
                 ConfigValue(Defaults.stringConvertibleArray.map(\.description), isSecret: false)
             ),
-
+            "intEnum": .success(ConfigValue(Defaults.intEnum.rawValue, isSecret: false)),
+            "intConvertible": .success(ConfigValue(Defaults.intConvertible.configInt, isSecret: false)),
+            "intEnumArray": .success(ConfigValue(Defaults.intEnumArray.map(\.rawValue), isSecret: false)),
+            "intConvertibleArray": .success(
+                ConfigValue(Defaults.intConvertibleArray.map(\.configInt), isSecret: false)
+            ),
             "failure": .failure(TestProvider.TestError()),
         ])
     }

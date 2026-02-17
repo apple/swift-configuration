@@ -52,16 +52,28 @@
 ### Synchronously reading integer values
 - ``ConfigSnapshotReader/int(forKey:isSecret:fileID:line:)``
 - ``ConfigSnapshotReader/int(forKey:isSecret:default:fileID:line:)``
+- ``ConfigSnapshotReader/int(forKey:as:isSecret:fileID:line:)-3edsa``
+- ``ConfigSnapshotReader/int(forKey:as:isSecret:fileID:line:)-1l91m``
+- ``ConfigSnapshotReader/int(forKey:as:isSecret:default:fileID:line:)-8oo8c``
+- ``ConfigSnapshotReader/int(forKey:as:isSecret:default:fileID:line:)-3a0gv``
 
 ### Synchronously reading required integer values
 - ``ConfigSnapshotReader/requiredInt(forKey:isSecret:fileID:line:)``
+- ``ConfigSnapshotReader/requiredInt(forKey:as:isSecret:fileID:line:)-4jh1t``
+- ``ConfigSnapshotReader/requiredInt(forKey:as:isSecret:fileID:line:)-x6dx``
 
 ### Synchronously reading lists of integer values
 - ``ConfigSnapshotReader/intArray(forKey:isSecret:fileID:line:)``
 - ``ConfigSnapshotReader/intArray(forKey:isSecret:default:fileID:line:)``
+- ``ConfigSnapshotReader/intArray(forKey:as:isSecret:fileID:line:)-5dw7j``
+- ``ConfigSnapshotReader/intArray(forKey:as:isSecret:fileID:line:)-8nwxy``
+- ``ConfigSnapshotReader/intArray(forKey:as:isSecret:default:fileID:line:)-85dpy``
+- ``ConfigSnapshotReader/intArray(forKey:as:isSecret:default:fileID:line:)-4u516``
 
 ### Synchronously reading required lists of integer values
 - ``ConfigSnapshotReader/requiredIntArray(forKey:isSecret:fileID:line:)``
+- ``ConfigSnapshotReader/requiredIntArray(forKey:as:isSecret:fileID:line:)-82bhm``
+- ``ConfigSnapshotReader/requiredIntArray(forKey:as:isSecret:fileID:line:)-1c4qk``
 
 ### Synchronously reading double values
 - ``ConfigSnapshotReader/double(forKey:isSecret:fileID:line:)``
