@@ -7,9 +7,9 @@ The mechanism, coupled with an example kubernetes configMap and deployment confi
 
 The initial, static configuration is configured in [Sources/App/App.swift](./Sources/App/App.swift). 
 In the initial setup, the code provides in-memory defaults that can be overrided, in order, by:
-- a local environment file (`.env`)
-- set environment variables
-- command-line arguments
+- command-line arguments provided to the executable, which overrides the following mechanisms
+- environment variables, if set where the executable runs 
+- a local environment file (`.env`), if provided
 
 The static configuration provides example configuration settings that control:
 - the log level for the application

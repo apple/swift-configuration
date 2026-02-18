@@ -33,7 +33,6 @@ let package = Package(
                 .byName(name: "App"),
                 .product(name: "HummingbirdTesting", package: "hummingbird"),
             ],
-            resources: [.process("Fixtures")]
         ),
     ]
 )

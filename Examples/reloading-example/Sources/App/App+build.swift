@@ -21,11 +21,11 @@ import ServiceLifecycle
 typealias AppRequestContext = BasicRequestContext
 
 struct ConfigWatchReporter: Service {
-    let dynamicConfig: ConfigReader
+    let config: ConfigReader
     let logger: Logger
 
     func run() async throws {
-        try await self.dynamicConfig.watchString(forKey: "name", default: "unset") { updates in
+        try await self.config.watchString(forKey: "name", default: "unset") { updates in
             for try await update in updates.cancelOnGracefulShutdown() {
                 logger.info("Received a configuration change: \(update)")
             }
@@ -38,29 +38,24 @@ struct ConfigWatchReporter: Service {
 /// - Parameter reader: configuration reader
 /// - Throws: Configuration or application setup errors
 /// - Returns: Configured application instance
-func buildApplication(reader: ConfigReader) async throws -> some ApplicationProtocol {
+func buildApplication(config: ConfigReader) async throws -> some ApplicationProtocol {
     let logger = {
-        var logger = Logger(label: reader.string(forKey: "http.serverName", default: "default-HB-server"))
-        logger.logLevel = reader.string(forKey: "log.level", as: Logger.Level.self, default: .info)
+        var logger = Logger(label: config.string(forKey: "http.serverName", default: "default-HB-server"))
+        logger.logLevel = config.string(forKey: "log.level", as: Logger.Level.self, default: .info)
         return logger
     }()
 
-    // https://swiftpackageindex.com/apple/swift-configuration/1.0.1/documentation/configuration
-    let dynamicConfig = try await ReloadingFileProvider<YAMLSnapshot>(config: reader)
+    let configReporter = ConfigWatchReporter(config: config, logger: logger)
 
-    let dynamicConfigReader = ConfigReader(provider: dynamicConfig)
-    let configReporter = ConfigWatchReporter(dynamicConfig: dynamicConfigReader, logger: logger)
-
-    let router = try buildRouter(config: reader, dynamicConfig: dynamicConfigReader)
+    let router = try buildRouter(config: config)
 
     // Create the app and add a service to it.
     // https://docs.hummingbird.codes/2.0/documentation/hummingbird/servicelifecycle#Hummingbird-Integration
     let app = Application(
         router: router,
-        configuration: ApplicationConfiguration(reader: reader.scoped(to: "http")),
+        configuration: ApplicationConfiguration(reader: config.scoped(to: "http")),
         services: [
-            dynamicConfig,
-            configReporter,
+            configReporter
         ],
         logger: logger
     )
@@ -68,7 +63,7 @@ func buildApplication(reader: ConfigReader) async throws -> some ApplicationProt
 }
 
 /// Build router.
-func buildRouter(config: ConfigReader, dynamicConfig: ConfigReader) throws -> Router<AppRequestContext> {
+func buildRouter(config: ConfigReader) throws -> Router<AppRequestContext> {
     let router = Router(context: AppRequestContext.self)
     // Add middleware
     router.addMiddleware {
@@ -77,7 +72,7 @@ func buildRouter(config: ConfigReader, dynamicConfig: ConfigReader) throws -> Ro
     }
     // Add default endpoint
     router.get("/") { _, _ in
-        let name = dynamicConfig.string(forKey: "name")
+        let name = config.scoped(to: "app").string(forKey: "name")
 
         return "Hello \(name ?? "World")!"
     }

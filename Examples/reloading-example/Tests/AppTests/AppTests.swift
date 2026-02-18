@@ -21,18 +21,13 @@ import Foundation
 
 @testable import App
 
-private func fixtureConfigReaderFactory() throws -> ConfigReader {
-
-    guard let appSettingsPath = Bundle.module.path(forResource: "appsettings", ofType: "yaml") else {
-        fatalError("Unable to find appsettings.yaml in test bundle")
-    }
-
-    return ConfigReader(providers: [
+private func configReaderFactory() -> ConfigReader {
+    ConfigReader(providers: [
         InMemoryProvider(values: [
             "http.host": ConfigValue("127.0.0.1"),
             "http.port": ConfigValue(8080),
             "log.level": ConfigValue("trace"),
-            "filePath": ConfigValue(stringLiteral: appSettingsPath),
+            "app.name": ConfigValue("Test"),
         ])
     ])
 }
@@ -40,9 +35,8 @@ private func fixtureConfigReaderFactory() throws -> ConfigReader {
 @Suite
 struct AppTests {
     @Test
-    //(.timeLimit(.seconds(1)))
     func app() async throws {
-        let app = try await buildApplication(reader: fixtureConfigReaderFactory())
+        let app = try await buildApplication(config: configReaderFactory())
         try await app.test(.router) { client in
             try await client.execute(uri: "/", method: .get) { response in
                 #expect(String(buffer: response.body) == "Hello Test!")

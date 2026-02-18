@@ -22,19 +22,35 @@ struct App {
         // Application will read configuration from the following in the order listed
         // Command line, Environment variables, dotEnv file, defaults provided in memory
         // CLI >overrides> ENV >overrides> .env >overrides> in-memory defaults
-
-        let reader = try await ConfigReader(providers: [
+        async let staticProviders: [(any ConfigProvider)] = [
             CommandLineArgumentsProvider(),
             EnvironmentVariablesProvider(),
             EnvironmentVariablesProvider(environmentFilePath: ".env", allowMissing: true),
             InMemoryProvider(values: [
+                // default log level
                 "log.level": "info",
-                "config.filePath": "/etc/config/appsettings.yaml",  // the default, expected dynamic configuration location
-                "pollIntervalSeconds": 1,  // default reload interval is 15 seconds, set to 1 second for the example
+
+                // the default, expected dynamic configuration location
+                "config.filePath": "/etc/config/appsettings.yaml",
+
+                // default reload interval is 15 seconds, set to 1 second for the example
+                "pollIntervalSeconds": 1,
+
+                //name used in the logger
                 "http.serverName": "config-reload-example",
             ]),
-        ])
-        let app = try await buildApplication(reader: reader)  // <-- this is a service, and you can add other
+        ]
+        // create an initial configuration reader to bootstrap readers that depend on it, such as a ReloadingFileProvider
+        let initConfig = try await ConfigReader(providers: staticProviders)
+
+        // https://swiftpackageindex.com/apple/swift-configuration/documentation/configuration
+        // create a dynamic configuration provider that watches a file for changes and reloads it when it changes
+        // the file path and polling interval are read from the initial configuration reader
+        let dynamicConfig = try await ReloadingFileProvider<YAMLSnapshot>(config: initConfig.scoped(to: "config"))
+        // assemble a final configuration reader that includes the dynamic provider
+        let config = try await ConfigReader(providers: [dynamicConfig] + staticProviders)
+
+        let app = try await buildApplication(config: config)
 
         try await app.runService()
     }
