@@ -31,7 +31,8 @@ let package = Package(
             dependencies: [
                 .byName(name: "App"),
                 .product(name: "HummingbirdTesting", package: "hummingbird"),
-            ]
+            ],
+            resources: [.process("Fixtures")]
         ),
     ]
 )

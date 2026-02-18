@@ -17,26 +17,35 @@ import Hummingbird
 import HummingbirdTesting
 import Logging
 import Testing
+import Foundation
 
 @testable import App
 
-private let reader = ConfigReader(providers: [
-    InMemoryProvider(values: [
-        "http.host": "127.0.0.1",
-        "http.port": "0",
-        "log.level": "trace",
-        "filePath": "appsettings.yaml",
+private func fixtureConfigReaderFactory() throws -> ConfigReader {
+
+    guard let appSettingsPath = Bundle.module.path(forResource: "appsettings", ofType: "yaml") else {
+        fatalError("Unable to find appsettings.yaml in test bundle")
+    }
+
+    return ConfigReader(providers: [
+        InMemoryProvider(values: [
+            "http.host": ConfigValue("127.0.0.1"),
+            "http.port": ConfigValue(8080),
+            "log.level": ConfigValue("trace"),
+            "filePath": ConfigValue(stringLiteral: appSettingsPath),
+        ])
     ])
-])
+}
 
 @Suite
 struct AppTests {
     @Test
+    //(.timeLimit(.seconds(1)))
     func app() async throws {
-        let app = try await buildApplication(reader: reader)
+        let app = try await buildApplication(reader: fixtureConfigReaderFactory())
         try await app.test(.router) { client in
             try await client.execute(uri: "/", method: .get) { response in
-                #expect(response.body == ByteBuffer(string: "Hello!"))
+                #expect(String(buffer: response.body) == "Hello Test!")
             }
         }
     }

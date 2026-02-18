@@ -26,7 +26,7 @@ struct ConfigWatchReporter: Service {
 
     func run() async throws {
         try await self.dynamicConfig.watchString(forKey: "name", default: "unset") { updates in
-            for try await update in updates {
+            for try await update in updates.cancelOnGracefulShutdown() {
                 logger.info("Received a configuration change: \(update)")
             }
         }
@@ -58,7 +58,10 @@ func buildApplication(reader: ConfigReader) async throws -> some ApplicationProt
     let app = Application(
         router: router,
         configuration: ApplicationConfiguration(reader: reader.scoped(to: "http")),
-        services: [dynamicConfig, configReporter],
+        services: [
+            dynamicConfig,
+            configReporter,
+        ],
         logger: logger
     )
     return app
