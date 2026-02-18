@@ -46,7 +46,9 @@ struct App {
         // https://swiftpackageindex.com/apple/swift-configuration/documentation/configuration
         // create a dynamic configuration provider that watches a file for changes and reloads it when it changes
         // the file path and polling interval are read from the initial configuration reader
-        let dynamicConfig: ReloadingFileProvider<YAMLSnapshot> = try await ReloadingFileProvider<YAMLSnapshot>(config: initConfig.scoped(to: "config"))
+        let dynamicConfig: ReloadingFileProvider<YAMLSnapshot> = try await ReloadingFileProvider<YAMLSnapshot>(
+            config: initConfig.scoped(to: "config")
+        )
         // assemble a final configuration reader that includes the dynamic provider
         let config = try await ConfigReader(providers: [dynamicConfig] + staticProviders)
 

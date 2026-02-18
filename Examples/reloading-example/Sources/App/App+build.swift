@@ -25,11 +25,12 @@ struct ConfigWatchReporter: Service {
     let logger: Logger
 
     func run() async throws {
-        try await self.config.scoped(to: "app").watchString(forKey: "name", default: "unset") { updates in
-            for try await update in updates.cancelOnGracefulShutdown() {
-                logger.info("Received a configuration change: \(update)")
+        try await self.config.scoped(to: "app")
+            .watchString(forKey: "name", default: "unset") { updates in
+                for try await update in updates.cancelOnGracefulShutdown() {
+                    logger.info("Received a configuration change: \(update)")
+                }
             }
-        }
     }
 }
 
@@ -38,7 +39,9 @@ struct ConfigWatchReporter: Service {
 /// - Parameter reader: configuration reader
 /// - Throws: Configuration or application setup errors
 /// - Returns: Configured application instance
-func buildApplication(config: ConfigReader, reloadingProvider: ReloadingFileProvider<YAMLSnapshot>) async throws -> some ApplicationProtocol {
+func buildApplication(config: ConfigReader, reloadingProvider: ReloadingFileProvider<YAMLSnapshot>) async throws
+    -> some ApplicationProtocol
+{
     let logger = {
         var logger = Logger(label: config.string(forKey: "http.serverName", default: "default-HB-server"))
         logger.logLevel = config.string(forKey: "log.level", as: Logger.Level.self, default: .info)
@@ -58,7 +61,7 @@ func buildApplication(config: ConfigReader, reloadingProvider: ReloadingFileProv
         configuration: ApplicationConfiguration(reader: config.scoped(to: "http")),
         services: [
             reloadingProvider,
-            configReporter
+            configReporter,
         ],
         logger: logger
     )
