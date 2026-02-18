@@ -14,7 +14,7 @@ In the initial setup, the code provides in-memory defaults that can be overrided
 The static configuration provides example configuration settings that control:
 - the log level for the application
 - the logger name
-- the location of the JSON file to use for dynamic configuration
+- the location of the YAML file to use for dynamic configuration
 
 The dynamic configuration is set up in the buildApplication method in [Sources/App/App+build.swift](./Sources/App/App+build.swift).
 It loads the location of the JSON file from the static configuration, throwing an error and terminating the app if that file doesn't exist.
