@@ -25,7 +25,7 @@ struct ConfigWatchReporter: Service {
     let logger: Logger
 
     func run() async throws {
-        try await self.config.watchString(forKey: "name", default: "unset") { updates in
+        try await self.config.scoped(to: "app").watchString(forKey: "name", default: "unset") { updates in
             for try await update in updates.cancelOnGracefulShutdown() {
                 logger.info("Received a configuration change: \(update)")
             }
