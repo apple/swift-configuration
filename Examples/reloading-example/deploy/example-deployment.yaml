@@ -23,8 +23,6 @@ spec:
             # location of the configuration file mounted from ConfigMap
             - name: CONFIG_FILE_PATH
               value: "/etc/config/appsettings.yaml"
-            - name: CONFIG_ACCESS_LOG_FILE
-              value: "/tmp/config-access.log"
           ports:
             - containerPort: 8080
           volumeMounts:
