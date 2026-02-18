@@ -34,7 +34,7 @@ struct App {
                 "config.filePath": "/etc/config/appsettings.yaml",
 
                 // default reload interval is 15 seconds, set to 1 second for the example
-                "pollIntervalSeconds": 1,
+                "config.pollIntervalSeconds": 1,
 
                 //name used in the logger
                 "http.serverName": "config-reload-example",
@@ -46,11 +46,12 @@ struct App {
         // https://swiftpackageindex.com/apple/swift-configuration/documentation/configuration
         // create a dynamic configuration provider that watches a file for changes and reloads it when it changes
         // the file path and polling interval are read from the initial configuration reader
-        let dynamicConfig = try await ReloadingFileProvider<YAMLSnapshot>(config: initConfig.scoped(to: "config"))
+        let dynamicConfig: ReloadingFileProvider<YAMLSnapshot> = try await ReloadingFileProvider<YAMLSnapshot>(config: initConfig.scoped(to: "config"))
         // assemble a final configuration reader that includes the dynamic provider
         let config = try await ConfigReader(providers: [dynamicConfig] + staticProviders)
 
-        let app = try await buildApplication(config: config)
+        // The reloading file provider needs to be passed in and added to the list of long-running tasks operating in the background.
+        let app = try await buildApplication(config: config, reloadingProvider: dynamicConfig)
 
         try await app.runService()
     }

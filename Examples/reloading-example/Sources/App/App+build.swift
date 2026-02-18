@@ -38,7 +38,7 @@ struct ConfigWatchReporter: Service {
 /// - Parameter reader: configuration reader
 /// - Throws: Configuration or application setup errors
 /// - Returns: Configured application instance
-func buildApplication(config: ConfigReader) async throws -> some ApplicationProtocol {
+func buildApplication(config: ConfigReader, reloadingProvider: ReloadingFileProvider<YAMLSnapshot>) async throws -> some ApplicationProtocol {
     let logger = {
         var logger = Logger(label: config.string(forKey: "http.serverName", default: "default-HB-server"))
         logger.logLevel = config.string(forKey: "log.level", as: Logger.Level.self, default: .info)
@@ -49,12 +49,15 @@ func buildApplication(config: ConfigReader) async throws -> some ApplicationProt
 
     let router = try buildRouter(config: config)
 
-    // Create the app and add a service to it.
+    // Create the app and add the services to it.
     // https://docs.hummingbird.codes/2.0/documentation/hummingbird/servicelifecycle#Hummingbird-Integration
+    // This runs a background service that watches for fileystem changes for configuration, and another
+    // that reports changes to a specific configuration value.
     let app = Application(
         router: router,
         configuration: ApplicationConfiguration(reader: config.scoped(to: "http")),
         services: [
+            reloadingProvider,
             configReporter
         ],
         logger: logger
