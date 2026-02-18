@@ -21,7 +21,7 @@ spec:
             - name: LOG_LEVEL
               value: "debug"
             # location of the configuration file mounted from ConfigMap
-            - name: filePath
+            - name: CONFIG_FILE_PATH
               value: "/etc/config/appsettings.yaml"
           ports:
             - containerPort: 8080
