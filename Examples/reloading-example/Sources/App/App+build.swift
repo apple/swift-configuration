@@ -59,7 +59,10 @@ func buildApplication(initialConfigProviders: [(any ConfigProvider)]) async thro
         config: initConfig.scoped(to: "config")
     )
     // Assemble a final configuration reader that includes the dynamic provider
-    let config = ConfigReader(providers: [reloadingProvider] + initialConfigProviders)
+    let config = ConfigReader(
+        providers: [reloadingProvider] + initialConfigProviders,
+        accessReporter: AccessLogger(logger: logger)
+    )
 
     let configReporter = ConfigWatchReporter(config: config, logger: logger)
 
