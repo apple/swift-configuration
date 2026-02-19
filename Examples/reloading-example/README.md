@@ -3,7 +3,7 @@
 This example starts from the template that the Hummingbird projects for a simple web server.
 
 The app takes advantage of Swift Configuration to establish a static, initial configuration as well as a dynamic, reloading configuration that reads a YAML file from the filesystem.
-The mechanism, coupled with an example kubernetes configMap and deployment configuration, show how to take advantage of a configuration object that updates automatically as the configMap changes.
+The mechanism, coupled with an example Kubernetes configMap and deployment configuration, shows how to take advantage of a configuration value that updates automatically as the configMap changes.
 
 The initial, static configuration is configured in [Sources/App/App.swift](./Sources/App/App.swift). 
 In the initial setup, the code provides in-memory defaults that can be overrided, in order, by:
