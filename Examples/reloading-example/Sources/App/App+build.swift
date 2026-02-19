@@ -35,8 +35,7 @@ struct ConfigWatchReporter: Service {
 }
 
 /// Builds the application.
-/// - Parameters:
-///   - initialConfigProviders: A set of initial configuration providers
+/// - Parameter initialConfigProviders: A set of initial configuration providers
 /// - Throws: Configuration or application setup errors.
 /// - Returns: Configured application instance.
 func buildApplication(initialConfigProviders: [(any ConfigProvider)]) async throws
