@@ -19,7 +19,7 @@ The static configuration provides example configuration settings that control:
 The dynamic configuration is set up in the `buildApplication` method in [Sources/App/App+build.swift](./Sources/App/App+build.swift).
 It loads the location of the YAML file from the static configuration, throwing an error and terminating the app if that file doesn't exist.
 The code creates an additional configuration reader to access the configuration from the YAML data, and hands that configuration reader into the `buildRouter()` method, alongside the static configuration, to allow the use of both within the routes it assembles.
-The default configuration for the ReloadingFileProvider checks for updates to the YAML file roughly every 15 seconds.
+The default configuration for the `ReloadingFileProvider` checks for updates to the YAML file roughly every 15 seconds.
 
 Example Kubernetes deployment, service, and configuration map manifests are in [deploy](./deploy/). They define a basic example config-map that contains YAML content, and maps that configuration to the filesystem within the deployed pod(s).
 When the configuration map is updated, the Kubernetes control plan updates the content on the filesystem, and shortly thereafter the app reads the new value and makes it available inside the app.
