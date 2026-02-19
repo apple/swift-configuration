@@ -21,22 +21,26 @@ import Foundation
 
 @testable import App
 
-private func configReaderFactory() -> ConfigReader {
-    ConfigReader(providers: [
+func initialProviders() -> [(any ConfigProvider)] {
+    guard let appSettingsPath = Bundle.module.path(forResource: "appsettings", ofType: "yaml") else {
+        fatalError("Unable to find appsettings.yaml in test bundle")
+    }
+    return [
         InMemoryProvider(values: [
             "http.host": ConfigValue("127.0.0.1"),
             "http.port": ConfigValue(8080),
             "log.level": ConfigValue("trace"),
+            "config.filePath": ConfigValue(stringLiteral: appSettingsPath),
             "app.name": ConfigValue("Test"),
         ])
-    ])
+    ]
 }
 
 @Suite
 struct AppTests {
     @Test
     func app() async throws {
-        let app = try await buildApplication(config: configReaderFactory())
+        let app = try await buildApplication(initialConfigProviders: initialProviders())
         try await app.test(.router) { client in
             try await client.execute(uri: "/", method: .get) { response in
                 #expect(String(buffer: response.body) == "Hello Test!")
