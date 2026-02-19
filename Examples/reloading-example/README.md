@@ -16,7 +16,7 @@ The static configuration provides example configuration settings that control:
 - The logger name.
 - The location of the YAML file to use for dynamic configuration.
 
-The dynamic configuration is set up in the buildApplication method in [Sources/App/App+build.swift](./Sources/App/App+build.swift).
+The dynamic configuration is set up in the `buildApplication` method in [Sources/App/App+build.swift](./Sources/App/App+build.swift).
 It loads the location of the YAML file from the static configuration, throwing an error and terminating the app if that file doesn't exist.
 The code creates an additional configuration reader to access the configuration from the YAML data, and hands that configuration reader into the buildRouter() method, alongside the static configuration, to allow the use of both within the routes it assembles.
 The default configuration for the ReloadingFileProvider checks for updates to the YAML file roughly every 15 seconds.
