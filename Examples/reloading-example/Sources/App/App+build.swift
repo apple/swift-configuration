@@ -34,7 +34,7 @@ struct ConfigWatchReporter: Service {
     }
 }
 
-/// DescriptionBuild application
+/// Builds the application.
 /// - Parameters:
 ///   - config: Configuration for the app.
 ///   - reloadingProvider: The reloading provider service.
@@ -69,7 +69,7 @@ func buildApplication(config: ConfigReader, reloadingProvider: ReloadingFileProv
     return app
 }
 
-/// Build router.
+/// Builds the router.
 /// - Parameter config: Configuration for the app.
 /// - Throws: Configuration or setup errors.
 /// - Returns: The configured router for the app.
