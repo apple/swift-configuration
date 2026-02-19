@@ -34,11 +34,12 @@ struct ConfigWatchReporter: Service {
     }
 }
 
-/// Build application.
-///
-/// - Parameter reader: configuration reader
-/// - Throws: Configuration or application setup errors
-/// - Returns: Configured application instance
+/// DescriptionBuild application
+/// - Parameters:
+///   - config: Configuration for the app.
+///   - reloadingProvider: The reloading provider service.
+/// - Throws: Configuration or application setup errors.
+/// - Returns: Configured application instance.
 func buildApplication(config: ConfigReader, reloadingProvider: ReloadingFileProvider<YAMLSnapshot>) async throws
     -> some ApplicationProtocol
 {
@@ -69,6 +70,9 @@ func buildApplication(config: ConfigReader, reloadingProvider: ReloadingFileProv
 }
 
 /// Build router.
+/// - Parameter config: Configuration for the app.
+/// - Throws: Configuration or setup errors.
+/// - Returns: The configured router for the app.
 func buildRouter(config: ConfigReader) throws -> Router<AppRequestContext> {
     let router = Router(context: AppRequestContext.self)
     // Add middleware
