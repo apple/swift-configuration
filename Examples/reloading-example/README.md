@@ -81,7 +81,7 @@ kubectl port-forward deployment/http-server 8080:8080
 
 t2:
 ```bash
-while true; do; sleep 1; curl http://localhost:8080; echo ""; done
+while true; do; sleep 1; curl http://localhost:8080 && echo ""; done
 ```
 
 The endpoint starts with reporting "Hello Swift", the value provided by the configuration map.
