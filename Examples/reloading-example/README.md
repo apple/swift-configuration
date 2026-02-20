@@ -99,5 +99,5 @@ To clean up, delete the cluster and the pods running within it:
 
 
 ```bash
-kind cluster delete
+kind delete cluster
 ```
