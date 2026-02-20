@@ -74,10 +74,18 @@ t1:
 kubectl get pods
 ```
 
+- Enable port forwarding from localhost:8080 into the cluster:
+
+(this command takes over the shell, so you'll need another window for further shell commands)
+
 t1:
 ```bash
 kubectl port-forward deployment/http-server 8080:8080
 ```
+
+- Call the endpoint 1/sec in a loop in a new window, to see the effect of the change:
+
+(this command takes over the shell, so you'll need another window for further shell commands)
 
 t2:
 ```bash
