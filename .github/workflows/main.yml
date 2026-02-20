@@ -18,19 +18,17 @@ jobs:
       linux_5_10_enabled: false
       linux_6_0_enabled: false
       linux_6_1_enabled: false
-      linux_6_2_arguments_override: "--explicit-target-dependency-import-check error"
       linux_nightly_6_1_enabled: false
-      linux_nightly_next_enabled: false
+      linux_6_2_arguments_override: "--explicit-target-dependency-import-check error"
+      linux_nightly_next_enabled: true
       linux_nightly_next_arguments_override: "--explicit-target-dependency-import-check error"
       linux_nightly_main_arguments_override: "--explicit-target-dependency-import-check error"
-      # Windows is disabled, blocked on Swift Service Lifecycle Windows support: https://github.com/swift-server/swift-service-lifecycle/issues/213
-      windows_6_0_enabled: false
-      windows_6_1_enabled: false
-      windows_nightly_6_1_enabled: false
+      windows_6_2_enabled: false
+      windows_nightly_next_enabled: false
       windows_nightly_main_enabled: false
-      windows_6_1_arguments_override: "--enable-all-traits --explicit-target-dependency-import-check error"
-      windows_nightly_6_1_arguments_override: "--enable-all-traits --explicit-target-dependency-import-check error"
-      windows_nightly_main_arguments_override: "--enable-all-traits --explicit-target-dependency-import-check error"
+      windows_6_2_arguments_override: "--explicit-target-dependency-import-check error"
+      windows_nightly_next_arguments_override: "--explicit-target-dependency-import-check error"
+      windows_nightly_main_arguments_override: "--explicit-target-dependency-import-check error"
 
   static-sdk:
     name: Static SDK
@@ -72,8 +70,7 @@ jobs:
       linux_6_0_enabled: false
       linux_6_1_enabled: false
       linux_nightly_next_enabled: false
-      windows_6_0_enabled: false
-      windows_6_1_enabled: false
+      windows_6_2_enabled: false
       windows_nightly_next_enabled: false
       windows_nightly_main_enabled: false
 
