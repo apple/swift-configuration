@@ -149,6 +149,13 @@ let package = Package(
             ]
         ),
 
+        .testTarget(
+            name: "ConfigurationTestingInternalTests",
+            dependencies: [
+                "ConfigurationTestingInternal"
+            ]
+        ),
+
         // Testing (a public library)
         .target(
             name: "ConfigurationTesting",
