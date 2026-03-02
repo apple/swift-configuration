@@ -130,6 +130,7 @@ The library includes comprehensive built-in provider support:
 ### Community providers
 
 - TOML file: [mattt/swift-configuration-toml](https://github.com/mattt/swift-configuration-toml)
+- AWS Secrets Manager: [songshift/swift-configuration-aws](https://github.com/songshift/swift-configuration-aws)
 
 You can also implement a custom [`ConfigProvider`](https://swiftpackageindex.com/apple/swift-configuration/documentation/configuration/configprovider) for specialized configuration formats and sources.
 
