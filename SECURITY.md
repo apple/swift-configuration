@@ -1,6 +1,6 @@
 # Security disclosure process
 
-If you believe that you have discovered a security or privacy vulnerability in our open source software, please report it to us using the [GitHub private vulnerability feature](https://github.com/apple/container/security/advisories/new). Reports should include specific product and software version(s) that you believe are affected; a technical description of the behavior that you observed and the behavior that you expected; the steps required to reproduce the issue; and a proof of concept or exploit.
+If you believe that you have discovered a security or privacy vulnerability in our open source software, please report it to us using the [GitHub private vulnerability feature](https://github.com/apple/swift-configuration/security/advisories/new). Reports should include specific product and software version(s) that you believe are affected; a technical description of the behavior that you observed and the behavior that you expected; the steps required to reproduce the issue; and a proof of concept or exploit.
 
 The project team will do their best to acknowledge receiving all security reports within 7 days of submission. This initial acknowledgment is neither acceptance nor rejection of your report. The project team may come back to you with further questions or invite you to collaborate while working through the details of your report.
 

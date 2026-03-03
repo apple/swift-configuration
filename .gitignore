@@ -7,3 +7,5 @@ DerivedData/
 Package.resolved
 *.pyc
 .docc-build
+.vscode
+.devcontainer

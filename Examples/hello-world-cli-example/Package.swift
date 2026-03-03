@@ -1,4 +1,4 @@
-// swift-tools-version: 6.1
+// swift-tools-version: 6.2
 
 import PackageDescription
 
@@ -8,14 +8,18 @@ let package = Package(
         .macOS(.v15)
     ],
     dependencies: [
-       .package(url: "https://github.com/apple/swift-configuration", .upToNextMinor(from: "0.1.0"), traits: [.defaults, "CommandLineArgumentsSupport"])
+        .package(
+            url: "https://github.com/apple/swift-configuration",
+            from: "1.0.0",
+            traits: [.defaults, "CommandLineArguments"]
+        )
     ],
     targets: [
         .executableTarget(
             name: "CLI",
             dependencies: [
-                .product(name: "Configuration", package: "swift-configuration"),
+                .product(name: "Configuration", package: "swift-configuration")
             ]
-        ),
+        )
     ]
 )

@@ -69,7 +69,7 @@ struct MutableInMemoryProviderTests {
     @available(Configuration 1.0, *)
     @Test func compat() async throws {
         let provider = makeProvider()
-        try await ProviderCompatTest(provider: provider).run()
+        try await ProviderCompatTest(provider: provider).runTest()
     }
 
     @available(Configuration 1.0, *)
@@ -132,11 +132,11 @@ struct MutableInMemoryProviderTests {
         let provider = makeProvider()
         let config = ConfigReader(provider: provider)
 
-        config.withSnapshot { snapshot in
-            #expect(snapshot.bool(forKey: "bool") == true)
-            provider.setValue(false, forKey: "bool")
-            #expect(snapshot.bool(forKey: "bool") == true)
-        }
+        let snapshot = config.snapshot()
+        #expect(snapshot.bool(forKey: "bool") == true)
+        provider.setValue(false, forKey: "bool")
+        #expect(snapshot.bool(forKey: "bool") == true)
+
         #expect(config.bool(forKey: "bool") == false)
     }
 

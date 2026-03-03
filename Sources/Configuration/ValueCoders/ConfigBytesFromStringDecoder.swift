@@ -22,7 +22,7 @@ import Foundation
 ///
 /// This protocol defines the interface for converting string-based configuration
 /// values into binary data. Different implementations can support various encoding
-/// formats such as Base64, hexadecimal, or other custom encodings.
+/// formats such as base64, hexadecimal, or other custom encodings.
 ///
 /// ## Usage
 ///
@@ -32,8 +32,9 @@ import Foundation
 ///
 /// ```swift
 /// let decoder: ConfigBytesFromStringDecoder = .base64
-/// let bytes = decoder.decode("SGVsbG8gV29ybGQ=") // "Hello World" in Base64
+/// let bytes = decoder.decode("SGVsbG8gV29ybGQ=") // "Hello World" in base64
 /// ```
+@available(Configuration 1.0, *)
 public protocol ConfigBytesFromStringDecoder: Sendable {
 
     /// Decodes a string value into an array of bytes.
@@ -48,17 +49,19 @@ public protocol ConfigBytesFromStringDecoder: Sendable {
     func decode(_ value: String) -> [UInt8]?
 }
 
-/// A decoder that converts Base64-encoded strings into byte arrays.
+/// A decoder that converts base64-encoded strings into byte arrays.
 ///
-/// This decoder interprets string configuration values as Base64-encoded data
+/// This decoder interprets string configuration values as base64-encoded data
 /// and converts them to their binary representation.
-public struct Base64BytesFromStringDecoder: Sendable {
+@available(Configuration 1.0, *)
+public struct ConfigBytesFromBase64StringDecoder: Sendable {
 
-    /// Creates a new Base64 decoder.
+    /// Creates a new base64 decoder.
     public init() {}
 }
 
-extension Base64BytesFromStringDecoder: ConfigBytesFromStringDecoder {
+@available(Configuration 1.0, *)
+extension ConfigBytesFromBase64StringDecoder: ConfigBytesFromStringDecoder {
     // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
     public func decode(_ value: String) -> [UInt8]? {
         guard let data = Data(base64Encoded: value) else {
@@ -68,9 +71,10 @@ extension Base64BytesFromStringDecoder: ConfigBytesFromStringDecoder {
     }
 }
 
-extension ConfigBytesFromStringDecoder where Self == Base64BytesFromStringDecoder {
+@available(Configuration 1.0, *)
+extension ConfigBytesFromStringDecoder where Self == ConfigBytesFromBase64StringDecoder {
 
-    /// A decoder that interprets string values as Base64-encoded data.
+    /// A decoder that interprets string values as base64-encoded data.
     public static var base64: Self { .init() }
 }
 
@@ -85,13 +89,15 @@ extension ConfigBytesFromStringDecoder where Self == Base64BytesFromStringDecode
 /// The decoder expects strings with an even number of characters, where each
 /// pair of characters represents one byte. For example, "48656C6C6F" represents
 /// the bytes for "Hello".
-public struct HexByteFromStringDecoder: Sendable {
+@available(Configuration 1.0, *)
+public struct ConfigBytesFromHexStringDecoder: Sendable {
 
     /// Creates a new hexadecimal decoder.
     public init() {}
 }
 
-extension HexByteFromStringDecoder: ConfigBytesFromStringDecoder {
+@available(Configuration 1.0, *)
+extension ConfigBytesFromHexStringDecoder: ConfigBytesFromStringDecoder {
     // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
     public func decode(_ value: String) -> [UInt8]? {
         if value.count % 2 != 0 {
@@ -113,7 +119,8 @@ extension HexByteFromStringDecoder: ConfigBytesFromStringDecoder {
     }
 }
 
-extension ConfigBytesFromStringDecoder where Self == HexByteFromStringDecoder {
+@available(Configuration 1.0, *)
+extension ConfigBytesFromStringDecoder where Self == ConfigBytesFromHexStringDecoder {
 
     /// A decoder that interprets string values as hexadecimal-encoded data.
     public static var hex: Self { .init() }

@@ -37,41 +37,31 @@ struct ConfigReaderMethodTestsFetch2 {
         % lower_test_suffix = lower_first(test_suffix)
         do {
             // Optional - success
-            #expect(try await config.fetch${suffix}(forKey: ConfigKey(["${lower_test_suffix}"]), as: ${test_type}.self) == Defaults.${lower_test_suffix})
             #expect(try await config.fetch${suffix}(forKey: "${lower_test_suffix}", as: ${test_type}.self) == Defaults.${lower_test_suffix})
 
             // Optional - missing
-            #expect(try await config.fetch${suffix}(forKey: ConfigKey(["absent${test_suffix}"]), as: ${test_type}.self) == nil)
             #expect(try await config.fetch${suffix}(forKey: "absent${test_suffix}", as: ${test_type}.self) == nil)
 
             // Optional - failing
-            await #expect(throws: TestProvider.TestError.self) { try await config.fetch${suffix}(forKey: ConfigKey(["failure"]), as: ${test_type}.self) }
             await #expect(throws: TestProvider.TestError.self) { try await config.fetch${suffix}(forKey: "failure", as: ${test_type}.self) }
 
             // Defaulted - success
-            #expect(try await config.fetch${suffix}(forKey: ConfigKey(["${lower_test_suffix}"]), as: ${test_type}.self, default: Defaults.other${test_suffix}) == Defaults.${lower_test_suffix})
             #expect(try await config.fetch${suffix}(forKey: "${lower_test_suffix}", as: ${test_type}.self, default: Defaults.other${test_suffix}) == Defaults.${lower_test_suffix})
 
             // Defaulted - missing
-            #expect(try await config.fetch${suffix}(forKey: ConfigKey(["absent${test_suffix}"]), as: ${test_type}.self, default: Defaults.other${test_suffix}) == Defaults.other${test_suffix})
             #expect(try await config.fetch${suffix}(forKey: "absent${test_suffix}", as: ${test_type}.self, default: Defaults.other${test_suffix}) == Defaults.other${test_suffix})
 
             // Defaulted - failing
-            await #expect(throws: TestProvider.TestError.self) { try await config.fetch${suffix}(forKey: ConfigKey(["failure"]), as: ${test_type}.self, default: Defaults.other${test_suffix}) }
             await #expect(throws: TestProvider.TestError.self) { try await config.fetch${suffix}(forKey: "failure", as: ${test_type}.self, default: Defaults.other${test_suffix}) }
 
             // Required - success
-            #expect(try await config.fetchRequired${suffix}(forKey: ConfigKey(["${lower_test_suffix}"]), as: ${test_type}.self) == Defaults.${lower_test_suffix})
             #expect(try await config.fetchRequired${suffix}(forKey: "${lower_test_suffix}", as: ${test_type}.self) == Defaults.${lower_test_suffix})
 
             // Required - missing
-            let error1 = await #expect(throws: ConfigError.self) { try await config.fetchRequired${suffix}(forKey: ConfigKey(["absent${test_suffix}"]), as: ${test_type}.self) }
+            let error1 = await #expect(throws: ConfigError.self) { try await config.fetchRequired${suffix}(forKey: "absent${test_suffix}", as: ${test_type}.self) }
             #expect(error1 == .missingRequiredConfigValue(AbsoluteConfigKey(["absent${test_suffix}"])))
-            let error2 = await #expect(throws: ConfigError.self) { try await config.fetchRequired${suffix}(forKey: "absent${test_suffix}", as: ${test_type}.self) }
-            #expect(error2 == .missingRequiredConfigValue(AbsoluteConfigKey(["absent${test_suffix}"])))
 
             // Required - failing
-            await #expect(throws: TestProvider.TestError.self) { try await config.fetchRequired${suffix}(forKey: ConfigKey(["failure"]), as: ${test_type}.self) }
             await #expect(throws: TestProvider.TestError.self) { try await config.fetchRequired${suffix}(forKey: "failure", as: ${test_type}.self) }
         }
         % end

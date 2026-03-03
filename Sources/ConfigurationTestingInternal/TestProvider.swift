@@ -55,35 +55,7 @@ package struct TestProvider: Sendable {
 }
 
 @available(Configuration 1.0, *)
-extension TestProvider {
-
-    /// Creates a new test provider with string-based key mappings.
-    ///
-    /// This convenience initializer allows you to specify keys as strings rather
-    /// than ``AbsoluteConfigKey`` instances.
-    ///
-    /// - Parameters:
-    ///   - name: An optional name for the provider (currently unused).
-    ///   - values: A dictionary mapping string keys to their expected results.
-    ///   - keyDecoder: The decoder to use for converting string keys to ``AbsoluteConfigKey``.
-    package init(
-        name: String? = nil,
-        values: [String: Result<ConfigValue, any Error>],
-        keyDecoder: some ConfigKeyDecoder = .dotSeparated
-    ) {
-        self.values = Dictionary(
-            uniqueKeysWithValues: values.map {
-                (
-                    AbsoluteConfigKey(keyDecoder.decode($0.key, context: [:])),
-                    $0.value
-                )
-            }
-        )
-    }
-}
-
-@available(Configuration 1.0, *)
-extension TestProvider: ConfigProvider, ConfigSnapshotProtocol {
+extension TestProvider: ConfigProvider, ConfigSnapshot {
     package var providerName: String {
         "TestProvider"
     }
@@ -103,12 +75,12 @@ extension TestProvider: ConfigProvider, ConfigSnapshotProtocol {
         }
     }
 
-    package func snapshot() -> any ConfigSnapshotProtocol {
+    package func snapshot() -> any ConfigSnapshot {
         self
     }
 
-    package func watchSnapshot<Return>(
-        updatesHandler: (ConfigUpdatesAsyncSequence<any ConfigSnapshotProtocol, Never>) async throws -> Return
+    package func watchSnapshot<Return: ~Copyable>(
+        updatesHandler: (_ updates: ConfigUpdatesAsyncSequence<any ConfigSnapshot, Never>) async throws -> Return
     )
         async throws -> Return
     {
@@ -122,11 +94,11 @@ extension TestProvider: ConfigProvider, ConfigSnapshotProtocol {
         try value(forKey: key, type: type)
     }
 
-    package func watchValue<Return>(
+    package func watchValue<Return: ~Copyable>(
         forKey key: AbsoluteConfigKey,
         type: ConfigType,
         updatesHandler handler: (
-            ConfigUpdatesAsyncSequence<Result<LookupResult, any Error>, Never>
+            _ updates: ConfigUpdatesAsyncSequence<Result<LookupResult, any Error>, Never>
         ) async throws -> Return
     ) async throws -> Return {
         try await watchValueFromValue(forKey: key, type: type, updatesHandler: handler)

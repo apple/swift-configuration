@@ -1,0 +1,10 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: reloading-example-configmap
+data:
+  # The key name becomes the filename by default if mounted as a directory
+  appsettings.yaml: |
+    app:
+      name: "CNCF"

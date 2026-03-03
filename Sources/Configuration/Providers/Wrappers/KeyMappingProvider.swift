@@ -34,7 +34,7 @@
 /// ```swift
 /// // Create providers
 /// let envProvider = EnvironmentVariablesProvider()
-/// let jsonProvider = try await JSONProvider(filePath: "/etc/config.json")
+/// let jsonProvider = try await FileProvider<JSONSnapshot>(filePath: "/etc/config.json")
 ///
 /// // Only remap the environment variables, not the JSON config
 /// let keyMappedEnvProvider = KeyMappingProvider(upstream: envProvider) { key in
@@ -57,9 +57,7 @@
 ///
 /// ```swift
 /// let envProvider = EnvironmentVariablesProvider()
-/// let keyMappedEnvProvider = envProvider.mapKeys { key in
-///     key.prepending(["myapp", "prod"])
-/// }
+/// let keyMappedEnvProvider = envProvider.prefixKeys(with: ["myapp", "prod"])
 /// ```
 @available(Configuration 1.0, *)
 public struct KeyMappingProvider<Upstream: ConfigProvider>: Sendable {
@@ -101,24 +99,24 @@ extension KeyMappingProvider: ConfigProvider {
     }
 
     // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
-    public func watchValue<Return>(
+    public func watchValue<Return: ~Copyable>(
         forKey key: AbsoluteConfigKey,
         type: ConfigType,
         updatesHandler: (
-            ConfigUpdatesAsyncSequence<Result<LookupResult, any Error>, Never>
+            _ updates: ConfigUpdatesAsyncSequence<Result<LookupResult, any Error>, Never>
         ) async throws -> Return
     ) async throws -> Return {
         try await upstream.watchValue(forKey: self.mapKey(key), type: type, updatesHandler: updatesHandler)
     }
 
     // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
-    public func snapshot() -> any ConfigSnapshotProtocol {
+    public func snapshot() -> any ConfigSnapshot {
         MappedKeySnapshot(mapKey: self.mapKey, upstream: self.upstream.snapshot())
     }
 
     // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
-    public func watchSnapshot<Return>(
-        updatesHandler: (ConfigUpdatesAsyncSequence<any ConfigSnapshotProtocol, Never>) async throws -> Return
+    public func watchSnapshot<Return: ~Copyable>(
+        updatesHandler: (_ updates: ConfigUpdatesAsyncSequence<any ConfigSnapshot, Never>) async throws -> Return
     ) async throws -> Return {
         try await upstream.watchSnapshot { sequence in
             try await updatesHandler(
@@ -135,13 +133,13 @@ extension KeyMappingProvider: ConfigProvider {
 
 /// A configuration snapshot that maps all keys before delegating to an upstream snapshot.
 @available(Configuration 1.0, *)
-private struct MappedKeySnapshot: ConfigSnapshotProtocol {
+private struct MappedKeySnapshot: ConfigSnapshot {
 
     /// The prefix key to prepend to all configuration keys.
     let mapKey: @Sendable (AbsoluteConfigKey) -> AbsoluteConfigKey
 
     /// The upstream configuration snapshot to delegate to after prefixing keys.
-    var upstream: any ConfigSnapshotProtocol
+    var upstream: any ConfigSnapshot
 
     var providerName: String {
         "KeyMappingProvider[upstream: \(self.upstream.providerName)]"

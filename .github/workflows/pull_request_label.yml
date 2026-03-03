@@ -1,12 +1,11 @@
 name: PR label
 
+permissions:
+  contents: read
+
 on:
   pull_request:
     types: [labeled, unlabeled, opened, reopened, synchronize]
-
-permissions:
-  contents: read
-  pull-requests: read
 
 jobs:
   semver-label-check:
@@ -15,7 +14,7 @@ jobs:
     timeout-minutes: 1
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           persist-credentials: false
       - name: Check for Semantic Version label

@@ -45,14 +45,15 @@ import Synchronization
 /// ## Execution Patterns
 ///
 /// - **Synchronous and asynchronous access** (`value`, `fetchValue`, `snapshot`): The library calls providers
-///   sequentially, returning the first value that is returned from the providers.
+///   sequentially, returning the first value from the providers.
 /// - **Watching for changes** (`watchValue`, `watchSnapshot`): The library monitors all providers in parallel and
 ///   returns the first non-nil value from their latest results.
 ///
 /// ## Error Handling
 ///
-/// When any nested provider throws an error, the error is immediately propagated to the caller rather than
-/// being ignored. This ensures predictable behavior and prevents silent failures that could mask configuration issues.
+/// When any nested provider throws an error, ``MultiProvider`` immediately propagates the error to the caller
+/// rather than ignoring it. This ensures predictable behavior and prevents silent failures that could mask
+/// configuration issues.
 @available(Configuration 1.0, *)
 internal struct MultiProvider: Sendable {
 
@@ -88,8 +89,8 @@ extension MultiProvider: CustomStringConvertible {
 @available(Configuration 1.0, *)
 struct MultiSnapshot {
 
-    /// The individual snapshots from each nested provider, maintained in precedence order.
-    var snapshots: [any ConfigSnapshotProtocol]
+    /// The individual snapshots from each nested provider in precedence order.
+    var snapshots: [any ConfigSnapshot]
 
     /// Resolves a configuration value by querying nested provider snapshots in precedence order.
     /// - Parameters:
@@ -129,7 +130,7 @@ extension MultiProvider {
 
     /// Synchronously resolves a configuration value from nested providers.
     ///
-    /// Queries each nested provider sequentially until a non-nil value is found or all providers
+    /// Queries each nested provider sequentially until a non-nil value appears or all providers
     /// have been exhausted. The first provider to return a non-nil value determines the final result.
     ///
     /// - Parameters:
@@ -141,6 +142,7 @@ extension MultiProvider {
         type: ConfigType
     ) -> ([AccessEvent.ProviderResult], Result<ConfigValue?, any Error>) {
         var results: [AccessEvent.ProviderResult] = []
+        results.reserveCapacity(storage.providers.count)
         for childProvider in storage.providers {
             let providerName = childProvider.providerName
             let lookupResult: LookupResult
@@ -195,28 +197,33 @@ extension MultiProvider {
     /// - Parameter body: A closure that receives an async sequence of ``MultiSnapshot`` updates.
     /// - Returns: The value returned by the body closure.
     /// - Throws: Any error thrown by the nested providers or the body closure.
-    func watchSnapshot<Return>(
-        _ body: (ConfigUpdatesAsyncSequence<MultiSnapshot, Never>) async throws -> Return
-    ) async throws -> Return {
+    nonisolated(nonsending)
+        func watchSnapshot<Return: ~Copyable>(
+            _ body: (ConfigUpdatesAsyncSequence<MultiSnapshot, Never>) async throws -> Return
+        ) async throws -> Return
+    {
         let providers = storage.providers
-        let sources:
-            [@Sendable (
-                (ConfigUpdatesAsyncSequence<any ConfigSnapshotProtocol, Never>) async throws -> Void
-            ) async throws -> Void] = providers.map { $0.watchSnapshot }
-        return try await combineLatestOneOrMore(
-            elementType: (any ConfigSnapshotProtocol).self,
-            sources: sources,
-            updatesHandler: { updateArrays in
-                try await body(
-                    ConfigUpdatesAsyncSequence(
-                        updateArrays
-                            .map { array in
-                                MultiSnapshot(snapshots: array)
-                            }
-                    )
+        typealias UpdatesSequence = any (AsyncSequence<any ConfigSnapshot, Never> & Sendable)
+        var updateSequences: [UpdatesSequence] = []
+        updateSequences.reserveCapacity(providers.count)
+        return try await withProvidersWatchingSnapshot(
+            providers: ArraySlice(providers),
+            updateSequences: &updateSequences,
+        ) { providerUpdateSequences in
+            let updateArrays = combineLatestMany(
+                elementType: (any ConfigSnapshot).self,
+                failureType: Never.self,
+                providerUpdateSequences
+            )
+            return try await body(
+                ConfigUpdatesAsyncSequence(
+                    updateArrays
+                        .map { array in
+                            MultiSnapshot(snapshots: array)
+                        }
                 )
-            }
-        )
+            )
+        }
     }
 
     /// Asynchronously resolves a configuration value from nested providers.
@@ -281,52 +288,97 @@ extension MultiProvider {
     ///   - updatesHandler: A closure that receives an async sequence of combined updates from all providers.
     /// - Throws: Any error thrown by the nested providers or the handler closure.
     /// - Returns: The value returned by the handler.
-    func watchValue<Return>(
-        forKey key: AbsoluteConfigKey,
-        type: ConfigType,
-        updatesHandler: (
-            ConfigUpdatesAsyncSequence<([AccessEvent.ProviderResult], Result<ConfigValue?, any Error>), Never>
+    nonisolated(nonsending)
+        func watchValue<Return: ~Copyable>(
+            forKey key: AbsoluteConfigKey,
+            type: ConfigType,
+            updatesHandler: (
+                ConfigUpdatesAsyncSequence<([AccessEvent.ProviderResult], Result<ConfigValue?, any Error>), Never>
+            ) async throws -> Return
         ) async throws -> Return
-    ) async throws -> Return {
+    {
         let providers = storage.providers
         let providerNames = providers.map(\.providerName)
-        let sources:
-            [@Sendable (
-                (
-                    ConfigUpdatesAsyncSequence<Result<LookupResult, any Error>, Never>
-                ) async throws -> Void
-            ) async throws -> Void] = providers.map { provider in
-                { handler in
-                    _ = try await provider.watchValue(forKey: key, type: type, updatesHandler: handler)
-                }
-            }
-        return try await combineLatestOneOrMore(
-            elementType: Result<LookupResult, any Error>.self,
-            sources: sources,
-            updatesHandler: { updateArrays in
-                try await updatesHandler(
-                    ConfigUpdatesAsyncSequence(
-                        updateArrays
-                            .map { array in
-                                var results: [AccessEvent.ProviderResult] = []
-                                for (providerIndex, lookupResult) in array.enumerated() {
-                                    let providerName = providerNames[providerIndex]
-                                    results.append(.init(providerName: providerName, result: lookupResult))
-                                    switch lookupResult {
-                                    case .success(let value) where value.value == nil:
-                                        // Got a success + nil from a nested provider, keep iterating.
-                                        continue
-                                    default:
-                                        // Got a success + non-nil or an error from a nested provider, propagate that up.
-                                        return (results, lookupResult.map { $0.value })
-                                    }
+        typealias UpdatesSequence = any (AsyncSequence<Result<LookupResult, any Error>, Never> & Sendable)
+        var updateSequences: [UpdatesSequence] = []
+        updateSequences.reserveCapacity(providers.count)
+        return try await withProvidersWatchingValue(
+            providers: ArraySlice(providers),
+            updateSequences: &updateSequences,
+            key: key,
+            configType: type,
+        ) { providerUpdateSequences in
+            let updateArrays = combineLatestMany(
+                elementType: Result<LookupResult, any Error>.self,
+                failureType: Never.self,
+                providerUpdateSequences
+            )
+            return try await updatesHandler(
+                ConfigUpdatesAsyncSequence(
+                    updateArrays
+                        .map { array in
+                            var results: [AccessEvent.ProviderResult] = []
+                            for (providerIndex, lookupResult) in array.enumerated() {
+                                let providerName = providerNames[providerIndex]
+                                results.append(.init(providerName: providerName, result: lookupResult))
+                                switch lookupResult {
+                                case .success(let value) where value.value == nil:
+                                    // Got a success + nil from a nested provider, keep iterating.
+                                    continue
+                                default:
+                                    // Got a success + non-nil or an error from a nested provider, propagate that up.
+                                    return (results, lookupResult.map { $0.value })
                                 }
-                                // If all nested results were success + nil, return the same.
-                                return (results, .success(nil))
                             }
-                    )
+                            // If all nested results were success + nil, return the same.
+                            return (results, .success(nil))
+                        }
                 )
-            }
+            )
+        }
+    }
+}
+
+@available(Configuration 1.0, *)
+nonisolated(nonsending) private func withProvidersWatchingValue<Return: ~Copyable>(
+    providers: ArraySlice<any ConfigProvider>,
+    updateSequences: inout [any (AsyncSequence<Result<LookupResult, any Error>, Never> & Sendable)],
+    key: AbsoluteConfigKey,
+    configType: ConfigType,
+    body: ([any (AsyncSequence<Result<LookupResult, any Error>, Never> & Sendable)]) async throws -> Return
+) async throws -> Return {
+    guard let provider = providers.first else {
+        // Recursion termination, once we've collected all update sequences, execute the body.
+        return try await body(updateSequences)
+    }
+    return try await provider.watchValue(forKey: key, type: configType) { updates in
+        updateSequences.append(updates)
+        return try await withProvidersWatchingValue(
+            providers: providers.dropFirst(),
+            updateSequences: &updateSequences,
+            key: key,
+            configType: configType,
+            body: body
+        )
+    }
+}
+
+@available(Configuration 1.0, *)
+nonisolated(nonsending) private func withProvidersWatchingSnapshot<Return: ~Copyable>(
+    providers: ArraySlice<any ConfigProvider>,
+    updateSequences: inout [any (AsyncSequence<any ConfigSnapshot, Never> & Sendable)],
+    body: ([any (AsyncSequence<any ConfigSnapshot, Never> & Sendable)]) async throws -> Return
+) async throws -> Return {
+    guard let provider = providers.first else {
+        // Recursion termination, once we've collected all update sequences, execute the body.
+        return try await body(updateSequences)
+    }
+    return try await provider.watchSnapshot { updates in
+        updateSequences.append(updates)
+        return try await withProvidersWatchingSnapshot(
+            providers: providers.dropFirst(),
+            updateSequences: &updateSequences,
+            body: body
         )
     }
 }

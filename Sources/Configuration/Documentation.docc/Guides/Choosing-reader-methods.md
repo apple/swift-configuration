@@ -49,12 +49,13 @@ Use optional variants when:
 
 - **Truly optional features**: The configuration controls optional functionality.
 - **Gradual rollouts**: New configuration that might not be present everywhere.
-- **Conditional behavior**: Your code can operate differently based on presence/absence.
+- **Conditional behavior**: Your code can operate differently based on presence or absence.
 - **Debugging and diagnostics**: You want to detect missing configuration explicitly.
 
 #### Error handling behavior
 
 Optional variants handle errors gracefully by returning `nil`:
+
 - Missing values return `nil`.
 - Type conversion errors return `nil`.
 - Provider errors return `nil` (except for fetch variants, which always propagate provider errors).
@@ -106,7 +107,7 @@ Use default variants when:
 - **Required functionality**: The feature needs a value to operate, but can use defaults.
 - **Configuration evolution**: New settings that should work with older deployments.
 
-#### Choosing good defaults
+#### Choose good defaults
 
 Consider these principles when choosing default values:
 
@@ -128,6 +129,7 @@ let maxConnections = config.int(forKey: "pool.max", default: 10) // Conservative
 #### Error handling behavior
 
 Default variants handle errors by returning the default value:
+
 - Missing values return the default.
 - Type conversion errors return the default.
 - Provider errors return the default (except for fetch variants).
@@ -165,11 +167,11 @@ do {
 Use required variants when:
 
 - **Essential service configuration**: Server ports, database hosts, service endpoints.
-- **Application startup**: Values needed before the application can function properly.
+- **Application startup**: Values you need before the application can function properly.
 - **Critical functionality**: Configuration that must be present for core features to work.
 - **Fail-fast behavior**: You want immediate errors for missing critical configuration.
 
-### Choosing the right variant
+### Choose the right variant
 
 Use this decision tree to select the appropriate variant:
 
@@ -208,39 +210,51 @@ All variants support the same additional features:
 ```swift
 // Optional with context
 let timeout = config.int(
-    forKey: "service.timeout",
-    context: ["environment": "production", "region": "us-east-1"]
+    forKey: ConfigKey(
+        "service.timeout",
+        context: ["environment": "production", "region": "us-east-1"]
+    )
 )
 
 // Default with context
 let timeout = config.int(
-    forKey: "service.timeout",
-    context: ["environment": "production"],
+    forKey: ConfigKey(
+        "service.timeout",
+        context: ["environment": "production"]
+    ),
     default: 30
 )
 
 // Required with context
 let timeout = try config.requiredInt(
-    forKey: "service.timeout",
-    context: ["environment": "production"]
+    forKey: ConfigKey(
+        "service.timeout",
+        context: ["environment": "production"]
+    )
 )
 ```
 
 #### Type conversion
 
-String configuration values can be automatically converted to other types using the `as:` parameter. 
+
+##### String-representable types
+
+You can automatically convert string configuration values to other types using the `as:` parameter. 
 This works with:
 
 **Built-in convertible types:**
-- `SystemPackage.FilePath` - Converts from file paths.
-- `Foundation.URL` - Converts from URL strings.
-- `Foundation.UUID` - Converts from UUID strings.
-- `Foundation.Date` - Converts from ISO8601 date strings.
+
+- `SystemPackage.FilePath`: Converts from file paths.
+- `Foundation.URL`: Converts from URL strings.
+- `Foundation.UUID`: Converts from UUID strings.
+- `Foundation.Date`: Converts from ISO8601 date strings.
 
 **String-backed enums:**
+
 - Types that conform to `RawRepresentable<String>`.
 
 **Custom types:**
+
 - Types that you explicitly conform to ``ExpressibleByConfigString``.
 
 ```swift
@@ -278,6 +292,56 @@ struct DatabaseURL: ExpressibleByConfigString {
 let dbUrl = config.string(forKey: "database.url", as: DatabaseURL.self)
 ```
 
+##### Integer-representable types
+
+You can also automatically convert integer configuration values to other types using the `as:` parameter. 
+This works with:
+
+**Built-in convertible types:**
+
+- `Swift.Duration`: Converts from an integer value to a duration measured in seconds.
+
+**Int-backed enums:**
+
+- Types that conform to `RawRepresentable<Int>`.
+
+**Custom types:**
+
+- Types that you explicitly conform to ``ExpressibleByConfigInt``.
+
+```swift
+// Built-in type conversion
+let timeout = config.int(forKey: "api.timeout", as: Duration.self)
+
+// Int-backed enum conversion (RawRepresentable<Int>)
+enum LogLevel: Int {
+    case error = 1
+    case warning = 2
+}
+
+// Optional conversion
+let level: LogLevel? = config.int(forKey: "log.level", as: LogLevel.self)
+
+// Default conversion
+let level = config.int(forKey: "log.level", as: LogLevel.self, default: .error)
+
+// Required conversion
+let level = try config.requiredInt(forKey: "log.level", as: LogLevel.self)
+
+// Custom type conversion (ExpressibleByConfigInt)
+struct APIVersion: ExpressibleByConfigInt {
+    let version: Int
+
+    init?(configInt value: Int) {
+        guard value > 0 else { return nil }
+        self.version = value
+    }
+
+    var description: String { version.description }
+}
+let apiVersion = config.int(forKey: "api.version", as: APIVersion.self)
+```
+
 #### Secret handling
 
 ```swift
@@ -292,12 +356,9 @@ Also check out <doc:Handling-secrets-correctly>.
 ### Best practices
 
 1. **Use required variants** only for truly critical configuration.
-
-2. **Use default variants for user experience settings** where missing configuration shouldn't break functionality.
-
-3. **Use optional variants for feature flags and debugging** where the absence of configuration is meaningful.
-
+2. **Use default variants** for user experience settings where missing configuration shouldn't break functionality.
+3. **Use optional variants** for feature flags and debugging where the absence of configuration is meaningful.
 4. **Choose safe defaults** that won't cause security issues or performance problems if used in production.
 
-For guidance on selecting between get, fetch, and watch access patterns, see <doc:Choosing-access-patterns>. 
-For comprehensive best practices on configuration design, check out <doc:Best-practices>.
+For guidance on selecting between get, fetch, and watch access patterns, see <doc:Choosing-access-patterns>.
+For more configuration guidance, check out <doc:Best-practices>.

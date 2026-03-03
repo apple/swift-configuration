@@ -1,4 +1,4 @@
-// swift-tools-version: 6.1
+// swift-tools-version: 6.2
 
 import PackageDescription
 #if canImport(FoundationEssentials)
@@ -8,38 +8,32 @@ import Foundation
 #endif
 
 let defaultTraits: Set<String> = [
-    "JSONSupport"
-
-    // Disabled due to a bug in SwiftPM with traits that pull in an external dependency.
-    // Once that's fixed in Swift 6.2.x, we can enable these traits by default.
-    // Open fix: https://github.com/swiftlang/swift-package-manager/pull/9136
-    // "LoggingSupport",
-    // "ReloadingSupport",
+    "JSON"
 ]
 
 var traits: Set<Trait> = [
     .trait(
-        name: "LoggingSupport",
+        name: "Logging",
         description: "Adds support for swift-log integration."
     ),
     .trait(
-        name: "JSONSupport",
+        name: "JSON",
         description: "Adds support for parsing JSON configuration files."
     ),
     .trait(
-        name: "ReloadingSupport",
+        name: "Reloading",
         description:
-            "Adds support for reloading built-in provider variants, such as ReloadingJSONProvider and ReloadingYAMLProvider (when their respective traits are enabled).",
+            "Adds support for reloading built-in provider variants, such as ReloadingFileProvider.",
         enabledTraits: [
-            "LoggingSupport"
+            "Logging"
         ]
     ),
     .trait(
-        name: "CommandLineArgumentsSupport",
+        name: "CommandLineArguments",
         description: "Adds support for parsing command line arguments."
     ),
     .trait(
-        name: "YAMLSupport",
+        name: "YAML",
         description: "Adds support for parsing YAML configuration files."
     ),
 ]
@@ -61,6 +55,7 @@ let enableAllTraitsExplicit = ProcessInfo.processInfo.environment["ENABLE_ALL_TR
 
 let enableAllTraits = spiGenerateDocs || previewDocs || enableAllTraitsExplicit
 let addDoccPlugin = previewDocs || spiGenerateDocs
+let enableAllCIFlags = enableAllTraitsExplicit
 
 traits.insert(
     .default(
@@ -77,7 +72,8 @@ let package = Package(
     traits: traits,
     dependencies: [
         .package(url: "https://github.com/apple/swift-system", from: "1.5.0"),
-        .package(url: "https://github.com/swift-server/swift-service-lifecycle", from: "2.7.0"),
+        .package(url: "https://github.com/apple/swift-collections", from: "1.3.0"),
+        .package(url: "https://github.com/swift-server/swift-service-lifecycle", from: "2.8.0"),
         .package(url: "https://github.com/apple/swift-log", from: "1.6.3"),
         .package(url: "https://github.com/apple/swift-metrics", from: "2.7.0"),
         .package(url: "https://github.com/jpsim/Yams", "5.4.0"..<"7.0.0"),
@@ -93,24 +89,28 @@ let package = Package(
                     package: "swift-system"
                 ),
                 .product(
+                    name: "DequeModule",
+                    package: "swift-collections"
+                ),
+                .product(
                     name: "Logging",
                     package: "swift-log",
-                    condition: .when(traits: ["LoggingSupport"])
+                    condition: .when(traits: ["Logging"])
                 ),
                 .product(
                     name: "Metrics",
                     package: "swift-metrics",
-                    condition: .when(traits: ["ReloadingSupport"])
+                    condition: .when(traits: ["Reloading"])
                 ),
                 .product(
                     name: "ServiceLifecycle",
                     package: "swift-service-lifecycle",
-                    condition: .when(traits: ["ReloadingSupport"])
+                    condition: .when(traits: ["Reloading"])
                 ),
                 .product(
                     name: "Yams",
                     package: "Yams",
-                    condition: .when(traits: ["YAMLSupport"])
+                    condition: .when(traits: ["YAML"])
                 ),
             ],
             exclude: [
@@ -131,18 +131,21 @@ let package = Package(
                 "ConfigReaderTests/ConfigReaderMethodTestsGet1.swift.gyb",
                 "ConfigReaderTests/ConfigReaderMethodTestsGet2.swift.gyb",
                 "ConfigReaderTests/ConfigReaderMethodTestsGet3.swift.gyb",
+                "ConfigReaderTests/ConfigReaderMethodTestsGet4.swift.gyb",
+                "ConfigReaderTests/ConfigReaderMethodTestsGet5.swift.gyb",
                 "ConfigReaderTests/ConfigReaderMethodTestsFetch1.swift.gyb",
                 "ConfigReaderTests/ConfigReaderMethodTestsFetch2.swift.gyb",
                 "ConfigReaderTests/ConfigReaderMethodTestsFetch3.swift.gyb",
+                "ConfigReaderTests/ConfigReaderMethodTestsFetch4.swift.gyb",
+                "ConfigReaderTests/ConfigReaderMethodTestsFetch5.swift.gyb",
                 "ConfigReaderTests/ConfigReaderMethodTestsWatch1.swift.gyb",
                 "ConfigReaderTests/ConfigReaderMethodTestsWatch2.swift.gyb",
                 "ConfigReaderTests/ConfigReaderMethodTestsWatch3.swift.gyb",
+                "ConfigReaderTests/ConfigReaderMethodTestsWatch4.swift.gyb",
+                "ConfigReaderTests/ConfigReaderMethodTestsWatch5.swift.gyb",
                 "ConfigReaderTests/ConfigSnapshotReaderMethodTestsGet1.swift.gyb",
                 "ConfigReaderTests/ConfigSnapshotReaderMethodTestsGet2.swift.gyb",
                 "ConfigReaderTests/ConfigSnapshotReaderMethodTestsGet3.swift.gyb",
-            ],
-            resources: [
-                .copy("Resources")
             ]
         ),
 
@@ -179,7 +182,19 @@ for target in package.targets {
     // https://github.com/swiftlang/swift-evolution/blob/main/proposals/0409-access-level-on-imports.md
     settings.append(.enableUpcomingFeature("InternalImportsByDefault"))
 
-    settings.append(.enableExperimentalFeature("AvailabilityMacro=Configuration 1.0:macOS 15.0, iOS 18.0, watchOS 11.0, tvOS 18.0, visionOS 2.0"))
+    // https://docs.swift.org/compiler/documentation/diagnostics/nonisolated-nonsending-by-default/
+    settings.append(.enableUpcomingFeature("NonisolatedNonsendingByDefault"))
+
+    settings.append(
+        .enableExperimentalFeature(
+            "AvailabilityMacro=Configuration 1.0:macOS 15.0, iOS 18.0, watchOS 11.0, tvOS 18.0, visionOS 2.0"
+        )
+    )
+
+    if enableAllCIFlags {
+        // Ensure all public types are explicitly annotated as Sendable or not Sendable.
+        settings.append(.unsafeFlags(["-Xfrontend", "-require-explicit-sendable"]))
+    }
 
     target.swiftSettings = settings
 }

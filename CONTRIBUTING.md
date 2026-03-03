@@ -56,3 +56,7 @@ My system has IPv6 disabled.
   - Documented, adding API documentation as needed to cover new functions and properties.
   - Accompanied by a great commit message.
 3. Open a pull request at https://github.com/apple/swift-configuration and wait for code review by the maintainers.
+
+## Automated release process
+
+This repository uses automated releases based on semantic versioning labels. See the [Auto Release Workflow documentation](https://github.com/apple/swift-temporal-sdk/blob/main/.github/workflows/README.md) for details.

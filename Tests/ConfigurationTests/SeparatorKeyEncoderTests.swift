@@ -12,7 +12,7 @@
 //
 //===----------------------------------------------------------------------===//
 
-import Configuration
+@testable import Configuration
 import Testing
 
 struct SeparatorKeyEncoderTests {

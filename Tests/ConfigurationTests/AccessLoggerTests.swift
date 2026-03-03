@@ -12,7 +12,7 @@
 //
 //===----------------------------------------------------------------------===//
 
-#if LoggingSupport
+#if Logging
 
 import Testing
 import Configuration

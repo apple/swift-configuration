@@ -4,20 +4,18 @@ Provide flexible and consistent configuration for your application.
 
 ## Overview
 
-Swift Configuration provides a consistent configuration system for your tools and applications, both server and client. 
-
-This guide shows how to:
+Swift Configuration provides consistent configuration for your tools and applications. This guide shows how to:
 
 1. Set up a configuration hierarchy with multiple providers.
 2. Configure your application's components.
-3. Access configuration values in your application and in libraries.
+3. Access configuration values in your application and libraries.
 4. Monitor configuration access with access reporting.
 
-This pattern works especially well for server applications where configuration might come from various sources such as environment variables, configuration files, and remote configuration services.
+This pattern works well for server applications where configuration comes from environment variables, configuration files, and remote services.
 
-### Setting up a configuration hierarchy
+### Set up a configuration hierarchy
 
-Start by creating a configuration hierarchy in your application's entry point. This defines the order in which configuration sources are consulted when looking for values:
+Start by creating a configuration hierarchy in your application's entry point. This defines the order for consulting configuration sources when looking for values:
 
 ```swift
 import Configuration
@@ -35,8 +33,11 @@ let logger: Logger = ...
 
 let config = ConfigReader(
     providers: [
-        EnvironmentVariablesProvider(), 
-        try await JSONProvider(filePath: "/etc/myapp/config.json"), 
+        EnvironmentVariablesProvider(),
+        try await FileProvider<JSONSnapshot>(
+            filePath: "/etc/myapp/config.json",
+            allowMissing: true  // Optional: treat missing file as empty config
+        ),
         InMemoryProvider(values: [
             "http.server.port": 8080,
             "http.server.host": "127.0.0.1",
@@ -137,7 +138,7 @@ And using ``InMemoryProvider``:
 
 In practice, you'd only specify a subset of the config keys in each location, to match the needs of your service's operators.
 
-### Using scoped configuration
+### Use scoped configuration
 
 For services with multiple instances of the same component, but with different settings, use scoped configuration:
 
@@ -169,7 +170,7 @@ let customerTimeout = customerConfig.double(
 )
 ```
 
-This can be configured via environment variables as follows:
+You can configure this via environment variables as follows:
 
 ```bash
 # Admin API configuration
@@ -185,4 +186,4 @@ export SERVICES_CUSTOMER_TIMEOUT=15.0
 
 For details about the key conversion logic, check out ``EnvironmentVariablesProvider``.
 
-For comprehensive configuration best practices, see <doc:Best-practices>. To understand different access patterns and reader methods, refer to <doc:Choosing-access-patterns> and <doc:Choosing-reader-methods>. For handling secrets securely, check out <doc:Handling-secrets-correctly>.
+For more configuration guidance, see <doc:Best-practices>. To understand different access patterns and reader methods, refer to <doc:Choosing-access-patterns> and <doc:Choosing-reader-methods>. For handling secrets securely, check out <doc:Handling-secrets-correctly>. If you need to integrate with a custom configuration source, see <doc:Implementing-a-provider>.

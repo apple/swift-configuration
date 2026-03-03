@@ -44,7 +44,7 @@ import Foundation
 ///         // First, check environment variables
 ///         EnvironmentVariablesProvider(),
 ///         // Then, check a JSON config file
-///         try await JSONProvider(filePath: "/etc/config.json"),
+///         try await FileProvider<JSONSnapshot>(filePath: "/etc/config.json"),
 ///         // Finally, fall back to in-memory defaults
 ///         InMemoryProvider(values: [
 ///             "http.timeout": 60,
@@ -92,13 +92,12 @@ import Foundation
 /// ### Using configuration context
 ///
 /// Provide additional context to help providers return more specific values. In the following example
-/// with a configuration that includes repeated configurations per "upstream" side, the value returned is
+/// with a configuration that includes repeated configurations per "upstream", the value returned is
 /// potentially constrained to the configuration with the matching context:
 ///
 /// ```swift
 /// let httpTimeout = config.int(
-///     forKey: "http.timeout",
-///     context: ["upstream": "example.com"],
+///     forKey: ConfigKey("http.timeout", context: ["upstream": "example.com"]),
 ///     default: 60
 /// )
 /// ```
@@ -108,15 +107,17 @@ import Foundation
 ///
 /// ### Automatic type conversion
 ///
-/// The library can automatically convert string configuration values to other types using the `as:` parameter.
+/// The library can automatically convert string or int configuration values to other types using the `as:` parameter.
 /// This works with:
-/// - String-backed enum types, as they conform to `RawRepresentable<String>`.
-/// - Types that you explicitly conform to ``ExpressibleByConfigString``.
+/// - String or Int backed enum types, as they conform to `RawRepresentable<String>` or `RawRepresentable<Int>`.
+/// - Types that you explicitly conform to ``ExpressibleByConfigString`` or ``ExpressibleByConfigInt``.
 /// - Built-in types that already conform to ``ExpressibleByConfigString``:
 ///   - `SystemPackage.FilePath` - Converts from file paths.
 ///   - `Foundation.URL` - Converts from URL strings.
 ///   - `Foundation.UUID` - Converts from UUID strings.
 ///   - `Foundation.Date` - Converts from ISO8601 date strings.
+/// - Built-in types that already conform to ``ExpressibleByConfigInt``:
+/// - `Swift.Duration` - Converts from an integer value to a Duration measured in seconds.
 ///
 /// ```swift
 /// // Built-in type conversion
@@ -151,19 +152,6 @@ import Foundation
 ///     forKey: "database.url",
 ///     as: DatabaseURL.self
 /// )
-/// ```
-///
-/// ### Customizing key decoding
-///
-/// By default, config keys use a dot-separated notation (`http.timeout` becomes `["http", "timeout"]`).
-/// The ``ConfigKeyDecoder`` handles this parsing, with ``ConfigReader`` using
-/// ``ConfigKeyDecoder/dotSeparated`` by default.
-///
-/// To use different key separators, provide a custom decoder:
-///
-/// ```swift
-/// let config = ConfigReader(keyDecoder: .colonSeparated, provider: provider)
-/// let httpTimeout = config.int(forKey: "http:timeout", default: 60)
 /// ```
 ///
 /// ### How providers encode keys
@@ -218,8 +206,7 @@ import Foundation
 ///
 /// ```swift
 /// let dbConfig = config.string(
-///     forKey: "database.url",
-///     context: ["environment": "staging"],
+///     forKey: ConfigKey("database.url", context: ["environment": "staging"]),
 ///     default: "localhost:5432"
 /// )
 /// ```
@@ -244,14 +231,8 @@ public struct ConfigReader: Sendable {
     /// with the prefix `outer.middle`, you can access the key`outer.middle.inner` using just `inner`.
     let keyPrefix: AbsoluteConfigKey?
 
-    /// The underlying storage that is shared with all the transitive child configs created
-    /// from this one.
+    /// The underlying storage that all transitive child configs created from this reader share.
     private final class Storage: Sendable {
-
-        /// The decoder that converts string keys into config key arrays.
-        ///
-        /// For example, converts the string`foo.bar.baz` into its array representation `["foo", "bar", "baz"]`.
-        let keyDecoder: any ConfigKeyDecoder
 
         /// The underlying multi provider.
         let provider: MultiProvider
@@ -261,21 +242,18 @@ public struct ConfigReader: Sendable {
 
         /// Creates a storage instance.
         /// - Parameters:
-        ///   - keyDecoder: The decoder for converting string keys to config keys.
         ///   - provider: The multi-provider that manages the provider hierarchy.
         ///   - accessReporter: The reporter for configuration access events.
         init(
-            keyDecoder: some ConfigKeyDecoder,
             provider: MultiProvider,
             accessReporter: (any AccessReporter)?
         ) {
-            self.keyDecoder = keyDecoder
             self.provider = provider
             self.accessReporter = accessReporter
         }
     }
 
-    /// The underlying storage that is shared with all the transitive child configs created from this one.
+    /// The underlying storage that all transitive child configs created from this reader share.
     private let storage: Storage
 
     /// Creates a new config reader with shared storage.
@@ -292,11 +270,9 @@ public struct ConfigReader: Sendable {
 
     /// Creates a config reader with multiple providers.
     /// - Parameters:
-    ///   - keyDecoder: The decoder that converts string keys to config keys.
     ///   - providers: The configuration providers, queried in order until a value is found.
     ///   - accessReporter: The reporter for configuration access events.
     public init(
-        keyDecoder: some ConfigKeyDecoder = .dotSeparated,
         providers: [any ConfigProvider],
         accessReporter: (any AccessReporter)? = nil
     ) {
@@ -317,7 +293,6 @@ public struct ConfigReader: Sendable {
         self.init(
             keyPrefix: nil,
             storage: .init(
-                keyDecoder: keyDecoder,
                 provider: MultiProvider(providers: providers),
                 accessReporter: reporter
             )
@@ -330,16 +305,13 @@ extension ConfigReader {
 
     /// Creates a config reader with a single provider.
     /// - Parameters:
-    ///   - keyDecoder: The decoder that converts string keys to config keys.
     ///   - provider: The configuration provider.
     ///   - accessReporter: The reporter for configuration access events.
     public init(
-        keyDecoder: some ConfigKeyDecoder = .dotSeparated,
         provider: some ConfigProvider,
         accessReporter: (any AccessReporter)? = nil
     ) {
         self.init(
-            keyDecoder: keyDecoder,
             providers: [provider],
             accessReporter: accessReporter
         )
@@ -349,21 +321,10 @@ extension ConfigReader {
     /// - Parameters:
     ///   - scopedKey: The key components to append to the current key prefix.
     ///   - parent: The parent config reader from which to create the scoped reader.
-    ///   - keyDecoderOverride: An optional key decoder that replaces the parent's decoder.
-    private init(scopedKey: ConfigKey, parent: ConfigReader, keyDecoderOverride: (any ConfigKeyDecoder)?) {
-        let storage: Storage
-        if let keyDecoderOverride {
-            storage = .init(
-                keyDecoder: keyDecoderOverride,
-                provider: parent.storage.provider,
-                accessReporter: parent.storage.accessReporter
-            )
-        } else {
-            storage = parent.storage
-        }
+    private init(scopedKey: ConfigKey, parent: ConfigReader) {
         self.init(
             keyPrefix: parent.keyPrefix.appending(scopedKey),
-            storage: storage
+            storage: parent.storage
         )
     }
 
@@ -374,39 +335,12 @@ extension ConfigReader {
     /// let timeout = httpConfig.int(forKey: "timeout", default: 30) // Reads "http.client.timeout"
     /// ```
     ///
-    /// - Parameters:
-    ///   - configKey: The key components to append to the current key prefix.
-    ///   - keyDecoderOverride: An optional key decoder that replaces the current decoder.
+    /// - Parameter configKey: The key components to append to the current key prefix.
     /// - Returns: A config reader for accessing values within the specified scope.
-    public func scoped(to configKey: ConfigKey, keyDecoderOverride: (any ConfigKeyDecoder)? = nil) -> ConfigReader {
+    public func scoped(to configKey: ConfigKey) -> ConfigReader {
         ConfigReader(
             scopedKey: configKey,
-            parent: self,
-            keyDecoderOverride: keyDecoderOverride
-        )
-    }
-
-    /// Returns a scoped config reader with the specified string key appended to the current prefix.
-    ///
-    /// ```swift
-    /// let dbConfig = config.scoped(to: "database")
-    /// let host = dbConfig.string(forKey: "host", default: "localhost") // Reads "database.host"
-    /// ```
-    ///
-    /// - Parameters:
-    ///   - key: The string key to decode and append to the current key prefix.
-    ///   - context: Additional context used when decoding the key.
-    ///   - keyDecoderOverride: An optional key decoder that replaces the current decoder.
-    /// - Returns: A config reader for accessing values within the specified scope.
-    public func scoped(
-        to key: String,
-        context: [String: ConfigContextValue] = [:],
-        keyDecoderOverride: (any ConfigKeyDecoder)? = nil
-    ) -> ConfigReader {
-        ConfigReader(
-            scopedKey: (keyDecoderOverride ?? keyDecoder).decode(key, context: context),
-            parent: self,
-            keyDecoderOverride: keyDecoderOverride
+            parent: self
         )
     }
 }
@@ -415,11 +349,6 @@ extension ConfigReader {
 
 @available(Configuration 1.0, *)
 extension ConfigReader {
-
-    /// The decoder the library uses to convert string keys into config keys.
-    var keyDecoder: any ConfigKeyDecoder {
-        storage.keyDecoder
-    }
 
     /// The multi-provider that manages the hierarchy of configuration providers.
     var provider: MultiProvider {

@@ -88,10 +88,11 @@ struct MultiProviderTests {
             )
         }
 
-        func watchValue<Return>(
+        func watchValue<Return: ~Copyable>(
             forKey key: AbsoluteConfigKey,
             type: ConfigType,
-            updatesHandler handler: (ConfigUpdatesAsyncSequence<Result<LookupResult, any Error>, Never>) async throws ->
+            updatesHandler handler: (_ updates: ConfigUpdatesAsyncSequence<Result<LookupResult, any Error>, Never>)
+                async throws ->
                 Return
         ) async throws -> Return {
             try await multiProvider.watchValue(forKey: key, type: type) { updates in
@@ -106,12 +107,12 @@ struct MultiProviderTests {
             }
         }
 
-        func snapshot() -> any ConfigSnapshotProtocol {
+        func snapshot() -> any ConfigSnapshot {
             multiProvider.snapshot()
         }
 
-        func watchSnapshot<Return>(
-            updatesHandler: (ConfigUpdatesAsyncSequence<any ConfigSnapshotProtocol, Never>) async throws -> Return
+        func watchSnapshot<Return: ~Copyable>(
+            updatesHandler: (_ updates: ConfigUpdatesAsyncSequence<any ConfigSnapshot, Never>) async throws -> Return
         )
             async throws -> Return
         {
@@ -128,7 +129,7 @@ struct MultiProviderTests {
     @available(Configuration 1.0, *)
     @Test func compat() async throws {
         let multiProvider = MultiProvider(providers: providers)
-        try await ProviderCompatTest(provider: MultiProviderTestShims(multiProvider: multiProvider)).run()
+        try await ProviderCompatTest(provider: MultiProviderTestShims(multiProvider: multiProvider)).runTest()
     }
 
     @available(Configuration 1.0, *)
@@ -174,10 +175,68 @@ struct MultiProviderTests {
 
         #expect(accessReporter.events.count == 3)
     }
+
+    @available(Configuration 1.0, *)
+    @Test func watchingTwoUpstreams_handlerReturns() async throws {
+        let first = InMemoryProvider(
+            name: "first",
+            values: [
+                "value": "First"
+            ]
+        )
+        let second = InMemoryProvider(
+            name: "first",
+            values: [
+                "value": "Second"
+            ]
+        )
+        let accessReporter = TestAccessReporter()
+        let config = ConfigReader(providers: [first, second], accessReporter: accessReporter)
+
+        try await config.watchString(forKey: "value", default: "default") { updates in
+            var iterator = updates.makeAsyncIterator()
+            let firstValue = try await iterator.next()
+            #expect(firstValue == "First")
+            // Return immediately
+        }
+
+        #expect(accessReporter.events.count == 1)
+    }
+
+    @available(Configuration 1.0, *)
+    @Test func watchingTwoUpstreams_handlerThrowsError() async throws {
+        let first = InMemoryProvider(
+            name: "first",
+            values: [
+                "value": "First"
+            ]
+        )
+        let second = InMemoryProvider(
+            name: "first",
+            values: [
+                "value": "Second"
+            ]
+        )
+        let accessReporter = TestAccessReporter()
+        let config = ConfigReader(providers: [first, second], accessReporter: accessReporter)
+
+        struct HandlerError: Error {}
+        await #expect(throws: HandlerError.self) {
+            try await config.watchString(forKey: "value", default: "default") { updates in
+                var iterator = updates.makeAsyncIterator()
+                let firstValue = try await iterator.next()
+                #expect(firstValue == "First")
+                // Throws immediately
+                throw HandlerError()
+            }
+        }
+
+        #expect(accessReporter.events.count == 1)
+    }
 }
 
 @available(Configuration 1.0, *)
-extension MultiSnapshot: ConfigSnapshotProtocol {
+extension MultiSnapshot: ConfigSnapshot {
     var providerName: String {
         "MultiProvider"
     }

@@ -38,9 +38,9 @@
 ///
 /// ## See also
 ///
-/// - ``ConfigKeyDecoder`` - For decoding strings back to keys
 /// - ``AbsoluteConfigKey`` - The structured key representation
-public protocol ConfigKeyEncoder: Sendable {
+@available(Configuration 1.0, *)
+internal protocol ConfigKeyEncoder: Sendable {
 
     /// Encodes a structured configuration key into its string representation.
     ///
@@ -50,7 +50,7 @@ public protocol ConfigKeyEncoder: Sendable {
     ///
     /// ```swift
     /// let encoder = SeparatorKeyEncoder(separator: ".")
-    /// let key = AbsoluteConfigKey(components: ["database", "host"], context: context)
+    /// let key = AbsoluteConfigKey(["database", "host"], context: context)
     /// let encoded = encoder.encode(key)
     /// // Results in "database.host"
     /// ```

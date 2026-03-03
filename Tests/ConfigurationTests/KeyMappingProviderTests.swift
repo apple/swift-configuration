@@ -117,7 +117,7 @@ struct KeyMappingProviderTests {
             }
         }
 
-        var receivedSnapshots: [any ConfigSnapshotProtocol] = []
+        var receivedSnapshots: [any ConfigSnapshot] = []
         try await mapper.watchSnapshot { sequence in
             for try await snapshot in sequence {
                 receivedSnapshots.append(snapshot)
@@ -178,6 +178,6 @@ struct KeyMappingProviderTests {
 
         // Use a passtrhough mapper so the compat test can find the expected values
         let mapper = KeyMappingProvider(upstream: upstream) { $0 }
-        try await ProviderCompatTest(provider: mapper).run()
+        try await ProviderCompatTest(provider: mapper).runTest()
     }
 }
