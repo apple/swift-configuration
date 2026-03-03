@@ -77,6 +77,17 @@ jobs:
       windows_nightly_next_enabled: false
       windows_nightly_main_enabled: false
 
+  wasm-sdk:
+    name: WebAssembly Swift SDK
+    uses: swiftlang/github-workflows/.github/workflows/swift_package_test.yml@0.0.7
+    with:
+      enable_wasm_sdk_build: true
+      enable_linux_checks: false
+      enable_windows_checks: false
+      linux_env_vars: "ENABLE_ALL_TRAITS=1"
+      swift_flags: --target Configuration
+      swift_nightly_flags: --target Configuration
+  
   construct-linkage-test-matrix:
     name: Construct linkage matrix
     runs-on: ubuntu-latest
