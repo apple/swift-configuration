@@ -16,29 +16,28 @@ import Synchronization
 
 /// A container type for reading config values from snapshots.
 ///
-/// A config snapshot reader provides read-only access to config values stored in an underlying snapshot.
-/// Unlike ``ConfigReader``, which can access live, changing config values from providers, a snapshot reader
-/// works with a fixed, immutable snapshot of the configuration data.
+/// A config snapshot reader provides read-only access to config values stored in an underlying
+/// ``ConfigSnapshot``. Unlike a config reader, which can access live, changing config values
+/// from providers, a snapshot reader works with a fixed, immutable snapshot of the configuration data.
 ///
 /// ## Usage
 ///
-/// Get a ``ConfigSnapshotReader`` from a ``ConfigReader`` by using ``ConfigReader/withSnapshot(_:)``
-/// to retrieve a snapshot. The values of the snapshot are guaranteed to be from the same point in time:
+/// Get a snapshot reader from a config reader by using the ``ConfigReader/snapshot()`` method. All values in the
+/// snapshot are guaranteed to be from the same point in time:
 /// ```swift
 /// // Get a snapshot from a ConfigReader
 /// let config = ConfigReader(provider: EnvironmentVariablesProvider())
-/// let result = config.withSnapshot { snapshot in
-///     // Use snapshot to read config values
-///     let cert = snapshot.string(forKey: "cert")
-///     let privateKey = snapshot.string(forKey: "privateKey")
-///     // Ensures that both values are coming from the same
-///     // underlying snapshot and that a provider didn't change
-///     // its internal state between the two `string(...)` calls.
-///     return MyCert(cert: cert, privateKey: privateKey)
-/// }
+/// let snapshot = config.snapshot()
+/// // Use snapshot to read config values
+/// let cert = snapshot.string(forKey: "cert")
+/// let privateKey = snapshot.string(forKey: "privateKey")
+/// // Ensures that both values are coming from the same
+/// // underlying snapshot and that a provider didn't change
+/// // its internal state between the two `string(...)` calls.
+/// let identity = MyIdentity(cert: cert, privateKey: privateKey)
 /// ```
 ///
-/// Or you can watch for snapshot updates using the ``ConfigReader/watchSnapshot(fileID:line:updatesHandler:)``:
+/// Or you can watch for snapshot updates using the ``ConfigReader/watchSnapshot(fileID:line:updatesHandler:)`` method:
 ///
 /// ```swift
 /// try await config.watchSnapshot { snapshots in
@@ -69,28 +68,11 @@ import Synchronization
 /// ### Config keys and context
 ///
 /// The library requests config values using a canonical "config key", that represents a key path.
-/// You can provide additional context that was used by some providers when the snapshot was created.
+/// You can provide additional context that some providers use when creating the snapshot.
 ///
 /// ```swift
 /// let httpTimeout = snapshotReader.int(
-///     forKey: "http.timeout",
-///     context: ["upstream": "example.com"],
-///     default: 60
-/// )
-/// ```
-///
-/// ### Key decoding
-///
-/// By default, the snapshot reader uses the key decoder from the original config reader, but you can
-/// provide a different one when creating a scoped reader:
-///
-/// ```swift
-/// let scopedReader = snapshotReader.scoped(
-///     to: "http",
-///     keyDecoderOverride: .colonSeparated
-/// )
-/// let timeout = scopedReader.int(
-///     forKey: "http:timeout",
+///     forKey: ConfigKey("http.timeout", context: ["upstream": "example.com"]),
 ///     default: 60
 /// )
 /// ```
@@ -160,14 +142,8 @@ public struct ConfigSnapshotReader: Sendable {
     /// the value just using the key `inner` at the call site.
     let keyPrefix: AbsoluteConfigKey?
 
-    /// The underlying storage that is shared with any transitive child configs created
-    /// from this one.
+    /// The underlying storage that any transitive child configs created from this reader share.
     final class Storage: Sendable {
-
-        /// The key decoder that the library uses to interpret string keys.
-        ///
-        /// For example, turns `foo.bar.baz` into `["foo", "bar", "baz"]`.
-        let keyDecoder: any ConfigKeyDecoder
 
         /// The underlying multi snapshot.
         let snapshot: MultiSnapshot
@@ -177,15 +153,12 @@ public struct ConfigSnapshotReader: Sendable {
 
         /// Creates a storage instance.
         /// - Parameters:
-        ///   - keyDecoder: The key decoder used by methods that take string keys.
         ///   - snapshot: The underlying multi snapshot.
         ///   - accessReporter: The reporter of access events.
         init(
-            keyDecoder: some ConfigKeyDecoder,
             snapshot: MultiSnapshot,
             accessReporter: (any AccessReporter)?
         ) {
-            self.keyDecoder = keyDecoder
             self.snapshot = snapshot
             self.accessReporter = accessReporter
         }
@@ -193,11 +166,6 @@ public struct ConfigSnapshotReader: Sendable {
 
     /// The underlying storage that is shared with any transitive child readers created from this one.
     private var storage: Storage
-
-    /// The key decoder the library uses to interpret  string keys.
-    var keyDecoder: any ConfigKeyDecoder {
-        storage.keyDecoder
-    }
 
     /// The underlying multi snapshot.
     private var snapshot: MultiSnapshot {
@@ -226,21 +194,10 @@ public struct ConfigSnapshotReader: Sendable {
     /// - Parameters:
     ///   - scopedKey: The key to append to the current key prefix.
     ///   - parent: The parent reader from which to create a scoped reader.
-    ///   - keyDecoderOverride: A key decoder that replaces the original key decoder.
-    private init(scopedKey: ConfigKey, parent: ConfigSnapshotReader, keyDecoderOverride: (any ConfigKeyDecoder)?) {
-        let storage: Storage
-        if let keyDecoderOverride {
-            storage = .init(
-                keyDecoder: keyDecoderOverride,
-                snapshot: parent.storage.snapshot,
-                accessReporter: parent.storage.accessReporter
-            )
-        } else {
-            storage = parent.storage
-        }
+    private init(scopedKey: ConfigKey, parent: ConfigSnapshotReader) {
         self.init(
             keyPrefix: parent.keyPrefix.appending(scopedKey),
-            storage: storage
+            storage: parent.storage
         )
     }
 
@@ -253,83 +210,46 @@ public struct ConfigSnapshotReader: Sendable {
     /// let timeout = httpConfig.int(forKey: "timeout") // Reads from "client.http.timeout" in the snapshot
     /// ```
     ///
-    /// - Parameters:
-    ///   - configKey: The key to append to the current key prefix.
-    ///   - keyDecoderOverride: A key decoder that replaces the original key decoder.
+    /// - Parameter configKey: The key to append to the current key prefix.
     /// - Returns: A reader for accessing scoped values.
-    public func scoped(to configKey: ConfigKey, keyDecoderOverride: (any ConfigKeyDecoder)? = nil)
+    public func scoped(to configKey: ConfigKey)
         -> ConfigSnapshotReader
     {
         ConfigSnapshotReader(
             scopedKey: configKey,
-            parent: self,
-            keyDecoderOverride: keyDecoderOverride
-        )
-    }
-
-    /// Returns a scoped reader by appending the provided key to the current key prefix.
-    ///
-    /// Use this method to create a reader that accesses a subset of the configuration,
-    /// using a string key that will be decoded according to the reader's key decoder.
-    ///
-    /// ```swift
-    /// let httpConfig = snapshotReader.scoped(to: "http.client")
-    /// let timeout = httpConfig.int(forKey: "timeout") // Reads from "http.client.timeout" in the snapshot
-    /// ```
-    ///
-    /// - Parameters:
-    ///   - key: The key to append to the current key prefix.
-    ///   - context: Additional config context for the key.
-    ///   - keyDecoderOverride: A key decoder that replaces the original key decoder.
-    /// - Returns: A reader for accessing scoped values.
-    public func scoped(
-        to key: String,
-        context: [String: ConfigContextValue] = [:],
-        keyDecoderOverride: (any ConfigKeyDecoder)? = nil
-    ) -> ConfigSnapshotReader {
-        ConfigSnapshotReader(
-            scopedKey: (keyDecoderOverride ?? keyDecoder).decode(key, context: context),
-            parent: self,
-            keyDecoderOverride: keyDecoderOverride
+            parent: self
         )
     }
 }
 
 @available(Configuration 1.0, *)
 extension ConfigReader {
-    /// Provides a snapshot of the current configuration state and passes it to the provided closure.
+    /// Returns a snapshot of the current configuration state.
     ///
-    /// This method creates a snapshot of the current configuration state and passes it to the
-    /// provided closure. The snapshot reader provides read-only access to the configuration's state
-    /// at the time the method was called.
+    /// The snapshot reader provides read-only access to the configuration's state
+    /// at the time you call this method.
     ///
     /// ```swift
-    /// let result = config.withSnapshot { snapshot in
-    ///     // Use snapshot to read config values
-    ///     let cert = snapshot.string(forKey: "cert")
-    ///     let privateKey = snapshot.string(forKey: "privateKey")
-    ///     // Ensures that both values are coming from the same underlying snapshot and that a provider
-    ///     // didn't change its internal state between the two `string(...)` calls.
-    ///     return MyCert(cert: cert, privateKey: privateKey)
-    /// }
+    /// let snapshot = config.snapshot()
+    /// // Use snapshot to read config values
+    /// let cert = snapshot.string(forKey: "cert")
+    /// let privateKey = snapshot.string(forKey: "privateKey")
+    /// // Ensures that both values are coming from the same underlying snapshot and that a provider
+    /// // didn't change its internal state between the two `string(...)` calls.
+    /// let identity = MyIdentity(cert: cert, privateKey: privateKey)
     /// ```
     ///
-    /// - Parameter body: A closure that takes a `ConfigSnapshotReader` and returns a value.
-    /// - Returns: The value returned by the closure.
-    /// - Throws: Rethrows any errors thrown by the provided closure.
-    public func withSnapshot<Failure: Error, Return>(
-        _ body: (ConfigSnapshotReader) throws(Failure) -> Return
-    ) throws(Failure) -> Return {
+    /// - Returns: The snapshot.
+    public func snapshot() -> ConfigSnapshotReader {
         let multiSnapshot = provider.snapshot()
         let snapshotReader = ConfigSnapshotReader(
             keyPrefix: keyPrefix,
             storage: .init(
-                keyDecoder: keyDecoder,
                 snapshot: multiSnapshot,
                 accessReporter: accessReporter
             )
         )
-        return try body(snapshotReader)
+        return snapshotReader
     }
 
     /// Watches the configuration for changes.
@@ -357,10 +277,10 @@ extension ConfigReader {
     ///   - updatesHandler: A closure that receives an async sequence of `ConfigSnapshotReader` instances.
     /// - Returns: The value returned by the handler.
     /// - Throws: Any error thrown by the handler.
-    public func watchSnapshot<Return>(
+    public func watchSnapshot<Return: ~Copyable>(
         fileID: String = #fileID,
         line: UInt = #line,
-        updatesHandler: (ConfigUpdatesAsyncSequence<ConfigSnapshotReader, Never>) async throws -> Return
+        updatesHandler: (_ updates: ConfigUpdatesAsyncSequence<ConfigSnapshotReader, Never>) async throws -> Return
     ) async throws -> Return {
         try await provider.watchSnapshot { updates in
             try await updatesHandler(
@@ -370,7 +290,6 @@ extension ConfigReader {
                             ConfigSnapshotReader(
                                 keyPrefix: keyPrefix,
                                 storage: .init(
-                                    keyDecoder: keyDecoder,
                                     snapshot: multiSnapshot,
                                     accessReporter: accessReporter
                                 )
@@ -392,8 +311,8 @@ extension ConfigSnapshotReader {
     ///   - isSecret: Whether the value is a secret.
     ///   - unwrap: A closure that unwraps the config content to the desired type.
     ///   - wrap: A closure that wraps the value in config content.
-    ///   - fileID: The file ID where this method was called from.
-    ///   - line: The line number where this method was called from.
+    ///   - fileID: The file ID of the call site.
+    ///   - line: The line number of the call site.
     /// - Returns: The unwrapped value if found and convertible, or nil otherwise.
     internal func value<Value>(
         forKey key: ConfigKey,
@@ -427,8 +346,8 @@ extension ConfigSnapshotReader {
     ///   - defaultValue: The default value to return if the value isn't found or can't be converted.
     ///   - unwrap: A closure that unwraps the config content to the desired type.
     ///   - wrap: A closure that wraps the value in config content.
-    ///   - fileID: The file ID where this method was called from.
-    ///   - line: The line number where this method was called from.
+    ///   - fileID: The file ID of the call site.
+    ///   - line: The line number of the call site.
     /// - Returns: The unwrapped value if found and convertible, or the default value otherwise.
     internal func value<Value>(
         forKey key: ConfigKey,
@@ -463,8 +382,8 @@ extension ConfigSnapshotReader {
     ///   - isSecret: Whether the value is a secret.
     ///   - unwrap: A closure that unwraps the config content to the desired type.
     ///   - wrap: A closure that wraps the value in config content.
-    ///   - fileID: The file ID where this method was called from.
-    ///   - line: The line number where this method was called from.
+    ///   - fileID: The file ID of the call site.
+    ///   - line: The line number of the call site.
     /// - Returns: The unwrapped value.
     /// - Throws: A `ConfigError` if the value isn't found or can't be converted.
     internal func requiredValue<Value>(
@@ -566,5 +485,83 @@ extension ConfigSnapshotReader {
         _ values: [Value]
     ) -> ConfigContent {
         .stringArray(values.map(\.rawValue))
+    }
+
+    /// Casts an integer value to a `ExpressibleByConfigInt` type.
+    ///
+    /// - Parameters:
+    ///   - int: The integer to cast.
+    ///   - type: The type to cast to.
+    ///   - key: The config key for error reporting.
+    /// - Returns: The cast value.
+    /// - Throws: A `ConfigError` if the integer can't be cast to the type.
+    internal func cast<Value: ExpressibleByConfigInt>(
+        _ int: Int,
+        type: Value.Type,
+        key: ConfigKey
+    ) throws -> Value {
+        guard let typedValue = Value.init(configInt: int) else {
+            throw ConfigError.configValueFailedToCast(name: keyPrefix.appending(key).description, type: "\(type)")
+        }
+        return typedValue
+    }
+
+    /// Casts an integer value to a `RawRepresentable` type with an `Int` raw value.
+    ///
+    /// - Parameters:
+    ///   - int: The integer to cast.
+    ///   - type: The type to cast to.
+    ///   - key: The config key for error reporting.
+    /// - Returns: The cast value.
+    /// - Throws: A `ConfigError` if the integer can't be cast to the type.
+    internal func cast<Value: RawRepresentable<Int>>(
+        _ int: Int,
+        type: Value.Type,
+        key: ConfigKey
+    ) throws -> Value {
+        guard let typedValue = Value.init(rawValue: int) else {
+            throw ConfigError.configValueFailedToCast(name: keyPrefix.appending(key).description, type: "\(type)")
+        }
+        return typedValue
+    }
+
+    /// Converts a `ExpressibleByConfigInt` value to content.
+    ///
+    /// - Parameter value: The value to convert.
+    /// - Returns: The config content.
+    internal func uncast<Value: ExpressibleByConfigInt>(
+        _ value: Value
+    ) -> ConfigContent {
+        .int(value.configInt)
+    }
+
+    /// Converts an array of `ExpressibleByConfigInt` values to content.
+    ///
+    /// - Parameter values: The values to convert.
+    /// - Returns: The config content.
+    internal func uncast<Value: ExpressibleByConfigInt>(
+        _ values: [Value]
+    ) -> ConfigContent {
+        .intArray(values.map(\.configInt))
+    }
+
+    /// Converts a `RawRepresentable` value with an `Int` raw value to content.
+    ///
+    /// - Parameter value: The value to convert.
+    /// - Returns: The config content.
+    internal func uncast<Value: RawRepresentable<Int>>(
+        _ value: Value
+    ) -> ConfigContent {
+        .int(value.rawValue)
+    }
+
+    /// Converts an array of `RawRepresentable` values with `Int` raw values to content.
+    ///
+    /// - Parameter values: The values to convert.
+    /// - Returns: The config content.
+    internal func uncast<Value: RawRepresentable<Int>>(
+        _ values: [Value]
+    ) -> ConfigContent {
+        .intArray(values.map(\.rawValue))
     }
 }

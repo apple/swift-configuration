@@ -12,7 +12,7 @@
 //
 //===----------------------------------------------------------------------===//
 
-#if ReloadingSupport
+#if Reloading
 
 #if canImport(FoundationEssentials)
 import FoundationEssentials

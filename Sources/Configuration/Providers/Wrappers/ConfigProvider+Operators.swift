@@ -24,24 +24,6 @@ extension ConfigProvider {
         }
     }
 
-    /// Creates a new prefixed configuration provider with a string prefix.
-    ///
-    /// This convenience method allows you to specify a string prefix that will be
-    /// decoded using the provided key decoder.
-    ///
-    /// - Parameters:
-    ///   - prefix: The string prefix to decode and prepend to all configuration keys.
-    ///   - context: Additional context used when decoding the prefix string.
-    ///   - keyDecoder: The decoder to use for parsing the prefix string.
-    /// - Returns: A provider which prefixes keys.
-    public func prefixKeys(
-        with prefix: String,
-        context: [String: ConfigContextValue] = [:],
-        keyDecoder: some ConfigKeyDecoder = .dotSeparated
-    ) -> KeyMappingProvider<Self> {
-        self.prefixKeys(with: keyDecoder.decode(prefix, context: context))
-    }
-
     /// Creates a new configuration provider where each key is rewritten by the given closure.
     ///
     /// - Parameter transform: The closure applied to each key before a lookup.

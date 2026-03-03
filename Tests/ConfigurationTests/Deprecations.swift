@@ -15,16 +15,7 @@
 import Configuration
 import SystemPackage
 
-/// This type only exists to test that deprecated symbols are still usable.
+/// Test that deprecated symbols are still usable.
 @available(Configuration 1.0, *)
 @available(*, deprecated)
-struct Deprecations {
-    #if ReloadingSupport && JSONSupport && YAMLSupport
-    func fileProviders() async throws {
-        let _ = try await JSONProvider(filePath: "/dev/null")
-        let _ = try await ReloadingJSONProvider(filePath: "/dev/null")
-        let _ = try await YAMLProvider(filePath: "/dev/null")
-        let _ = try await ReloadingYAMLProvider(filePath: "/dev/null")
-    }
-    #endif
-}
+struct Deprecations {}

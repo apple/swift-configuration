@@ -9,6 +9,7 @@ A Swift library for reading configuration in applications and libraries.
 
 - 📚 **Documentation** is available on the [Swift Package Index](https://swiftpackageindex.com/apple/swift-configuration/documentation/configuration).
 - 💻 **Examples** are available [just below](#Examples), in the [Examples](Examples/) directory, and on the [Example use cases](https://swiftpackageindex.com/apple/swift-configuration/documentation/configuration/example-use-cases) page.
+- 📺 **Video** introduction is available [on YouTube](https://www.youtube.com/watch?v=I3lYW6OEyIs).
 - 🚀 **Contributions** are welcome, please see [CONTRIBUTING.md](CONTRIBUTING.md).
 - 🪪 **License** is Apache 2.0, repeated in [LICENSE](LICENSE.txt).
 - 🔒 **Security** issues should be reported via the process in [SECURITY.md](SECURITY.md).
@@ -56,12 +57,10 @@ If both sources are unavailable, the fallback default of `60` is returned.
 
 ## Quick start
 
-> Important: While this library's API is still in development, use the `.upToNextMinor(from: "...")` dependency constraint to avoid unexpected build breakages. Before we reach 1.0, API-breaking changes may occur between minor `0.x` versions.
-
 Add the dependency to your `Package.swift`:
 
 ```swift
-.package(url: "https://github.com/apple/swift-configuration", .upToNextMinor(from: "0.2.0"))
+.package(url: "https://github.com/apple/swift-configuration", from: "1.0.0")
 ```
 
 Add the library dependency to your target:
@@ -94,27 +93,29 @@ To enable an additional trait on the package, update the package dependency:
 ```diff
 .package(
     url: "https://github.com/apple/swift-configuration",
-    .upToNextMinor(from: "0.2.0"),
-+   traits: [.defaults, "OtherFeatureSupport"]
+    from: "1.0.0",
++   traits: [.defaults, "YAML"]
 )
 ```
 
 Available traits:
-- **`JSONSupport`** (default): Adds support for `FileProvider<JSONSnapshot>`, a `ConfigProvider` for reading JSON files.
-- **`LoggingSupport`** (opt-in): Adds support for `AccessLogger`, a way to emit access events into a `SwiftLog.Logger`.
-- **`ReloadingSupport`** (opt-in): Adds support for auto-reloading variants of file providers, such as `ReloadingFileProvider<JSONSnapshot>` (when `JSONSupport` is enabled) and `ReloadingFileProvider<YAMLSnapshot>` (when `YAMLSupport` is enabled).
-- **`CommandLineArgumentsSupport`** (opt-in): Adds support for `CommandLineArgumentsProvider` for parsing command line arguments.
-- **`YAMLSupport`** (opt-in): Adds support for `FileProvider<YAMLSnapshot>`, a `ConfigProvider` for reading YAML files.
+- **`JSON`** (default): Adds support for `FileProvider<JSONSnapshot>`, a `ConfigProvider` for reading JSON files.
+- **`Logging`** (opt-in): Adds support for `AccessLogger`, a way to emit access events into a `SwiftLog.Logger`.
+- **`Reloading`** (opt-in): Adds support for auto-reloading variants of file providers, such as `ReloadingFileProvider<JSONSnapshot>` (when `JSON` is enabled) and `ReloadingFileProvider<YAMLSnapshot>` (when `YAML` is enabled).
+- **`CommandLineArguments`** (opt-in): Adds support for `CommandLineArgumentsProvider` for parsing command line arguments.
+- **`YAML`** (opt-in): Adds support for `FileProvider<YAMLSnapshot>`, a `ConfigProvider` for reading YAML files.
 
 ## Supported platforms and minimum versions
 
-The library is supported on macOS, Linux, and Windows.
+The library is supported on Apple platforms, Linux, and Android.
 
-| Component     | macOS  | Linux, Windows | iOS    | tvOS   | watchOS | visionOS |
-| ------------- | -----  | -------------- | ---    | ----   | ------- | -------- |
-| Configuration | ✅ 15+ | ✅              | ✅ 18+ | ✅ 18+ | ✅ 11+   | ✅ 2+    |
+| Component     | macOS  | Android    | Linux | iOS    | tvOS   | watchOS | visionOS |
+| ------------- | -----  | -------    | ----- | ---    | ----   | ------- | -------- |
+| Configuration | ✅ 15+ | ✅ API 28+ | ✅    | ✅ 18+ | ✅ 18+ | ✅ 11+  | ✅ 2+    |
 
 ## Configuration providers
+
+### Built-in providers
 
 The library includes comprehensive built-in provider support:
 
@@ -125,6 +126,11 @@ The library includes comprehensive built-in provider support:
 - Directory of files: [`DirectoryFilesProvider`](https://swiftpackageindex.com/apple/swift-configuration/documentation/configuration/directoryfilesprovider)
 - In-memory: [`InMemoryProvider`](https://swiftpackageindex.com/apple/swift-configuration/documentation/configuration/inmemoryprovider) and [`MutableInMemoryProvider`](https://swiftpackageindex.com/apple/swift-configuration/documentation/configuration/mutableinmemoryprovider)
 - Key transforming: [`KeyMappingProvider`](https://swiftpackageindex.com/apple/swift-configuration/documentation/configuration/keymappingprovider)
+
+### Community providers
+
+- TOML file: [mattt/swift-configuration-toml](https://github.com/mattt/swift-configuration-toml)
+- AWS Secrets Manager: [songshift/swift-configuration-aws](https://github.com/songshift/swift-configuration-aws)
 
 You can also implement a custom [`ConfigProvider`](https://swiftpackageindex.com/apple/swift-configuration/documentation/configuration/configprovider) for specialized configuration formats and sources.
 

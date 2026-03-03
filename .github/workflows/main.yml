@@ -38,8 +38,20 @@ jobs:
     # Workaround https://github.com/nektos/act/issues/1875
     uses: apple/swift-nio/.github/workflows/static_sdk.yml@main
     with:
-      env_vars: '{"ENABLE_ALL_TRAITS":"1"}'
-      command_arguments: '--product Configuration'
+      # Yams doesn't compile for Musl.
+      # env_vars: '{"ENABLE_ALL_TRAITS":"1"}'
+      command_arguments: '--swift-sdk x86_64-swift-linux-musl --target Configuration'
+
+  android-sdk-testing:
+    name: Android SDK with emulator testing
+    uses: swiftlang/github-workflows/.github/workflows/swift_package_test.yml@0.0.7
+    with:
+      enable_linux_checks: false
+      enable_windows_checks: false
+      enable_android_sdk_build: true
+      enable_android_sdk_checks: true
+      android_ndk_versions: '["r27d", "r29"]'
+      linux_env_vars: 'ENABLE_ALL_TRAITS=1'
 
   macos-tests:
     name: macOS tests
@@ -74,7 +86,7 @@ jobs:
       integration-test-matrix: '${{ steps.generate-matrix.outputs.integration-test-matrix }}'
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           persist-credentials: false
       - id: generate-matrix
@@ -103,7 +115,7 @@ jobs:
       example-packages-matrix: '${{ steps.generate-matrix.outputs.example-packages-matrix }}'
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           persist-credentials: false
       - id: generate-matrix
@@ -124,3 +136,12 @@ jobs:
     with:
       name: "Example packages"
       matrix_string: '${{ needs.construct-example-packages-matrix.outputs.example-packages-matrix }}'
+
+  benchmarks:
+    name: Benchmarks
+    uses: apple/swift-nio/.github/workflows/benchmarks.yml@main
+    with:
+      benchmark_package_path: "Benchmarks"
+      linux_5_10_enabled: false
+      linux_6_0_enabled: false
+      linux_6_1_enabled: false

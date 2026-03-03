@@ -34,7 +34,7 @@ import WASILibc
 #error("Unsupported runtime")
 #endif
 
-/// A configuration provider that sources values from environment variables.
+/// A configuration provider that reads values from environment variables.
 ///
 /// This provider reads configuration values from environment variables, supporting both
 /// the current process environment and `.env` files. It automatically converts hierarchical
@@ -43,11 +43,11 @@ import WASILibc
 ///
 /// ## Key transformation
 ///
-/// Configuration keys are transformed into environment variable names using these rules:
-/// - Components are joined with underscores
-/// - All characters are converted to uppercase
-/// - CamelCase is detected and word boundaries are marked with underscores
-/// - Non-alphanumeric characters are replaced with underscores
+/// This provider transforms configuration keys into environment variable names using these rules:
+/// - Joins components with underscores.
+/// - Converts all characters to uppercase.
+/// - Detects CamelCase and marks word boundaries with underscores.
+/// - Replaces non-alphanumeric characters with underscores.
 ///
 /// For example: `http.serverTimeout` becomes `HTTP_SERVER_TIMEOUT`
 ///
@@ -61,8 +61,8 @@ import WASILibc
 ///
 /// ## Secret handling
 ///
-/// Environment variables can be marked as secrets using a ``SecretsSpecifier``.
-/// Secret values are automatically redacted in debug output and logging.
+/// You can mark environment variables as secrets using a ``SecretsSpecifier``.
+/// The provider automatically redacts secret values in debug output and logging.
 ///
 /// > Important: This provider performs case-insensitive lookup of environment variable names.
 ///
@@ -142,28 +142,24 @@ public struct EnvironmentVariablesProvider: Sendable {
 
         /// A decoder of arrays from a string.
         var arrayDecoder: EnvironmentValueArrayDecoder
+
+        /// A decoder of bool values from a string.
+        static func decodeBool(from string: String) -> Bool? {
+            let stringLowercased = string.lowercased()
+            return switch stringLowercased {
+            case "yes", "1": true
+            case "no", "0": false
+            default: Bool(stringLowercased)
+            }
+        }
     }
 
     /// The underlying snapshot of the provider.
     private let _snapshot: Snapshot
 
-    /// The error thrown by the provider.
-    enum ProviderError: Error, CustomStringConvertible {
-
-        /// The environment file was not found at the provided path.
-        case environmentFileNotFound(path: FilePath)
-
-        var description: String {
-            switch self {
-            case .environmentFileNotFound(let path):
-                return "EnvironmentVariablesProvider: File not found at path: \(path)."
-            }
-        }
-    }
-
     /// Creates a new provider that reads from the current process environment.
     ///
-    /// This initializer creates a provider that sources configuration values from
+    /// This initializer creates a provider that reads configuration values from
     /// the environment variables of the current process.
     ///
     /// ```swift
@@ -239,7 +235,7 @@ public struct EnvironmentVariablesProvider: Sendable {
 
     /// Creates a new provider that reads from an environment file.
     ///
-    /// This initializer loads environment variables from a `.env` file at the specified path.
+    /// This initializer loads environment variables from an `.env` file at the specified path.
     /// The file should contain key-value pairs in the format `KEY=value`, one per line.
     /// Comments (lines starting with `#`) and empty lines are ignored.
     ///
@@ -247,36 +243,72 @@ public struct EnvironmentVariablesProvider: Sendable {
     /// // Load from a .env file
     /// let provider = try await EnvironmentVariablesProvider(
     ///     environmentFilePath: ".env",
+    ///     allowMissing: true,
     ///     secretsSpecifier: .specific(["API_KEY"])
     /// )
     /// ```
     ///
     /// - Parameters:
     ///   - environmentFilePath: The file system path to the environment file to load.
+    ///   - allowMissing: A flag controlling how the provider handles a missing file.
+    ///     - When `false` (the default), if the file is missing or malformed, throws an error.
+    ///     - When `true`, if the file is missing, treats it as empty. Malformed files still throw an error.
     ///   - secretsSpecifier: Specifies which environment variables should be treated as secrets.
     ///   - bytesDecoder: The decoder used for converting string values to byte arrays.
     ///   - arraySeparator: The character used to separate elements in array values.
-    /// - Throws: If the file cannot be found or read.
+    /// - Throws: If the file is malformed, or if missing when allowMissing is `false`.
     public init(
         environmentFilePath: FilePath,
+        allowMissing: Bool = false,
         secretsSpecifier: SecretsSpecifier<String, String> = .none,
         bytesDecoder: some ConfigBytesFromStringDecoder = .base64,
         arraySeparator: Character = ","
     ) async throws {
-        do {
-            let contents = try String(
-                contentsOfFile: environmentFilePath.string,
-                encoding: .utf8
-            )
-            self.init(
-                environmentVariables: EnvironmentFileParser.parsed(contents),
-                secretsSpecifier: secretsSpecifier,
-                bytesDecoder: bytesDecoder,
-                arraySeparator: arraySeparator
-            )
-        } catch let error where error.isFileNotFoundError {
-            throw ProviderError.environmentFileNotFound(path: environmentFilePath)
+        try await self.init(
+            environmentFilePath: environmentFilePath,
+            allowMissing: allowMissing,
+            fileSystem: LocalCommonProviderFileSystem(),
+            secretsSpecifier: secretsSpecifier,
+            bytesDecoder: bytesDecoder,
+            arraySeparator: arraySeparator
+        )
+    }
+
+    /// Creates a new provider that reads from an environment file.
+    /// - Parameters:
+    ///   - environmentFilePath: The file system path to the environment file to load.
+    ///   - allowMissing: A flag controlling how the provider handles a missing file.
+    ///     - When `false` (the default), if the file is missing or malformed, throws an error.
+    ///     - When `true`, if the file is missing, treats it as empty. Malformed files still throw an error.
+    ///   - fileSystem: The file system implementation to use.
+    ///   - secretsSpecifier: Specifies which environment variables should be treated as secrets.
+    ///   - bytesDecoder: The decoder used for converting string values to byte arrays.
+    ///   - arraySeparator: The character used to separate elements in array values.
+    /// - Throws: If the file is malformed, or if missing when allowMissing is `false`.
+    internal init(
+        environmentFilePath: FilePath,
+        allowMissing: Bool,
+        fileSystem: some CommonProviderFileSystem,
+        secretsSpecifier: SecretsSpecifier<String, String> = .none,
+        bytesDecoder: some ConfigBytesFromStringDecoder = .base64,
+        arraySeparator: Character = ","
+    ) async throws {
+        let loadedData = try await fileSystem.fileContents(atPath: environmentFilePath)
+        let data: Data
+        if let loadedData {
+            data = loadedData
+        } else if allowMissing {
+            data = Data()
+        } else {
+            throw FileSystemError.fileNotFound(path: environmentFilePath)
         }
+        let contents = String(decoding: data, as: UTF8.self)
+        self.init(
+            environmentVariables: EnvironmentFileParser.parsed(contents),
+            secretsSpecifier: secretsSpecifier,
+            bytesDecoder: bytesDecoder,
+            arraySeparator: arraySeparator
+        )
     }
 
     /// Returns the raw string value for a specific environment variable name.
@@ -313,24 +345,7 @@ internal struct EnvironmentValueArrayDecoder {
     /// - Parameter string: The source string to parse.
     /// - Returns: The parsed array.
     func decode(_ string: String) -> [String] {
-        string.split(separator: separator).map { $0.trimmed() }
-    }
-}
-
-extension Error {
-    /// Inspects whether the error represents a file not found.
-    internal var isFileNotFoundError: Bool {
-        if let posixError = self as? POSIXError {
-            return posixError.code == POSIXError.Code.ENOENT
-        }
-        if let cocoaError = self as? CocoaError, cocoaError.isFileError {
-            return [
-                CocoaError.fileNoSuchFile,
-                CocoaError.fileReadNoSuchFile,
-            ]
-            .contains(cocoaError.code)
-        }
-        return false
+        string.split(separator: separator, omittingEmptySubsequences: false).map { $0.trimmed() }
     }
 }
 
@@ -388,7 +403,7 @@ extension EnvironmentVariablesProvider.Snapshot {
             }
             content = .double(doubleValue)
         case .bool:
-            guard let boolValue = Bool(stringValue) else {
+            guard let boolValue = Self.decodeBool(from: stringValue) else {
                 try throwMismatch()
             }
             content = .bool(boolValue)
@@ -421,7 +436,7 @@ extension EnvironmentVariablesProvider.Snapshot {
         case .boolArray:
             let arrayValue = arrayDecoder.decode(stringValue)
             let boolArray = try arrayValue.map { stringValue in
-                guard let boolValue = Bool(stringValue) else {
+                guard let boolValue = Self.decodeBool(from: stringValue) else {
                     try throwMismatch()
                 }
                 return boolValue
@@ -486,10 +501,11 @@ extension EnvironmentVariablesProvider: ConfigProvider {
     }
 
     // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
-    public func watchValue<Return>(
+    public func watchValue<Return: ~Copyable>(
         forKey key: AbsoluteConfigKey,
         type: ConfigType,
-        updatesHandler: (ConfigUpdatesAsyncSequence<Result<LookupResult, any Error>, Never>) async throws -> Return
+        updatesHandler: (_ updates: ConfigUpdatesAsyncSequence<Result<LookupResult, any Error>, Never>) async throws ->
+            Return
     ) async throws -> Return {
         try await watchValueFromValue(forKey: key, type: type, updatesHandler: updatesHandler)
     }
@@ -500,8 +516,8 @@ extension EnvironmentVariablesProvider: ConfigProvider {
     }
 
     // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
-    public func watchSnapshot<Return>(
-        updatesHandler: (ConfigUpdatesAsyncSequence<any ConfigSnapshot, Never>) async throws -> Return
+    public func watchSnapshot<Return: ~Copyable>(
+        updatesHandler: (_ updates: ConfigUpdatesAsyncSequence<any ConfigSnapshot, Never>) async throws -> Return
     ) async throws -> Return {
         try await watchSnapshotFromSnapshot(updatesHandler: updatesHandler)
     }

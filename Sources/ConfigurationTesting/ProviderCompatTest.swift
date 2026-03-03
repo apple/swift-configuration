@@ -113,7 +113,7 @@ public struct ProviderCompatTest: Sendable {
         try await watchSnapshot()
     }
 
-    let keyDecoder = SeparatorKeyDecoder.dotSeparated
+    let keyDecoder = DotSeparatorKeyDecoder.self
     let expectedValues: [(String, ConfigType, ConfigContent?)] = [
         ("string", .string, .string("Hello")),
         ("absent.string", .string, nil),

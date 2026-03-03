@@ -30,7 +30,7 @@ extension ConfigProvider {
     /// func watchValue(
     ///     forKey: AbsoluteConfigKey,
     ///     type: ConfigType,
-    ///     updatesHandler: (ConfigUpdatesAsyncSequence<Result<LookupResult, any Error>, Never>) async throws -> Void
+    ///     updatesHandler: (_ updates: ConfigUpdatesAsyncSequence<Result<LookupResult, any Error>, Never>) async throws -> Void
     /// ) async throws {
     ///     try await watchValueFromValue(forKey: key, type: type, updatesHandler: updatesHandler)
     /// }
@@ -43,11 +43,11 @@ extension ConfigProvider {
     /// - Returns: The value returned by the handler closure.
     /// - Throws: Provider-specific errors or errors thrown by the handler.
     nonisolated(nonsending)
-        public func watchValueFromValue<Return>(
+        public func watchValueFromValue<Return: ~Copyable>(
             forKey key: AbsoluteConfigKey,
             type: ConfigType,
             updatesHandler: (
-                ConfigUpdatesAsyncSequence<Result<LookupResult, any Error>, Never>
+                _ updates: ConfigUpdatesAsyncSequence<Result<LookupResult, any Error>, Never>
             ) async throws -> Return
         ) async throws -> Return
     {
@@ -76,7 +76,7 @@ extension ConfigProvider {
     ///
     /// ```swift
     /// func watchSnapshot(
-    ///     updatesHandler: (ConfigUpdatesAsyncSequence<any ConfigSnapshot, Never>) async throws -> Void
+    ///     updatesHandler: (_ updates: ConfigUpdatesAsyncSequence<any ConfigSnapshot, Never>) async throws -> Void
     /// ) async throws {
     ///     try await watchSnapshotFromSnapshot(updatesHandler)
     /// }
@@ -85,8 +85,8 @@ extension ConfigProvider {
     /// - Parameter updatesHandler: The closure that processes the async sequence of snapshot updates.
     /// - Returns: The value returned by the handler closure.
     /// - Throws: Provider-specific errors or errors thrown by the handler.
-    nonisolated(nonsending) public func watchSnapshotFromSnapshot<Return>(
-        updatesHandler: (ConfigUpdatesAsyncSequence<any ConfigSnapshot, Never>) async throws -> Return
+    nonisolated(nonsending) public func watchSnapshotFromSnapshot<Return: ~Copyable>(
+        updatesHandler: (_ updates: ConfigUpdatesAsyncSequence<any ConfigSnapshot, Never>) async throws -> Return
     ) async throws -> Return {
         let (stream, continuation) = AsyncStream<any ConfigSnapshot>
             .makeStream(bufferingPolicy: .bufferingNewest(1))

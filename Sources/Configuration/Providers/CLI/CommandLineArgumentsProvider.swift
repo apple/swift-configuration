@@ -12,7 +12,7 @@
 //
 //===----------------------------------------------------------------------===//
 
-#if CommandLineArgumentsSupport
+#if CommandLineArguments
 
 /// A configuration provider that sources values from command-line arguments.
 ///
@@ -150,10 +150,11 @@ extension CommandLineArgumentsProvider: ConfigProvider {
     }
 
     // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
-    public func watchValue<Return>(
+    public func watchValue<Return: ~Copyable>(
         forKey key: AbsoluteConfigKey,
         type: ConfigType,
-        updatesHandler: (ConfigUpdatesAsyncSequence<Result<LookupResult, any Error>, Never>) async throws -> Return
+        updatesHandler: (_ updates: ConfigUpdatesAsyncSequence<Result<LookupResult, any Error>, Never>) async throws ->
+            Return
     ) async throws -> Return {
         try await watchValueFromValue(forKey: key, type: type, updatesHandler: updatesHandler)
     }
@@ -164,8 +165,8 @@ extension CommandLineArgumentsProvider: ConfigProvider {
     }
 
     // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
-    public func watchSnapshot<Return>(
-        updatesHandler: (ConfigUpdatesAsyncSequence<any ConfigSnapshot, Never>) async throws -> Return
+    public func watchSnapshot<Return: ~Copyable>(
+        updatesHandler: (_ updates: ConfigUpdatesAsyncSequence<any ConfigSnapshot, Never>) async throws -> Return
     ) async throws -> Return {
         try await watchSnapshotFromSnapshot(updatesHandler: updatesHandler)
     }

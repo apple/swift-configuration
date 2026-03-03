@@ -6,15 +6,11 @@ Check out some techniques to debug unexpected issues and to increase visibility 
 
 ### Debugging configuration issues
 
-If your configuration values aren't being read correctly, check:
+If you can't read your configuration values correctly, check:
 
-1. **Key formatting**: Make sure the key format matches your `ConfigKeyDecoder`. The default is dot-notation (for example, `database.url`).
-
-2. **Environment variable naming**: When using `EnvironmentVariablesProvider`, keys are automatically converted to uppercase with dots replaced by underscores. For example, `database.url` becomes `DATABASE_URL`.
-
-3. **Provider ordering**: When using multiple providers, remember they're checked in order, and the first one that returns a value wins.
-
-4. **Debug with an access reporter**: Use the access reporting feature to see which keys are being queried and what values (if any) are being returned. See the next section for details.
+1. **Environment variable naming**: When using ``EnvironmentVariablesProvider``, the provider automatically converts keys to uppercase and replaces dots with underscores. For example, `database.url` becomes `DATABASE_URL`.
+2. **Provider ordering**: When using multiple providers, the library checks them in order and the first one that returns a value wins.
+3. **Debug with an access reporter**: Use access reporting to see which keys are being queried and what values (if any) are being returned. See the next section for details.
 
 For guidance on selecting the right configuration access patterns and reader methods, check out <doc:Choosing-access-patterns> and <doc:Choosing-reader-methods>.
 
@@ -36,10 +32,11 @@ let timeout = config.double(forKey: "http.timeout", default: 30.0)
 ```
 
 This produces log entries showing:
-- Which configuration keys were accessed.
-- What values were returned (with secret values redacted).
+
+- Which configuration keys the code accessed.
+- What values the provider returned (with secret values redacted).
 - Which provider supplied the value.
-- Whether default values were used.
+- Whether the reader used default values.
 - The location of the code reading the config value.
 - The timestamp of the access.
 
@@ -70,17 +67,60 @@ tail -f /var/log/myapp/config-access.log
 ### Error handling
 
 #### Provider errors
+
 If any provider throws an error during lookup:
-- **Required methods** (`getRequired*`): Error is immediately thrown to the caller.
-- **Optional methods** (`get*` with or without defaults): Error is handled gracefully, nil or default value is returned.
+
+- **Required methods** (`requiredString`, etc.): The method immediately throws the error to the caller.
+- **Optional methods** (with or without defaults): The library handles the error gracefully, returning `nil` or the default value.
 
 > Tip: Even when an error gets handled gracefully, you can log it using an ``AccessReporter``.
 
 #### Missing values
+
 When no provider has the requested value:
+
 - **Methods with defaults**: Return the provided default value.
-- **Methods without defaults**: Return nil.
+- **Methods without defaults**: Return `nil`.
 - **Required methods**: Throw an error.
+
+#### File not found errors
+
+File-based providers (``FileProvider``, ``ReloadingFileProvider``, ``DirectoryFilesProvider``, ``EnvironmentVariablesProvider`` with file path) can throw "file not found" errors when expected configuration files don't exist.
+
+Common scenarios and solutions:
+
+**Optional configuration files:**
+```swift
+// Problem: App crashes when optional config file is missing
+let provider = try await FileProvider<JSONSnapshot>(filePath: "/etc/optional-config.json")
+
+// Solution: Use allowMissing parameter
+let provider = try await FileProvider<JSONSnapshot>(
+    filePath: "/etc/optional-config.json",
+    allowMissing: true
+)
+```
+
+**Environment-specific files:**
+```swift
+// Different environments may have different config files
+let configPath = "/etc/\(environment)/config.json"
+let provider = try await FileProvider<JSONSnapshot>(
+    filePath: configPath,
+    allowMissing: true  // Gracefully handle missing env-specific configs
+)
+```
+
+**Container startup issues:**
+```swift
+// Config files might not be ready when container starts
+let provider = try await ReloadingFileProvider<JSONSnapshot>(
+    filePath: "/mnt/config/app.json",
+    allowMissing: true  // Allow startup with empty config, load when available
+)
+```
+
+> Important: The `allowMissing` parameter only affects missing files or directories. Files with syntax errors (invalid JSON, YAML, and so on) will still throw parsing errors.
 
 ### Reloading provider troubleshooting
 
@@ -88,8 +128,8 @@ When no provider has the requested value:
 
 If your reloading provider isn't detecting file changes:
 
-1. **Check ServiceGroup**: Ensure the provider is running in a ServiceGroup.
-2. **Enable verbose logging**: The built-in providers use Swift Log for detailed logging, which can help spot the underlying issue.
+1. **Check ServiceGroup**: Run the provider in a `ServiceGroup`.
+2. **Enable verbose logging**: The built-in providers use Swift Log for detailed logging, which can help spot issues.
 3. **Verify file path**: Confirm the file path is correct, the file exists, and file permissions are correct.
 4. **Check poll interval**: Consider if your poll interval is appropriate for your use case.
 

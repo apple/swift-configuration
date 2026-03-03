@@ -20,10 +20,7 @@ swift run {target-name}
 
 ## Examples catalog
 
-### Hello world
-
-These examples introduce fundamental Swift Configuration concepts and are suitable for developers new to the library.
-
 | Example | Description | Key Concepts |
 |---------|-------------|--------------|
 | [`hello-world-cli-example`](hello-world-cli-example/) | Simple CLI demonstrating provider hierarchy and basic configuration reading | Provider priority, environment variables, command-line arguments, type-safe reading |
+| [`reloading-example`](reloading-example/) | Simple web server demonstrating live reloading from a Kubernetes configMap | Live-reloading, file providers, multi-phase initialization |

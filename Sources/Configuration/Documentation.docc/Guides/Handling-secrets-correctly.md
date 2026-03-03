@@ -4,7 +4,7 @@ Protect sensitive configuration values from accidental disclosure in logs and de
 
 ## Overview
 
-Swift Configuration provides built-in support for marking sensitive values as secrets. Secret values are automatically redacted by built-in access reporters and other components to prevent accidental disclosure of sensitive information like API keys, passwords, and tokens.
+Swift Configuration provides built-in support for marking sensitive values as secrets. Access reporters automatically redact secret values to prevent accidental disclosure of API keys, passwords, and other sensitive information.
 
 ### Marking values as secret when reading
 
@@ -56,7 +56,7 @@ Use ``SecretsSpecifier`` to automatically mark values as secret based on keys or
 
 #### Mark all values as secret
 
-The following example marks all configuration read by the ``DirectoryFilesProvider`` as secret:
+The following example marks all configuration that the ``DirectoryFilesProvider`` reads as secret:
 
 ```swift
 let provider = DirectoryFilesProvider(
@@ -78,7 +78,7 @@ let provider = EnvironmentVariablesProvider(
 #### Dynamic secret detection
 
 The following example marks keys as secret based on the closure you provide.
-In this case, keys that contain `password`, `secret`, or `token` are all marked as secret:
+In this case, the library marks keys that contain `password`, `secret`, or `token` as secret:
 
 ```swift
 let provider = FileProvider<JSONSnapshot>(
@@ -93,7 +93,7 @@ let provider = FileProvider<JSONSnapshot>(
 
 #### No secret values
 
-The following example asserts that none of the values returned from the provider are considered secret:
+The following example asserts that the provider doesn't return any secret values:
 
 ```swift
 let provider = FileProvider<JSONSnapshot>(
@@ -114,11 +114,11 @@ let secretValue = ConfigValue("sensitive-data", isSecret: true)
 let regularValue = ConfigValue("public-data", isSecret: false)
 ```
 
-Set the `isSecret` property to `true` when your provider knows the values are read from a secrets store and must not be logged.
+Set the `isSecret` property to `true` when your provider reads the values from a secrets store and must not log them.
 
-### How secret values are protected
+### How the library protects secret values
 
-Secret values are automatically handled by:
+The library automatically handles secret values with:
 
 - **``AccessLogger``** and **``FileAccessLogger``**: Redact secret values in logs.
 - **Provider descriptions**: Show `<REDACTED>` instead of actual values.
@@ -134,11 +134,8 @@ print(provider)
 ### Best practices
 
 1. **Mark all sensitive data as secret**: API keys, passwords, tokens, private keys, connection strings.
-
 2. **Use provider-level specification** when you know which keys are always secret.
-
 3. **Use reader-level marking** for context-specific secrets or when the same key might be secret in some contexts but not others.
-
-4. **Be conservative**: When in doubt, mark values as secret - it's safer than accidentally leaking sensitive data.
+4. **Be conservative**: When in doubt, mark values as secret. It's safer than accidentally leaking sensitive data.
 
 For additional guidance on configuration security and overall best practices, see <doc:Best-practices>. To debug issues with secret redaction in access logs, check out <doc:Troubleshooting>. When selecting between required, optional, and default method variants for secret values, refer to <doc:Choosing-reader-methods>.

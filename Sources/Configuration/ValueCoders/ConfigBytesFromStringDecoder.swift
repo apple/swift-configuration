@@ -34,6 +34,7 @@ import Foundation
 /// let decoder: ConfigBytesFromStringDecoder = .base64
 /// let bytes = decoder.decode("SGVsbG8gV29ybGQ=") // "Hello World" in base64
 /// ```
+@available(Configuration 1.0, *)
 public protocol ConfigBytesFromStringDecoder: Sendable {
 
     /// Decodes a string value into an array of bytes.
@@ -52,12 +53,14 @@ public protocol ConfigBytesFromStringDecoder: Sendable {
 ///
 /// This decoder interprets string configuration values as base64-encoded data
 /// and converts them to their binary representation.
+@available(Configuration 1.0, *)
 public struct ConfigBytesFromBase64StringDecoder: Sendable {
 
     /// Creates a new base64 decoder.
     public init() {}
 }
 
+@available(Configuration 1.0, *)
 extension ConfigBytesFromBase64StringDecoder: ConfigBytesFromStringDecoder {
     // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
     public func decode(_ value: String) -> [UInt8]? {
@@ -68,6 +71,7 @@ extension ConfigBytesFromBase64StringDecoder: ConfigBytesFromStringDecoder {
     }
 }
 
+@available(Configuration 1.0, *)
 extension ConfigBytesFromStringDecoder where Self == ConfigBytesFromBase64StringDecoder {
 
     /// A decoder that interprets string values as base64-encoded data.
@@ -85,12 +89,14 @@ extension ConfigBytesFromStringDecoder where Self == ConfigBytesFromBase64String
 /// The decoder expects strings with an even number of characters, where each
 /// pair of characters represents one byte. For example, "48656C6C6F" represents
 /// the bytes for "Hello".
+@available(Configuration 1.0, *)
 public struct ConfigBytesFromHexStringDecoder: Sendable {
 
     /// Creates a new hexadecimal decoder.
     public init() {}
 }
 
+@available(Configuration 1.0, *)
 extension ConfigBytesFromHexStringDecoder: ConfigBytesFromStringDecoder {
     // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
     public func decode(_ value: String) -> [UInt8]? {
@@ -113,6 +119,7 @@ extension ConfigBytesFromHexStringDecoder: ConfigBytesFromStringDecoder {
     }
 }
 
+@available(Configuration 1.0, *)
 extension ConfigBytesFromStringDecoder where Self == ConfigBytesFromHexStringDecoder {
 
     /// A decoder that interprets string values as hexadecimal-encoded data.

@@ -24,7 +24,7 @@ variable name above `SERVER_PORT`.
 
 ### Reading from a JSON configuration file
 
-You can store multiple configuration values together in a JSON file and read them from the fileystem using ``FileProvider`` with ``JSONSnapshot``.
+You can store multiple configuration values together in a JSON file and read them from the filesystem using ``FileProvider`` with ``JSONSnapshot``.
 The following example creates a ``ConfigReader`` for a JSON file at the path `/etc/config.json`, and reads a url and port
 number collected as properties of the `database` JSON object:
 
@@ -53,7 +53,7 @@ The matching JSON for this configuration might look like:
 
 ### Reading from a directory of secret files
 
-Use the ``DirectoryFilesProvider`` to read multiple values collected together in a directory on the fileystem, each 
+Use the ``DirectoryFilesProvider`` to read multiple values collected together in a directory on the filesystem, each
 in a separate file. The default directory key encoder uses a hyphen in the filename to separate key components.
 The following example uses the directory `/run/secrets` as a base, and reads the file `database-password` as 
 the key `database.password`:
@@ -77,12 +77,77 @@ such as Kubernetes secrets mounted into a container's filesystem.
 
 > Tip: For comprehensive guidance on handling secrets securely, see <doc:Handling-secrets-correctly>.
 
+### Handling optional configuration files
+
+File-based providers support an `allowMissing` parameter to control whether the provider throws an error for missing files or treats them as empty configuration. This is useful when configuration files are optional.
+
+When `allowMissing` is `false` (the default), missing files throw an error:
+
+```swift
+import Configuration
+
+// This will throw an error if config.json doesn't exist
+let config = ConfigReader(
+    provider: try await FileProvider<JSONSnapshot>(
+        filePath: "/etc/config.json",
+        allowMissing: false  // This is the default
+    )
+)
+```
+
+When `allowMissing` is `true`, the provider treats missing files as empty configuration:
+
+```swift
+import Configuration
+
+// This won't throw if config.json is missing - treats it as empty
+let config = ConfigReader(
+    provider: try await FileProvider<JSONSnapshot>(
+        filePath: "/etc/config.json",
+        allowMissing: true
+    )
+)
+
+// Returns the default value if the file is missing
+let port = config.int(forKey: "server.port", default: 8080)
+```
+
+The same applies to other file-based providers:
+
+```swift
+// Optional secrets directory
+let secretsConfig = ConfigReader(
+    provider: try await DirectoryFilesProvider(
+        directoryPath: "/run/secrets",
+        allowMissing: true
+    )
+)
+
+// Optional environment file
+let envConfig = ConfigReader(
+    provider: try await EnvironmentVariablesProvider(
+        environmentFilePath: "/etc/app.env",
+        allowMissing: true
+    )
+)
+
+// Optional reloading configuration
+let reloadingConfig = ConfigReader(
+    provider: try await ReloadingFileProvider<YAMLSnapshot>(
+        filePath: "/etc/dynamic-config.yaml",
+        allowMissing: true
+    )
+)
+```
+
+> Important: The `allowMissing` parameter only affects missing files. Malformed files, such as invalid JSON and YAML syntax errors will still throw parsing errors regardless of this setting.
+
 ### Setting up a fallback hierarchy
 
 Use multiple providers together to provide a configuration hierarchy that can override values at different levels.
 The following example uses both an environment variable provider and a JSON provider together, with values from 
 environment variables overriding values from the JSON file.
-In this example, the defaults are provided using an ``InMemoryProvider``, which are only read if the environment 
+In this example, an ``InMemoryProvider`` provides the defaults, which the reader only consults if the environment
 variable or the JSON key don't exist:
 
 ```swift
@@ -156,10 +221,10 @@ For details on reloading providers and ServiceLifecycle integration, see <doc:Us
 
 ### Prefixing configuration keys
 
-In most cases, the configuration key provided by the reader can be directly used by the provided, for
-example `http.timeout` used as the environment variable name `HTTP_TIMEOUT`.
+In most cases, the provider can directly use the configuration key from the reader, for
+example using `http.timeout` as the environment variable name `HTTP_TIMEOUT`.
 
-Sometimes you might need to transform the incoming keys in some way, before they get delivered to the provider.
+Sometimes you might need to transform the incoming keys in some way before the provider receives them.
 A common example is prefixing each key with a constant prefix, for example `myapp`, turning the key `http.timeout`
 to `myapp.http.timeout`.
 
@@ -182,5 +247,5 @@ let config = ConfigReader(provider: prefixedProvider)
 let databaseURL = config.string(forKey: "database.url", default: "localhost")
 ```
 
-For comprehensive configuration guidance and best practices, see <doc:Best-practices>. 
+For more configuration guidance, see <doc:Best-practices>.
 To understand different reader method variants, check out <doc:Choosing-reader-methods>.

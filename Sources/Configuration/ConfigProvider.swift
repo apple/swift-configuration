@@ -16,27 +16,31 @@
 ///
 /// Configuration providers offer three access patterns for retrieving values:
 ///
-/// 1. **Get methods**: Synchronous access to current values.
-/// 2. **Fetch methods**: Asynchronous access that retrieves fresh values from remote sources.
-/// 3. **Watch methods**: Reactive access that provides an async sequence of value updates.
+/// 1. **Get methods**: Synchronous access to cached, in-memory values.
+/// 2. **Fetch methods**: Asynchronous access that retrieves fresh values from the remote source.
+/// 3. **Watch methods**: Reactive access that provides an async sequence of updates.
+///
+/// For more details on the patterns, check out <doc:Choosing-access-patterns>.
 ///
 /// ## Individual value access
 ///
 /// Access specific configuration values using these methods:
-/// - ``ConfigProvider/value(forKey:type:)`` - Get current value synchronously.
-/// - ``ConfigProvider/fetchValue(forKey:type:)`` - Fetch latest value asynchronously.
-/// - ``ConfigProvider/watchValue(forKey:type:updatesHandler:)`` - Watch for value changes.
+/// - ``ConfigProvider/value(forKey:type:)`` - Get the current value synchronously.
+/// - ``ConfigProvider/fetchValue(forKey:type:)`` - Fetch the latest value asynchronously.
+/// - ``ConfigProvider/watchValue(forKey:type:updatesHandler:)`` - Watch for value changes,
+///   receiving the current value first.
 ///
 /// ## Snapshot access
 ///
 /// Access immutable snapshots of the provider's state:
-/// - ``ConfigProvider/snapshot()`` - Get current snapshot.
-/// - ``ConfigProvider/watchSnapshot(updatesHandler:)`` - Watch for snapshot changes.
+/// - ``ConfigProvider/snapshot()`` - Get the current snapshot.
+/// - ``ConfigProvider/watchSnapshot(updatesHandler:)`` - Watch for snapshot changes,
+///   receiving the current snapshot first.
 ///
 /// ## Implementation guidance
 ///
-/// **Simple providers**: Implement only the `get` methods and use these convenience methods
-/// for the other access patterns:
+/// **Immutable providers**: Implement only the synchronous methods and use these
+/// convenience methods for the other access patterns:
 /// - ``ConfigProvider/watchValueFromValue(forKey:type:updatesHandler:)``
 /// - ``ConfigProvider/watchSnapshotFromSnapshot(updatesHandler:)``
 ///
@@ -45,6 +49,9 @@
 ///
 /// **Dynamic providers**: Implement `watch` methods to emit real-time updates from
 /// polling, file system monitoring, or other change detection mechanisms.
+///
+/// For a comprehensive guide on implementing your own custom provider,
+/// see <doc:Implementing-a-provider>.
 @available(Configuration 1.0, *)
 public protocol ConfigProvider: Sendable {
 
@@ -97,11 +104,11 @@ public protocol ConfigProvider: Sendable {
     ///   - updatesHandler: The closure that processes the async sequence of value updates.
     /// - Throws: Provider-specific errors or errors thrown by the handler closure.
     /// - Returns: The value returned by the closure.
-    func watchValue<Return>(
+    func watchValue<Return: ~Copyable>(
         forKey key: AbsoluteConfigKey,
         type: ConfigType,
         updatesHandler: (
-            ConfigUpdatesAsyncSequence<Result<LookupResult, any Error>, Never>
+            _ updates: ConfigUpdatesAsyncSequence<Result<LookupResult, any Error>, Never>
         ) async throws -> Return
     ) async throws -> Return
 
@@ -128,8 +135,8 @@ public protocol ConfigProvider: Sendable {
     /// - Parameter updatesHandler: The closure that processes the asynchronous sequence of snapshot updates.
     /// - Throws: Provider-specific errors or errors thrown by the handler closure.
     /// - Returns: The value returned by the closure.
-    func watchSnapshot<Return>(
-        updatesHandler: (ConfigUpdatesAsyncSequence<any ConfigSnapshot, Never>) async throws -> Return
+    func watchSnapshot<Return: ~Copyable>(
+        updatesHandler: (_ updates: ConfigUpdatesAsyncSequence<any ConfigSnapshot, Never>) async throws -> Return
     ) async throws -> Return
 }
 
@@ -161,6 +168,16 @@ public protocol ConfigSnapshot: Sendable {
 }
 
 /// The result of looking up a configuration value in a provider.
+///
+/// Providers return this result from value lookup methods, containing both the
+/// encoded key used for the lookup and the value found:
+///
+/// ```swift
+/// let result = try provider.value(forKey: key, type: .string)
+/// if let value = result.value {
+///     print("Found: \(value)")
+/// }
+/// ```
 @available(Configuration 1.0, *)
 public struct LookupResult: Sendable, Equatable, Hashable {
 
@@ -328,7 +345,7 @@ public struct LookupResult: Sendable, Equatable, Hashable {
         /// The actual type of the configuration value.
         var actualType: ConfigType
 
-        /// The type that was requested.
+        /// The requested type.
         var requestedType: ConfigType
     }
 
@@ -435,9 +452,14 @@ public struct LookupResult: Sendable, Equatable, Hashable {
 
 /// A configuration value that wraps content with metadata.
 ///
-/// Configuration values include the actual content and a flag indicating whether
-/// the value contains sensitive information. Secret values are protected from
-/// accidental disclosure in logs and debug output.
+/// Configuration values pair raw content with a flag indicating whether the value
+/// contains sensitive information. Secret values are protected from accidental
+/// disclosure in logs and debug output:
+///
+/// ```swift
+/// let apiKey = ConfigValue(.string("sk-abc123"), isSecret: true)
+/// print(apiKey)  // Prints: [string: <REDACTED>]
+/// ```
 @available(Configuration 1.0, *)
 public struct ConfigValue: Sendable, Equatable, Hashable {
 

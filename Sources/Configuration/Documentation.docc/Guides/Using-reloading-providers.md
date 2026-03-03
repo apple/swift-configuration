@@ -20,6 +20,7 @@ import ServiceLifecycle
 
 let provider = try await ReloadingFileProvider<JSONSnapshot>(
     filePath: "/etc/config.json",
+    allowMissing: true,  // Optional: treat missing file as empty config
     pollInterval: .seconds(15)
 )
 
@@ -78,7 +79,7 @@ try await config.watchString(
 
 #### Configuration snapshots
 
-The following example reads the `database.host` and `database.password` key with the guarantee that they are read from the same update of the reloading file:
+The following example reads the `database.host` and `database.password` key with the guarantee that you read them from the same update of the reloading file:
 
 ```swift
 try await config.watchSnapshot { updates in
@@ -95,8 +96,60 @@ try await config.watchSnapshot { updates in
 | Feature | Static providers | Reloading providers |
 |---------|------------------|---------------------|
 | **File reading** | Load once at startup | Reloading on change |
-| **Service lifecycle** | Not required | Conforms to `Service` and must run in a `ServiceGroup` |
+| **Service lifecycle** | Not required | Conforms to `Service` and you must run in a `ServiceGroup` |
 | **Configuration updates** | Require restart | Automatic reload |
+
+### Handling missing files during reloading
+
+Reloading providers support the `allowMissing` parameter to handle cases where configuration files might be temporarily missing or optional. This is useful for:
+
+- Optional configuration files that might not exist in all environments.
+- Configuration files that the system creates or removes dynamically.
+- Graceful handling of file system issues during service startup.
+
+#### Missing file behavior
+
+When `allowMissing` is `false` (the default), missing files cause errors:
+
+```swift
+let provider = try await ReloadingFileProvider<JSONSnapshot>(
+    filePath: "/etc/config.json",
+    allowMissing: false  // Default: throw error if file is missing
+)
+// Will throw an error if config.json doesn't exist
+```
+
+When `allowMissing` is `true`, the provider treats missing files as empty configuration:
+
+```swift
+let provider = try await ReloadingFileProvider<JSONSnapshot>(
+    filePath: "/etc/config.json",
+    allowMissing: true  // Treat missing file as empty config
+)
+// Won't throw if config.json is missing - uses empty config instead
+```
+
+#### Behavior during reloading
+
+If a file becomes missing after the provider starts, the behavior depends on the `allowMissing` setting:
+
+- **`allowMissing: false`**: The provider keeps the last known configuration and logs an error.
+- **`allowMissing: true`**: The provider switches to empty configuration.
+
+In both cases, when a valid file comes back, the provider will load it and recover.
+
+```swift
+// Example: File gets deleted during runtime
+try await config.watchString(forKey: "database.host", default: "localhost") { updates in
+    for await host in updates {
+        // With allowMissing: true, this will receive "localhost" when file is removed
+        // With allowMissing: false, this keeps the last known value
+        print("Database host: \(host)")
+    }
+}
+```
+
+> Important: The `allowMissing` parameter only affects missing files. Malformed files will still cause parsing errors regardless of this setting.
 
 ### Advanced features
 
@@ -145,5 +198,5 @@ let jsonProvider = try await ReloadingFileProvider<JSONSnapshot>(
    let timeout = config.double(forKey: "timeout", default: 60.0)
    ```
 
-For guidance on choosing between get, fetch, and watch access patterns with reloading providers, see <doc:Choosing-access-patterns>. For troubleshooting reloading provider issues, check out <doc:Troubleshooting>. To learn about in-memory providers as an alternative, see <doc:Using-in-memory-providers>.
+For guidance on choosing between get, fetch, and watch access patterns with reloading providers, see <doc:Choosing-access-patterns>. For troubleshooting reloading provider issues, check out <doc:Troubleshooting>. To learn about in-memory providers as an alternative, see <doc:Using-in-memory-providers>. If you need to create your own reloading provider for a custom data source, see <doc:Implementing-a-provider>.
 

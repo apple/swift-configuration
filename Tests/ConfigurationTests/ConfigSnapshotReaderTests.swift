@@ -27,10 +27,9 @@ struct ConfigSnapshotReaderTests {
             ]
         )
         let config = ConfigReader(provider: provider)
-        try config.withSnapshot { snapshot in
-            try #require(snapshot.string(forKey: "http.stuff", default: "test") == "test")
-            try #require(snapshot.string(forKey: "http.client.user-agent") == "Config/1.0 (Test)")
-        }
+        let snapshot = config.snapshot()
+        try #require(snapshot.string(forKey: "http.stuff", default: "test") == "test")
+        try #require(snapshot.string(forKey: "http.client.user-agent") == "Config/1.0 (Test)")
     }
 
     @available(Configuration 1.0, *)
@@ -60,25 +59,9 @@ struct ConfigSnapshotReaderTests {
             ]
         )
         let config = ConfigReader(provider: provider)
-        config.withSnapshot { snapshot in
-            #expect(snapshot.string(forKey: "user-agent") == nil)
-            let scoped = snapshot.scoped(to: "http.client")
-            #expect(scoped.string(forKey: "user-agent") == "Config/1.0 (Test)")
-        }
-    }
-
-    @available(Configuration 1.0, *)
-    @Test func scopingCustomDecoder() throws {
-        let provider = InMemoryProvider(
-            name: "test",
-            values: [
-                "http.client.user-agent": "Config/1.0 (Test)"
-            ]
-        )
-        let config = ConfigReader(provider: provider)
-        config.withSnapshot { snapshot in
-            let scoped = snapshot.scoped(to: "http", keyDecoderOverride: .colonSeparated)
-            #expect(scoped.string(forKey: "client:user-agent") == "Config/1.0 (Test)")
-        }
+        let snapshot = config.snapshot()
+        #expect(snapshot.string(forKey: "user-agent") == nil)
+        let scoped = snapshot.scoped(to: "http.client")
+        #expect(scoped.string(forKey: "user-agent") == "Config/1.0 (Test)")
     }
 }

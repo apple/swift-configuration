@@ -4,20 +4,18 @@ Follow these principles to make your code easily configurable and composable wit
 
 ## Overview
 
-When designing configuration for your Swift libraries and applications, following established patterns helps create
-a consistent and maintainable experience for developers. These best practices ensure your configuration integrates 
-well with the broader Swift ecosystem.
+When designing configuration for Swift libraries and applications, follow these patterns to create consistent, maintainable code that integrates well with the Swift ecosystem.
 
 ### Document configuration keys
 
-Include comprehensive documentation about what configuration keys your library reads. For each key, document:
+Include thorough documentation about what configuration keys your library reads. For each key, document:
 
-- The key name and its hierarchical structure
-- The expected data type
-- Whether the key is required or optional
-- Default values when applicable
-- Valid value ranges or constraints
-- Usage examples
+- The key name and its hierarchical structure.
+- The expected data type.
+- Whether the key is required or optional.
+- Default values when applicable.
+- Valid value ranges or constraints.
+- Usage examples.
 
 ```swift
 public struct HTTPClientConfiguration {
@@ -38,8 +36,7 @@ public struct HTTPClientConfiguration {
 
 ### Use sensible defaults
 
-Provide reasonable default values whenever possible to make your library work without extensive configuration. 
-This reduces the barrier to adoption and ensures your library works out of the box for common use cases.
+Provide reasonable default values to make your library work without extensive configuration.
 
 ```swift
 // Good: Provides sensible defaults
@@ -114,8 +111,7 @@ For more details, check out <doc:Choosing-reader-methods>.
 
 ### Validate configuration values
 
-Consider validating configuration values and throwing meaningful errors if they're invalid. This helps 
-developers catch configuration issues early.
+Validate configuration values and throw meaningful errors for invalid input to catch configuration issues early.
 
 ```swift
 public init(config: ConfigReader) throws {
@@ -134,7 +130,7 @@ public init(config: ConfigReader) throws {
 }
 ```
 
-### Choosing provider types
+### Choose provider types
 
 #### When to use reloading providers
 
@@ -151,7 +147,17 @@ Check out <doc:Using-reloading-providers> to learn more.
 Use static providers when configuration doesn't change during runtime:
 
 - Containerized applications with immutable configuration.
-- Applications where configuration is set once at startup.
+- Applications where you set configuration once at startup.
 
-For help choosing between different access patterns and reader method variants, see <doc:Choosing-access-patterns> 
+#### When to create custom providers
+
+If none of the providers (built-in or community ones) meet your needs, you can implement your own custom provider. Common scenarios include:
+
+- Integrating with external configuration services.
+- Reading from a custom file format.
+- Bridging an existing configuration system.
+
+For detailed guidance on implementing custom providers, see <doc:Implementing-a-provider>.
+
+For help choosing between different access patterns and reader method variants, see <doc:Choosing-access-patterns>
 and <doc:Choosing-reader-methods>. For troubleshooting configuration issues, refer to <doc:Troubleshooting>.

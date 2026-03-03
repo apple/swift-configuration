@@ -10,8 +10,8 @@ let package = Package(
     dependencies: [
         .package(
             url: "https://github.com/apple/swift-configuration",
-            .upToNextMinor(from: "0.2.0"),
-            traits: [.defaults, "CommandLineArgumentsSupport"]
+            from: "1.0.0",
+            traits: [.defaults, "CommandLineArguments"]
         )
     ],
     targets: [

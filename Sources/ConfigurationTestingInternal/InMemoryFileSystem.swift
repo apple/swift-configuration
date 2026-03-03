@@ -100,9 +100,9 @@ package final class InMemoryFileSystem: Sendable {
 
 @available(Configuration 1.0, *)
 extension InMemoryFileSystem: CommonProviderFileSystem {
-    func listFileNames(atPath directoryPath: FilePath) async throws -> [String] {
+    func listFileNames(atPath directoryPath: FilePath) async throws -> [String]? {
         let prefixComponents = directoryPath.components
-        return files.withLock { files in
+        let matchingFiles = files.withLock { files in
             files
                 .filter { (filePath, _) in
                     let components = filePath.components
@@ -113,29 +113,28 @@ extension InMemoryFileSystem: CommonProviderFileSystem {
                 }
                 .compactMap { $0.key.lastComponent?.string }
         }
+        if matchingFiles.isEmpty {
+            return nil
+        }
+        return matchingFiles
     }
 
-    func lastModifiedTimestamp(atPath filePath: FilePath) async throws -> Date {
-        try files.withLock { files in
+    func lastModifiedTimestamp(atPath filePath: FilePath) async throws -> Date? {
+        files.withLock { files in
             guard let data = files[filePath] else {
-                throw LocalCommonProviderFileSystem.FileSystemError.fileReadError(
-                    filePath: filePath,
-                    underlyingError: TestError.fileNotFound(filePath: filePath)
-                )
+                return nil
             }
             return data.lastModifiedTimestamp
         }
     }
 
-    func fileContents(atPath filePath: FilePath) async throws -> Data {
-        let data = try files.withLock { files in
-            guard let data = files[filePath] else {
-                throw LocalCommonProviderFileSystem.FileSystemError.fileReadError(
-                    filePath: filePath,
-                    underlyingError: TestError.fileNotFound(filePath: filePath)
-                )
-            }
-            return data
+    func fileContents(atPath filePath: FilePath) async throws -> Data? {
+        guard
+            let data = files.withLock({ files -> FileInfo? in
+                files[filePath]
+            })
+        else {
+            return nil
         }
         switch data.data {
         case .file(let data):
@@ -145,13 +144,10 @@ extension InMemoryFileSystem: CommonProviderFileSystem {
         }
     }
 
-    func resolveSymlinks(atPath filePath: FilePath) async throws -> FilePath {
-        func locked_resolveSymlinks(at filePath: FilePath, files: inout [FilePath: FileInfo]) throws -> FilePath {
+    func resolveSymlinks(atPath filePath: FilePath) async throws -> FilePath? {
+        func locked_resolveSymlinks(at filePath: FilePath, files: inout [FilePath: FileInfo]) throws -> FilePath? {
             guard let data = files[filePath] else {
-                throw LocalCommonProviderFileSystem.FileSystemError.fileReadError(
-                    filePath: filePath,
-                    underlyingError: TestError.fileNotFound(filePath: filePath)
-                )
+                return nil
             }
             switch data.data {
             case .file:

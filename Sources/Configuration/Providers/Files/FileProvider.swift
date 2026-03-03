@@ -61,7 +61,7 @@ import Foundation
 public struct FileProvider<Snapshot: FileConfigSnapshot>: Sendable {
 
     /// A snapshot of the internal state.
-    private let _snapshot: Snapshot
+    private let _snapshot: any ConfigSnapshot & CustomStringConvertible & CustomDebugStringConvertible
 
     /// Creates a file provider that reads from the specified file path.
     ///
@@ -72,16 +72,22 @@ public struct FileProvider<Snapshot: FileConfigSnapshot>: Sendable {
     ///   - snapshotType: The type of snapshot to create from the file contents.
     ///   - parsingOptions: Options used by the snapshot to parse the file data.
     ///   - filePath: The path to the configuration file to read.
-    /// - Throws: If the file cannot be read or if snapshot creation fails.
+    ///   - allowMissing: A flag controlling how the provider handles a missing file.
+    ///     - When `false` (the default), if the file is missing or malformed, throws an error.
+    ///     - When `true`, if the file is missing, treats it as empty. Malformed files still throw an error.
+    /// - Throws: If snapshot creation fails or if the file is malformed. Whether an error is thrown
+    ///   when the file is missing is controlled by the `allowMissing` parameter.
     public init(
         snapshotType: Snapshot.Type = Snapshot.self,
         parsingOptions: Snapshot.ParsingOptions = .default,
-        filePath: FilePath
+        filePath: FilePath,
+        allowMissing: Bool = false
     ) async throws {
         try await self.init(
             snapshotType: snapshotType,
             parsingOptions: parsingOptions,
             filePath: filePath,
+            allowMissing: allowMissing,
             fileSystem: LocalCommonProviderFileSystem()
         )
     }
@@ -92,13 +98,19 @@ public struct FileProvider<Snapshot: FileConfigSnapshot>: Sendable {
     /// and creates a snapshot from that file.
     ///
     /// ## Configuration keys
+    ///
     /// - `filePath` (string, required): The path to the configuration file to read.
+    /// - `allowMissing` (bool, optional, default: false): A flag controlling how
+    ///   the provider handles a missing file. When `false` (the default), if the file
+    ///   is missing or malformed, throws an error. When `true`, if the file is missing,
+    ///   treats it as empty. Malformed files still throw an error.
     ///
     /// - Parameters:
     ///   - snapshotType: The type of snapshot to create from the file contents.
     ///   - parsingOptions: Options used by the snapshot to parse the file data.
     ///   - config: A configuration reader that contains the required configuration keys.
-    /// - Throws: If the `filePath` key is missing, if the file cannot be read, or if snapshot creation fails.
+    /// - Throws: If snapshot creation fails or if the file is malformed. Whether an error is thrown
+    ///   when the file is missing is controlled by the `allowMissing` configuration value.
     public init(
         snapshotType: Snapshot.Type = Snapshot.self,
         parsingOptions: Snapshot.ParsingOptions = .default,
@@ -107,7 +119,43 @@ public struct FileProvider<Snapshot: FileConfigSnapshot>: Sendable {
         try await self.init(
             snapshotType: snapshotType,
             parsingOptions: parsingOptions,
-            filePath: config.requiredString(forKey: "filePath", as: FilePath.self)
+            filePath: config.requiredString(forKey: "filePath", as: FilePath.self),
+            allowMissing: config.bool(forKey: "allowMissing", default: false)
+        )
+    }
+
+    /// Creates a file provider using a file path from a configuration reader.
+    ///
+    /// This initializer reads the file path from the provided configuration reader
+    /// and creates a snapshot from that file.
+    ///
+    /// ## Configuration keys
+    ///
+    /// - `filePath` (string, required): The path to the configuration file to read.
+    /// - `allowMissing` (bool, optional, default: false): A flag controlling how
+    ///   the provider handles a missing file. When `false` (the default), if the file
+    ///   is missing or malformed, throws an error. When `true`, if the file is missing,
+    ///   treats it as empty. Malformed files still throw an error.
+    ///
+    /// - Parameters:
+    ///   - snapshotType: The type of snapshot to create from the file contents.
+    ///   - parsingOptions: Options used by the snapshot to parse the file data.
+    ///   - config: A configuration reader that contains the required configuration keys.
+    ///   - fileSystem: The file system implementation to use for reading the file.
+    /// - Throws: If snapshot creation fails or if the file is malformed. Whether an error is thrown
+    ///   when the file is missing is controlled by the `allowMissing` configuration value.
+    internal init(
+        snapshotType: Snapshot.Type = Snapshot.self,
+        parsingOptions: Snapshot.ParsingOptions = .default,
+        config: ConfigReader,
+        fileSystem: some CommonProviderFileSystem
+    ) async throws {
+        try await self.init(
+            snapshotType: snapshotType,
+            parsingOptions: parsingOptions,
+            filePath: config.requiredString(forKey: "filePath", as: FilePath.self),
+            allowMissing: config.bool(forKey: "allowMissing", default: false),
+            fileSystem: fileSystem
         )
     }
 
@@ -120,20 +168,33 @@ public struct FileProvider<Snapshot: FileConfigSnapshot>: Sendable {
     ///   - snapshotType: The type of snapshot to create from the file contents.
     ///   - parsingOptions: Options used by the snapshot to parse the file data.
     ///   - filePath: The path to the configuration file to read.
+    ///   - allowMissing: A flag controlling how the provider handles a missing file.
+    ///     - When `false` (the default), if the file is missing or malformed, throws an error.
+    ///     - When `true`, if the file is missing, treats it as empty. Malformed files still throw an error.
     ///   - fileSystem: The file system implementation to use for reading the file.
     /// - Throws: If the file cannot be read or if snapshot creation fails.
     internal init(
         snapshotType: Snapshot.Type = Snapshot.self,
         parsingOptions: Snapshot.ParsingOptions,
         filePath: FilePath,
+        allowMissing: Bool,
         fileSystem: some CommonProviderFileSystem
     ) async throws {
         let fileContents = try await fileSystem.fileContents(atPath: filePath)
-        self._snapshot = try snapshotType.init(
-            data: fileContents.bytes,
-            providerName: "FileProvider<\(Snapshot.self)>",
-            parsingOptions: parsingOptions
-        )
+        let providerName = "FileProvider<\(Snapshot.self)>"
+        /// Debug swift 6.2.3 compiler crashes if we shadow fileContents.
+        /// See https://github.com/apple/swift-configuration/pull/151
+        if fileContents != nil {
+            self._snapshot = try snapshotType.init(
+                data: fileContents!.bytes,
+                providerName: providerName,
+                parsingOptions: parsingOptions
+            )
+        } else if allowMissing {
+            self._snapshot = EmptyFileConfigSnapshot(providerName: providerName)
+        } else {
+            throw FileSystemError.fileNotFound(path: filePath)
+        }
     }
 }
 
@@ -177,18 +238,18 @@ extension FileProvider: ConfigProvider {
     }
 
     // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
-    public func watchSnapshot<Return>(
-        updatesHandler: (ConfigUpdatesAsyncSequence<any ConfigSnapshot, Never>) async throws -> Return
+    public func watchSnapshot<Return: ~Copyable>(
+        updatesHandler: (_ updates: ConfigUpdatesAsyncSequence<any ConfigSnapshot, Never>) async throws -> Return
     ) async throws -> Return {
         try await watchSnapshotFromSnapshot(updatesHandler: updatesHandler)
     }
 
     // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
-    public func watchValue<Return>(
+    public func watchValue<Return: ~Copyable>(
         forKey key: AbsoluteConfigKey,
         type: ConfigType,
         updatesHandler: (
-            ConfigUpdatesAsyncSequence<Result<LookupResult, any Error>, Never>
+            _ updates: ConfigUpdatesAsyncSequence<Result<LookupResult, any Error>, Never>
         ) async throws -> Return
     ) async throws -> Return {
         try await watchValueFromValue(forKey: key, type: type, updatesHandler: updatesHandler)

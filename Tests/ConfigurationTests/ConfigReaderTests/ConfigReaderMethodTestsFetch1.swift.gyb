@@ -35,41 +35,31 @@ struct ConfigReaderMethodTestsFetch1 {
         % lower_name = lower_first(name)
         do {
             // Optional - success
-            #expect(try await config.fetch${name}(forKey: ConfigKey(["${lower_name}"])) == Defaults.${lower_name})
             #expect(try await config.fetch${name}(forKey: "${lower_name}") == Defaults.${lower_name})
 
             // Optional - missing
-            #expect(try await config.fetch${name}(forKey: ConfigKey(["absent${name}"])) == nil)
             #expect(try await config.fetch${name}(forKey: "absent${name}") == nil)
 
             // Optional - failing
-            await #expect(throws: TestProvider.TestError.self) { try await config.fetch${name}(forKey: ConfigKey(["failure"])) }
             await #expect(throws: TestProvider.TestError.self) { try await config.fetch${name}(forKey: "failure") }
 
             // Defaulted - success
-            #expect(try await config.fetch${name}(forKey: ConfigKey(["${lower_name}"]), default: Defaults.other${name}) == Defaults.${lower_name})
             #expect(try await config.fetch${name}(forKey: "${lower_name}", default: Defaults.other${name}) == Defaults.${lower_name})
 
             // Defaulted - missing
-            #expect(try await config.fetch${name}(forKey: ConfigKey(["absent${name}"]), default: Defaults.other${name}) == Defaults.other${name})
             #expect(try await config.fetch${name}(forKey: "absent${name}", default: Defaults.other${name}) == Defaults.other${name})
 
             // Defaulted - failing
-            await #expect(throws: TestProvider.TestError.self) { try await config.fetch${name}(forKey: ConfigKey(["failure"]), default: Defaults.other${name}) }
             await #expect(throws: TestProvider.TestError.self) { try await config.fetch${name}(forKey: "failure", default: Defaults.other${name}) }
 
             // Required - success
-            #expect(try await config.fetchRequired${name}(forKey: ConfigKey(["${lower_name}"])) == Defaults.${lower_name})
             #expect(try await config.fetchRequired${name}(forKey: "${lower_name}") == Defaults.${lower_name})
 
             // Required - missing
-            let error1 = await #expect(throws: ConfigError.self) { try await config.fetchRequired${name}(forKey: ConfigKey(["absent${name}"])) }
+            let error1 = await #expect(throws: ConfigError.self) { try await config.fetchRequired${name}(forKey: "absent${name}") }
             #expect(error1 == .missingRequiredConfigValue(AbsoluteConfigKey(["absent${name}"])))
-            let error2 = await #expect(throws: ConfigError.self) { try await config.fetchRequired${name}(forKey: "absent${name}") }
-            #expect(error2 == .missingRequiredConfigValue(AbsoluteConfigKey(["absent${name}"])))
 
             // Required - failing
-            await #expect(throws: TestProvider.TestError.self) { try await config.fetchRequired${name}(forKey: ConfigKey(["failure"])) }
             await #expect(throws: TestProvider.TestError.self) { try await config.fetchRequired${name}(forKey: "failure") }
         }
         % end

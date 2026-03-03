@@ -36,41 +36,31 @@ struct ConfigReaderMethodTestsGet3 {
         % lower_test_suffix = lower_first(test_suffix)
         do {
             // Optional - success
-            #expect(config.stringArray(forKey: ConfigKey(["${lower_test_suffix}"]), as: ${test_type}.self) == Defaults.${lower_test_suffix})
             #expect(config.stringArray(forKey: "${lower_test_suffix}", as: ${test_type}.self) == Defaults.${lower_test_suffix})
 
             // Optional - missing
-            #expect(config.stringArray(forKey: ConfigKey(["absent${test_suffix}"]), as: ${test_type}.self) == nil)
             #expect(config.stringArray(forKey: "absent${test_suffix}", as: ${test_type}.self) == nil)
 
             // Optional - failing
-            #expect(config.stringArray(forKey: ConfigKey(["failure"]), as: ${test_type}.self) == nil)
             #expect(config.stringArray(forKey: "failure", as: ${test_type}.self) == nil)
 
             // Defaulted - success
-            #expect(config.stringArray(forKey: ConfigKey(["${lower_test_suffix}"]), as: ${test_type}.self, default: Defaults.other${test_suffix}) == Defaults.${lower_test_suffix})
             #expect(config.stringArray(forKey: "${lower_test_suffix}", as: ${test_type}.self, default: Defaults.other${test_suffix}) == Defaults.${lower_test_suffix})
 
             // Defaulted - missing
-            #expect(config.stringArray(forKey: ConfigKey(["absent${test_suffix}"]), as: ${test_type}.self, default: Defaults.other${test_suffix}) == Defaults.other${test_suffix})
             #expect(config.stringArray(forKey: "absent${test_suffix}", as: ${test_type}.self, default: Defaults.other${test_suffix}) == Defaults.other${test_suffix})
 
             // Defaulted - failing
-            #expect(config.stringArray(forKey: ConfigKey(["failure"]), as: ${test_type}.self, default: Defaults.other${test_suffix}) == Defaults.other${test_suffix})
             #expect(config.stringArray(forKey: "failure", as: ${test_type}.self, default: Defaults.other${test_suffix}) == Defaults.other${test_suffix})
 
             // Required - success
-            #expect(try config.requiredStringArray(forKey: ConfigKey(["${lower_test_suffix}"]), as: ${test_type}.self) == Defaults.${lower_test_suffix})
             #expect(try config.requiredStringArray(forKey: "${lower_test_suffix}", as: ${test_type}.self) == Defaults.${lower_test_suffix})
 
             // Required - missing
-            let error1 = #expect(throws: ConfigError.self) { try config.requiredStringArray(forKey: ConfigKey(["absent${test_suffix}"]), as: ${test_type}.self) }
+            let error1 = #expect(throws: ConfigError.self) { try config.requiredStringArray(forKey: "absent${test_suffix}", as: ${test_type}.self) }
             #expect(error1 == .missingRequiredConfigValue(AbsoluteConfigKey(["absent${test_suffix}"])))
-            let error2 = #expect(throws: ConfigError.self) { try config.requiredStringArray(forKey: "absent${test_suffix}", as: ${test_type}.self) }
-            #expect(error2 == .missingRequiredConfigValue(AbsoluteConfigKey(["absent${test_suffix}"])))
 
             // Required - failing
-            #expect(throws: TestProvider.TestError.self) { try config.requiredStringArray(forKey: ConfigKey(["failure"]), as: ${test_type}.self) }
             #expect(throws: TestProvider.TestError.self) { try config.requiredStringArray(forKey: "failure", as: ${test_type}.self) }
         }
         % end

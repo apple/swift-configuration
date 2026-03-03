@@ -4,8 +4,7 @@ Learn how to select the right method for reading configuration values based on y
 
 ## Overview
 
-Swift Configuration provides three access patterns for retrieving configuration values, each optimized 
-for different use cases and performance requirements.
+Swift Configuration provides three access patterns for retrieving configuration values, each optimized for different use cases and performance requirements.
 
 The three access patterns are:
 
@@ -44,13 +43,11 @@ Use the "get" pattern when:
 
 - Returns the currently cached value from the provider.
 - No network or I/O operations occur during the call.
-- Values may become stale if the underlying data source changes and the provider is either non-reloading, or 
-  has a long reload interval.
+- Values may become stale if the underlying data source changes and you use either a non-reloading provider or one with a long reload interval.
 
 ### Fetch: Asynchronous fresh access
 
-The "fetch" pattern asynchronously retrieves the most current value from the authoritative data source. This ensures 
-you always get up-to-date configuration, even if it requires network calls or file system access.
+The "fetch" pattern asynchronously retrieves the most current value from the authoritative data source, ensuring you always get up-to-date configuration.
 
 ```swift
 let config = ConfigReader(provider: remoteConfigProvider)
@@ -60,32 +57,33 @@ let timeout = try await config.fetchInt(forKey: "http.timeout", default: 30)
 
 // Fetch with context for environment-specific configuration
 let dbConnectionString = try await config.fetchRequiredString(
-    forKey: "database.url",
-    context: [
-        "environment": "production",
-        "region": "us-west-2",
-        "service": "user-service"
-    ],
+    forKey: ConfigKey(
+        "database.url",
+        context: [
+            "environment": "production",
+            "region": "us-west-2",
+            "service": "user-service"
+        ]
+    ),
     isSecret: true
 )
 ```
 
 #### When to use
 
-Use the `fetch` pattern when:
+Use the "fetch" pattern when:
 
 - **Freshness is critical**: You need the latest configuration values.
 - **Remote providers**: Using configuration services, databases, or external APIs that perform evaluation remotely.
 - **Infrequent access**: Reading configuration occasionally, not in hot paths.
-- **Setup operations**: Configuring long-lived resources like database connections where one-time overhead isn't 
-  a concern, and the improved freshness is important.
+- **Setup operations**: Configuring long-lived resources like database connections where one-time overhead isn't a concern, and the improved freshness is important.
 - **Administrative operations**: Fetching current settings for management interfaces.
 
 #### Behavior characteristics
 
 - Always contacts the authoritative data source.
 - May involve network calls, file system access, or database queries.
-- Providers may (but are not required to) cache the fetched value for subsequent "get" calls.
+- Providers may cache the fetched value for subsequent "get" calls, but don't have to.
 - Throws an error if the provider fails to reach the source.
 
 ### Watch: Reactive continuous updates
@@ -93,8 +91,8 @@ Use the `fetch` pattern when:
 The "watch" pattern provides an async sequence of configuration updates, allowing you to react to changes in real-time.
 This is ideal for long-running services that need to adapt to configuration changes without restarting.
 
-The async sequence is required to receive the current value as the first element as quickly as possible - this is 
-part of the API contract with configuration providers (for details, check out ``ConfigProvider``.)
+The async sequence must provide the current value as the first element as quickly as possible - this is
+part of the API contract with configuration providers (for details, check out ``ConfigProvider``).
 
 ```swift
 let config = ConfigReader(provider: reloadingProvider)
@@ -113,15 +111,15 @@ try await config.watchInt(forKey: "http.timeout", default: 30) { updates in
 Use the "watch" pattern when:
 
 - **Dynamic configuration**: Values change during application runtime.
-- **Hot reloading**: Need to update behavior without restarting the service.
-- **Feature toggles**: Enabling/disabling features based on configuration changes.
+- **Hot reloading**: You need to update behavior without restarting the service.
+- **Feature toggles**: Enabling or disabling features based on configuration changes.
 - **Resource management**: Adjusting timeouts, limits, or thresholds dynamically.
 - **A/B testing**: Updating experimental parameters in real-time.
 
 #### Behavior characteristics
 
 - Immediately emits the initial value, then subsequent updates.
-- Continues monitoring until the task is cancelled.
+- Continues monitoring until you cancel the task.
 - Works with providers like ``ReloadingFileProvider``.
 
 For details on reloading providers, check out <doc:Using-reloading-providers>.
@@ -132,7 +130,7 @@ All access patterns support configuration context, which provides additional met
 more specific values. Context is particularly useful with the "fetch" and "watch" patterns when working with 
 dynamic or environment-aware providers.
 
-#### Filtering watch updates using context
+#### Filter watch updates using context
 
 ```swift
 let context: [String: ConfigContextValue] = [
@@ -145,15 +143,19 @@ let context: [String: ConfigContextValue] = [
 
 // Get environment-specific database configuration
 let dbConfig = try await config.fetchRequiredString(
-    forKey: "database.connection_string",
-    context: context,
+    forKey: ConfigKey(
+        "database.connection_string",
+        context: context
+    ),
     isSecret: true
 )
 
 // Watch for region-specific timeout adjustments
 try await config.watchInt(
-    forKey: "api.timeout",
-    context: ["region": "us-west-2"],
+    forKey: ConfigKey(
+        "api.timeout",
+        context: ["region": "us-west-2"]
+    ),
     default: 5000
 ) { updates in
     for await timeout in updates {
@@ -165,16 +167,19 @@ try await config.watchInt(
 ### Summary of performance considerations
 
 #### Get pattern performance
+
 - **Fastest**: No async overhead, immediate return.
 - **Memory usage**: Minimal, uses cached values.
 - **Best for**: Request handling, hot code paths, startup configuration.
 
-#### Fetch pattern performance  
+#### Fetch pattern performance
+
 - **Moderate**: Async overhead plus data source access time.
 - **Network dependent**: Performance varies with provider implementation.
 - **Best for**: Infrequent access, setup operations, administrative tasks.
 
 #### Watch pattern performance
+
 - **Background monitoring**: Continuous resource usage for monitoring.
 - **Event-driven**: Efficient updates only when values change.
 - **Best for**: Long-running services, dynamic configuration, feature toggles.
@@ -222,18 +227,10 @@ try await config.watchRequiredInt(forKey: "port") { updates in
 
 ### Best practices
 
-1. **Choose based on use case**: Use "get" for performance-critical paths, "fetch" for freshness, and 
-   "watch" for hot reloading.
-
-2. **Handle errors appropriately**: Design error handling strategies that match your application's 
-   resilience requirements.
-
-3. **Use context judiciously**: Provide context when you need environment-specific or conditional 
-   configuration values.
-
-4. **Monitor configuration access**: Use ``AccessReporter`` to understand your application's 
-   configuration dependencies.
-
+1. **Choose based on use case**: Use "get" for performance-critical paths, "fetch" for freshness, and "watch" for hot reloading.
+2. **Handle errors appropriately**: Design error handling strategies that match your application's resilience requirements.
+3. **Use context judiciously**: Provide context when you need environment-specific or conditional configuration values.
+4. **Monitor configuration access**: Use ``AccessReporter`` to understand your application's configuration dependencies.
 5. **Cache wisely**: For frequently accessed values, prefer "get" over repeated "fetch" calls.
 
 For more guidance on selecting the right reader methods for your needs, see <doc:Choosing-reader-methods>. 

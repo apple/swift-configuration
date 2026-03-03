@@ -57,9 +57,7 @@
 ///
 /// ```swift
 /// let envProvider = EnvironmentVariablesProvider()
-/// let keyMappedEnvProvider = envProvider.mapKeys { key in
-///     key.prepending(["myapp", "prod"])
-/// }
+/// let keyMappedEnvProvider = envProvider.prefixKeys(with: ["myapp", "prod"])
 /// ```
 @available(Configuration 1.0, *)
 public struct KeyMappingProvider<Upstream: ConfigProvider>: Sendable {
@@ -101,11 +99,11 @@ extension KeyMappingProvider: ConfigProvider {
     }
 
     // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
-    public func watchValue<Return>(
+    public func watchValue<Return: ~Copyable>(
         forKey key: AbsoluteConfigKey,
         type: ConfigType,
         updatesHandler: (
-            ConfigUpdatesAsyncSequence<Result<LookupResult, any Error>, Never>
+            _ updates: ConfigUpdatesAsyncSequence<Result<LookupResult, any Error>, Never>
         ) async throws -> Return
     ) async throws -> Return {
         try await upstream.watchValue(forKey: self.mapKey(key), type: type, updatesHandler: updatesHandler)
@@ -117,8 +115,8 @@ extension KeyMappingProvider: ConfigProvider {
     }
 
     // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
-    public func watchSnapshot<Return>(
-        updatesHandler: (ConfigUpdatesAsyncSequence<any ConfigSnapshot, Never>) async throws -> Return
+    public func watchSnapshot<Return: ~Copyable>(
+        updatesHandler: (_ updates: ConfigUpdatesAsyncSequence<any ConfigSnapshot, Never>) async throws -> Return
     ) async throws -> Return {
         try await upstream.watchSnapshot { sequence in
             try await updatesHandler(

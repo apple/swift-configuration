@@ -6,7 +6,7 @@ A Swift library for reading configuration in applications and libraries.
 
 Swift Configuration defines an abstraction between configuration _readers_ and _providers_.
 
-Applications and libraries _read_ configuration through a consistent API, while the actual _provider_ is set up once at the application's entry point.
+Applications and libraries _read_ configuration through a consistent API, while you set up the actual _provider_ once at your application's entry point.
 
 For example, to read the timeout configuration value for an HTTP client, check out the following examples using different providers:
 
@@ -120,7 +120,7 @@ For example, to read the timeout configuration value for an HTTP client, check o
         ```swift
         // Environment variables consulted first, then JSON.
         let primaryProvider = EnvironmentVariablesProvider()
-        let secondaryProvider = try await JSONProvider(
+        let secondaryProvider = try await FileProvider<JSONSnapshot>(
             filePath: "/etc/config.json"
         )
         let config = ConfigReader(providers: [
@@ -145,16 +145,16 @@ For example, to read the timeout configuration value for an HTTP client, check o
 
 For a selection of more detailed examples, read through <doc:Example-use-cases>.
 
-These providers can be combined to form a hierarchy, for details check out <doc:Provider-hierarchy>.
+For a video introduction, check out our [talk on YouTube](https://www.youtube.com/watch?v=I3lYW6OEyIs).
+
+You can combine these providers to form a hierarchy. For details, check out <doc:Provider-hierarchy>.
 
 ### Quick start
-
-> Important: While this library's API is still in development, use the `.upToNextMinor(from: "...")` dependency constraint to avoid unexpected build breakages. Before we reach 1.0, API-breaking changes may occur between minor `0.x` versions.
 
 Add the dependency to your `Package.swift`:
 
 ```swift
-.package(url: "https://github.com/apple/swift-configuration", .upToNextMinor(from: "0.2.0"))
+.package(url: "https://github.com/apple/swift-configuration", from: "1.0.0")
 ```
 
 Add the library dependency to your target:
@@ -181,25 +181,25 @@ To enable an additional trait on the package, update the package dependency:
 ```diff
 .package(
     url: "https://github.com/apple/swift-configuration",
-    exact: "...",
-+   traits: [.defaults, "OtherFeatureSupport"]
+    from: "1.0.0",
++   traits: [.defaults, "YAML"]
 )
 ```
 
 Available traits:
-- **`JSONSupport`** (default): Adds support for ``JSONSnapshot``, which enables using ``FileProvider`` and ``ReloadingFileProvider`` with JSON files.
-- **`LoggingSupport`** (opt-in): Adds support for ``AccessLogger``, a way to emit access events into a `SwiftLog.Logger`.
-- **`ReloadingSupport`** (opt-in): Adds support for ``ReloadingFileProvider``, which provides auto-reloading capability for file-based configuration.
-- **`CommandLineArgumentsSupport`** (opt-in): Adds support for ``CommandLineArgumentsProvider`` for parsing command line arguments.
-- **`YAMLSupport`** (opt-in): Adds support for ``YAMLSnapshot``, which enables using ``FileProvider`` and ``ReloadingFileProvider`` with YAML files.
+- **`JSON`** (default): Adds support for ``JSONSnapshot``, which enables using ``FileProvider`` and ``ReloadingFileProvider`` with JSON files.
+- **`Logging`** (opt-in): Adds support for ``AccessLogger``, a way to emit access events into a Swift Log `Logger`.
+- **`Reloading`** (opt-in): Adds support for ``ReloadingFileProvider``, which provides auto-reloading capability for file-based configuration.
+- **`CommandLineArguments`** (opt-in): Adds support for ``CommandLineArgumentsProvider`` for parsing command line arguments.
+- **`YAML`** (opt-in): Adds support for ``YAMLSnapshot``, which enables using ``FileProvider`` and ``ReloadingFileProvider`` with YAML files.
 
 ### Supported platforms and minimum versions
 
-The library is supported on macOS, Linux, and Windows.
+The library is supported on Apple platforms, Linux, and Android.
 
-| Component     | macOS  | Linux, Windows | iOS    | tvOS   | watchOS | visionOS |
-| ------------- | -----  | -------------- | ---    | ----   | ------- | -------- |
-| Configuration | ✅ 15+ | ✅              | ✅ 18+ | ✅ 18+ | ✅ 11+   | ✅ 2+    |
+| Component     | macOS  | Android    | Linux | iOS    | tvOS   | watchOS | visionOS |
+| ------------- | -----  | -------    | ----- | ---    | ----   | ------- | -------- |
+| Configuration | ✅ 15+ | ✅ API 28+ | ✅    | ✅ 18+ | ✅ 18+ | ✅ 11+  | ✅ 2+    |
 
 ### Key features
 
@@ -231,6 +231,8 @@ To understand the choices available, see <doc:Choosing-reader-methods>.
 
 #### Providers
 
+##### Built-in providers
+
 The library includes comprehensive built-in provider support:
 
 - Environment variables: ``EnvironmentVariablesProvider``
@@ -241,6 +243,10 @@ The library includes comprehensive built-in provider support:
 - In-memory: ``InMemoryProvider`` and ``MutableInMemoryProvider``
 - Key transforming: ``KeyMappingProvider``
 
+##### Community providers
+
+- TOML file: [mattt/swift-configuration-toml](https://github.com/mattt/swift-configuration-toml)
+
 You can also implement a custom ``ConfigProvider``.
 
 #### Provider hierarchy
@@ -248,8 +254,7 @@ You can also implement a custom ``ConfigProvider``.
 In addition to using providers individually, you can create fallback behavior using an array of providers.
 The first provider that returns a non-nil value wins.
 
-The following example illustrates a hierarchy of provides, with environmental variables overrides winning 
-over command line arguments, a file at `/etc/config.json`, and in-memory defaults:
+The following example shows a provider hierarchy where environment variables take precedence over command line arguments, a JSON file, and in-memory defaults:
 
 ```swift
 // Create a hierarchy of providers with fallback behavior.
@@ -272,7 +277,7 @@ let timeout = config.int(forKey: "http.timeout", default: 15)
 
 #### Hot reloading
 
-Long-running services can periodically reload configuration with ``ReloadingFileProvider``:
+You can periodically reload configuration in long-running services with ``ReloadingFileProvider``:
 
 ```swift
 let provider = try await ReloadingFileProvider<JSONSnapshot>(filePath: "/etc/config.json")
@@ -291,7 +296,7 @@ Read <doc:Using-reloading-providers> for details on how to receive updates as co
 #### Namespacing and scoped readers
 
 The built-in namespacing of ``ConfigKey`` interprets `"http.timeout"` as an array of two components: `"http"` and `"timeout"`.
-The following example uses ``ConfigReader/scoped(to:context:keyDecoderOverride:)`` to create a namespaced reader with the key `"http"`, to allow reads to use the shorter key `"timeout"`:
+The following example uses ``ConfigReader/scoped(to:)`` to create a namespaced reader with the key `"http"`, to allow reads to use the shorter key `"timeout"`:
 
 Consider the following JSON configuration:
 
@@ -317,7 +322,7 @@ let timeout = httpConfig.int(forKey: "timeout")
 
 #### Debugging and troubleshooting
 
-Debugging with ``AccessReporter`` makes it possible to log all accesses to a config reader:
+Use ``AccessReporter`` to log all accesses to a config reader:
 
 ```swift
 let logger = Logger(label: "config")
@@ -328,7 +333,7 @@ let config = ConfigReader(
 // Now all configuration access is logged, with secret values redacted
 ```
 
-You can also add the following environment variable, and emit log accesses into a file without any code changes:
+You can also add the following environment variable to emit access logs to a file without any code changes:
 
 ```env
 CONFIG_ACCESS_LOG_FILE=/var/log/myapp/config-access.log
@@ -342,7 +347,7 @@ tail -f /var/log/myapp/config-access.log
 
 Check out the built-in ``AccessLogger``, ``FileAccessLogger``, and <doc:Troubleshooting>.
 
-#### Secrets handling
+#### Handling Secrets
 
 The library provides built-in support for handling sensitive configuration values securely:
 
@@ -352,43 +357,23 @@ let privateKey = try snapshot.requiredString(forKey: "mtls.privateKey", isSecret
 let optionalAPIToken = config.string(forKey: "api.token", isSecret: true)
 ```
 
-When values are marked as secrets, they are automatically redacted from access logs and debugging output. 
+When you mark values as secrets, the library automatically redacts them from access logs and debugging output. 
 Read <doc:Handling-secrets-correctly> for guidance on best practices for secrets management.
 
 #### Consistent snapshots
 
-Retrieve related values from a consistent snapshot using ``ConfigSnapshotReader``, which you
-get from calling ``ConfigReader/withSnapshot(_:)``.
+Retrieve related values from a consistent snapshot using ``ConfigSnapshotReader``, which ``ConfigReader/snapshot()`` returns.
 
-This ensures that multiple values are read from a single snapshot inside each provider, even when using
+This ensures that you read multiple values from a single snapshot inside each provider, even when using
 providers that update their internal values.
 For example by downloading new data periodically:
 
 ```swift
 let config = /* a reader with one or more providers that change values over time */
-try config.withSnapshot { snapshot in
-    let certificate = try snapshot.requiredString(forKey: "mtls.certificate")
-    let privateKey = try snapshot.requiredString(forKey: "mtls.privateKey", isSecret: true)
-    // `certificate` and `privateKey` are guaranteed to come from the same snapshot in the provider
-}
-```
-
-#### Custom key syntax
-
-Customizable shorthand key syntax using ``ConfigKeyDecoder`` allows namespacing using not just the default dot-separated `http.timeout`, but any custom convention, such as `http::timeout`:
-
-```swift
-// Create a custom key decoder that uses double-colon separator
-let doubleColonDecoder = SeparatorKeyDecoder(separator: "::")
-
-// Use the keyDecoder parameter when creating the config reader
-let config = ConfigReader(
-    provider: EnvironmentVariablesProvider(),
-    keyDecoder: doubleColonDecoder
-)
-
-// Now you can use double-colon syntax in your keys
-let timeout = config.int(forKey: "http::timeout", default: 60)
+let snapshot = config.snapshot()
+let certificate = try snapshot.requiredString(forKey: "mtls.certificate")
+let privateKey = try snapshot.requiredString(forKey: "mtls.privateKey", isSecret: true)
+// `certificate` and `privateKey` are guaranteed to come from the same snapshot in the provider
 ```
 
 #### Extensible ecosystem
@@ -426,7 +411,9 @@ Any package can implement a ``ConfigProvider``, making the ecosystem extensible 
 - ``KeyMappingProvider``
 
 ### Creating a custom provider
+- <doc:Implementing-a-provider>
 - ``ConfigSnapshot``
+- ``FileConfigSnapshot``
 - ``FileParsingOptions``
 - ``ConfigProvider``
 - ``ConfigContent``
@@ -440,11 +427,6 @@ Any package can implement a ``ConfigProvider``, making the ecosystem extensible 
 - ``ConfigKey``
 - ``AbsoluteConfigKey``
 - ``ConfigContextValue``
-- ``ConfigKeyEncoder``
-- ``ConfigKeyDecoder``
-- ``SeparatorKeyEncoder``
-- ``SeparatorKeyDecoder``
-- ``DirectoryFileKeyEncoder``
 
 ### Troubleshooting and access reporting
 - <doc:Troubleshooting>
@@ -456,6 +438,7 @@ Any package can implement a ``ConfigProvider``, making the ecosystem extensible 
 
 ### Value conversion
 - ``ExpressibleByConfigString``
+- ``ExpressibleByConfigInt``
 - ``ConfigBytesFromStringDecoder``
 - ``ConfigBytesFromBase64StringDecoder``
 - ``ConfigBytesFromHexStringDecoder``
