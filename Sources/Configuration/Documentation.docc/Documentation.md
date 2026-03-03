@@ -122,30 +122,6 @@ For example, to read the timeout configuration value for an HTTP client, check o
         print(httpTimeout) // prints 30
         ```
     }
-    @Tab("Reloading Property list") {
-        ```xml
-        <?xml version="1.0" encoding="UTF-8"?>
-        <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-        <plist version="1.0">
-        <dict>
-            <key>http</key>
-            <dict>
-                <key>timeout</key>
-                <integer>30</integer>
-            </dict>
-        </dict>
-        </plist>
-        ```
-        ```swift
-        let provider = try await ReloadingFileProvider<PropertyListSnapshot>(
-            filePath: "/etc/config.plist"
-        )
-        // Omitted: Add `provider` to a ServiceGroup
-        let config = ConfigReader(provider: provider)
-        let httpTimeout = config.int(forKey: "http.timeout", default: 60)
-        print(httpTimeout) // prints 30
-        ```
-    }
     @Tab("Directory files") {
         ```
         /

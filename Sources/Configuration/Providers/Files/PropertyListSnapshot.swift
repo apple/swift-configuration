@@ -42,8 +42,7 @@ public struct PropertyListSnapshot {
 
         /// Creates parsing options for plist snapshots.
         ///
-        /// - Parameters:
-        ///   - secretsSpecifier: The specifier for identifying secret values.
+        /// - Parameter secretsSpecifier: The specifier for identifying secret values.
         public init(
             secretsSpecifier: SecretsSpecifier<String, any Sendable> = .none
         ) {
@@ -61,7 +60,7 @@ public struct PropertyListSnapshot {
     /// The key encoder for plist.
     static let keyEncoder: SeparatorKeyEncoder = .dotSeparated
 
-    /// A plist number-like value: an int, double, or a bool.            
+    /// A plist number-like value: an int, double, or a bool.
     internal enum PlistNumberIsh: CustomStringConvertible {
 
         /// A Boolean value.
@@ -292,10 +291,12 @@ extension PropertyListSnapshot: FileConfigSnapshot {
         let plistData = data.withUnsafeBytes { buffer in
             Data(buffer)
         }
-        guard let parsedDictionary = try PropertyListSerialization.propertyList(
-            from: plistData,
-            format: nil
-        ) as? [String: any Sendable] else {
+        guard
+            let parsedDictionary = try PropertyListSerialization.propertyList(
+                from: plistData,
+                format: nil
+            ) as? [String: any Sendable]
+        else {
             throw PlistConfigError.topLevelPlistValueIsNotDictionary
         }
         let values = try parsePlistValues(
@@ -388,12 +389,12 @@ internal func parsePlistValues(
                         primitiveValue = .numberArray(
                             try array.enumerated()
                                 .map { index, value in
-                                    if let int = value as? Int {
+                                    if let bool = value as? Bool {
+                                        return .bool(bool)
+                                    } else if let int = value as? Int {
                                         return .int(int)
                                     } else if let double = value as? Double {
                                         return .double(double)
-                                    } else if let bool = value as? Bool {
-                                        return .bool(bool)
                                     } else {
                                         throw PropertyListSnapshot.PlistConfigError.unexpectedValueInArray(
                                             keyComponents + ["\(index)"],
@@ -425,12 +426,12 @@ internal func parsePlistValues(
             } else {
                 if let string = value as? String {
                     primitiveValue = .string(string)
+                } else if let bool = value as? Bool {
+                    primitiveValue = .number(.bool(bool))
                 } else if let int = value as? Int {
                     primitiveValue = .number(.int(int))
                 } else if let double = value as? Double {
                     primitiveValue = .number(.double(double))
-                } else if let bool = value as? Bool {
-                    primitiveValue = .number(.bool(bool))
                 } else if let data = value as? Data {
                     primitiveValue = .data(data)
                 } else {
