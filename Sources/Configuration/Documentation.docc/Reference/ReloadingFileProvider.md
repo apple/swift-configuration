@@ -16,3 +16,4 @@
 - ``FileConfigSnapshot``
 - ``JSONSnapshot``
 - ``YAMLSnapshot``
+- ``PropertyListSnapshot``

@@ -99,6 +99,53 @@ For example, to read the timeout configuration value for an HTTP client, check o
         print(httpTimeout) // prints 30
         ```
     }
+    @Tab("Property list") {
+        ```xml
+        <?xml version="1.0" encoding="UTF-8"?>
+        <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+        <plist version="1.0">
+        <dict>
+            <key>http</key>
+            <dict>
+                <key>timeout</key>
+                <integer>30</integer>
+            </dict>
+        </dict>
+        </plist>
+        ```
+        ```swift
+        let provider = try await FileProvider<PropertyListSnapshot>(
+            filePath: "/etc/config.plist"
+        )
+        let config = ConfigReader(provider: provider)
+        let httpTimeout = config.int(forKey: "http.timeout", default: 60)
+        print(httpTimeout) // prints 30
+        ```
+    }
+    @Tab("Reloading Property list") {
+        ```xml
+        <?xml version="1.0" encoding="UTF-8"?>
+        <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+        <plist version="1.0">
+        <dict>
+            <key>http</key>
+            <dict>
+                <key>timeout</key>
+                <integer>30</integer>
+            </dict>
+        </dict>
+        </plist>
+        ```
+        ```swift
+        let provider = try await ReloadingFileProvider<PropertyListSnapshot>(
+            filePath: "/etc/config.plist"
+        )
+        // Omitted: Add `provider` to a ServiceGroup
+        let config = ConfigReader(provider: provider)
+        let httpTimeout = config.int(forKey: "http.timeout", default: 60)
+        print(httpTimeout) // prints 30
+        ```
+    }
     @Tab("Directory files") {
         ```
         /
@@ -192,6 +239,7 @@ Available traits:
 - **`Reloading`** (opt-in): Adds support for ``ReloadingFileProvider``, which provides auto-reloading capability for file-based configuration.
 - **`CommandLineArguments`** (opt-in): Adds support for ``CommandLineArgumentsProvider`` for parsing command line arguments.
 - **`YAML`** (opt-in): Adds support for ``YAMLSnapshot``, which enables using ``FileProvider`` and ``ReloadingFileProvider`` with YAML files.
+- **`PropertyList`** (opt-in): Adds support for ``PropertyListSnapshot``, which enables using ``FileProvider`` and ``ReloadingFileProvider`` with property list files.
 
 ### Supported platforms and minimum versions
 
@@ -239,6 +287,7 @@ The library includes comprehensive built-in provider support:
 - Command-line arguments: ``CommandLineArgumentsProvider``
 - JSON file: ``FileProvider`` and ``ReloadingFileProvider`` with ``JSONSnapshot``
 - YAML file: ``FileProvider`` and ``ReloadingFileProvider`` with ``YAMLSnapshot``
+- Property list file: ``FileProvider`` and ``ReloadingFileProvider`` with ``PropertyListSnapshot``
 - Directory of files: ``DirectoryFilesProvider``
 - In-memory: ``InMemoryProvider`` and ``MutableInMemoryProvider``
 - Key transforming: ``KeyMappingProvider``
@@ -403,6 +452,7 @@ Any package can implement a ``ConfigProvider``, making the ecosystem extensible 
 - ``ReloadingFileProvider``
 - ``JSONSnapshot``
 - ``YAMLSnapshot``
+- ``PropertyListSnapshot``
 - <doc:Using-reloading-providers>
 - ``DirectoryFilesProvider``
 - <doc:Using-in-memory-providers>
