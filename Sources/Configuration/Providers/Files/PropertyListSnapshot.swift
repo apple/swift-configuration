@@ -16,6 +16,9 @@
 
 // Needs full Foundation for PropertyListSerialization.
 import Foundation
+#if canImport(CoreFoundation)
+import CoreFoundation
+#endif
 
 /// A snapshot of configuration values parsed from property list (plist) data.
 ///
@@ -385,22 +388,17 @@ internal func parsePlistValues(
                                     return string
                                 }
                         )
-                    } else if firstValue is Int || firstValue is Double || firstValue is Bool {
+                    } else if parsePlistNumberIsh(firstValue) != nil {
                         primitiveValue = .numberArray(
                             try array.enumerated()
                                 .map { index, value in
-                                    if let bool = value as? Bool {
-                                        return .bool(bool)
-                                    } else if let int = value as? Int {
-                                        return .int(int)
-                                    } else if let double = value as? Double {
-                                        return .double(double)
-                                    } else {
+                                    guard let number = parsePlistNumberIsh(value) else {
                                         throw PropertyListSnapshot.PlistConfigError.unexpectedValueInArray(
                                             keyComponents + ["\(index)"],
                                             "\(type(of: value))"
                                         )
                                     }
+                                    return number
                                 }
                         )
                     } else if firstValue is Data {
@@ -426,12 +424,8 @@ internal func parsePlistValues(
             } else {
                 if let string = value as? String {
                     primitiveValue = .string(string)
-                } else if let bool = value as? Bool {
-                    primitiveValue = .number(.bool(bool))
-                } else if let int = value as? Int {
-                    primitiveValue = .number(.int(int))
-                } else if let double = value as? Double {
-                    primitiveValue = .number(.double(double))
+                } else if let number = parsePlistNumberIsh(value) {
+                    primitiveValue = .number(number)
                 } else if let data = value as? Data {
                     primitiveValue = .data(data)
                 } else {
@@ -450,6 +444,48 @@ internal func parsePlistValues(
         }
     }
     return values
+}
+
+@available(Configuration 1.0, *)
+/// Parses a plist scalar into a plist number-like value.
+///
+/// Handles `NSNumber` first to avoid Foundation bridging ambiguities where the same boxed
+/// value can cast to `Bool`, `Int`, or `Double` depending on cast order.
+private func parsePlistNumberIsh(_ value: any Sendable) -> PropertyListSnapshot.PlistNumberIsh? {
+    #if canImport(CoreFoundation)
+    if let number = value as? NSNumber {
+        if number === kCFBooleanTrue {
+            return .bool(true)
+        } else if number === kCFBooleanFalse {
+            return .bool(false)
+        }
+
+        #if canImport(ObjectiveC)
+        let nsNumber = number as CFNumber
+        #else
+        let nsNumber = unsafeBitCast(number, to: CFNumber.self)
+        #endif
+        let type = CFNumberGetType(nsNumber)
+        switch type {
+        case .sInt8Type, .charType, .sInt16Type, .shortType, .sInt32Type, .intType, .sInt64Type, .longLongType,
+            .nsIntegerType, .longType, .cfIndexType:
+            return .int(number.intValue)
+        case .float32Type, .floatType, .float64Type, .doubleType, .cgFloatType:
+            return .double(number.doubleValue)
+        default:
+            return nil
+        }
+    }
+    #endif
+
+    if let bool = value as? Bool {
+        return .bool(bool)
+    } else if let int = value as? Int {
+        return .int(int)
+    } else if let double = value as? Double {
+        return .double(double)
+    }
+    return nil
 }
 
 #endif
