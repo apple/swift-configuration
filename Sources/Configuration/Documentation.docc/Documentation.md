@@ -147,6 +147,8 @@ For a selection of more detailed examples, read through <doc:Example-use-cases>.
 
 For a video introduction, check out our [talk on YouTube](https://www.youtube.com/watch?v=I3lYW6OEyIs).
 
+If you're migrating from scattered `ProcessInfo` calls, the <doc:Migrating-to-swift-configuration> guide walks through the transition step by step.
+
 You can combine these providers to form a hierarchy. For details, check out <doc:Provider-hierarchy>.
 
 ### Quick start
@@ -225,7 +227,7 @@ The library provides three distinct ways to read configuration values:
   ```
 
 For detailed guidance on when to use each access pattern, see <doc:Choosing-access-patterns>.
-Within each of the access patterns, the library offers different reader methods that reflect your needs of 
+Within each of the access patterns, the library offers different reader methods that reflect your needs of
 optional, default, and required configuration parameters.
 To understand the choices available, see <doc:Choosing-reader-methods>.
 
@@ -357,7 +359,7 @@ let privateKey = try snapshot.requiredString(forKey: "mtls.privateKey", isSecret
 let optionalAPIToken = config.string(forKey: "api.token", isSecret: true)
 ```
 
-When you mark values as secrets, the library automatically redacts them from access logs and debugging output. 
+When you mark values as secrets, the library automatically redacts them from access logs and debugging output.
 Read <doc:Handling-secrets-correctly> for guidance on best practices for secrets management.
 
 #### Consistent snapshots
@@ -387,6 +389,7 @@ Any package can implement a ``ConfigProvider``, making the ecosystem extensible 
 - <doc:Configuring-libraries>
 - <doc:Example-use-cases>
 - <doc:Best-practices>
+- <doc:Migrating-to-swift-configuration>
 
 ### Readers and providers
 - ``ConfigReader``
