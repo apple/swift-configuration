@@ -29,7 +29,7 @@ extension ConfigSnapshotReader {
     /// If the value doesn't exist or can't be converted to the expected type, the method returns `nil`.
     ///
     /// ```swift
-    /// let port = snapshot.int(forKey: ["server", "port"])
+    /// let configValue = snapshot.string(forKey: ["server", "port"])
     /// ```
     ///
     /// - Parameters:
@@ -62,7 +62,7 @@ extension ConfigSnapshotReader {
     /// returns the default value instead.
     ///
     /// ```swift
-    /// let maxRetries = snapshot.int(forKey: ["network", "maxRetries"], default: 3)
+    /// let configValue = snapshot.string(forKey: ["network", "maxRetries"], default: "localhost")
     /// ```
     ///
     /// - Parameters:
@@ -97,7 +97,7 @@ extension ConfigSnapshotReader {
     /// The method throws an error if the value is missing or can't be converted to the expected type.
     ///
     /// ```swift
-    /// let apiKey = try snapshot.requiredString(forKey: ["api", "key"], isSecret: true)
+    /// let requiredValue = try snapshot.requiredString(forKey: ["api", "key"], isSecret: true)
     /// ```
     ///
     /// - Parameters:
@@ -130,7 +130,7 @@ extension ConfigSnapshotReader {
     /// If the value doesn't exist or can't be converted to the expected type, the method returns `nil`.
     ///
     /// ```swift
-    /// let port = snapshot.int(forKey: ["server", "port"])
+    /// let configValue = snapshot.int(forKey: ["server", "port"])
     /// ```
     ///
     /// - Parameters:
@@ -163,7 +163,7 @@ extension ConfigSnapshotReader {
     /// returns the default value instead.
     ///
     /// ```swift
-    /// let maxRetries = snapshot.int(forKey: ["network", "maxRetries"], default: 3)
+    /// let configValue = snapshot.int(forKey: ["network", "maxRetries"], default: 3)
     /// ```
     ///
     /// - Parameters:
@@ -198,7 +198,7 @@ extension ConfigSnapshotReader {
     /// The method throws an error if the value is missing or can't be converted to the expected type.
     ///
     /// ```swift
-    /// let apiKey = try snapshot.requiredString(forKey: ["api", "key"], isSecret: true)
+    /// let requiredValue = try snapshot.requiredInt(forKey: ["api", "key"], isSecret: true)
     /// ```
     ///
     /// - Parameters:
@@ -231,7 +231,7 @@ extension ConfigSnapshotReader {
     /// If the value doesn't exist or can't be converted to the expected type, the method returns `nil`.
     ///
     /// ```swift
-    /// let port = snapshot.int(forKey: ["server", "port"])
+    /// let configValue = snapshot.double(forKey: ["server", "port"])
     /// ```
     ///
     /// - Parameters:
@@ -264,7 +264,7 @@ extension ConfigSnapshotReader {
     /// returns the default value instead.
     ///
     /// ```swift
-    /// let maxRetries = snapshot.int(forKey: ["network", "maxRetries"], default: 3)
+    /// let configValue = snapshot.double(forKey: ["network", "maxRetries"], default: 3.14)
     /// ```
     ///
     /// - Parameters:
@@ -299,7 +299,7 @@ extension ConfigSnapshotReader {
     /// The method throws an error if the value is missing or can't be converted to the expected type.
     ///
     /// ```swift
-    /// let apiKey = try snapshot.requiredString(forKey: ["api", "key"], isSecret: true)
+    /// let requiredValue = try snapshot.requiredDouble(forKey: ["api", "key"], isSecret: true)
     /// ```
     ///
     /// - Parameters:
@@ -332,7 +332,7 @@ extension ConfigSnapshotReader {
     /// If the value doesn't exist or can't be converted to the expected type, the method returns `nil`.
     ///
     /// ```swift
-    /// let port = snapshot.int(forKey: ["server", "port"])
+    /// let configValue = snapshot.bool(forKey: ["server", "port"])
     /// ```
     ///
     /// - Parameters:
@@ -365,7 +365,7 @@ extension ConfigSnapshotReader {
     /// returns the default value instead.
     ///
     /// ```swift
-    /// let maxRetries = snapshot.int(forKey: ["network", "maxRetries"], default: 3)
+    /// let configValue = snapshot.bool(forKey: ["network", "maxRetries"], default: true)
     /// ```
     ///
     /// - Parameters:
@@ -400,7 +400,7 @@ extension ConfigSnapshotReader {
     /// The method throws an error if the value is missing or can't be converted to the expected type.
     ///
     /// ```swift
-    /// let apiKey = try snapshot.requiredString(forKey: ["api", "key"], isSecret: true)
+    /// let requiredValue = try snapshot.requiredBool(forKey: ["api", "key"], isSecret: true)
     /// ```
     ///
     /// - Parameters:
@@ -433,7 +433,7 @@ extension ConfigSnapshotReader {
     /// If the value doesn't exist or can't be converted to the expected type, the method returns `nil`.
     ///
     /// ```swift
-    /// let port = snapshot.int(forKey: ["server", "port"])
+    /// let configValue = snapshot.bytes(forKey: ["server", "port"])
     /// ```
     ///
     /// - Parameters:
@@ -466,7 +466,7 @@ extension ConfigSnapshotReader {
     /// returns the default value instead.
     ///
     /// ```swift
-    /// let maxRetries = snapshot.int(forKey: ["network", "maxRetries"], default: 3)
+    /// let configValue = snapshot.bytes(forKey: ["network", "maxRetries"], default: [0x01, 0x02])
     /// ```
     ///
     /// - Parameters:
@@ -501,7 +501,7 @@ extension ConfigSnapshotReader {
     /// The method throws an error if the value is missing or can't be converted to the expected type.
     ///
     /// ```swift
-    /// let apiKey = try snapshot.requiredString(forKey: ["api", "key"], isSecret: true)
+    /// let requiredValue = try snapshot.requiredBytes(forKey: ["api", "key"], isSecret: true)
     /// ```
     ///
     /// - Parameters:
@@ -534,7 +534,7 @@ extension ConfigSnapshotReader {
     /// If the value doesn't exist or can't be converted to the expected type, the method returns `nil`.
     ///
     /// ```swift
-    /// let port = snapshot.int(forKey: ["server", "port"])
+    /// let configValue = snapshot.stringArray(forKey: ["server", "port"])
     /// ```
     ///
     /// - Parameters:
@@ -567,7 +567,7 @@ extension ConfigSnapshotReader {
     /// returns the default value instead.
     ///
     /// ```swift
-    /// let maxRetries = snapshot.int(forKey: ["network", "maxRetries"], default: 3)
+    /// let configValue = snapshot.stringArray(forKey: ["network", "maxRetries"], default: ["a", "b"])
     /// ```
     ///
     /// - Parameters:
@@ -602,7 +602,7 @@ extension ConfigSnapshotReader {
     /// The method throws an error if the value is missing or can't be converted to the expected type.
     ///
     /// ```swift
-    /// let apiKey = try snapshot.requiredString(forKey: ["api", "key"], isSecret: true)
+    /// let requiredValue = try snapshot.requiredStringArray(forKey: ["api", "key"], isSecret: true)
     /// ```
     ///
     /// - Parameters:
@@ -635,7 +635,7 @@ extension ConfigSnapshotReader {
     /// If the value doesn't exist or can't be converted to the expected type, the method returns `nil`.
     ///
     /// ```swift
-    /// let port = snapshot.int(forKey: ["server", "port"])
+    /// let configValue = snapshot.intArray(forKey: ["server", "port"])
     /// ```
     ///
     /// - Parameters:
@@ -668,7 +668,7 @@ extension ConfigSnapshotReader {
     /// returns the default value instead.
     ///
     /// ```swift
-    /// let maxRetries = snapshot.int(forKey: ["network", "maxRetries"], default: 3)
+    /// let configValue = snapshot.intArray(forKey: ["network", "maxRetries"], default: [1, 2])
     /// ```
     ///
     /// - Parameters:
@@ -703,7 +703,7 @@ extension ConfigSnapshotReader {
     /// The method throws an error if the value is missing or can't be converted to the expected type.
     ///
     /// ```swift
-    /// let apiKey = try snapshot.requiredString(forKey: ["api", "key"], isSecret: true)
+    /// let requiredValue = try snapshot.requiredIntArray(forKey: ["api", "key"], isSecret: true)
     /// ```
     ///
     /// - Parameters:
@@ -736,7 +736,7 @@ extension ConfigSnapshotReader {
     /// If the value doesn't exist or can't be converted to the expected type, the method returns `nil`.
     ///
     /// ```swift
-    /// let port = snapshot.int(forKey: ["server", "port"])
+    /// let configValue = snapshot.doubleArray(forKey: ["server", "port"])
     /// ```
     ///
     /// - Parameters:
@@ -769,7 +769,7 @@ extension ConfigSnapshotReader {
     /// returns the default value instead.
     ///
     /// ```swift
-    /// let maxRetries = snapshot.int(forKey: ["network", "maxRetries"], default: 3)
+    /// let configValue = snapshot.doubleArray(forKey: ["network", "maxRetries"], default: [1.0, 2.0])
     /// ```
     ///
     /// - Parameters:
@@ -804,7 +804,7 @@ extension ConfigSnapshotReader {
     /// The method throws an error if the value is missing or can't be converted to the expected type.
     ///
     /// ```swift
-    /// let apiKey = try snapshot.requiredString(forKey: ["api", "key"], isSecret: true)
+    /// let requiredValue = try snapshot.requiredDoubleArray(forKey: ["api", "key"], isSecret: true)
     /// ```
     ///
     /// - Parameters:
@@ -837,7 +837,7 @@ extension ConfigSnapshotReader {
     /// If the value doesn't exist or can't be converted to the expected type, the method returns `nil`.
     ///
     /// ```swift
-    /// let port = snapshot.int(forKey: ["server", "port"])
+    /// let configValue = snapshot.boolArray(forKey: ["server", "port"])
     /// ```
     ///
     /// - Parameters:
@@ -870,7 +870,7 @@ extension ConfigSnapshotReader {
     /// returns the default value instead.
     ///
     /// ```swift
-    /// let maxRetries = snapshot.int(forKey: ["network", "maxRetries"], default: 3)
+    /// let configValue = snapshot.boolArray(forKey: ["network", "maxRetries"], default: [true, false])
     /// ```
     ///
     /// - Parameters:
@@ -905,7 +905,7 @@ extension ConfigSnapshotReader {
     /// The method throws an error if the value is missing or can't be converted to the expected type.
     ///
     /// ```swift
-    /// let apiKey = try snapshot.requiredString(forKey: ["api", "key"], isSecret: true)
+    /// let requiredValue = try snapshot.requiredBoolArray(forKey: ["api", "key"], isSecret: true)
     /// ```
     ///
     /// - Parameters:
@@ -938,7 +938,7 @@ extension ConfigSnapshotReader {
     /// If the value doesn't exist or can't be converted to the expected type, the method returns `nil`.
     ///
     /// ```swift
-    /// let port = snapshot.int(forKey: ["server", "port"])
+    /// let configValue = snapshot.byteChunkArray(forKey: ["server", "port"])
     /// ```
     ///
     /// - Parameters:
@@ -971,7 +971,7 @@ extension ConfigSnapshotReader {
     /// returns the default value instead.
     ///
     /// ```swift
-    /// let maxRetries = snapshot.int(forKey: ["network", "maxRetries"], default: 3)
+    /// let configValue = snapshot.byteChunkArray(forKey: ["network", "maxRetries"], default: [[0x01], [0x02]])
     /// ```
     ///
     /// - Parameters:
@@ -1006,7 +1006,7 @@ extension ConfigSnapshotReader {
     /// The method throws an error if the value is missing or can't be converted to the expected type.
     ///
     /// ```swift
-    /// let apiKey = try snapshot.requiredString(forKey: ["api", "key"], isSecret: true)
+    /// let requiredValue = try snapshot.requiredByteChunkArray(forKey: ["api", "key"], isSecret: true)
     /// ```
     ///
     /// - Parameters:
