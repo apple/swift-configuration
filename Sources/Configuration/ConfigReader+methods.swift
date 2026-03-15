@@ -29,7 +29,7 @@ extension ConfigReader {
     /// If the value doesn't exist or can't be converted to the expected type, the method returns `nil`.
     ///
     /// ```swift
-    /// let port = config.int(forKey: ["server", "port"])
+    /// let configValue = config.string(forKey: ["server", "port"])
     /// ```
     ///
     /// - Parameters:
@@ -62,7 +62,7 @@ extension ConfigReader {
     /// returns the default value instead.
     ///
     /// ```swift
-    /// let maxRetries = config.int(forKey: ["network", "maxRetries"], default: 3)
+    /// let configValue = config.string(forKey: ["network", "maxRetries"], default: "localhost")
     /// ```
     ///
     /// - Parameters:
@@ -97,7 +97,7 @@ extension ConfigReader {
     /// The method throws an error if the value is missing or can't be converted to the expected type.
     ///
     /// ```swift
-    /// let apiKey = try config.requiredString(forKey: ["api", "key"], isSecret: true)
+    /// let requiredValue = try config.requiredString(forKey: ["api", "key"], isSecret: true)
     /// ```
     ///
     /// - Parameters:
@@ -130,7 +130,7 @@ extension ConfigReader {
     /// If the value doesn't exist or can't be converted to the expected type, the method returns `nil`.
     ///
     /// ```swift
-    /// let port = config.int(forKey: ["server", "port"])
+    /// let configValue = config.int(forKey: ["server", "port"])
     /// ```
     ///
     /// - Parameters:
@@ -163,7 +163,7 @@ extension ConfigReader {
     /// returns the default value instead.
     ///
     /// ```swift
-    /// let maxRetries = config.int(forKey: ["network", "maxRetries"], default: 3)
+    /// let configValue = config.int(forKey: ["network", "maxRetries"], default: 3)
     /// ```
     ///
     /// - Parameters:
@@ -198,7 +198,7 @@ extension ConfigReader {
     /// The method throws an error if the value is missing or can't be converted to the expected type.
     ///
     /// ```swift
-    /// let apiKey = try config.requiredString(forKey: ["api", "key"], isSecret: true)
+    /// let requiredValue = try config.requiredInt(forKey: ["api", "key"], isSecret: true)
     /// ```
     ///
     /// - Parameters:
@@ -231,7 +231,7 @@ extension ConfigReader {
     /// If the value doesn't exist or can't be converted to the expected type, the method returns `nil`.
     ///
     /// ```swift
-    /// let port = config.int(forKey: ["server", "port"])
+    /// let configValue = config.double(forKey: ["server", "port"])
     /// ```
     ///
     /// - Parameters:
@@ -264,7 +264,7 @@ extension ConfigReader {
     /// returns the default value instead.
     ///
     /// ```swift
-    /// let maxRetries = config.int(forKey: ["network", "maxRetries"], default: 3)
+    /// let configValue = config.double(forKey: ["network", "maxRetries"], default: 3.14)
     /// ```
     ///
     /// - Parameters:
@@ -299,7 +299,7 @@ extension ConfigReader {
     /// The method throws an error if the value is missing or can't be converted to the expected type.
     ///
     /// ```swift
-    /// let apiKey = try config.requiredString(forKey: ["api", "key"], isSecret: true)
+    /// let requiredValue = try config.requiredDouble(forKey: ["api", "key"], isSecret: true)
     /// ```
     ///
     /// - Parameters:
@@ -332,7 +332,7 @@ extension ConfigReader {
     /// If the value doesn't exist or can't be converted to the expected type, the method returns `nil`.
     ///
     /// ```swift
-    /// let port = config.int(forKey: ["server", "port"])
+    /// let configValue = config.bool(forKey: ["server", "port"])
     /// ```
     ///
     /// - Parameters:
@@ -365,7 +365,7 @@ extension ConfigReader {
     /// returns the default value instead.
     ///
     /// ```swift
-    /// let maxRetries = config.int(forKey: ["network", "maxRetries"], default: 3)
+    /// let configValue = config.bool(forKey: ["network", "maxRetries"], default: true)
     /// ```
     ///
     /// - Parameters:
@@ -400,7 +400,7 @@ extension ConfigReader {
     /// The method throws an error if the value is missing or can't be converted to the expected type.
     ///
     /// ```swift
-    /// let apiKey = try config.requiredString(forKey: ["api", "key"], isSecret: true)
+    /// let requiredValue = try config.requiredBool(forKey: ["api", "key"], isSecret: true)
     /// ```
     ///
     /// - Parameters:
@@ -433,7 +433,7 @@ extension ConfigReader {
     /// If the value doesn't exist or can't be converted to the expected type, the method returns `nil`.
     ///
     /// ```swift
-    /// let port = config.int(forKey: ["server", "port"])
+    /// let configValue = config.bytes(forKey: ["server", "port"])
     /// ```
     ///
     /// - Parameters:
@@ -466,7 +466,7 @@ extension ConfigReader {
     /// returns the default value instead.
     ///
     /// ```swift
-    /// let maxRetries = config.int(forKey: ["network", "maxRetries"], default: 3)
+    /// let configValue = config.bytes(forKey: ["network", "maxRetries"], default: [0x01, 0x02])
     /// ```
     ///
     /// - Parameters:
@@ -501,7 +501,7 @@ extension ConfigReader {
     /// The method throws an error if the value is missing or can't be converted to the expected type.
     ///
     /// ```swift
-    /// let apiKey = try config.requiredString(forKey: ["api", "key"], isSecret: true)
+    /// let requiredValue = try config.requiredBytes(forKey: ["api", "key"], isSecret: true)
     /// ```
     ///
     /// - Parameters:
@@ -534,7 +534,7 @@ extension ConfigReader {
     /// If the value doesn't exist or can't be converted to the expected type, the method returns `nil`.
     ///
     /// ```swift
-    /// let port = config.int(forKey: ["server", "port"])
+    /// let configValue = config.stringArray(forKey: ["server", "port"])
     /// ```
     ///
     /// - Parameters:
@@ -567,7 +567,7 @@ extension ConfigReader {
     /// returns the default value instead.
     ///
     /// ```swift
-    /// let maxRetries = config.int(forKey: ["network", "maxRetries"], default: 3)
+    /// let configValue = config.stringArray(forKey: ["network", "maxRetries"], default: ["a", "b"])
     /// ```
     ///
     /// - Parameters:
@@ -602,7 +602,7 @@ extension ConfigReader {
     /// The method throws an error if the value is missing or can't be converted to the expected type.
     ///
     /// ```swift
-    /// let apiKey = try config.requiredString(forKey: ["api", "key"], isSecret: true)
+    /// let requiredValue = try config.requiredStringArray(forKey: ["api", "key"], isSecret: true)
     /// ```
     ///
     /// - Parameters:
@@ -635,7 +635,7 @@ extension ConfigReader {
     /// If the value doesn't exist or can't be converted to the expected type, the method returns `nil`.
     ///
     /// ```swift
-    /// let port = config.int(forKey: ["server", "port"])
+    /// let configValue = config.intArray(forKey: ["server", "port"])
     /// ```
     ///
     /// - Parameters:
@@ -668,7 +668,7 @@ extension ConfigReader {
     /// returns the default value instead.
     ///
     /// ```swift
-    /// let maxRetries = config.int(forKey: ["network", "maxRetries"], default: 3)
+    /// let configValue = config.intArray(forKey: ["network", "maxRetries"], default: [1, 2])
     /// ```
     ///
     /// - Parameters:
@@ -703,7 +703,7 @@ extension ConfigReader {
     /// The method throws an error if the value is missing or can't be converted to the expected type.
     ///
     /// ```swift
-    /// let apiKey = try config.requiredString(forKey: ["api", "key"], isSecret: true)
+    /// let requiredValue = try config.requiredIntArray(forKey: ["api", "key"], isSecret: true)
     /// ```
     ///
     /// - Parameters:
@@ -736,7 +736,7 @@ extension ConfigReader {
     /// If the value doesn't exist or can't be converted to the expected type, the method returns `nil`.
     ///
     /// ```swift
-    /// let port = config.int(forKey: ["server", "port"])
+    /// let configValue = config.doubleArray(forKey: ["server", "port"])
     /// ```
     ///
     /// - Parameters:
@@ -769,7 +769,7 @@ extension ConfigReader {
     /// returns the default value instead.
     ///
     /// ```swift
-    /// let maxRetries = config.int(forKey: ["network", "maxRetries"], default: 3)
+    /// let configValue = config.doubleArray(forKey: ["network", "maxRetries"], default: [1.0, 2.0])
     /// ```
     ///
     /// - Parameters:
@@ -804,7 +804,7 @@ extension ConfigReader {
     /// The method throws an error if the value is missing or can't be converted to the expected type.
     ///
     /// ```swift
-    /// let apiKey = try config.requiredString(forKey: ["api", "key"], isSecret: true)
+    /// let requiredValue = try config.requiredDoubleArray(forKey: ["api", "key"], isSecret: true)
     /// ```
     ///
     /// - Parameters:
@@ -837,7 +837,7 @@ extension ConfigReader {
     /// If the value doesn't exist or can't be converted to the expected type, the method returns `nil`.
     ///
     /// ```swift
-    /// let port = config.int(forKey: ["server", "port"])
+    /// let configValue = config.boolArray(forKey: ["server", "port"])
     /// ```
     ///
     /// - Parameters:
@@ -870,7 +870,7 @@ extension ConfigReader {
     /// returns the default value instead.
     ///
     /// ```swift
-    /// let maxRetries = config.int(forKey: ["network", "maxRetries"], default: 3)
+    /// let configValue = config.boolArray(forKey: ["network", "maxRetries"], default: [true, false])
     /// ```
     ///
     /// - Parameters:
@@ -905,7 +905,7 @@ extension ConfigReader {
     /// The method throws an error if the value is missing or can't be converted to the expected type.
     ///
     /// ```swift
-    /// let apiKey = try config.requiredString(forKey: ["api", "key"], isSecret: true)
+    /// let requiredValue = try config.requiredBoolArray(forKey: ["api", "key"], isSecret: true)
     /// ```
     ///
     /// - Parameters:
@@ -938,7 +938,7 @@ extension ConfigReader {
     /// If the value doesn't exist or can't be converted to the expected type, the method returns `nil`.
     ///
     /// ```swift
-    /// let port = config.int(forKey: ["server", "port"])
+    /// let configValue = config.byteChunkArray(forKey: ["server", "port"])
     /// ```
     ///
     /// - Parameters:
@@ -971,7 +971,7 @@ extension ConfigReader {
     /// returns the default value instead.
     ///
     /// ```swift
-    /// let maxRetries = config.int(forKey: ["network", "maxRetries"], default: 3)
+    /// let configValue = config.byteChunkArray(forKey: ["network", "maxRetries"], default: [[0x01], [0x02]])
     /// ```
     ///
     /// - Parameters:
@@ -1006,7 +1006,7 @@ extension ConfigReader {
     /// The method throws an error if the value is missing or can't be converted to the expected type.
     ///
     /// ```swift
-    /// let apiKey = try config.requiredString(forKey: ["api", "key"], isSecret: true)
+    /// let requiredValue = try config.requiredByteChunkArray(forKey: ["api", "key"], isSecret: true)
     /// ```
     ///
     /// - Parameters:
@@ -1903,7 +1903,7 @@ extension ConfigReader {
     /// network requests or other async operations.
     ///
     /// ```swift
-    /// let timeout = try await config.fetchDouble(forKey: ["network", "timeout"])
+    /// let fetchedValue = try await config.fetchString(forKey: ["network", "timeout"])
     /// ```
     ///
     /// - Parameters:
@@ -1936,7 +1936,7 @@ extension ConfigReader {
     /// If the configuration value is missing, the method returns the default value instead.
     ///
     /// ```swift
-    /// let maxRetries = try await config.fetchInt(forKey: ["network", "maxRetries"], default: 3)
+    /// let fetchedValue = try await config.fetchString(forKey: ["network", "maxRetries"], default: "localhost")
     /// ```
     ///
     /// - Parameters:
@@ -1973,7 +1973,7 @@ extension ConfigReader {
     /// missing or can't be converted to the expected type.
     ///
     /// ```swift
-    /// let apiKey = try await config.fetchRequiredString(forKey: ["api", "key"], isSecret: true)
+    /// let requiredValue = try await config.fetchRequiredString(forKey: ["api", "key"], isSecret: true)
     /// ```
     ///
     /// - Parameters:
@@ -2008,7 +2008,7 @@ extension ConfigReader {
     /// network requests or other async operations.
     ///
     /// ```swift
-    /// let timeout = try await config.fetchDouble(forKey: ["network", "timeout"])
+    /// let fetchedValue = try await config.fetchInt(forKey: ["network", "timeout"])
     /// ```
     ///
     /// - Parameters:
@@ -2041,7 +2041,7 @@ extension ConfigReader {
     /// If the configuration value is missing, the method returns the default value instead.
     ///
     /// ```swift
-    /// let maxRetries = try await config.fetchInt(forKey: ["network", "maxRetries"], default: 3)
+    /// let fetchedValue = try await config.fetchInt(forKey: ["network", "maxRetries"], default: 3)
     /// ```
     ///
     /// - Parameters:
@@ -2078,7 +2078,7 @@ extension ConfigReader {
     /// missing or can't be converted to the expected type.
     ///
     /// ```swift
-    /// let apiKey = try await config.fetchRequiredString(forKey: ["api", "key"], isSecret: true)
+    /// let requiredValue = try await config.fetchRequiredInt(forKey: ["api", "key"], isSecret: true)
     /// ```
     ///
     /// - Parameters:
@@ -2113,7 +2113,7 @@ extension ConfigReader {
     /// network requests or other async operations.
     ///
     /// ```swift
-    /// let timeout = try await config.fetchDouble(forKey: ["network", "timeout"])
+    /// let fetchedValue = try await config.fetchDouble(forKey: ["network", "timeout"])
     /// ```
     ///
     /// - Parameters:
@@ -2146,7 +2146,7 @@ extension ConfigReader {
     /// If the configuration value is missing, the method returns the default value instead.
     ///
     /// ```swift
-    /// let maxRetries = try await config.fetchInt(forKey: ["network", "maxRetries"], default: 3)
+    /// let fetchedValue = try await config.fetchDouble(forKey: ["network", "maxRetries"], default: 3.14)
     /// ```
     ///
     /// - Parameters:
@@ -2183,7 +2183,7 @@ extension ConfigReader {
     /// missing or can't be converted to the expected type.
     ///
     /// ```swift
-    /// let apiKey = try await config.fetchRequiredString(forKey: ["api", "key"], isSecret: true)
+    /// let requiredValue = try await config.fetchRequiredDouble(forKey: ["api", "key"], isSecret: true)
     /// ```
     ///
     /// - Parameters:
@@ -2218,7 +2218,7 @@ extension ConfigReader {
     /// network requests or other async operations.
     ///
     /// ```swift
-    /// let timeout = try await config.fetchDouble(forKey: ["network", "timeout"])
+    /// let fetchedValue = try await config.fetchBool(forKey: ["network", "timeout"])
     /// ```
     ///
     /// - Parameters:
@@ -2251,7 +2251,7 @@ extension ConfigReader {
     /// If the configuration value is missing, the method returns the default value instead.
     ///
     /// ```swift
-    /// let maxRetries = try await config.fetchInt(forKey: ["network", "maxRetries"], default: 3)
+    /// let fetchedValue = try await config.fetchBool(forKey: ["network", "maxRetries"], default: true)
     /// ```
     ///
     /// - Parameters:
@@ -2288,7 +2288,7 @@ extension ConfigReader {
     /// missing or can't be converted to the expected type.
     ///
     /// ```swift
-    /// let apiKey = try await config.fetchRequiredString(forKey: ["api", "key"], isSecret: true)
+    /// let requiredValue = try await config.fetchRequiredBool(forKey: ["api", "key"], isSecret: true)
     /// ```
     ///
     /// - Parameters:
@@ -2323,7 +2323,7 @@ extension ConfigReader {
     /// network requests or other async operations.
     ///
     /// ```swift
-    /// let timeout = try await config.fetchDouble(forKey: ["network", "timeout"])
+    /// let fetchedValue = try await config.fetchBytes(forKey: ["network", "timeout"])
     /// ```
     ///
     /// - Parameters:
@@ -2356,7 +2356,7 @@ extension ConfigReader {
     /// If the configuration value is missing, the method returns the default value instead.
     ///
     /// ```swift
-    /// let maxRetries = try await config.fetchInt(forKey: ["network", "maxRetries"], default: 3)
+    /// let fetchedValue = try await config.fetchBytes(forKey: ["network", "maxRetries"], default: [0x01, 0x02])
     /// ```
     ///
     /// - Parameters:
@@ -2393,7 +2393,7 @@ extension ConfigReader {
     /// missing or can't be converted to the expected type.
     ///
     /// ```swift
-    /// let apiKey = try await config.fetchRequiredString(forKey: ["api", "key"], isSecret: true)
+    /// let requiredValue = try await config.fetchRequiredBytes(forKey: ["api", "key"], isSecret: true)
     /// ```
     ///
     /// - Parameters:
@@ -2428,7 +2428,7 @@ extension ConfigReader {
     /// network requests or other async operations.
     ///
     /// ```swift
-    /// let timeout = try await config.fetchDouble(forKey: ["network", "timeout"])
+    /// let fetchedValue = try await config.fetchStringArray(forKey: ["network", "timeout"])
     /// ```
     ///
     /// - Parameters:
@@ -2461,7 +2461,7 @@ extension ConfigReader {
     /// If the configuration value is missing, the method returns the default value instead.
     ///
     /// ```swift
-    /// let maxRetries = try await config.fetchInt(forKey: ["network", "maxRetries"], default: 3)
+    /// let fetchedValue = try await config.fetchStringArray(forKey: ["network", "maxRetries"], default: ["a", "b"])
     /// ```
     ///
     /// - Parameters:
@@ -2498,7 +2498,7 @@ extension ConfigReader {
     /// missing or can't be converted to the expected type.
     ///
     /// ```swift
-    /// let apiKey = try await config.fetchRequiredString(forKey: ["api", "key"], isSecret: true)
+    /// let requiredValue = try await config.fetchRequiredStringArray(forKey: ["api", "key"], isSecret: true)
     /// ```
     ///
     /// - Parameters:
@@ -2533,7 +2533,7 @@ extension ConfigReader {
     /// network requests or other async operations.
     ///
     /// ```swift
-    /// let timeout = try await config.fetchDouble(forKey: ["network", "timeout"])
+    /// let fetchedValue = try await config.fetchIntArray(forKey: ["network", "timeout"])
     /// ```
     ///
     /// - Parameters:
@@ -2566,7 +2566,7 @@ extension ConfigReader {
     /// If the configuration value is missing, the method returns the default value instead.
     ///
     /// ```swift
-    /// let maxRetries = try await config.fetchInt(forKey: ["network", "maxRetries"], default: 3)
+    /// let fetchedValue = try await config.fetchIntArray(forKey: ["network", "maxRetries"], default: [1, 2])
     /// ```
     ///
     /// - Parameters:
@@ -2603,7 +2603,7 @@ extension ConfigReader {
     /// missing or can't be converted to the expected type.
     ///
     /// ```swift
-    /// let apiKey = try await config.fetchRequiredString(forKey: ["api", "key"], isSecret: true)
+    /// let requiredValue = try await config.fetchRequiredIntArray(forKey: ["api", "key"], isSecret: true)
     /// ```
     ///
     /// - Parameters:
@@ -2638,7 +2638,7 @@ extension ConfigReader {
     /// network requests or other async operations.
     ///
     /// ```swift
-    /// let timeout = try await config.fetchDouble(forKey: ["network", "timeout"])
+    /// let fetchedValue = try await config.fetchDoubleArray(forKey: ["network", "timeout"])
     /// ```
     ///
     /// - Parameters:
@@ -2671,7 +2671,7 @@ extension ConfigReader {
     /// If the configuration value is missing, the method returns the default value instead.
     ///
     /// ```swift
-    /// let maxRetries = try await config.fetchInt(forKey: ["network", "maxRetries"], default: 3)
+    /// let fetchedValue = try await config.fetchDoubleArray(forKey: ["network", "maxRetries"], default: [1.0, 2.0])
     /// ```
     ///
     /// - Parameters:
@@ -2708,7 +2708,7 @@ extension ConfigReader {
     /// missing or can't be converted to the expected type.
     ///
     /// ```swift
-    /// let apiKey = try await config.fetchRequiredString(forKey: ["api", "key"], isSecret: true)
+    /// let requiredValue = try await config.fetchRequiredDoubleArray(forKey: ["api", "key"], isSecret: true)
     /// ```
     ///
     /// - Parameters:
@@ -2743,7 +2743,7 @@ extension ConfigReader {
     /// network requests or other async operations.
     ///
     /// ```swift
-    /// let timeout = try await config.fetchDouble(forKey: ["network", "timeout"])
+    /// let fetchedValue = try await config.fetchBoolArray(forKey: ["network", "timeout"])
     /// ```
     ///
     /// - Parameters:
@@ -2776,7 +2776,7 @@ extension ConfigReader {
     /// If the configuration value is missing, the method returns the default value instead.
     ///
     /// ```swift
-    /// let maxRetries = try await config.fetchInt(forKey: ["network", "maxRetries"], default: 3)
+    /// let fetchedValue = try await config.fetchBoolArray(forKey: ["network", "maxRetries"], default: [true, false])
     /// ```
     ///
     /// - Parameters:
@@ -2813,7 +2813,7 @@ extension ConfigReader {
     /// missing or can't be converted to the expected type.
     ///
     /// ```swift
-    /// let apiKey = try await config.fetchRequiredString(forKey: ["api", "key"], isSecret: true)
+    /// let requiredValue = try await config.fetchRequiredBoolArray(forKey: ["api", "key"], isSecret: true)
     /// ```
     ///
     /// - Parameters:
@@ -2848,7 +2848,7 @@ extension ConfigReader {
     /// network requests or other async operations.
     ///
     /// ```swift
-    /// let timeout = try await config.fetchDouble(forKey: ["network", "timeout"])
+    /// let fetchedValue = try await config.fetchByteChunkArray(forKey: ["network", "timeout"])
     /// ```
     ///
     /// - Parameters:
@@ -2881,7 +2881,7 @@ extension ConfigReader {
     /// If the configuration value is missing, the method returns the default value instead.
     ///
     /// ```swift
-    /// let maxRetries = try await config.fetchInt(forKey: ["network", "maxRetries"], default: 3)
+    /// let fetchedValue = try await config.fetchByteChunkArray(forKey: ["network", "maxRetries"], default: [[0x01], [0x02]])
     /// ```
     ///
     /// - Parameters:
@@ -2918,7 +2918,7 @@ extension ConfigReader {
     /// missing or can't be converted to the expected type.
     ///
     /// ```swift
-    /// let apiKey = try await config.fetchRequiredString(forKey: ["api", "key"], isSecret: true)
+    /// let requiredValue = try await config.fetchRequiredByteChunkArray(forKey: ["api", "key"], isSecret: true)
     /// ```
     ///
     /// - Parameters:
@@ -3818,12 +3818,12 @@ extension ConfigReader {
     /// or `nil` if the value is missing or can't be converted.
     ///
     /// ```swift
-    /// try await config.watchInt(forKey: ["server", "port"]) { updates in
-    ///     for await port in updates {
-    ///         if let port = port {
-    ///             print("Server port is: \(port)")
+    /// try await config.watchString(forKey: ["server", "port"]) { updates in
+    ///     for await updatedValue in updates {
+    ///         if let updatedValue {
+    ///             print("Updated value is: \(updatedValue)")
     ///         } else {
-    ///             print("No server port configured")
+    ///             print("No value configured")
     ///         }
     ///     }
     /// }
@@ -3864,9 +3864,9 @@ extension ConfigReader {
     /// or the default value if the configuration value is missing or can't be converted.
     ///
     /// ```swift
-    /// try await config.watchInt(forKey: ["server", "port"], default: 8080) { updates in
-    ///     for await port in updates {
-    ///         print("Server port is: \(port)")
+    /// try await config.watchString(forKey: ["server", "port"], default: "localhost") { updates in
+    ///     for await updatedValue in updates {
+    ///         print("Updated value is: \(updatedValue)")
     ///     }
     /// }
     /// ```
@@ -3909,9 +3909,9 @@ extension ConfigReader {
     /// or an error if the configuration value is missing or can't be converted.
     ///
     /// ```swift
-    /// try await config.watchRequiredInt(forKey: ["server", "port"]) { updates in
-    ///     for try await port in updates {
-    ///         print("Server port is: \(port)")
+    /// try await config.watchRequiredString(forKey: ["server", "port"]) { updates in
+    ///     for try await updatedValue in updates {
+    ///         print("Updated value is: \(updatedValue)")
     ///     }
     /// }
     /// ```
@@ -3952,11 +3952,11 @@ extension ConfigReader {
     ///
     /// ```swift
     /// try await config.watchInt(forKey: ["server", "port"]) { updates in
-    ///     for await port in updates {
-    ///         if let port = port {
-    ///             print("Server port is: \(port)")
+    ///     for await updatedValue in updates {
+    ///         if let updatedValue {
+    ///             print("Updated value is: \(updatedValue)")
     ///         } else {
-    ///             print("No server port configured")
+    ///             print("No value configured")
     ///         }
     ///     }
     /// }
@@ -3997,9 +3997,9 @@ extension ConfigReader {
     /// or the default value if the configuration value is missing or can't be converted.
     ///
     /// ```swift
-    /// try await config.watchInt(forKey: ["server", "port"], default: 8080) { updates in
-    ///     for await port in updates {
-    ///         print("Server port is: \(port)")
+    /// try await config.watchInt(forKey: ["server", "port"], default: 3) { updates in
+    ///     for await updatedValue in updates {
+    ///         print("Updated value is: \(updatedValue)")
     ///     }
     /// }
     /// ```
@@ -4043,8 +4043,8 @@ extension ConfigReader {
     ///
     /// ```swift
     /// try await config.watchRequiredInt(forKey: ["server", "port"]) { updates in
-    ///     for try await port in updates {
-    ///         print("Server port is: \(port)")
+    ///     for try await updatedValue in updates {
+    ///         print("Updated value is: \(updatedValue)")
     ///     }
     /// }
     /// ```
@@ -4084,12 +4084,12 @@ extension ConfigReader {
     /// or `nil` if the value is missing or can't be converted.
     ///
     /// ```swift
-    /// try await config.watchInt(forKey: ["server", "port"]) { updates in
-    ///     for await port in updates {
-    ///         if let port = port {
-    ///             print("Server port is: \(port)")
+    /// try await config.watchDouble(forKey: ["server", "port"]) { updates in
+    ///     for await updatedValue in updates {
+    ///         if let updatedValue {
+    ///             print("Updated value is: \(updatedValue)")
     ///         } else {
-    ///             print("No server port configured")
+    ///             print("No value configured")
     ///         }
     ///     }
     /// }
@@ -4130,9 +4130,9 @@ extension ConfigReader {
     /// or the default value if the configuration value is missing or can't be converted.
     ///
     /// ```swift
-    /// try await config.watchInt(forKey: ["server", "port"], default: 8080) { updates in
-    ///     for await port in updates {
-    ///         print("Server port is: \(port)")
+    /// try await config.watchDouble(forKey: ["server", "port"], default: 3.14) { updates in
+    ///     for await updatedValue in updates {
+    ///         print("Updated value is: \(updatedValue)")
     ///     }
     /// }
     /// ```
@@ -4175,9 +4175,9 @@ extension ConfigReader {
     /// or an error if the configuration value is missing or can't be converted.
     ///
     /// ```swift
-    /// try await config.watchRequiredInt(forKey: ["server", "port"]) { updates in
-    ///     for try await port in updates {
-    ///         print("Server port is: \(port)")
+    /// try await config.watchRequiredDouble(forKey: ["server", "port"]) { updates in
+    ///     for try await updatedValue in updates {
+    ///         print("Updated value is: \(updatedValue)")
     ///     }
     /// }
     /// ```
@@ -4217,12 +4217,12 @@ extension ConfigReader {
     /// or `nil` if the value is missing or can't be converted.
     ///
     /// ```swift
-    /// try await config.watchInt(forKey: ["server", "port"]) { updates in
-    ///     for await port in updates {
-    ///         if let port = port {
-    ///             print("Server port is: \(port)")
+    /// try await config.watchBool(forKey: ["server", "port"]) { updates in
+    ///     for await updatedValue in updates {
+    ///         if let updatedValue {
+    ///             print("Updated value is: \(updatedValue)")
     ///         } else {
-    ///             print("No server port configured")
+    ///             print("No value configured")
     ///         }
     ///     }
     /// }
@@ -4263,9 +4263,9 @@ extension ConfigReader {
     /// or the default value if the configuration value is missing or can't be converted.
     ///
     /// ```swift
-    /// try await config.watchInt(forKey: ["server", "port"], default: 8080) { updates in
-    ///     for await port in updates {
-    ///         print("Server port is: \(port)")
+    /// try await config.watchBool(forKey: ["server", "port"], default: true) { updates in
+    ///     for await updatedValue in updates {
+    ///         print("Updated value is: \(updatedValue)")
     ///     }
     /// }
     /// ```
@@ -4308,9 +4308,9 @@ extension ConfigReader {
     /// or an error if the configuration value is missing or can't be converted.
     ///
     /// ```swift
-    /// try await config.watchRequiredInt(forKey: ["server", "port"]) { updates in
-    ///     for try await port in updates {
-    ///         print("Server port is: \(port)")
+    /// try await config.watchRequiredBool(forKey: ["server", "port"]) { updates in
+    ///     for try await updatedValue in updates {
+    ///         print("Updated value is: \(updatedValue)")
     ///     }
     /// }
     /// ```
@@ -4350,12 +4350,12 @@ extension ConfigReader {
     /// or `nil` if the value is missing or can't be converted.
     ///
     /// ```swift
-    /// try await config.watchInt(forKey: ["server", "port"]) { updates in
-    ///     for await port in updates {
-    ///         if let port = port {
-    ///             print("Server port is: \(port)")
+    /// try await config.watchBytes(forKey: ["server", "port"]) { updates in
+    ///     for await updatedValue in updates {
+    ///         if let updatedValue {
+    ///             print("Updated value is: \(updatedValue)")
     ///         } else {
-    ///             print("No server port configured")
+    ///             print("No value configured")
     ///         }
     ///     }
     /// }
@@ -4396,9 +4396,9 @@ extension ConfigReader {
     /// or the default value if the configuration value is missing or can't be converted.
     ///
     /// ```swift
-    /// try await config.watchInt(forKey: ["server", "port"], default: 8080) { updates in
-    ///     for await port in updates {
-    ///         print("Server port is: \(port)")
+    /// try await config.watchBytes(forKey: ["server", "port"], default: [0x01, 0x02]) { updates in
+    ///     for await updatedValue in updates {
+    ///         print("Updated value is: \(updatedValue)")
     ///     }
     /// }
     /// ```
@@ -4441,9 +4441,9 @@ extension ConfigReader {
     /// or an error if the configuration value is missing or can't be converted.
     ///
     /// ```swift
-    /// try await config.watchRequiredInt(forKey: ["server", "port"]) { updates in
-    ///     for try await port in updates {
-    ///         print("Server port is: \(port)")
+    /// try await config.watchRequiredBytes(forKey: ["server", "port"]) { updates in
+    ///     for try await updatedValue in updates {
+    ///         print("Updated value is: \(updatedValue)")
     ///     }
     /// }
     /// ```
@@ -4483,12 +4483,12 @@ extension ConfigReader {
     /// or `nil` if the value is missing or can't be converted.
     ///
     /// ```swift
-    /// try await config.watchInt(forKey: ["server", "port"]) { updates in
-    ///     for await port in updates {
-    ///         if let port = port {
-    ///             print("Server port is: \(port)")
+    /// try await config.watchStringArray(forKey: ["server", "port"]) { updates in
+    ///     for await updatedValue in updates {
+    ///         if let updatedValue {
+    ///             print("Updated value is: \(updatedValue)")
     ///         } else {
-    ///             print("No server port configured")
+    ///             print("No value configured")
     ///         }
     ///     }
     /// }
@@ -4529,9 +4529,9 @@ extension ConfigReader {
     /// or the default value if the configuration value is missing or can't be converted.
     ///
     /// ```swift
-    /// try await config.watchInt(forKey: ["server", "port"], default: 8080) { updates in
-    ///     for await port in updates {
-    ///         print("Server port is: \(port)")
+    /// try await config.watchStringArray(forKey: ["server", "port"], default: ["a", "b"]) { updates in
+    ///     for await updatedValue in updates {
+    ///         print("Updated value is: \(updatedValue)")
     ///     }
     /// }
     /// ```
@@ -4574,9 +4574,9 @@ extension ConfigReader {
     /// or an error if the configuration value is missing or can't be converted.
     ///
     /// ```swift
-    /// try await config.watchRequiredInt(forKey: ["server", "port"]) { updates in
-    ///     for try await port in updates {
-    ///         print("Server port is: \(port)")
+    /// try await config.watchRequiredStringArray(forKey: ["server", "port"]) { updates in
+    ///     for try await updatedValue in updates {
+    ///         print("Updated value is: \(updatedValue)")
     ///     }
     /// }
     /// ```
@@ -4616,12 +4616,12 @@ extension ConfigReader {
     /// or `nil` if the value is missing or can't be converted.
     ///
     /// ```swift
-    /// try await config.watchInt(forKey: ["server", "port"]) { updates in
-    ///     for await port in updates {
-    ///         if let port = port {
-    ///             print("Server port is: \(port)")
+    /// try await config.watchIntArray(forKey: ["server", "port"]) { updates in
+    ///     for await updatedValue in updates {
+    ///         if let updatedValue {
+    ///             print("Updated value is: \(updatedValue)")
     ///         } else {
-    ///             print("No server port configured")
+    ///             print("No value configured")
     ///         }
     ///     }
     /// }
@@ -4662,9 +4662,9 @@ extension ConfigReader {
     /// or the default value if the configuration value is missing or can't be converted.
     ///
     /// ```swift
-    /// try await config.watchInt(forKey: ["server", "port"], default: 8080) { updates in
-    ///     for await port in updates {
-    ///         print("Server port is: \(port)")
+    /// try await config.watchIntArray(forKey: ["server", "port"], default: [1, 2]) { updates in
+    ///     for await updatedValue in updates {
+    ///         print("Updated value is: \(updatedValue)")
     ///     }
     /// }
     /// ```
@@ -4707,9 +4707,9 @@ extension ConfigReader {
     /// or an error if the configuration value is missing or can't be converted.
     ///
     /// ```swift
-    /// try await config.watchRequiredInt(forKey: ["server", "port"]) { updates in
-    ///     for try await port in updates {
-    ///         print("Server port is: \(port)")
+    /// try await config.watchRequiredIntArray(forKey: ["server", "port"]) { updates in
+    ///     for try await updatedValue in updates {
+    ///         print("Updated value is: \(updatedValue)")
     ///     }
     /// }
     /// ```
@@ -4749,12 +4749,12 @@ extension ConfigReader {
     /// or `nil` if the value is missing or can't be converted.
     ///
     /// ```swift
-    /// try await config.watchInt(forKey: ["server", "port"]) { updates in
-    ///     for await port in updates {
-    ///         if let port = port {
-    ///             print("Server port is: \(port)")
+    /// try await config.watchDoubleArray(forKey: ["server", "port"]) { updates in
+    ///     for await updatedValue in updates {
+    ///         if let updatedValue {
+    ///             print("Updated value is: \(updatedValue)")
     ///         } else {
-    ///             print("No server port configured")
+    ///             print("No value configured")
     ///         }
     ///     }
     /// }
@@ -4795,9 +4795,9 @@ extension ConfigReader {
     /// or the default value if the configuration value is missing or can't be converted.
     ///
     /// ```swift
-    /// try await config.watchInt(forKey: ["server", "port"], default: 8080) { updates in
-    ///     for await port in updates {
-    ///         print("Server port is: \(port)")
+    /// try await config.watchDoubleArray(forKey: ["server", "port"], default: [1.0, 2.0]) { updates in
+    ///     for await updatedValue in updates {
+    ///         print("Updated value is: \(updatedValue)")
     ///     }
     /// }
     /// ```
@@ -4840,9 +4840,9 @@ extension ConfigReader {
     /// or an error if the configuration value is missing or can't be converted.
     ///
     /// ```swift
-    /// try await config.watchRequiredInt(forKey: ["server", "port"]) { updates in
-    ///     for try await port in updates {
-    ///         print("Server port is: \(port)")
+    /// try await config.watchRequiredDoubleArray(forKey: ["server", "port"]) { updates in
+    ///     for try await updatedValue in updates {
+    ///         print("Updated value is: \(updatedValue)")
     ///     }
     /// }
     /// ```
@@ -4882,12 +4882,12 @@ extension ConfigReader {
     /// or `nil` if the value is missing or can't be converted.
     ///
     /// ```swift
-    /// try await config.watchInt(forKey: ["server", "port"]) { updates in
-    ///     for await port in updates {
-    ///         if let port = port {
-    ///             print("Server port is: \(port)")
+    /// try await config.watchBoolArray(forKey: ["server", "port"]) { updates in
+    ///     for await updatedValue in updates {
+    ///         if let updatedValue {
+    ///             print("Updated value is: \(updatedValue)")
     ///         } else {
-    ///             print("No server port configured")
+    ///             print("No value configured")
     ///         }
     ///     }
     /// }
@@ -4928,9 +4928,9 @@ extension ConfigReader {
     /// or the default value if the configuration value is missing or can't be converted.
     ///
     /// ```swift
-    /// try await config.watchInt(forKey: ["server", "port"], default: 8080) { updates in
-    ///     for await port in updates {
-    ///         print("Server port is: \(port)")
+    /// try await config.watchBoolArray(forKey: ["server", "port"], default: [true, false]) { updates in
+    ///     for await updatedValue in updates {
+    ///         print("Updated value is: \(updatedValue)")
     ///     }
     /// }
     /// ```
@@ -4973,9 +4973,9 @@ extension ConfigReader {
     /// or an error if the configuration value is missing or can't be converted.
     ///
     /// ```swift
-    /// try await config.watchRequiredInt(forKey: ["server", "port"]) { updates in
-    ///     for try await port in updates {
-    ///         print("Server port is: \(port)")
+    /// try await config.watchRequiredBoolArray(forKey: ["server", "port"]) { updates in
+    ///     for try await updatedValue in updates {
+    ///         print("Updated value is: \(updatedValue)")
     ///     }
     /// }
     /// ```
@@ -5015,12 +5015,12 @@ extension ConfigReader {
     /// or `nil` if the value is missing or can't be converted.
     ///
     /// ```swift
-    /// try await config.watchInt(forKey: ["server", "port"]) { updates in
-    ///     for await port in updates {
-    ///         if let port = port {
-    ///             print("Server port is: \(port)")
+    /// try await config.watchByteChunkArray(forKey: ["server", "port"]) { updates in
+    ///     for await updatedValue in updates {
+    ///         if let updatedValue {
+    ///             print("Updated value is: \(updatedValue)")
     ///         } else {
-    ///             print("No server port configured")
+    ///             print("No value configured")
     ///         }
     ///     }
     /// }
@@ -5061,9 +5061,9 @@ extension ConfigReader {
     /// or the default value if the configuration value is missing or can't be converted.
     ///
     /// ```swift
-    /// try await config.watchInt(forKey: ["server", "port"], default: 8080) { updates in
-    ///     for await port in updates {
-    ///         print("Server port is: \(port)")
+    /// try await config.watchByteChunkArray(forKey: ["server", "port"], default: [[0x01], [0x02]]) { updates in
+    ///     for await updatedValue in updates {
+    ///         print("Updated value is: \(updatedValue)")
     ///     }
     /// }
     /// ```
@@ -5106,9 +5106,9 @@ extension ConfigReader {
     /// or an error if the configuration value is missing or can't be converted.
     ///
     /// ```swift
-    /// try await config.watchRequiredInt(forKey: ["server", "port"]) { updates in
-    ///     for try await port in updates {
-    ///         print("Server port is: \(port)")
+    /// try await config.watchRequiredByteChunkArray(forKey: ["server", "port"]) { updates in
+    ///     for try await updatedValue in updates {
+    ///         print("Updated value is: \(updatedValue)")
     ///     }
     /// }
     /// ```
