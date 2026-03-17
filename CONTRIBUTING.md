@@ -14,7 +14,7 @@ Specify the following:
 * Swift Configuration version
 * Contextual information (e.g. what you were trying to achieve with swift-configuration)
 * Simplest possible steps to reproduce
-  * More complex the steps are, lower the priority will be.
+  * The more complex the steps are, the lower the priority will be.
   * A pull request with failing test case is preferred, but it's just fine to paste the test case into the issue description.
 * Anything that might be relevant in your opinion, such as:
   * Swift version or the output of `swift --version`
