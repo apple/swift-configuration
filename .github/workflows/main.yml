@@ -135,6 +135,26 @@ jobs:
       name: "Example packages"
       matrix_string: '${{ needs.construct-example-packages-matrix.outputs.example-packages-matrix }}'
 
+  example-xcode-projects:
+    strategy:
+      matrix:
+        destination: 
+          - generic/platform=macOS
+          - generic/platform=iOS Simulator
+          - generic/platform=tvOS Simulator
+          - generic/platform=visionOS Simulator
+    name: Example Xcode projects
+    runs-on: macos-26
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - name: Build
+        run: ./Scripts/test-xcode-examples.sh
+        env:
+          XCODEBUILD_DESTINATION: ${{ matrix.destination }}
+
   benchmarks:
     name: Benchmarks
     uses: apple/swift-nio/.github/workflows/benchmarks.yml@main
