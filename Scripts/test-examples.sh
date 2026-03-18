@@ -15,8 +15,8 @@ TMP_DIR=$(/usr/bin/mktemp -d -p "${TMPDIR-/tmp}" "$(basename "$0").XXXXXXXXXX")
 PACKAGE_PATH=${PACKAGE_PATH:-${REPO_ROOT}}
 EXAMPLES_PACKAGE_PATH="${PACKAGE_PATH}/Examples"
 SHARED_EXAMPLE_HARNESS_PACKAGE_PATH="${TMP_DIR}/example-harness"
-SHARED_PACKAGE_SCRATCH_PATH="${TMP_DIR}/example-cache"
-SHARED_PACKAGE_CACHE_PATH="${TMP_DIR}/example-scratch"
+SHARED_PACKAGE_SCRATCH_PATH="${TMP_DIR}/example-scratch"
+SHARED_PACKAGE_CACHE_PATH="${TMP_DIR}/example-cache"
 
 for EXAMPLE_PACKAGE_PATH in $(find "${EXAMPLES_PACKAGE_PATH}" -maxdepth 2 -name Package.swift -type f -print0 | xargs -0 dirname | sort); do
 
