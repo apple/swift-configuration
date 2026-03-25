@@ -21,8 +21,8 @@ struct HelloWorldAppExampleApp: App {
 
     init() {
         let config = ConfigReader(providers: [
+            CommandLineArgumentsProvider(),
             EnvironmentVariablesProvider(),
-            InMemoryProvider(values: ["greetedName": "Memory"]),
         ])
         greetedName = config.string(forKey: "greetedName", default: "World")
     }
