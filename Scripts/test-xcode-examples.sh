@@ -15,8 +15,9 @@ TMP_DIR=$(/usr/bin/mktemp -d -p "${TMPDIR-/tmp}" "$(basename "$0").XXXXXXXXXX")
 PACKAGE_PATH=${PACKAGE_PATH:-${REPO_ROOT}}
 EXAMPLES_PACKAGE_PATH="${PACKAGE_PATH}/Examples"
 SHARED_EXAMPLE_HARNESS_PACKAGE_PATH="${TMP_DIR}/example-harness"
-SHARED_PACKAGE_SCRATCH_PATH="${TMP_DIR}/example-scratch"
+SHARED_DERIVED_DATA_PATH="${TMP_DIR}/example-derived-data"
 SHARED_PACKAGE_CACHE_PATH="${TMP_DIR}/example-cache"
+SHARED_CLONED_SOURCES_PATH="${TMP_DIR}/example-cloned-sources"
 XCODEBUILD_DESTINATION=${XCODEBUILD_DESTINATION:-"generic/platform=macOS"}
 ORIGINAL_LOCAL_DEPENDENCY_PATH=${ORIGINAL_LOCAL_DEPENDENCY_PATH:-"../../../swift-configuration"}
 
@@ -29,6 +30,10 @@ for EXAMPLE_PACKAGE_PATH in $(find "${EXAMPLES_PACKAGE_PATH}" -maxdepth 2 -name 
         continue
     fi
 
+    log "Recreating shared derived data directory: ${SHARED_DERIVED_DATA_PATH}"
+    rm -rf "${SHARED_DERIVED_DATA_PATH}"
+    mkdir -v "${SHARED_DERIVED_DATA_PATH}"
+
     log "Recreating shared example harness directory: ${SHARED_EXAMPLE_HARNESS_PACKAGE_PATH}"
     rm -rf "${SHARED_EXAMPLE_HARNESS_PACKAGE_PATH}"
     mkdir -v "${SHARED_EXAMPLE_HARNESS_PACKAGE_PATH}"
@@ -40,20 +45,21 @@ for EXAMPLE_PACKAGE_PATH in $(find "${EXAMPLES_PACKAGE_PATH}" -maxdepth 2 -name 
     log "Updating mtime of example contents..."
     find "${SHARED_EXAMPLE_HARNESS_PACKAGE_PATH}" -print0 | xargs -0 -n1 touch -m
 
+    # There is no CLI to modify dependencies, revert to sed
+    log "Re-overriding dependency in ${EXAMPLE_PACKAGE_NAME} to use ${PACKAGE_PATH}"
+    PBXPROJ_PATH=$(find $SHARED_EXAMPLE_HARNESS_PACKAGE_PATH -name "project.pbxproj" -type f -maxdepth 2)
+    sed -i '' "s|${ORIGINAL_LOCAL_DEPENDENCY_PATH}|${PACKAGE_PATH}|g" "$PBXPROJ_PATH"
+
+    PROJECT_PATH=$(find $SHARED_EXAMPLE_HARNESS_PACKAGE_PATH -name "*.xcodeproj" -type d -maxdepth 1)
+
     log "Building example app: ${EXAMPLE_PACKAGE_NAME}"
-    ( 
-        cd "${SHARED_EXAMPLE_HARNESS_PACKAGE_PATH}"
-
-        # There is no CLI to modify dependencies, revert to sed
-        PBXPROJ=$(find . -name "project.pbxproj" -type f -maxdepth 2)
-        sed -i '' "s|${ORIGINAL_LOCAL_DEPENDENCY_PATH}|${PACKAGE_PATH}|g" "$PBXPROJ"
-
-        "${XCODEBUILD_BIN}" build \
-            -scheme "${EXAMPLE_PACKAGE_NAME}" \
-            -destination "${XCODEBUILD_DESTINATION}" \
-            -clonedSourcePackagesDirPath "${SHARED_PACKAGE_CACHE_PATH}" \
-            -skipPackageUpdates \
-            -derivedDataPath "${SHARED_PACKAGE_SCRATCH_PATH}"
-        log "✅ Successfully built the example app ${EXAMPLE_PACKAGE_NAME}."
-    )
+    "${XCODEBUILD_BIN}" build \
+        -project "${PROJECT_PATH}" \
+        -scheme "${EXAMPLE_PACKAGE_NAME}" \
+        -destination "${XCODEBUILD_DESTINATION}" \
+        -packageCachePath "${SHARED_PACKAGE_CACHE_PATH}" \
+        -clonedSourcePackagesDirPath ${SHARED_CLONED_SOURCES_PATH} \
+        -skipPackageUpdates \
+        -derivedDataPath "${SHARED_DERIVED_DATA_PATH}"
+    log "✅ Successfully built the example app ${EXAMPLE_PACKAGE_NAME}."
 done
