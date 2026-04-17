@@ -13,7 +13,7 @@ env:
 jobs:
   soundness:
     name: Soundness
-    uses: swiftlang/github-workflows/.github/workflows/soundness.yml@0.0.8
+    uses: swiftlang/github-workflows/.github/workflows/soundness.yml@0.0.11
     with:
       license_header_check_project_name: "SwiftConfiguration"
 
