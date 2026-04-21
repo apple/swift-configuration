@@ -168,6 +168,28 @@ let jsonProvider = try await ReloadingFileProvider<JSONSnapshot>(
 )
 ```
 
+#### Observability metrics
+
+``ReloadingFileProvider`` emits metrics through [`swift-metrics`](https://github.com/apple/swift-metrics). By default, the provider uses the process-wide `MetricsSystem.factory`, so whichever backend you bootstrap (for example, `StatsdMetrics` or `PrometheusMetrics`) receives its counters and gauges. Pass an explicit `metrics:` argument to the initializer when you want to redirect them — for example, to an isolated registry in tests:
+
+```swift
+let provider = try await ReloadingFileProvider<JSONSnapshot>(
+    filePath: "/etc/config.json",
+    metrics: myTestMetricsFactory
+)
+```
+
+Every metric label starts with a prefix derived from the provider name, lowercased (for example, `reloadingfileprovider_poll_ticks_total`):
+
+| Metric                         | Type    | Meaning                                                                                                                 |
+|--------------------------------|---------|-------------------------------------------------------------------------------------------------------------------------|
+| `<prefix>_poll_ticks_total`    | Counter | Increments on every polling-cycle timestamp check, whether or not a reload was needed.                                  |
+| `<prefix>_poll_errors_total`   | Counter | Increments when the polling timestamp check fails (file-system error, permission issue, and so on).                     |
+| `<prefix>_reloads_total`       | Counter | Increments each time the provider successfully reloads and parses the configuration file after detecting a change.     |
+| `<prefix>_reload_errors_total` | Counter | Increments when a reload fails (parse error, file-system error, and so on).                                             |
+| `<prefix>_file_size_bytes`     | Gauge   | Current on-disk size of the configuration file in bytes, refreshed after every successful reload.                       |
+| `<prefix>_watchers_active`     | Gauge   | Total number of active value and snapshot watchers currently registered with the provider.                              |
+
 ### Migration from static providers
 
 1. **Replace initialization**:
