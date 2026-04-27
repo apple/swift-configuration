@@ -28,7 +28,7 @@ extension ConfigReader {
     /// If the value doesn't exist or can't be converted to the expected type, the method returns `nil`.
     ///
     /// ```swift
-    /// let port = config.int(forKey: ["server", "port"])
+    /// let port = config.${primitive_type["lowercase_name"]}(forKey: ["server", "port"])
     /// ```
     ///
     /// - Parameters:
@@ -61,7 +61,7 @@ extension ConfigReader {
     /// returns the default value instead.
     ///
     /// ```swift
-    /// let maxRetries = config.int(forKey: ["network", "maxRetries"], default: 3)
+    /// let maxRetries = config.${primitive_type["lowercase_name"]}(forKey: ["network", "maxRetries"], default: ${primitive_type["default_example"]})
     /// ```
     ///
     /// - Parameters:
@@ -96,7 +96,7 @@ extension ConfigReader {
     /// The method throws an error if the value is missing or can't be converted to the expected type.
     ///
     /// ```swift
-    /// let apiKey = try config.requiredString(forKey: ["api", "key"], isSecret: true)
+    /// let apiKey = try config.required${primitive_type["name"]}(forKey: ["api", "key"], isSecret: true)
     /// ```
     ///
     /// - Parameters:
@@ -569,7 +569,7 @@ extension ConfigReader {
     /// network requests or other async operations.
     ///
     /// ```swift
-    /// let timeout = try await config.fetchDouble(forKey: ["network", "timeout"])
+    /// let timeout = try await config.fetch${primitive_type["name"]}(forKey: ["network", "timeout"])
     /// ```
     ///
     /// - Parameters:
@@ -602,7 +602,7 @@ extension ConfigReader {
     /// If the configuration value is missing, the method returns the default value instead.
     ///
     /// ```swift
-    /// let maxRetries = try await config.fetchInt(forKey: ["network", "maxRetries"], default: 3)
+    /// let maxRetries = try await config.fetch${primitive_type["name"]}(forKey: ["network", "maxRetries"], default: ${primitive_type["default_example"]})
     /// ```
     ///
     /// - Parameters:
@@ -639,7 +639,7 @@ extension ConfigReader {
     /// missing or can't be converted to the expected type.
     ///
     /// ```swift
-    /// let apiKey = try await config.fetchRequiredString(forKey: ["api", "key"], isSecret: true)
+    /// let apiKey = try await config.fetchRequired${primitive_type["name"]}(forKey: ["api", "key"], isSecret: true)
     /// ```
     ///
     /// - Parameters:
@@ -1113,7 +1113,7 @@ extension ConfigReader {
     /// or `nil` if the value is missing or can't be converted.
     ///
     /// ```swift
-    /// try await config.watchInt(forKey: ["server", "port"]) { updates in
+    /// try await config.watch${primitive_type["name"]}(forKey: ["server", "port"]) { updates in
     ///     for await port in updates {
     ///         if let port = port {
     ///             print("Server port is: \(port)")
@@ -1159,7 +1159,7 @@ extension ConfigReader {
     /// or the default value if the configuration value is missing or can't be converted.
     ///
     /// ```swift
-    /// try await config.watchInt(forKey: ["server", "port"], default: 8080) { updates in
+    /// try await config.watch${primitive_type["name"]}(forKey: ["server", "port"], default: ${primitive_type["default_example"]}) { updates in
     ///     for await port in updates {
     ///         print("Server port is: \(port)")
     ///     }
@@ -1204,7 +1204,7 @@ extension ConfigReader {
     /// or an error if the configuration value is missing or can't be converted.
     ///
     /// ```swift
-    /// try await config.watchRequiredInt(forKey: ["server", "port"]) { updates in
+    /// try await config.watchRequired${primitive_type["name"]}(forKey: ["server", "port"]) { updates in
     ///     for try await port in updates {
     ///         print("Server port is: \(port)")
     ///     }
