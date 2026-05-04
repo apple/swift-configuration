@@ -57,4 +57,7 @@ public protocol ExpressibleByConfigStringArray: CustomStringConvertible {
     ///
     /// - Parameter configStringArray: The string array value from the configuration provider.
     init?(configStringArray: [String])
+    
+    /// Converts the value back into a configuration string array representation.
+    var configStringArray: [String] { get }
 }
