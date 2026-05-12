@@ -67,9 +67,9 @@ jobs:
       env_vars: '{"ENABLE_ALL_TRAITS":"1"}'
       runner_pool: general
       build_scheme: swift-configuration-Package
-      xcode_16_2_enabled: false
-      xcode_16_3_enabled: false
-      xcode_16_4_enabled: false
+      swift_6_1_enabled: true
+      swift_6_2_enabled: true
+      swift_6_3_enabled: true
 
   release-builds:
     name: Release builds
