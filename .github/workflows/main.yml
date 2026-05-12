@@ -60,7 +60,7 @@ jobs:
       env_vars: '{"ENABLE_ALL_TRAITS":"1"}'
       runner_pool: nightly
       build_scheme: swift-configuration-Package
-      swift_6_1_enabled: true
+      swift_6_1_enabled: false
       swift_6_2_enabled: true
       swift_6_3_enabled: true
 
