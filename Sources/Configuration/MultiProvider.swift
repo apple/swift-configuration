@@ -68,6 +68,7 @@ internal struct MultiProvider: Sendable {
 
     /// Creates a new multi-provider with the specified nested providers.
     /// - Parameter providers: The nested providers in precedence order (first provider has highest precedence).
+    /// - Precondition: providers must not be empty.
     init(providers: [any ConfigProvider]) {
         precondition(!providers.isEmpty, "MultiProvider requires at least one nested provider")
         self.storage = .init(providers: providers)
