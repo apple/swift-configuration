@@ -216,7 +216,7 @@ public struct BroadcastingAccessReporter: Sendable {
     /// Creates a new broadcasting access reporter.
     ///
     /// - Parameter upstreams: The reporters that will receive forwarded events.
-    /// - Precondition: upstreams must not be empty.
+    /// - Precondition: `upstreams` must not be empty.
     public init(upstreams: [any AccessReporter]) {
         precondition(!upstreams.isEmpty, "BroadcastingAccessReporter upstreams cannot be empty")
         self.upstreams = upstreams

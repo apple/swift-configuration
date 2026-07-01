@@ -272,7 +272,7 @@ public struct ConfigReader: Sendable {
     /// - Parameters:
     ///   - providers: The configuration providers, queried in order until a value is found.
     ///   - accessReporter: The reporter for configuration access events.
-    /// - Precondition: providers must not be empty.
+    /// - Precondition: `providers` must not be empty.
     public init(
         providers: [any ConfigProvider],
         accessReporter: (any AccessReporter)? = nil
