@@ -125,3 +125,27 @@ extension ConfigBytesFromStringDecoder where Self == ConfigBytesFromHexStringDec
     /// A decoder that interprets string values as hexadecimal-encoded data.
     public static var hex: Self { .init() }
 }
+
+@available(Configuration 1.0, *)
+extension ConfigBytesFromBase64StringDecoder: CustomStringConvertible {
+    // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
+    public var description: String { "ConfigBytesFromBase64StringDecoder" }
+}
+
+@available(Configuration 1.0, *)
+extension ConfigBytesFromBase64StringDecoder: CustomDebugStringConvertible {
+    // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
+    public var debugDescription: String { description }
+}
+
+@available(Configuration 1.0, *)
+extension ConfigBytesFromHexStringDecoder: CustomStringConvertible {
+    // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
+    public var description: String { "ConfigBytesFromHexStringDecoder" }
+}
+
+@available(Configuration 1.0, *)
+extension ConfigBytesFromHexStringDecoder: CustomDebugStringConvertible {
+    // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
+    public var debugDescription: String { description }
+}
