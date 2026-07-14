@@ -106,3 +106,16 @@ extension [String: ConfigContextValue] {
             .joined(separator: ";")
     }
 }
+
+@available(Configuration 1.0, *)
+extension ConfigContextValue: CustomDebugStringConvertible {
+    // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
+    public var debugDescription: String {
+        switch self {
+            case .string(let value): return ".string(\"\(value)\")"
+            case .int(let value): return ".int(\(value))"
+            case .double(let value): return ".double(\(value))"
+            case .bool(let value): return ".bool(\(value))"
+        }
+    }
+}
