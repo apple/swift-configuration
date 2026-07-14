@@ -137,3 +137,22 @@ extension SecretsSpecifier {
         return isSecret
     }
 }
+
+@available(Configuration 1.0, *)
+extension SecretsSpecifier: CustomStringConvertible {
+    // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
+    public var description: String {
+        switch self {
+            case .all: return "all"
+            case .none: return "none"
+            case .specific(let keys): return "specific(\(keys.count) keys)"
+            case .dynamic: return "dynamic"
+        }
+    }
+}
+
+@available(Configuration 1.0, *)
+extension SecretsSpecifier: CustomDebugStringConvertible {
+    // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
+    public var debugDescription: String { description }
+}
