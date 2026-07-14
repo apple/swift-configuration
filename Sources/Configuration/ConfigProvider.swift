@@ -554,3 +554,27 @@ extension ConfigContent: ExpressibleByBooleanLiteral {
         self = .bool(value)
     }
 }
+
+@available(Configuration 1.0, *)
+extension LookupResult: CustomStringConvertible {
+        // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
+        public var description: String {
+                    if let value {
+                                    return "[key: \(encodedKey), \(value)]"
+                    } else {
+                                    return "[key: \(encodedKey), (not found)]"
+                    }
+        }
+}
+
+@available(Configuration 1.0, *)
+extension LookupResult: CustomDebugStringConvertible {
+        // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
+        public var debugDescription: String { description }
+}
+
+@available(Configuration 1.0, *)
+extension ConfigValue: CustomDebugStringConvertible {
+        // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
+        public var debugDescription: String { description }
+}
