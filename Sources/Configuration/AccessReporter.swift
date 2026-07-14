@@ -233,12 +233,6 @@ extension BroadcastingAccessReporter: AccessReporter {
 }
 
 @available(Configuration 1.0, *)
-extension AccessEvent.Metadata.SourceLocation: CustomStringConvertible {
-    // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
-    public var description: String { "\(file):\(line)" }
-}
-
-@available(Configuration 1.0, *)
 extension AccessEvent.Metadata.SourceLocation: CustomDebugStringConvertible {
     // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
     public var debugDescription: String { description }
