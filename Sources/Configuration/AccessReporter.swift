@@ -231,3 +231,79 @@ extension BroadcastingAccessReporter: AccessReporter {
         }
     }
 }
+
+@available(Configuration 1.0, *)
+extension AccessEvent.Metadata.SourceLocation: CustomStringConvertible {
+    // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
+    public var description: String { "\(file):\(line)" }
+}
+
+@available(Configuration 1.0, *)
+extension AccessEvent.Metadata.SourceLocation: CustomDebugStringConvertible {
+    // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
+    public var debugDescription: String { description }
+}
+
+@available(Configuration 1.0, *)
+extension AccessEvent.Metadata: CustomStringConvertible {
+    // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
+    public var description: String { "\(accessKind.rawValue) \(key) as \(valueType)" }
+}
+
+@available(Configuration 1.0, *)
+extension AccessEvent.Metadata: CustomDebugStringConvertible {
+    // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
+    public var debugDescription: String { "\(accessKind.rawValue) \(key) as \(valueType) @ \(sourceLocation)" }
+}
+
+@available(Configuration 1.0, *)
+extension AccessEvent.ProviderResult: CustomStringConvertible {
+    // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
+    public var description: String {
+        switch result {
+            case .success(let lookup): return "\(providerName): \(lookup)"
+            case .failure(let error): return "\(providerName): error(\(error))"
+        }
+    }
+}
+
+@available(Configuration 1.0, *)
+extension AccessEvent.ProviderResult: CustomDebugStringConvertible {
+    // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
+    public var debugDescription: String { description }
+}
+
+@available(Configuration 1.0, *)
+extension AccessEvent: CustomStringConvertible {
+    // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
+    public var description: String {
+        switch result {
+            case .success(let value): return "AccessEvent[\(metadata), result: \(value?.description ?? "(not found)")]"
+            case .failure(let error): return "AccessEvent[\(metadata), error: \(error)]"
+        }
+    }
+}
+
+@available(Configuration 1.0, *)
+extension AccessEvent: CustomDebugStringConvertible {
+    // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
+    public var debugDescription: String {
+        let providerSummary = providerResults.map(\.description).joined(separator: ", ")
+        switch result {
+            case .success(let value): return "AccessEvent[\(metadata.debugDescription), providers: [\(providerSummary)], result: \(value?.description ?? "(not found)")]"
+            case .failure(let error): return "AccessEvent[\(metadata.debugDescription), providers: [\(providerSummary)], error: \(error)]"
+        }
+    }
+}
+
+@available(Configuration 1.0, *)
+extension BroadcastingAccessReporter: CustomStringConvertible {
+    // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
+    public var description: String { "BroadcastingAccessReporter[\(upstreams.count) reporters]" }
+}
+
+@available(Configuration 1.0, *)
+extension BroadcastingAccessReporter: CustomDebugStringConvertible {
+    // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
+    public var debugDescription: String { description }
+}
