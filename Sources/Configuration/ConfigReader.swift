@@ -389,3 +389,18 @@ package enum ConfigError: Error, CustomStringConvertible, Equatable {
         }
     }
 }
+
+@available(Configuration 1.0, *)
+extension ConfigReader: CustomStringConvertible {
+    // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
+    public var description: String {
+        if let keyPrefix { return "ConfigReader[prefix: \(keyPrefix), \(provider)]" }
+        return "ConfigReader[\(provider)]"
+    }
+}
+
+@available(Configuration 1.0, *)
+extension ConfigReader: CustomDebugStringConvertible {
+    // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
+    public var debugDescription: String { description }
+}
