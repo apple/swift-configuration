@@ -565,3 +565,19 @@ extension ConfigSnapshotReader {
         .intArray(values.map(\.rawValue))
     }
 }
+
+@available(Configuration 1.0, *)
+extension ConfigSnapshotReader: CustomStringConvertible {
+    // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
+    public var description: String {
+        let providerNames = storage.snapshot.snapshots.map(\.providerName).joined(separator: ", ")
+        if let keyPrefix { return "ConfigSnapshotReader[prefix: \(keyPrefix), of: \(providerNames)]" }
+        return "ConfigSnapshotReader[of: \(providerNames)]"
+    }
+}
+
+@available(Configuration 1.0, *)
+extension ConfigSnapshotReader: CustomDebugStringConvertible {
+    // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
+    public var debugDescription: String { description }
+}
