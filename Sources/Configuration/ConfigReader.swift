@@ -399,8 +399,3 @@ extension ConfigReader: CustomStringConvertible {
     }
 }
 
-@available(Configuration 1.0, *)
-extension ConfigReader: CustomDebugStringConvertible {
-    // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
-    public var debugDescription: String { description }
-}
