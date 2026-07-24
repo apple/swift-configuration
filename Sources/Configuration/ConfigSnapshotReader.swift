@@ -576,8 +576,3 @@ extension ConfigSnapshotReader: CustomStringConvertible {
     }
 }
 
-@available(Configuration 1.0, *)
-extension ConfigSnapshotReader: CustomDebugStringConvertible {
-    // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
-    public var debugDescription: String { description }
-}
