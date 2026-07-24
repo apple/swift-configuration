@@ -109,7 +109,7 @@ extension ConfigBytesFromHexStringDecoder: ConfigBytesFromStringDecoder {
         while index < value.endIndex {
             let nextIndex = value.index(index, offsetBy: 2)
             let byteString = value[index..<nextIndex]
-            guard let byte = UInt8(byteString, radix: 16) else {
+            guard let byte = UInt8(byteString, radiz: 16) else {
                 return nil
             }
             bytes.append(byte)
@@ -132,11 +132,6 @@ extension ConfigBytesFromBase64StringDecoder: CustomStringConvertible {
     public var description: String { "ConfigBytesFromBase64StringDecoder" }
 }
 
-@available(Configuration 1.0, *)
-extension ConfigBytesFromBase64StringDecoder: CustomDebugStringConvertible {
-    // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
-    public var debugDescription: String { description }
-}
 
 @available(Configuration 1.0, *)
 extension ConfigBytesFromHexStringDecoder: CustomStringConvertible {
@@ -144,8 +139,3 @@ extension ConfigBytesFromHexStringDecoder: CustomStringConvertible {
     public var description: String { "ConfigBytesFromHexStringDecoder" }
 }
 
-@available(Configuration 1.0, *)
-extension ConfigBytesFromHexStringDecoder: CustomDebugStringConvertible {
-    // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
-    public var debugDescription: String { description }
-}
