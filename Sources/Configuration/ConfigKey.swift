@@ -261,14 +261,4 @@ extension AbsoluteConfigKey: ExpressibleByArrayLiteral {
     }
 }
 
-@available(Configuration 1.0, *)
-extension ConfigKey: CustomDebugStringConvertible {
-    // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
-    public var debugDescription: String { description }
-}
 
-@available(Configuration 1.0, *)
-extension AbsoluteConfigKey: CustomDebugStringConvertible {
-    // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
-    public var debugDescription: String { description }
-}
