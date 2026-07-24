@@ -51,7 +51,7 @@ public struct AccessEvent: Sendable {
     /// source location, and timestamp.
     public struct Metadata: Sendable {
 
-        /// The source code location where a configuration access occurs.
+  2     /// The source code location where a configuration access occurs.
         ///
         /// Captures the file identifier and line number for debugging and auditing purposes.
         public struct SourceLocation: Sendable, CustomStringConvertible {
@@ -232,11 +232,6 @@ extension BroadcastingAccessReporter: AccessReporter {
     }
 }
 
-@available(Configuration 1.0, *)
-extension AccessEvent.Metadata.SourceLocation: CustomDebugStringConvertible {
-    // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
-    public var debugDescription: String { description }
-}
 
 @available(Configuration 1.0, *)
 extension AccessEvent.Metadata: CustomStringConvertible {
@@ -261,11 +256,6 @@ extension AccessEvent.ProviderResult: CustomStringConvertible {
     }
 }
 
-@available(Configuration 1.0, *)
-extension AccessEvent.ProviderResult: CustomDebugStringConvertible {
-    // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
-    public var debugDescription: String { description }
-}
 
 @available(Configuration 1.0, *)
 extension AccessEvent: CustomStringConvertible {
@@ -296,8 +286,3 @@ extension BroadcastingAccessReporter: CustomStringConvertible {
     public var description: String { "BroadcastingAccessReporter[\(upstreams.count) reporters]" }
 }
 
-@available(Configuration 1.0, *)
-extension BroadcastingAccessReporter: CustomDebugStringConvertible {
-    // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
-    public var debugDescription: String { description }
-}
