@@ -165,8 +165,3 @@ extension ConfigUpdatesAsyncSequence: CustomStringConvertible {
     public var description: String { "ConfigUpdatesAsyncSequence" }
 }
 
-@available(Configuration 1.0, *)
-extension ConfigUpdatesAsyncSequence: CustomDebugStringConvertible {
-    // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
-    public var debugDescription: String { description }
-}
