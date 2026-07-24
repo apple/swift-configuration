@@ -151,8 +151,3 @@ extension SecretsSpecifier: CustomStringConvertible {
     }
 }
 
-@available(Configuration 1.0, *)
-extension SecretsSpecifier: CustomDebugStringConvertible {
-    // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
-    public var debugDescription: String { description }
-}
