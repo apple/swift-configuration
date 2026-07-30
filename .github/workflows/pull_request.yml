@@ -150,3 +150,40 @@ jobs:
       linux_5_10_enabled: false
       linux_6_0_enabled: false
       linux_6_1_enabled: false
+
+  # Trait combinations beyond the ENABLE_ALL_TRAITS default used elsewhere in CI.
+  # See https://github.com/apple/swift-configuration/issues/29
+  trait-matrix:
+    name: Traits - ${{ matrix.traits }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - traits: no-traits
+            flags: "--disable-default-traits"
+          - traits: default-traits
+            flags: ""
+          - traits: logging-only
+            flags: "--disable-default-traits --traits Logging"
+          - traits: json-only
+            flags: "--disable-default-traits --traits JSON"
+          - traits: reloading-only
+            flags: "--disable-default-traits --traits Reloading"
+          - traits: command-line-arguments-only
+            flags: "--disable-default-traits --traits CommandLineArguments"
+          - traits: yaml-only
+            flags: "--disable-default-traits --traits YAML"
+          - traits: all-traits
+            flags: "--enable-all-traits"
+    container:
+      image: swift:latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - name: Mark the workspace as safe
+        run: git config --global --add safe.directory ${GITHUB_WORKSPACE}
+      - name: Test with trait combination
+        run: swift test --explicit-target-dependency-import-check error ${{ matrix.flags }}
