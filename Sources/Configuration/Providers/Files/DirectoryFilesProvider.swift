@@ -18,6 +18,9 @@ public import FoundationEssentials
 public import Foundation
 #endif
 public import SystemPackage
+#if Logging
+import Logging
+#endif
 
 /// A configuration provider that reads values from individual files in a directory.
 ///
@@ -233,6 +236,12 @@ public struct DirectoryFilesProvider: Sendable {
             fileNames = loadedFileNames
         } else if allowMissing {
             fileNames = []
+            #if Logging
+            MissingConfigurationLogging.logMissingDirectory(
+                providerName: "DirectoryFilesProvider",
+                path: directoryPath
+            )
+            #endif
         } else {
             throw FileSystemError.directoryNotFound(path: directoryPath)
         }
