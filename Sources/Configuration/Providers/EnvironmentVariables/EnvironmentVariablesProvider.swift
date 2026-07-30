@@ -18,6 +18,9 @@ import FoundationEssentials
 import Foundation
 #endif
 public import SystemPackage
+#if Logging
+import Logging
+#endif
 #if canImport(Darwin)
 import Darwin
 #elseif os(Windows)
@@ -299,6 +302,12 @@ public struct EnvironmentVariablesProvider: Sendable {
             data = loadedData
         } else if allowMissing {
             data = Data()
+            #if Logging
+            MissingConfigurationLogging.logMissingFile(
+                providerName: "EnvironmentVariablesProvider",
+                path: environmentFilePath
+            )
+            #endif
         } else {
             throw FileSystemError.fileNotFound(path: environmentFilePath)
         }

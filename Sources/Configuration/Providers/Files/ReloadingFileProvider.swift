@@ -228,8 +228,12 @@ public final class ReloadingFileProvider<Snapshot: FileConfigSnapshot>: Sendable
             source = .missing
             dataSize = 0
 
-            logger.debug(
-                "Successfully initialized reloading file provider from a missing file"
+            logger.notice(
+                "Configuration file not found; treating as empty because allowMissing is true",
+                metadata: [
+                    "provider": .string(providerName),
+                    "path": .string(filePath.string),
+                ]
             )
         } else {
             throw FileSystemError.fileNotFound(path: filePath)

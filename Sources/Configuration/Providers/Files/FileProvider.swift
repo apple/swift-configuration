@@ -14,6 +14,10 @@
 
 public import SystemPackage
 
+#if Logging
+import Logging
+#endif
+
 #if canImport(FoundationEssentials)
 import FoundationEssentials
 #else
@@ -191,6 +195,12 @@ public struct FileProvider<Snapshot: FileConfigSnapshot>: Sendable {
                 parsingOptions: parsingOptions
             )
         } else if allowMissing {
+            #if Logging
+            MissingConfigurationLogging.logMissingFile(
+                providerName: providerName,
+                path: filePath
+            )
+            #endif
             self._snapshot = EmptyFileConfigSnapshot(providerName: providerName)
         } else {
             throw FileSystemError.fileNotFound(path: filePath)
