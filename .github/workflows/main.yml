@@ -52,6 +52,16 @@ jobs:
       android_ndk_versions: '["r27d", "r29"]'
       linux_env_vars: 'ENABLE_ALL_TRAITS=1'
 
+  wasm-sdk:
+    name: WebAssembly Swift SDK
+    uses: swiftlang/github-workflows/.github/workflows/swift_package_test.yml@0.0.12
+    with:
+      enable_wasm_sdk_build: true
+      enable_linux_checks: false
+      enable_windows_checks: false
+      swift_flags: --target Configuration
+      swift_nightly_flags: --target Configuration
+
   macos-tests:
     name: macOS tests
     uses: apple/swift-nio/.github/workflows/macos_tests.yml@main
