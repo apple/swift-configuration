@@ -101,9 +101,10 @@ To enable an additional trait on the package, update the package dependency:
 Available traits:
 - **`JSON`** (default): Adds support for `FileProvider<JSONSnapshot>`, a `ConfigProvider` for reading JSON files.
 - **`Logging`** (opt-in): Adds support for `AccessLogger`, a way to emit access events into a `SwiftLog.Logger`.
-- **`Reloading`** (opt-in): Adds support for auto-reloading variants of file providers, such as `ReloadingFileProvider<JSONSnapshot>` (when `JSON` is enabled) and `ReloadingFileProvider<YAMLSnapshot>` (when `YAML` is enabled).
+- **`Reloading`** (opt-in): Adds support for auto-reloading variants of file providers, such as `ReloadingFileProvider<JSONSnapshot>` (when `JSON` is enabled), `ReloadingFileProvider<YAMLSnapshot>` (when `YAML` is enabled), and `ReloadingFileProvider<PropertyListSnapshot>` (when `PropertyList` is enabled).
 - **`CommandLineArguments`** (opt-in): Adds support for `CommandLineArgumentsProvider` for parsing command line arguments.
 - **`YAML`** (opt-in): Adds support for `FileProvider<YAMLSnapshot>`, a `ConfigProvider` for reading YAML files.
+- **`PropertyList`** (opt-in): Adds support for `FileProvider<PropertyListSnapshot>`, a `ConfigProvider` for reading property list files.
 
 ## Supported platforms and minimum versions
 
@@ -123,6 +124,7 @@ The library includes comprehensive built-in provider support:
 - Command-line arguments: [`CommandLineArgumentsProvider`](https://swiftpackageindex.com/apple/swift-configuration/documentation/configuration/commandlineargumentsprovider)
 - JSON file: [`FileProvider<JSONSnapshot>`](https://swiftpackageindex.com/apple/swift-configuration/documentation/configuration/fileprovider) and [`ReloadingFileProvider<JSONSnapshot>`](https://swiftpackageindex.com/apple/swift-configuration/documentation/configuration/reloadingfileprovider)
 - YAML file: [`FileProvider<YAMLSnapshot>`](https://swiftpackageindex.com/apple/swift-configuration/documentation/configuration/fileprovider) and [`ReloadingFileProvider<YAMLSnapshot>`](https://swiftpackageindex.com/apple/swift-configuration/documentation/configuration/reloadingfileprovider)
+- Property list file: [`FileProvider<PropertyListSnapshot>`](https://swiftpackageindex.com/apple/swift-configuration/documentation/configuration/fileprovider) and [`ReloadingFileProvider<PropertyListSnapshot>`](https://swiftpackageindex.com/apple/swift-configuration/documentation/configuration/reloadingfileprovider)
 - Directory of files: [`DirectoryFilesProvider`](https://swiftpackageindex.com/apple/swift-configuration/documentation/configuration/directoryfilesprovider)
 - In-memory: [`InMemoryProvider`](https://swiftpackageindex.com/apple/swift-configuration/documentation/configuration/inmemoryprovider) and [`MutableInMemoryProvider`](https://swiftpackageindex.com/apple/swift-configuration/documentation/configuration/mutableinmemoryprovider)
 - Key transforming: [`KeyMappingProvider`](https://swiftpackageindex.com/apple/swift-configuration/documentation/configuration/keymappingprovider)

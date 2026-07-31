@@ -1,7 +1,9 @@
 version: 1
 builder:
   configs:
-    - swift_version: '6.2'
+    - swift_version: '6.3'
       documentation_targets:
         - Configuration
         - ConfigurationTesting
+      custom_documentation_parameters:
+        - '--experimental-transform-for-static-hosting-with-content'
