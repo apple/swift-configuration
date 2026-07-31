@@ -86,7 +86,7 @@ jobs:
 
   wasm-sdk:
     name: WebAssembly Swift SDK
-    uses: swiftlang/github-workflows/.github/workflows/swift_package_test.yml@0.0.7
+    uses: swiftlang/github-workflows/.github/workflows/swift_package_test.yml@0.0.12
     with:
       enable_wasm_sdk_build: true
       enable_linux_checks: false
