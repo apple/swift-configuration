@@ -143,3 +143,39 @@ jobs:
       linux_5_10_enabled: false
       linux_6_0_enabled: false
       linux_6_1_enabled: false
+
+  trait-matrix:
+    name: Trait matrix (${{ matrix.name }})
+    runs-on: ubuntu-latest
+    container: swift:latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: No traits
+            flags: --disable-default-traits
+          - name: Default traits
+            flags: ""
+          - name: Logging
+            flags: --disable-default-traits --traits Logging
+          - name: JSON
+            flags: --disable-default-traits --traits JSON
+          - name: Reloading
+            flags: --disable-default-traits --traits Reloading
+          - name: CommandLineArguments
+            flags: --disable-default-traits --traits CommandLineArguments
+          - name: YAML
+            flags: --disable-default-traits --traits YAML
+          - name: PropertyList
+            flags: --disable-default-traits --traits PropertyList
+          - name: All traits
+            flags: --enable-all-traits
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - name: Mark repository as safe
+        run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
+      - name: Test
+        run: env -u ENABLE_ALL_TRAITS swift test --explicit-target-dependency-import-check error ${{ matrix.flags }}
