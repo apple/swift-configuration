@@ -22,10 +22,6 @@ the following contributions must be authored by humans and _not_ using AI tools:
 - Issue titles, bodies, and comments.
 - Pull request titles, descriptions, and comments.
 
-Contributors who feel more comfortable writing in another language should post their
-issues, comments, and pull request descriptions in that language instead of using
-AI tools for translation.
-
 ### Repository structure
 
 #### Package organization
