@@ -12,6 +12,20 @@ We follow an open process and discuss development on GitHub issues, pull request
 
 Large features and changes go through a lightweight proposals process - to learn more, check out <doc:Proposals>.
 
+> Important: Before you open a pull request, ensure an issue is assigned to you by a maintainer. Pull requests without an associated issue may be closed without review.
+
+### AI tools
+
+To ensure productive collaboration between maintainers and other contributors,
+the following contributions must be authored by humans and _not_ using AI tools:
+
+- Issue titles, bodies, and comments.
+- Pull request titles, descriptions, and comments.
+
+Contributors who feel more comfortable writing in another language should post their
+issues, comments, and pull request descriptions in that language instead of using
+AI tools for translation.
+
 ### Repository structure
 
 #### Package organization
