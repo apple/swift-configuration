@@ -16,11 +16,12 @@ Large features and changes go through a lightweight proposals process - to learn
 
 ### AI tools
 
-To ensure productive collaboration between maintainers and other contributors,
-the following contributions must be authored by humans and _not_ using AI tools:
+Human discourse is an essential part of open source development. To encourage productive collaboration between contributors and maintainers, please refrain from using AI tools for the following:
 
-- Issue titles, bodies, and comments.
-- Pull request titles, descriptions, and comments.
+- Issues: titles, bodies, and comments.
+- Pull requests: titles, descriptions, and comments.
+
+Contributors who feel more comfortable writing in another language may use automated translation tools, but must include their original content in their preferred language.
 
 ### Repository structure
 
