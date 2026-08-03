@@ -112,6 +112,11 @@ let package = Package(
                     condition: .when(traits: ["Reloading"])
                 ),
                 .product(
+                    name: "UnixSignals",
+                    package: "swift-service-lifecycle",
+                    condition: .when(traits: ["Reloading"])
+                ),
+                .product(
                     name: "Yams",
                     package: "Yams",
                     condition: .when(traits: ["YAML"])

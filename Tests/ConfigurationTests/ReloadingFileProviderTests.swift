@@ -73,6 +73,38 @@ struct ReloadingFileProviderTests {
         }
     }
 
+
+    @available(Configuration 1.0, *)
+    @Test func testForcedReloadSameTimestamp() async throws {
+        try await withTestProvider { provider, fileSystem, filePath, originalTimestamp in
+            // Check initial values
+            let result1 = try provider.value(forKey: ["key1"], type: .string)
+            #expect(try result1.value?.content.asString == "value1")
+
+            // Update file content but keep the same modification timestamp.
+            fileSystem.update(
+                filePath: filePath,
+                timestamp: originalTimestamp,
+                contents: .file(
+                    contents: """
+                        key1=forcedValue
+                        key2=value2
+                        """
+                )
+            )
+
+            // A normal reload check should not pick up the change.
+            try await provider.reloadIfNeeded(logger: .noop)
+            let result2 = try provider.value(forKey: ["key1"], type: .string)
+            #expect(try result2.value?.content.asString == "value1")
+
+            // A forced reload (as used for SIGHUP) should re-read the file.
+            try await provider.reloadIfNeeded(logger: .noop, force: true)
+            let result3 = try provider.value(forKey: ["key1"], type: .string)
+            #expect(try result3.value?.content.asString == "forcedValue")
+        }
+    }
+
     @available(Configuration 1.0, *)
     @Test func testBasicManualReload() async throws {
         try await withTestProvider { provider, fileSystem, filePath, originalTimestamp in

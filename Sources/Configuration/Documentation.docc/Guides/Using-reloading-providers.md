@@ -44,7 +44,20 @@ let host = config.string(
 )
 ```
 
-#### Poll interval considerations
+#### Reloading with SIGHUP
+
+While a reloading provider is running in a `ServiceGroup`, it listens for the `SIGHUP` signal by default.
+Sending `SIGHUP` to the process triggers an immediate reload check instead of waiting for the next poll interval:
+
+```bash
+kill -HUP <pid>
+```
+
+Signal-triggered reloads force a re-read of the configuration file even when the modification timestamp appears unchanged. Disable this behavior with `reloadOnSIGHUP: false` when constructing the provider, or set the `reloadOnSIGHUP` configuration key to `false` when using reader-based initialization.
+
+> Note: `SIGHUP` handling is unavailable on Windows and WASI. On those platforms, reloading continues to rely on poll-interval checks only.
+
+### Poll interval considerations
 
 Choose poll intervals based on how quickly you need to detect changes:
 

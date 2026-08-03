@@ -22,6 +22,7 @@ import Foundation
 
 public import SystemPackage
 public import ServiceLifecycle
+public import UnixSignals
 public import Logging
 public import Metrics
 import AsyncAlgorithms
@@ -63,7 +64,9 @@ import Synchronization
 /// ```
 ///
 /// The provider monitors the file by polling at the specified interval (default: 15 seconds)
-/// and notifies any active watchers when it detects changes.
+/// and notifies any active watchers when it detects changes. When running as a service, it
+/// also listens for `SIGHUP` and performs an immediate reload check so operators can trigger
+/// a refresh without waiting for the next poll (for example, `kill -HUP <pid>`).
 ///
 /// ## Configuration from a reader
 ///
@@ -140,6 +143,9 @@ public final class ReloadingFileProvider<Snapshot: FileConfigSnapshot>: Sendable
     /// The interval between polling checks.
     private let pollInterval: Duration
 
+    /// Whether the provider listens for `SIGHUP` and reloads when the signal is received.
+    private let reloadOnSIGHUP: Bool
+
     /// The human-readable name of the provider.
     public let providerName: String
 
@@ -159,6 +165,8 @@ public final class ReloadingFileProvider<Snapshot: FileConfigSnapshot>: Sendable
     ///     - When `false` (the default), if the file is missing or malformed, throws an error.
     ///     - When `true`, if the file is missing, treats it as empty. Malformed files still throw an error.
     ///   - pollInterval: How often to check for file changes.
+    ///   - reloadOnSIGHUP: When `true` (the default), listening for `SIGHUP` triggers an
+    ///     immediate reload check while the provider is running as a service.
     ///   - fileSystem: The file system implementation to use for reading the file.
     ///   - logger: The logger instance to use for this provider.
     ///   - metrics: The metrics factory to use for monitoring provider performance.
@@ -169,6 +177,7 @@ public final class ReloadingFileProvider<Snapshot: FileConfigSnapshot>: Sendable
         filePath: FilePath,
         allowMissing: Bool,
         pollInterval: Duration,
+        reloadOnSIGHUP: Bool = true,
         fileSystem: any CommonProviderFileSystem,
         logger: Logger,
         metrics: any MetricsFactory
@@ -177,6 +186,7 @@ public final class ReloadingFileProvider<Snapshot: FileConfigSnapshot>: Sendable
         self.filePath = filePath
         self.allowMissing = allowMissing
         self.pollInterval = pollInterval
+        self.reloadOnSIGHUP = reloadOnSIGHUP
         self.providerName = "ReloadingFileProvider<\(Snapshot.self)>"
         self.fileSystem = fileSystem
 
@@ -187,6 +197,7 @@ public final class ReloadingFileProvider<Snapshot: FileConfigSnapshot>: Sendable
         logger[metadataKey: "\(providerName).pollInterval.seconds"] = .string(
             pollInterval.components.seconds.description
         )
+        logger[metadataKey: "\(providerName).reloadOnSIGHUP"] = "\(reloadOnSIGHUP)"
         self.logger = logger
 
         // Set up metrics
@@ -259,6 +270,8 @@ public final class ReloadingFileProvider<Snapshot: FileConfigSnapshot>: Sendable
     ///     - When `false` (the default), if the file is missing or malformed, throws an error.
     ///     - When `true`, if the file is missing, treats it as empty. Malformed files still throw an error.
     ///   - pollInterval: How often to check for file changes.
+    ///   - reloadOnSIGHUP: When `true` (the default), listening for `SIGHUP` triggers an
+    ///     immediate reload check while the provider is running as a service.
     ///   - logger: The logger instance to use for this provider.
     ///   - metrics: The metrics factory to use for monitoring provider performance.
     /// - Throws: If the file cannot be read or if snapshot creation fails.
@@ -268,6 +281,7 @@ public final class ReloadingFileProvider<Snapshot: FileConfigSnapshot>: Sendable
         filePath: FilePath,
         allowMissing: Bool = false,
         pollInterval: Duration = .seconds(15),
+        reloadOnSIGHUP: Bool = true,
         logger: Logger = Logger(label: "ReloadingFileProvider"),
         metrics: any MetricsFactory = MetricsSystem.factory
     ) async throws {
@@ -277,6 +291,7 @@ public final class ReloadingFileProvider<Snapshot: FileConfigSnapshot>: Sendable
             filePath: filePath,
             allowMissing: allowMissing,
             pollInterval: pollInterval,
+            reloadOnSIGHUP: reloadOnSIGHUP,
             fileSystem: LocalCommonProviderFileSystem(),
             logger: logger,
             metrics: metrics
@@ -294,6 +309,8 @@ public final class ReloadingFileProvider<Snapshot: FileConfigSnapshot>: Sendable
     ///   treats it as empty. Malformed files still throw an error.
     /// - `pollIntervalSeconds` (int, optional, default: 15): How often, in seconds, to check for file
     ///   changes.
+    /// - `reloadOnSIGHUP` (bool, optional, default: true): When `true`, listening for `SIGHUP`
+    ///   triggers an immediate reload check while the provider is running as a service.
     ///
     /// - Parameters:
     ///   - snapshotType: The type of snapshot to create from the file contents.
@@ -330,6 +347,8 @@ public final class ReloadingFileProvider<Snapshot: FileConfigSnapshot>: Sendable
     ///   treats it as empty. Malformed files still throw an error.
     /// - `pollIntervalSeconds` (int, optional, default: 15): How often to check for file
     ///   changes in seconds.
+    /// - `reloadOnSIGHUP` (bool, optional, default: true): When `true`, listening for `SIGHUP`
+    ///   triggers an immediate reload check while the provider is running as a service.
     ///
     /// - Parameters:
     ///   - snapshotType: The type of snapshot to create from the file contents.
@@ -353,6 +372,7 @@ public final class ReloadingFileProvider<Snapshot: FileConfigSnapshot>: Sendable
             filePath: config.requiredString(forKey: "filePath", as: FilePath.self),
             allowMissing: config.bool(forKey: "allowMissing", default: false),
             pollInterval: .seconds(config.int(forKey: "pollIntervalSeconds", default: 15)),
+            reloadOnSIGHUP: config.bool(forKey: "reloadOnSIGHUP", default: true),
             fileSystem: fileSystem,
             logger: logger,
             metrics: metrics
@@ -366,9 +386,12 @@ public final class ReloadingFileProvider<Snapshot: FileConfigSnapshot>: Sendable
     /// changes, it reloads the file contents, creates a new snapshot, and notifies
     /// any active watchers of the changes.
     ///
-    /// - Parameter logger: The logger to use during the reload operation.
+    /// - Parameters:
+    ///   - logger: The logger to use during the reload operation.
+    ///   - force: When `true`, reloads even if the file timestamp and resolved path appear
+    ///     unchanged. Used for signal-triggered reloads such as `SIGHUP`.
     /// - Throws: File system errors or snapshot creation errors.
-    internal func reloadIfNeeded(logger: Logger) async throws {
+    internal func reloadIfNeeded(logger: Logger, force: Bool = false) async throws {
         logger.debug("reloadIfNeeded started")
         defer {
             logger.debug("reloadIfNeeded finished")
@@ -389,8 +412,8 @@ public final class ReloadingFileProvider<Snapshot: FileConfigSnapshot>: Sendable
                 .withLock({ storage -> Storage.Source? in
                     let originalSource = storage.source
 
-                    // Check if the source has changed
-                    guard originalSource != candidateSource else {
+                    // Check if the source has changed, unless a forced reload was requested.
+                    guard force || originalSource != candidateSource else {
                         logger.debug(
                             "File source unchanged, no reload needed",
                             metadata: originalSource.loggingMetadata(prefix: providerName)
@@ -414,7 +437,7 @@ public final class ReloadingFileProvider<Snapshot: FileConfigSnapshot>: Sendable
             uniquingKeysWith: { a, b in a }
         )
         logger.debug(
-            "File path or timestamp changed, reloading...",
+            force ? "Forced reload requested, reloading..." : "File path or timestamp changed, reloading...",
             metadata: summaryMetadata
         )
 
@@ -686,6 +709,25 @@ extension ReloadingFileProvider: Service {
             logger.debug("File polling stopping")
         }
 
+        try await withThrowingTaskGroup(of: Void.self) { group in
+            group.addTask {
+                try await self.runPollingLoop()
+            }
+
+            #if !os(Windows) && !os(WASI)
+            if self.reloadOnSIGHUP {
+                group.addTask {
+                    try await self.runSIGHUPReloadLoop()
+                }
+            }
+            #endif
+
+            try await group.waitForAll()
+        }
+    }
+
+    /// Polls the filesystem for configuration changes until graceful shutdown.
+    private func runPollingLoop() async throws {
         var counter = 1
         for try await _ in AsyncTimerSequence(interval: pollInterval, clock: .continuous).cancelOnGracefulShutdown() {
             defer {
@@ -713,6 +755,35 @@ extension ReloadingFileProvider: Service {
             }
         }
     }
+
+    #if !os(Windows) && !os(WASI)
+    /// Listens for `SIGHUP` and forces a configuration reload check on each signal.
+    private func runSIGHUPReloadLoop() async throws {
+        logger.debug("SIGHUP reload listener starting")
+        defer {
+            logger.debug("SIGHUP reload listener stopping")
+        }
+
+        let signals = await UnixSignalsSequence(trapping: .sighup)
+        for await signal in signals.cancelOnGracefulShutdown() {
+            var signalLogger = logger
+            signalLogger[metadataKey: "\(providerName).signal"] = .string("\(signal)")
+            signalLogger.debug("Received reload signal, forcing reload check")
+
+            do {
+                try await reloadIfNeeded(logger: signalLogger, force: true)
+            } catch {
+                signalLogger.debug(
+                    "Signal-triggered reload failed, will wait for next signal or poll tick",
+                    metadata: [
+                        "error": "\(error)"
+                    ]
+                )
+                metrics.reloadErrorCounter.increment(by: 1)
+            }
+        }
+    }
+    #endif
 }
 
 #endif
