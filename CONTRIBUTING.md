@@ -58,7 +58,9 @@ My system has IPv6 disabled.
 
 ## Contributing a pull request
 
-Important: Pull requests will only be accepted for open issues that were assigned to you by a maintainer. Pull requests without a referenced issue may be closed without review. If there is no issue already tracking the problem or feature request, please file a new one using your own voice (see "AI tools" usage above).
+> Important: To ensure productive use of contributor and maintainer time and resources, contributors must first agree their proposed change with a maintainer in an issue. Pull requests opened without prior discussion may be closed without review.
+
+If there is no issue already tracking the problem or feature request, please file a new one using your own voice (see "AI tools" usage above).
 
 Once an issue is assigned to you, follow these steps:
 
