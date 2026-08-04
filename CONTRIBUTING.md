@@ -58,7 +58,9 @@ My system has IPv6 disabled.
 
 ## Contributing a pull request
 
-Important: Pull requests will only be accepted for open issues that were assigned to you by a maintainer. Pull requests without a referenced issue may be closed without review. Once an issue is assigned to you, follow these steps:
+Important: Pull requests will only be accepted for open issues that were assigned to you by a maintainer. Pull requests without a referenced issue may be closed without review. If there is no issue already tracking the problem or feature request, please file a new one using your own voice (see "AI tools" usage above).
+
+Once an issue is assigned to you, follow these steps:
 
 1. Review the [Developing Swift Configuration](https://swiftpackageindex.com/apple/swift-configuration/documentation/configuration/development) documentation.
 2. Prepare your change, keeping in mind that a good patch is:

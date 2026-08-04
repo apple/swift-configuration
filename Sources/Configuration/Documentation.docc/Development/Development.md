@@ -12,7 +12,7 @@ We follow an open process and discuss development on GitHub issues, pull request
 
 Large features and changes go through a lightweight proposals process - to learn more, check out <doc:Proposals>.
 
-> Important: Before you open a pull request, ensure an issue is assigned to you by a maintainer. Pull requests without an associated issue may be closed without review.
+> Important: Before you open a pull request, ensure an issue is assigned to you by a maintainer. Pull requests without an associated issue may be closed without review. If there is no issue already tracking the problem or feature request, please file a new one using your own voice (see "AI tools" usage below).
 
 ### AI tools
 
