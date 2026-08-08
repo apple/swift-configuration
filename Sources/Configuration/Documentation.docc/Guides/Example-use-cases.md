@@ -112,6 +112,8 @@ let config = ConfigReader(
 let port = config.int(forKey: "server.port", default: 8080)
 ```
 
+When the `Logging` trait is enabled, stateless file-based providers also emit a warning with the missing path. This keeps optional files from failing startup while still making a likely deployment mistake visible.
+
 The same applies to other file-based providers:
 
 ```swift

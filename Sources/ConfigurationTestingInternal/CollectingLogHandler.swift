@@ -108,7 +108,7 @@ package struct CollectingLogHandler: LogHandler {
         function: String,
         line: UInt
     ) {
-        guard self.logLevel >= level else {
+        guard level >= self.logLevel else {
             return
         }
         self.storage.append(level: level, message: message, metadata: self.metadata.merging(metadata ?? [:]) { $1 })

@@ -18,6 +18,9 @@ import Foundation
 import ConfigurationTestingInternal
 import ConfigurationTesting
 import SystemPackage
+#if Logging
+import Logging
+#endif
 
 struct DirectoryFilesProviderTests {
 
@@ -126,10 +129,29 @@ struct DirectoryFilesProviderTests {
     @available(Configuration 1.0, *)
     @Test func missingDirectoryAllowedMissing() async throws {
         let fileSystem = InMemoryFileSystem(files: [:])
+        #if Logging
+        let logHandler = CollectingLogHandler()
+        let logger = Logger(label: "Test", factory: { _ in logHandler })
+        let missingFileLogger = MissingFileLogger(logger: logger)
+        #else
+        let missingFileLogger = MissingFileLogger(label: "Test")
+        #endif
         _ = try await DirectoryFilesProvider(
             directoryPath: "/test",
             allowMissing: true,
-            fileSystem: fileSystem
+            fileSystem: fileSystem,
+            missingFileLogger: missingFileLogger
         )
+        #if Logging
+        #expect(
+            logHandler.currentEntries == [
+                Entry(
+                    level: .warning,
+                    message: "Configuration directory is missing; using empty configuration",
+                    metadata: ["directoryPath": "/test"]
+                )
+            ]
+        )
+        #endif
     }
 }

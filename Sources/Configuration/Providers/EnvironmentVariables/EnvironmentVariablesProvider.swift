@@ -284,6 +284,7 @@ public struct EnvironmentVariablesProvider: Sendable {
     ///   - secretsSpecifier: Specifies which environment variables should be treated as secrets.
     ///   - bytesDecoder: The decoder used for converting string values to byte arrays.
     ///   - arraySeparator: The character used to separate elements in array values.
+    ///   - missingFileLogger: The logger used when an allowed environment file is missing.
     /// - Throws: If the file is malformed, or if missing when allowMissing is `false`.
     internal init(
         environmentFilePath: FilePath,
@@ -291,13 +292,19 @@ public struct EnvironmentVariablesProvider: Sendable {
         fileSystem: some CommonProviderFileSystem,
         secretsSpecifier: SecretsSpecifier<String, String> = .none,
         bytesDecoder: some ConfigBytesFromStringDecoder = .base64,
-        arraySeparator: Character = ","
+        arraySeparator: Character = ",",
+        missingFileLogger: MissingFileLogger = .init(label: "EnvironmentVariablesProvider")
     ) async throws {
         let loadedData = try await fileSystem.fileContents(atPath: environmentFilePath)
         let data: Data
         if let loadedData {
             data = loadedData
         } else if allowMissing {
+            missingFileLogger.warning(
+                "Environment file is missing; using empty configuration",
+                pathKey: "filePath",
+                path: environmentFilePath.string
+            )
             data = Data()
         } else {
             throw FileSystemError.fileNotFound(path: environmentFilePath)

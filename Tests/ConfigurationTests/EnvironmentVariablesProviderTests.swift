@@ -18,6 +18,9 @@ import Foundation
 import ConfigurationTestingInternal
 import ConfigurationTesting
 import SystemPackage
+#if Logging
+import Logging
+#endif
 
 struct EnvironmentVariablesProviderTests {
 
@@ -270,11 +273,30 @@ struct EnvironmentVariablesProviderTests {
     @Test func loadEnvironmentAllowedMissing() async throws {
         let fileSystem = InMemoryFileSystem(files: [:])
         let envFilePath: FilePath = "/tmp/definitelyNotAnEnvFile"
+        #if Logging
+        let logHandler = CollectingLogHandler()
+        let logger = Logger(label: "Test", factory: { _ in logHandler })
+        let missingFileLogger = MissingFileLogger(logger: logger)
+        #else
+        let missingFileLogger = MissingFileLogger(label: "Test")
+        #endif
         _ = try await EnvironmentVariablesProvider(
             environmentFilePath: envFilePath,
             allowMissing: true,
-            fileSystem: fileSystem
+            fileSystem: fileSystem,
+            missingFileLogger: missingFileLogger
         )
+        #if Logging
+        #expect(
+            logHandler.currentEntries == [
+                Entry(
+                    level: .warning,
+                    message: "Environment file is missing; using empty configuration",
+                    metadata: ["filePath": "/tmp/definitelyNotAnEnvFile"]
+                )
+            ]
+        )
+        #endif
     }
 }
 

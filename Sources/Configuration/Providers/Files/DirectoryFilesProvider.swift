@@ -186,19 +186,22 @@ public struct DirectoryFilesProvider: Sendable {
     ///   - fileSystem: The file system implementation to use.
     ///   - secretsSpecifier: Specifies which values should be treated as secrets. Defaults to `.all`.
     ///   - arraySeparator: The character used to separate elements in array values. Defaults to comma.
+    ///   - missingFileLogger: The logger used when an allowed configuration directory is missing.
     /// - Throws: If the directory doesn't exist or is unreadable.
     internal init(
         directoryPath: FilePath,
         allowMissing: Bool,
         fileSystem: some CommonProviderFileSystem,
         secretsSpecifier: SecretsSpecifier<String, Data> = .all,
-        arraySeparator: Character = ","
+        arraySeparator: Character = ",",
+        missingFileLogger: MissingFileLogger = .init(label: "DirectoryFilesProvider")
     ) async throws {
         let fileValues = try await Self.loadDirectory(
             at: directoryPath,
             allowMissing: allowMissing,
             fileSystem: fileSystem,
-            secretsSpecifier: secretsSpecifier
+            secretsSpecifier: secretsSpecifier,
+            missingFileLogger: missingFileLogger
         )
         self._snapshot = .init(
             fileValues: fileValues,
@@ -219,19 +222,26 @@ public struct DirectoryFilesProvider: Sendable {
     ///     - When `true`, if the directory is missing, treats it as empty.
     ///   - fileSystem: The file system implementation to use.
     ///   - secretsSpecifier: Specifies which values should be treated as secrets.
+    ///   - missingFileLogger: The logger used when an allowed configuration directory is missing.
     /// - Returns: A dictionary of file values keyed by file name.
     /// - Throws: If the directory doesn't exist or is unreadable, or any file is unreadable.
     private static func loadDirectory(
         at directoryPath: FilePath,
         allowMissing: Bool,
         fileSystem: some CommonProviderFileSystem,
-        secretsSpecifier: SecretsSpecifier<String, Data>
+        secretsSpecifier: SecretsSpecifier<String, Data>,
+        missingFileLogger: MissingFileLogger
     ) async throws -> [String: FileValue] {
         let loadedFileNames = try await fileSystem.listFileNames(atPath: directoryPath)
         let fileNames: [String]
         if let loadedFileNames {
             fileNames = loadedFileNames
         } else if allowMissing {
+            missingFileLogger.warning(
+                "Configuration directory is missing; using empty configuration",
+                pathKey: "directoryPath",
+                path: directoryPath.string
+            )
             fileNames = []
         } else {
             throw FileSystemError.directoryNotFound(path: directoryPath)

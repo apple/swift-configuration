@@ -172,13 +172,15 @@ public struct FileProvider<Snapshot: FileConfigSnapshot>: Sendable {
     ///     - When `false` (the default), if the file is missing or malformed, throws an error.
     ///     - When `true`, if the file is missing, treats it as empty. Malformed files still throw an error.
     ///   - fileSystem: The file system implementation to use for reading the file.
+    ///   - missingFileLogger: The logger used when an allowed configuration file is missing.
     /// - Throws: If the file cannot be read or if snapshot creation fails.
     internal init(
         snapshotType: Snapshot.Type = Snapshot.self,
         parsingOptions: Snapshot.ParsingOptions,
         filePath: FilePath,
         allowMissing: Bool,
-        fileSystem: some CommonProviderFileSystem
+        fileSystem: some CommonProviderFileSystem,
+        missingFileLogger: MissingFileLogger = .init(label: "FileProvider")
     ) async throws {
         let fileContents = try await fileSystem.fileContents(atPath: filePath)
         let providerName = "FileProvider<\(Snapshot.self)>"
@@ -191,6 +193,11 @@ public struct FileProvider<Snapshot: FileConfigSnapshot>: Sendable {
                 parsingOptions: parsingOptions
             )
         } else if allowMissing {
+            missingFileLogger.warning(
+                "Configuration file is missing; using empty configuration",
+                pathKey: "filePath",
+                path: filePath.string
+            )
             self._snapshot = EmptyFileConfigSnapshot(providerName: providerName)
         } else {
             throw FileSystemError.fileNotFound(path: filePath)

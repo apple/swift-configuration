@@ -73,12 +73,31 @@ struct FileProviderTests {
     @available(Configuration 1.0, *)
     @Test func missingFileAllowMissing() async throws {
         let fileSystem = InMemoryFileSystem(files: [:])
+        #if Logging
+        let logHandler = CollectingLogHandler()
+        let logger = Logger(label: "Test", factory: { _ in logHandler })
+        let missingFileLogger = MissingFileLogger(logger: logger)
+        #else
+        let missingFileLogger = MissingFileLogger(label: "Test")
+        #endif
         _ = try await FileProvider<TestSnapshot>(
             parsingOptions: .default,
             filePath: "/etc/config.txt",
             allowMissing: true,
-            fileSystem: fileSystem
+            fileSystem: fileSystem,
+            missingFileLogger: missingFileLogger
         )
+        #if Logging
+        #expect(
+            logHandler.currentEntries == [
+                Entry(
+                    level: .warning,
+                    message: "Configuration file is missing; using empty configuration",
+                    metadata: ["filePath": "/etc/config.txt"]
+                )
+            ]
+        )
+        #endif
     }
 
     @available(Configuration 1.0, *)
