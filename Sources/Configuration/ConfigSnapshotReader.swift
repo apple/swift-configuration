@@ -319,7 +319,7 @@ extension ConfigSnapshotReader {
         type: ConfigType,
         isSecret: Bool,
         unwrap: (ConfigContent) throws -> Value,
-        wrap: (Value) -> ConfigContent,
+        wrap: (Value) throws -> ConfigContent,
         fileID: String,
         line: UInt
     ) -> Value? {
@@ -355,7 +355,7 @@ extension ConfigSnapshotReader {
         isSecret: Bool,
         default defaultValue: Value,
         unwrap: (ConfigContent) throws -> Value,
-        wrap: (Value) -> ConfigContent,
+        wrap: (Value) throws -> ConfigContent,
         fileID: String,
         line: UInt
     ) -> Value {
@@ -391,7 +391,7 @@ extension ConfigSnapshotReader {
         type: ConfigType,
         isSecret: Bool,
         unwrap: (ConfigContent) throws -> Value,
-        wrap: (Value) -> ConfigContent,
+        wrap: (Value) throws -> ConfigContent,
         fileID: String,
         line: UInt
     ) throws -> Value {
@@ -506,7 +506,7 @@ extension ConfigSnapshotReader {
         return typedValue
     }
 
-    /// Casts an integer value to a `RawRepresentable` type with an `Int` raw value.
+    /// Casts an integer value to a `RawRepresentable` type with an integer raw value.
     ///
     /// - Parameters:
     ///   - int: The integer to cast.
@@ -514,12 +514,14 @@ extension ConfigSnapshotReader {
     ///   - key: The config key for error reporting.
     /// - Returns: The cast value.
     /// - Throws: A `ConfigError` if the integer can't be cast to the type.
-    internal func cast<Value: RawRepresentable<Int>>(
+    internal func cast<Value: RawRepresentable>(
         _ int: Int,
         type: Value.Type,
         key: ConfigKey
-    ) throws -> Value {
-        guard let typedValue = Value.init(rawValue: int) else {
+    ) throws -> Value where Value.RawValue: FixedWidthInteger {
+        guard let rawValue = Value.RawValue(exactly: int),
+            let typedValue = Value.init(rawValue: rawValue)
+        else {
             throw ConfigError.configValueFailedToCast(name: keyPrefix.appending(key).description, type: "\(type)")
         }
         return typedValue
@@ -545,23 +547,44 @@ extension ConfigSnapshotReader {
         .intArray(values.map(\.configInt))
     }
 
-    /// Converts a `RawRepresentable` value with an `Int` raw value to content.
+    /// Converts a `RawRepresentable` value with an integer raw value to content.
     ///
-    /// - Parameter value: The value to convert.
+    /// - Parameters:
+    ///   - value: The value to convert.
+    ///   - key: The config key for error context.
     /// - Returns: The config content.
-    internal func uncast<Value: RawRepresentable<Int>>(
-        _ value: Value
-    ) -> ConfigContent {
-        .int(value.rawValue)
+    /// - Throws: A `ConfigError` if the raw value can't be represented as an `Int`.
+    internal func uncast<Value: RawRepresentable>(
+        _ value: Value,
+        key: ConfigKey
+    ) throws -> ConfigContent where Value.RawValue: FixedWidthInteger {
+        guard let int = Int(exactly: value.rawValue) else {
+            throw ConfigError.configValueFailedToCast(name: keyPrefix.appending(key).description, type: "Int")
+        }
+        return .int(int)
     }
 
-    /// Converts an array of `RawRepresentable` values with `Int` raw values to content.
+    /// Converts an array of `RawRepresentable` values with integer raw values to content.
     ///
-    /// - Parameter values: The values to convert.
+    /// - Parameters:
+    ///   - values: The values to convert.
+    ///   - key: The config key for error context.
     /// - Returns: The config content.
-    internal func uncast<Value: RawRepresentable<Int>>(
-        _ values: [Value]
-    ) -> ConfigContent {
-        .intArray(values.map(\.rawValue))
+    /// - Throws: A `ConfigError` if a raw value can't be represented as an `Int`.
+    internal func uncast<Value: RawRepresentable>(
+        _ values: [Value],
+        key: ConfigKey
+    ) throws -> ConfigContent where Value.RawValue: FixedWidthInteger {
+        .intArray(
+            try values.map { value in
+                guard let int = Int(exactly: value.rawValue) else {
+                    throw ConfigError.configValueFailedToCast(
+                        name: keyPrefix.appending(key).description,
+                        type: "Int"
+                    )
+                }
+                return int
+            }
+        )
     }
 }

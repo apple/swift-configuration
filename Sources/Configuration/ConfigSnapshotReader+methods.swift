@@ -1695,19 +1695,19 @@ extension ConfigSnapshotReader {
     ///   - fileID: The file ID where this call originates. Used for access reporting.
     ///   - line: The line number where this call originates. Used for access reporting.
     /// - Returns: The value converted to the expected type if found and convertible, otherwise `nil`.
-    public func int<Value: RawRepresentable<Int>>(
+    public func int<Value: RawRepresentable>(
         forKey key: ConfigKey,
         as type: Value.Type = Value.self,
         isSecret: Bool = false,
         fileID: String = #fileID,
         line: UInt = #line
-    ) -> Value? {
+    ) -> Value? where Value.RawValue: FixedWidthInteger {
         value(
             forKey: key,
             type: .int,
             isSecret: isSecret,
             unwrap: { try cast($0.asInt, type: Value.self, key: key) },
-            wrap: { uncast($0) },
+            wrap: { try uncast($0, key: key) },
             fileID: fileID,
             line: line
         )
@@ -1731,21 +1731,21 @@ extension ConfigSnapshotReader {
     ///   - fileID: The file ID where this call originates. Used for access reporting.
     ///   - line: The line number where this call originates. Used for access reporting.
     /// - Returns: The config value if found and convertible, otherwise the default value.
-    public func int<Value: RawRepresentable<Int>>(
+    public func int<Value: RawRepresentable>(
         forKey key: ConfigKey,
         as type: Value.Type = Value.self,
         isSecret: Bool = false,
         default defaultValue: Value,
         fileID: String = #fileID,
         line: UInt = #line
-    ) -> Value {
+    ) -> Value where Value.RawValue: FixedWidthInteger {
         value(
             forKey: key,
             type: .int,
             isSecret: isSecret,
             default: defaultValue,
             unwrap: { try cast($0.asInt, type: Value.self, key: key) },
-            wrap: { uncast($0) },
+            wrap: { try uncast($0, key: key) },
             fileID: fileID,
             line: line
         )
@@ -1768,19 +1768,19 @@ extension ConfigSnapshotReader {
     ///   - line: The line number where this call originates. Used for access reporting.
     /// - Returns: The config value converted to the expected type.
     /// - Throws: An error if the value is missing or can't be converted to the expected type.
-    public func requiredInt<Value: RawRepresentable<Int>>(
+    public func requiredInt<Value: RawRepresentable>(
         forKey key: ConfigKey,
         as type: Value.Type = Value.self,
         isSecret: Bool = false,
         fileID: String = #fileID,
         line: UInt = #line
-    ) throws -> Value {
+    ) throws -> Value where Value.RawValue: FixedWidthInteger {
         try requiredValue(
             forKey: key,
             type: .int,
             isSecret: isSecret,
             unwrap: { try cast($0.asInt, type: Value.self, key: key) },
-            wrap: { uncast($0) },
+            wrap: { try uncast($0, key: key) },
             fileID: fileID,
             line: line
         )
@@ -1802,19 +1802,19 @@ extension ConfigSnapshotReader {
     ///   - fileID: The file ID where this call originates. Used for access reporting.
     ///   - line: The line number where this call originates. Used for access reporting.
     /// - Returns: An array of values converted to the expected type if found and convertible, otherwise `nil`.
-    public func intArray<Value: RawRepresentable<Int>>(
+    public func intArray<Value: RawRepresentable>(
         forKey key: ConfigKey,
         as type: Value.Type = Value.self,
         isSecret: Bool = false,
         fileID: String = #fileID,
         line: UInt = #line
-    ) -> [Value]? {
+    ) -> [Value]? where Value.RawValue: FixedWidthInteger {
         value(
             forKey: key,
             type: .intArray,
             isSecret: isSecret,
             unwrap: { try $0.asIntArray.map { try cast($0, type: Value.self, key: key) } },
-            wrap: { uncast($0) },
+            wrap: { try uncast($0, key: key) },
             fileID: fileID,
             line: line
         )
@@ -1838,21 +1838,21 @@ extension ConfigSnapshotReader {
     ///   - fileID: The file ID where this call originates. Used for access reporting.
     ///   - line: The line number where this call originates. Used for access reporting.
     /// - Returns: The config array if found and convertible, otherwise the default array.
-    public func intArray<Value: RawRepresentable<Int>>(
+    public func intArray<Value: RawRepresentable>(
         forKey key: ConfigKey,
         as type: Value.Type = Value.self,
         isSecret: Bool = false,
         default defaultValue: [Value],
         fileID: String = #fileID,
         line: UInt = #line
-    ) -> [Value] {
+    ) -> [Value] where Value.RawValue: FixedWidthInteger {
         value(
             forKey: key,
             type: .intArray,
             isSecret: isSecret,
             default: defaultValue,
             unwrap: { try $0.asIntArray.map { try cast($0, type: Value.self, key: key) } },
-            wrap: { uncast($0) },
+            wrap: { try uncast($0, key: key) },
             fileID: fileID,
             line: line
         )
@@ -1875,19 +1875,19 @@ extension ConfigSnapshotReader {
     ///   - line: The line number where this call originates. Used for access reporting.
     /// - Returns: The config array converted to the expected type.
     /// - Throws: An error if the value is missing or can't be converted to the expected type.
-    public func requiredIntArray<Value: RawRepresentable<Int>>(
+    public func requiredIntArray<Value: RawRepresentable>(
         forKey key: ConfigKey,
         as type: Value.Type = Value.self,
         isSecret: Bool = false,
         fileID: String = #fileID,
         line: UInt = #line
-    ) throws -> [Value] {
+    ) throws -> [Value] where Value.RawValue: FixedWidthInteger {
         try requiredValue(
             forKey: key,
             type: .intArray,
             isSecret: isSecret,
             unwrap: { try $0.asIntArray.map { try cast($0, type: Value.self, key: key) } },
-            wrap: { uncast($0) },
+            wrap: { try uncast($0, key: key) },
             fileID: fileID,
             line: line
         )
