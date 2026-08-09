@@ -26,6 +26,7 @@ struct ConfigReaderMethodTestsFetch4 {
 
     typealias Defaults = ConfigReaderTests.Defaults
     typealias TestIntEnum = ConfigReaderTests.TestIntEnum
+    typealias TestUInt8Enum = ConfigReaderTests.TestUInt8Enum
     typealias TestIntConvertible = ConfigReaderTests.TestIntConvertible
 
     @available(Configuration 1.0, *)
@@ -132,6 +133,54 @@ struct ConfigReaderMethodTestsFetch4 {
             // Required - failing
             await #expect(throws: TestProvider.TestError.self) {
                 try await config.fetchRequiredInt(forKey: "failure", as: TestIntEnum.self)
+            }
+        }
+        do {
+            // Optional - success
+            #expect(try await config.fetchInt(forKey: "uint8Enum", as: TestUInt8Enum.self) == Defaults.uint8Enum)
+
+            // Optional - missing
+            #expect(try await config.fetchInt(forKey: "absentUInt8Enum", as: TestUInt8Enum.self) == nil)
+
+            // Optional - failing
+            await #expect(throws: TestProvider.TestError.self) {
+                try await config.fetchInt(forKey: "failure", as: TestUInt8Enum.self)
+            }
+
+            // Defaulted - success
+            #expect(
+                try await config.fetchInt(forKey: "uint8Enum", as: TestUInt8Enum.self, default: Defaults.otherUInt8Enum)
+                    == Defaults.uint8Enum
+            )
+
+            // Defaulted - missing
+            #expect(
+                try await config.fetchInt(
+                    forKey: "absentUInt8Enum",
+                    as: TestUInt8Enum.self,
+                    default: Defaults.otherUInt8Enum
+                ) == Defaults.otherUInt8Enum
+            )
+
+            // Defaulted - failing
+            await #expect(throws: TestProvider.TestError.self) {
+                try await config.fetchInt(forKey: "failure", as: TestUInt8Enum.self, default: Defaults.otherUInt8Enum)
+            }
+
+            // Required - success
+            #expect(
+                try await config.fetchRequiredInt(forKey: "uint8Enum", as: TestUInt8Enum.self) == Defaults.uint8Enum
+            )
+
+            // Required - missing
+            let error1 = await #expect(throws: ConfigError.self) {
+                try await config.fetchRequiredInt(forKey: "absentUInt8Enum", as: TestUInt8Enum.self)
+            }
+            #expect(error1 == .missingRequiredConfigValue(AbsoluteConfigKey(["absentUInt8Enum"])))
+
+            // Required - failing
+            await #expect(throws: TestProvider.TestError.self) {
+                try await config.fetchRequiredInt(forKey: "failure", as: TestUInt8Enum.self)
             }
         }
     }

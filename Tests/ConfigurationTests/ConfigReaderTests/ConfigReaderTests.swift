@@ -81,6 +81,11 @@ struct ConfigReaderTests {
         case one
     }
 
+    enum TestUInt8Enum: UInt8, Equatable {
+        case zero
+        case one
+    }
+
     struct TestIntConvertible: ExpressibleByConfigInt, Equatable {
         var configInt: Int
         var description: String { "\(configInt)" }
@@ -129,10 +134,14 @@ struct ConfigReaderTests {
         static var otherStringConvertibleArray: [TestStringConvertible] { [.hello, .world, .hello] }
         static var intEnum: TestIntEnum { .zero }
         static var otherIntEnum: TestIntEnum { .one }
+        static var uint8Enum: TestUInt8Enum { .zero }
+        static var otherUInt8Enum: TestUInt8Enum { .one }
         static var intConvertible: TestIntConvertible { .zero }
         static var otherIntConvertible: TestIntConvertible { .zero }
         static var intEnumArray: [TestIntEnum] { [.zero, .one] }
         static var otherIntEnumArray: [TestIntEnum] { [.zero, .one, .zero] }
+        static var uint8EnumArray: [TestUInt8Enum] { [.zero, .one] }
+        static var otherUInt8EnumArray: [TestUInt8Enum] { [.zero, .one, .zero] }
         static var intConvertibleArray: [TestIntConvertible] { [.zero, .one] }
         static var otherIntConvertibleArray: [TestIntConvertible] { [.zero, .one, .zero] }
     }
@@ -158,8 +167,12 @@ struct ConfigReaderTests {
                 ConfigValue(Defaults.stringConvertibleArray.map(\.description), isSecret: false)
             ),
             "intEnum": .success(ConfigValue(Defaults.intEnum.rawValue, isSecret: false)),
+            "uint8Enum": .success(ConfigValue(Int(Defaults.uint8Enum.rawValue), isSecret: false)),
             "intConvertible": .success(ConfigValue(Defaults.intConvertible.configInt, isSecret: false)),
             "intEnumArray": .success(ConfigValue(Defaults.intEnumArray.map(\.rawValue), isSecret: false)),
+            "uint8EnumArray": .success(
+                ConfigValue(Defaults.uint8EnumArray.map { Int($0.rawValue) }, isSecret: false)
+            ),
             "intConvertibleArray": .success(
                 ConfigValue(Defaults.intConvertibleArray.map(\.configInt), isSecret: false)
             ),

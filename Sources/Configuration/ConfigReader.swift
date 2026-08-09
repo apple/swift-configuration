@@ -109,7 +109,7 @@ import Foundation
 ///
 /// The library can automatically convert string or int configuration values to other types using the `as:` parameter.
 /// This works with:
-/// - String or Int backed enum types, as they conform to `RawRepresentable<String>` or `RawRepresentable<Int>`.
+/// - String-backed enums and enums backed by a fixed-width integer, through `RawRepresentable`.
 /// - Types that you explicitly conform to ``ExpressibleByConfigString`` or ``ExpressibleByConfigInt``.
 /// - Built-in types that already conform to ``ExpressibleByConfigString``:
 ///   - `SystemPackage.FilePath` - Converts from file paths.

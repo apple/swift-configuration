@@ -25,17 +25,18 @@ struct ConfigReaderMethodTestsWatch5 {
     
     typealias Defaults = ConfigReaderTests.Defaults
     typealias TestIntEnum = ConfigReaderTests.TestIntEnum
+    typealias TestUInt8Enum = ConfigReaderTests.TestUInt8Enum
     typealias TestIntConvertible = ConfigReaderTests.TestIntConvertible
 
     @available(Configuration 1.0, *)
     @Test func watch() async throws {
         let config = ConfigReaderTests.config
         
-        % for int_convertible_type in int_convertible_types:
+        % for int_convertible_type in int_convertible_test_types:
         % suffix = "IntArray"
         % test_type = int_convertible_type["testType"]
         % test_suffix = int_convertible_type["testSuffix"] + "Array"
-        % lower_test_suffix = lower_first(test_suffix)
+        % lower_test_suffix = int_convertible_type.get("lowerTestSuffix", lower_first(int_convertible_type["testSuffix"])) + "Array"
         do {
             // Optional - success
             #expect(try await config.watch${suffix}(forKey: "${lower_test_suffix}", as: ${test_type}.self, updatesHandler: awaitFirst) == Defaults.${lower_test_suffix})

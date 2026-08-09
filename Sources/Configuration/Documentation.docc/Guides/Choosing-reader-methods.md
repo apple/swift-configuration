@@ -301,9 +301,10 @@ This works with:
 
 - `Swift.Duration`: Converts from an integer value to a duration measured in seconds.
 
-**Int-backed enums:**
+**Integer-backed enums:**
 
-- Types that conform to `RawRepresentable<Int>`.
+- Types that conform to `RawRepresentable` with a `FixedWidthInteger` raw value.
+  Conversion is exact, so values outside the raw type's range are rejected.
 
 **Custom types:**
 
@@ -313,8 +314,8 @@ This works with:
 // Built-in type conversion
 let timeout = config.int(forKey: "api.timeout", as: Duration.self)
 
-// Int-backed enum conversion (RawRepresentable<Int>)
-enum LogLevel: Int {
+// Integer-backed enum conversion
+enum LogLevel: UInt8 {
     case error = 1
     case warning = 2
 }

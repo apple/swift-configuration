@@ -24,16 +24,17 @@ struct ConfigReaderMethodTestsGet4 {
     
     typealias Defaults = ConfigReaderTests.Defaults
     typealias TestIntEnum = ConfigReaderTests.TestIntEnum
+    typealias TestUInt8Enum = ConfigReaderTests.TestUInt8Enum
     typealias TestIntConvertible = ConfigReaderTests.TestIntConvertible
 
     @available(Configuration 1.0, *)
     @Test func get() async throws {
         let config = ConfigReaderTests.config
         
-        % for int_convertible_type in int_convertible_types:
+        % for int_convertible_type in int_convertible_test_types:
         % test_type = int_convertible_type["testType"]
         % test_suffix = int_convertible_type["testSuffix"]
-        % lower_test_suffix = lower_first(test_suffix)
+        % lower_test_suffix = int_convertible_type.get("lowerTestSuffix", lower_first(test_suffix))
         do {
             // Optional - success
             #expect(config.int(forKey: "${lower_test_suffix}", as: ${test_type}.self) == Defaults.${lower_test_suffix})

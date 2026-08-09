@@ -365,13 +365,13 @@ extension ConfigReader {
         isSecret: Bool = false,
         fileID: String = #fileID,
         line: UInt = #line
-    ) -> Value? {
+    ) -> Value?${int_convertible_type["whereClause"]} {
         value(
             forKey: key,
             type: .int,
             isSecret: isSecret,
             unwrap: { try cast($0.asInt, type: Value.self, key: key) },
-            wrap: { uncast($0) },
+            wrap: { ${int_convertible_type["wrap"]} },
             fileID: fileID,
             line: line
         )
@@ -402,14 +402,14 @@ extension ConfigReader {
         default defaultValue: Value,
         fileID: String = #fileID,
         line: UInt = #line
-    ) -> Value {
+    ) -> Value${int_convertible_type["whereClause"]} {
         value(
             forKey: key,
             type: .int,
             isSecret: isSecret,
             default: defaultValue,
             unwrap: { try cast($0.asInt, type: Value.self, key: key) },
-            wrap: { uncast($0) },
+            wrap: { ${int_convertible_type["wrap"]} },
             fileID: fileID,
             line: line
         )
@@ -438,13 +438,13 @@ extension ConfigReader {
         isSecret: Bool = false,
         fileID: String = #fileID,
         line: UInt = #line
-    ) throws -> Value {
+    ) throws -> Value${int_convertible_type["whereClause"]} {
         try requiredValue(
             forKey: key,
             type: .int,
             isSecret: isSecret,
             unwrap: { try cast($0.asInt, type: Value.self, key: key) },
-            wrap: { uncast($0) },
+            wrap: { ${int_convertible_type["wrap"]} },
             fileID: fileID,
             line: line
         )
@@ -472,13 +472,13 @@ extension ConfigReader {
         isSecret: Bool = false,
         fileID: String = #fileID,
         line: UInt = #line
-    ) -> [Value]? {
+    ) -> [Value]?${int_convertible_type["whereClause"]} {
         value(
             forKey: key,
             type: .intArray,
             isSecret: isSecret,
             unwrap: { try $0.asIntArray.map { try cast($0, type: Value.self, key: key) } },
-            wrap: { uncast($0) },
+            wrap: { ${int_convertible_type["wrap"]} },
             fileID: fileID,
             line: line
         )
@@ -509,14 +509,14 @@ extension ConfigReader {
         default defaultValue: [Value],
         fileID: String = #fileID,
         line: UInt = #line
-    ) -> [Value] {
+    ) -> [Value]${int_convertible_type["whereClause"]} {
         value(
             forKey: key,
             type: .intArray,
             isSecret: isSecret,
             default: defaultValue,
             unwrap: { try $0.asIntArray.map { try cast($0, type: Value.self, key: key) } },
-            wrap: { uncast($0) },
+            wrap: { ${int_convertible_type["wrap"]} },
             fileID: fileID,
             line: line
         )
@@ -545,13 +545,13 @@ extension ConfigReader {
         isSecret: Bool = false,
         fileID: String = #fileID,
         line: UInt = #line
-    ) throws -> [Value] {
+    ) throws -> [Value]${int_convertible_type["whereClause"]} {
         try requiredValue(
             forKey: key,
             type: .intArray,
             isSecret: isSecret,
             unwrap: { try $0.asIntArray.map { try cast($0, type: Value.self, key: key) } },
-            wrap: { uncast($0) },
+            wrap: { ${int_convertible_type["wrap"]} },
             fileID: fileID,
             line: line
         )
@@ -909,13 +909,13 @@ extension ConfigReader {
         isSecret: Bool = false,
         fileID: String = #fileID,
         line: UInt = #line
-    ) async throws -> Value? {
+    ) async throws -> Value?${int_convertible_type["whereClause"]} {
         try await fetchValue(
             forKey: key,
             type: .int,
             isSecret: isSecret,
             unwrap: { try cast($0.asInt, type: Value.self, key: key) },
-            wrap: { uncast($0) },
+            wrap: { ${int_convertible_type["wrap"]} },
             fileID: fileID,
             line: line
         )
@@ -946,14 +946,14 @@ extension ConfigReader {
         default defaultValue: Value,
         fileID: String = #fileID,
         line: UInt = #line
-    ) async throws -> Value {
+    ) async throws -> Value${int_convertible_type["whereClause"]} {
         try await fetchValue(
             forKey: key,
             type: .int,
             isSecret: isSecret,
             default: defaultValue,
             unwrap: { try cast($0.asInt, type: Value.self, key: key) },
-            wrap: { uncast($0) },
+            wrap: { ${int_convertible_type["wrap"]} },
             fileID: fileID,
             line: line
         )
@@ -982,13 +982,13 @@ extension ConfigReader {
         isSecret: Bool = false,
         fileID: String = #fileID,
         line: UInt = #line
-    ) async throws -> Value {
+    ) async throws -> Value${int_convertible_type["whereClause"]} {
         try await fetchRequiredValue(
             forKey: key,
             type: .int,
             isSecret: isSecret,
             unwrap: { try cast($0.asInt, type: Value.self, key: key) },
-            wrap: { uncast($0) },
+            wrap: { ${int_convertible_type["wrap"]} },
             fileID: fileID,
             line: line
         )
@@ -1017,13 +1017,13 @@ extension ConfigReader {
         isSecret: Bool = false,
         fileID: String = #fileID,
         line: UInt = #line
-    ) async throws -> [Value]? {
+    ) async throws -> [Value]?${int_convertible_type["whereClause"]} {
         try await fetchValue(
             forKey: key,
             type: .intArray,
             isSecret: isSecret,
             unwrap: { try $0.asIntArray.map { try cast($0, type: Value.self, key: key) } },
-            wrap: { uncast($0) },
+            wrap: { ${int_convertible_type["wrap"]} },
             fileID: fileID,
             line: line
         )
@@ -1054,14 +1054,14 @@ extension ConfigReader {
         default defaultValue: [Value],
         fileID: String = #fileID,
         line: UInt = #line
-    ) async throws -> [Value] {
+    ) async throws -> [Value]${int_convertible_type["whereClause"]} {
         try await fetchValue(
             forKey: key,
             type: .intArray,
             isSecret: isSecret,
             default: defaultValue,
             unwrap: { try $0.asIntArray.map { try cast($0, type: Value.self, key: key) } },
-            wrap: { uncast($0) },
+            wrap: { ${int_convertible_type["wrap"]} },
             fileID: fileID,
             line: line
         )
@@ -1090,13 +1090,13 @@ extension ConfigReader {
         isSecret: Bool = false,
         fileID: String = #fileID,
         line: UInt = #line
-    ) async throws -> [Value] {
+    ) async throws -> [Value]${int_convertible_type["whereClause"]} {
         try await fetchRequiredValue(
             forKey: key,
             type: .intArray,
             isSecret: isSecret,
             unwrap: { try $0.asIntArray.map { try cast($0, type: Value.self, key: key) } },
-            wrap: { uncast($0) },
+            wrap: { ${int_convertible_type["wrap"]} },
             fileID: fileID,
             line: line
         )
@@ -1556,13 +1556,13 @@ extension ConfigReader {
         fileID: String = #fileID,
         line: UInt = #line,
         updatesHandler: (_ updates: ConfigUpdatesAsyncSequence<Value?, Never>) async throws -> Return
-    ) async throws -> Return {
+    ) async throws -> Return${int_convertible_type["whereClause"]} {
         try await watchValue(
             forKey: key,
             type: .int,
             isSecret: isSecret,
             unwrap: { try cast($0.asInt, type: Value.self, key: key) },
-            wrap: { uncast($0) },
+            wrap: { ${int_convertible_type["wrap"]} },
             fileID: fileID,
             line: line,
             updatesHandler: updatesHandler
@@ -1602,14 +1602,14 @@ extension ConfigReader {
         fileID: String = #fileID,
         line: UInt = #line,
         updatesHandler: (_ updates: ConfigUpdatesAsyncSequence<Value, Never>) async throws -> Return
-    ) async throws -> Return {
+    ) async throws -> Return${int_convertible_type["whereClause"]} {
         try await watchValue(
             forKey: key,
             type: .int,
             isSecret: isSecret,
             default: defaultValue,
             unwrap: { try cast($0.asInt, type: Value.self, key: key) },
-            wrap: { uncast($0) },
+            wrap: { ${int_convertible_type["wrap"]} },
             fileID: fileID,
             line: line,
             updatesHandler: updatesHandler
@@ -1647,13 +1647,13 @@ extension ConfigReader {
         fileID: String = #fileID,
         line: UInt = #line,
         updatesHandler: (_ updates: ConfigUpdatesAsyncSequence<Value, any Error>) async throws -> Return
-    ) async throws -> Return {
+    ) async throws -> Return${int_convertible_type["whereClause"]} {
         try await watchRequiredValue(
             forKey: key,
             type: .int,
             isSecret: isSecret,
             unwrap: { try cast($0.asInt, type: Value.self, key: key) },
-            wrap: { uncast($0) },
+            wrap: { ${int_convertible_type["wrap"]} },
             fileID: fileID,
             line: line,
             updatesHandler: updatesHandler
@@ -1695,13 +1695,13 @@ extension ConfigReader {
         fileID: String = #fileID,
         line: UInt = #line,
         updatesHandler: (_ updates: ConfigUpdatesAsyncSequence<[Value]?, Never>) async throws -> Return
-    ) async throws -> Return {
+    ) async throws -> Return${int_convertible_type["whereClause"]} {
         try await watchValue(
             forKey: key,
             type: .intArray,
             isSecret: isSecret,
             unwrap: { try $0.asIntArray.map { try cast($0, type: Value.self, key: key) } },
-            wrap: { uncast($0) },
+            wrap: { ${int_convertible_type["wrap"]} },
             fileID: fileID,
             line: line,
             updatesHandler: updatesHandler
@@ -1741,14 +1741,14 @@ extension ConfigReader {
         fileID: String = #fileID,
         line: UInt = #line,
         updatesHandler: (_ updates: ConfigUpdatesAsyncSequence<[Value], Never>) async throws -> Return
-    ) async throws -> Return {
+    ) async throws -> Return${int_convertible_type["whereClause"]} {
         try await watchValue(
             forKey: key,
             type: .intArray,
             isSecret: isSecret,
             default: defaultValue,
             unwrap: { try $0.asIntArray.map { try cast($0, type: Value.self, key: key) } },
-            wrap: { uncast($0) },
+            wrap: { ${int_convertible_type["wrap"]} },
             fileID: fileID,
             line: line,
             updatesHandler: updatesHandler
@@ -1786,13 +1786,13 @@ extension ConfigReader {
         fileID: String = #fileID,
         line: UInt = #line,
         updatesHandler: (_ updates: ConfigUpdatesAsyncSequence<[Value], any Error>) async throws -> Return
-    ) async throws -> Return {
+    ) async throws -> Return${int_convertible_type["whereClause"]} {
         try await watchRequiredValue(
             forKey: key,
             type: .intArray,
             isSecret: isSecret,
             unwrap: { try $0.asIntArray.map { try cast($0, type: Value.self, key: key) } },
-            wrap: { uncast($0) },
+            wrap: { ${int_convertible_type["wrap"]} },
             fileID: fileID,
             line: line,
             updatesHandler: updatesHandler
