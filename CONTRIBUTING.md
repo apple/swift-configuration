@@ -11,6 +11,7 @@ Human discourse is an essential part of open source development. To encourage pr
 
 - Issues: titles, bodies, and comments.
 - Pull requests: titles, descriptions, and comments.
+- Proposals.
 
 Contributors who feel more comfortable writing in another language may use automated translation tools, but must include their original content in their preferred language.
 
