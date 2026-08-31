@@ -23,7 +23,7 @@ struct ConfigReaderTests {
         // This config has no providers, so every returned value will match the default.
         try #require(config.string(forKey: "bar", default: "test") == "test")
     }
-
+    
     @available(Configuration 1.0, *)
     @Test func scoping() throws {
         let provider = InMemoryProvider(
@@ -37,7 +37,7 @@ struct ConfigReaderTests {
         let scoped = top.scoped(to: "http.client")
         #expect(scoped.string(forKey: "user-agent") == "Config/1.0 (Test)")
     }
-
+    
     @available(Configuration 1.0, *)
     @Test func context() throws {
         let provider = InMemoryProvider(values: [
@@ -49,12 +49,12 @@ struct ConfigReaderTests {
         #expect(config.double(forKey: ConfigKey("http.client.timeout", context: ["upstream": "example1.org"])) == 15.0)
         #expect(config.double(forKey: ConfigKey("http.client.timeout", context: ["upstream": "example2.org"])) == 30.0)
     }
-
+    
     enum TestEnum: String, Equatable {
         case one
         case two
     }
-
+    
     struct TestStringConvertible: ExpressibleByConfigString, Equatable {
         var string: String
         init(string: String) {
@@ -66,21 +66,58 @@ struct ConfigReaderTests {
         init?(configString: String) {
             self.string = configString
         }
-
+        
         static var hello: Self {
             .init(string: "Hello")
         }
-
+        
         static var world: Self {
             .init(string: "World")
         }
     }
-
+    
+    struct TestHTTPHeaders: ExpressibleByConfigStringArray, CustomStringConvertible, Equatable, Sendable {
+        var configStringArray: [String]
+        let headers: [(String, String)]
+        
+        init?(configStringArray: [String]) {
+            var parsed: [(String, String)] = []
+            parsed.reserveCapacity(configStringArray.count)
+            
+            for item in configStringArray {
+                let parts = item.split(separator: ":", maxSplits: 1, omittingEmptySubsequences: false)
+                guard parts.count == 2 else { return nil }
+                
+                let name = String(parts[0])
+                let value = String(parts[1])
+                guard !name.isEmpty else { return nil }
+                
+                parsed.append((name, value))
+            }
+            
+            self.configStringArray = configStringArray
+            self.headers = parsed
+        }
+        
+        init(headers: [(String, String)]) {
+            self.headers = headers
+            self.configStringArray = headers.map { "\($0.0):\($0.1)" }
+        }
+        
+        var description: String {
+            headers.map { "\($0.0):\($0.1)" }.joined(separator: ",")
+        }
+        
+        static func == (lhs: Self, rhs: Self) -> Bool {
+            lhs.headers.elementsEqual(rhs.headers) { $0.0 == $1.0 && $0.1 == $1.1 }
+        }
+    }
+    
     enum TestIntEnum: Int, Equatable {
         case zero
         case one
     }
-
+    
     struct TestIntConvertible: ExpressibleByConfigInt, Equatable {
         var configInt: Int
         var description: String { "\(configInt)" }
@@ -97,7 +134,7 @@ struct ConfigReaderTests {
             .init(1)
         }
     }
-
+    
     enum Defaults {
         static var string: String { "Hello" }
         static var otherString: String { "Other Hello" }
@@ -135,8 +172,12 @@ struct ConfigReaderTests {
         static var otherIntEnumArray: [TestIntEnum] { [.zero, .one, .zero] }
         static var intConvertibleArray: [TestIntConvertible] { [.zero, .one] }
         static var otherIntConvertibleArray: [TestIntConvertible] { [.zero, .one, .zero] }
+        static var httpHeadersRaw: [String] { ["A:1", "B:2"] }
+        static var otherHTTPHeadersRaw: [String] { ["X:9"] }
+        static var httpHeaders: TestHTTPHeaders { .init(configStringArray: httpHeadersRaw)! }
+        static var otherHTTPHeaders: TestHTTPHeaders { .init(configStringArray: otherHTTPHeadersRaw)! }
     }
-
+    
     @available(Configuration 1.0, *)
     static var provider: TestProvider {
         TestProvider(values: [
@@ -150,7 +191,7 @@ struct ConfigReaderTests {
             "doubleArray": .success(ConfigValue(Defaults.doubleArray, isSecret: false)),
             "boolArray": .success(ConfigValue(Defaults.boolArray, isSecret: false)),
             "byteChunkArray": .success(ConfigValue(Defaults.byteChunkArray, isSecret: false)),
-
+            
             "stringEnum": .success(ConfigValue(Defaults.stringEnum.rawValue, isSecret: false)),
             "stringConvertible": .success(ConfigValue(Defaults.stringConvertible.description, isSecret: false)),
             "stringEnumArray": .success(ConfigValue(Defaults.stringEnumArray.map(\.rawValue), isSecret: false)),
@@ -163,10 +204,11 @@ struct ConfigReaderTests {
             "intConvertibleArray": .success(
                 ConfigValue(Defaults.intConvertibleArray.map(\.configInt), isSecret: false)
             ),
+            "httpHeaders": .success(ConfigValue(Defaults.httpHeadersRaw, isSecret: false)),
             "failure": .failure(TestProvider.TestError()),
         ])
     }
-
+    
     @available(Configuration 1.0, *)
     static var config: ConfigReader {
         ConfigReader(provider: provider)
