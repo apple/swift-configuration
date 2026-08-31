@@ -82,6 +82,7 @@ print("The HTTP timeout is: \(httpTimeout)")
 ## Getting started guides
 - [Configuring applications](https://swiftpackageindex.com/apple/swift-configuration/documentation/configuration/configuring-applications)
 - [Configuring libraries](https://swiftpackageindex.com/apple/swift-configuration/documentation/configuration/configuring-libraries)
+- [Migrating to Swift Configuration](https://swiftpackageindex.com/apple/swift-configuration/documentation/configuration/migrating-to-swift-configuration)
 
 For more, check out the full [documentation](https://swiftpackageindex.com/apple/swift-configuration/documentation/configuration).
 
