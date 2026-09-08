@@ -26,6 +26,54 @@ import SystemPackage
 struct JSONReloadingFileProviderTests {
 
     @available(Configuration 1.0, *)
+    @Test func signalTriggerRecoversAfterInvalidContent() async throws {
+        let filePath = FilePath("/test/config.json")
+        let timestamp = Date(timeIntervalSince1970: 1_750_688_537)
+        let fileSystem = InMemoryFileSystem(files: [
+            filePath: .file(timestamp: timestamp, contents: #"{"key":"original"}"#)
+        ])
+        let logs = CollectingLogHandler()
+        let provider = try await ReloadingFileProvider<JSONSnapshot>(
+            parsingOptions: .default,
+            filePath: filePath,
+            allowMissing: false,
+            pollInterval: .seconds(3_600),
+            fileSystem: fileSystem,
+            logger: Logger(label: "test", factory: { _ in logs }),
+            metrics: NOOPMetricsHandler.instance
+        )
+        let (triggers, continuation) = AsyncStream<ReloadingFileProvider<JSONSnapshot>.ReloadTrigger>.makeStream()
+
+        try await withThrowingTaskGroup(of: Void.self) { group in
+            group.addTask { try await provider.run(triggers: triggers) }
+            defer { group.cancelAll() }
+
+            fileSystem.update(
+                filePath: filePath,
+                timestamp: timestamp.addingTimeInterval(1),
+                contents: .file(contents: "{")
+            )
+            continuation.yield(.sighup)
+            try await waitForReloadLog("SIGHUP check stopping", in: logs)
+            let original = try provider.value(forKey: ["key"], type: .string)
+            #expect(try original.value?.content.asString == "original")
+            #expect(logs.currentEntries.contains { $0.message == "SIGHUP check failed, will retry on next trigger" })
+
+            fileSystem.update(
+                filePath: filePath,
+                timestamp: timestamp.addingTimeInterval(1),
+                contents: .file(contents: #"{"key":"updated"}"#)
+            )
+            continuation.yield(.sighup)
+            continuation.finish()
+            try await group.waitForAll()
+
+            let updated = try provider.value(forKey: ["key"], type: .string)
+            #expect(try updated.value?.content.asString == "updated")
+        }
+    }
+
+    @available(Configuration 1.0, *)
     var provider: ReloadingFileProvider<JSONSnapshot> {
         get async throws {
             let fileSystem = InMemoryFileSystem(files: [

@@ -112,6 +112,11 @@ let package = Package(
                     condition: .when(traits: ["Reloading"])
                 ),
                 .product(
+                    name: "UnixSignals",
+                    package: "swift-service-lifecycle",
+                    condition: .when(traits: ["Reloading"])
+                ),
+                .product(
                     name: "Yams",
                     package: "Yams",
                     condition: .when(traits: ["YAML"])
@@ -130,6 +135,11 @@ let package = Package(
                 "Configuration",
                 "ConfigurationTestingInternal",
                 "ConfigurationTesting",
+                .product(
+                    name: "MetricsTestKit",
+                    package: "swift-metrics",
+                    condition: .when(traits: ["Reloading"])
+                ),
             ],
             exclude: [
                 "ConfigReaderTests/ConfigReaderMethodTestsGet1.swift.gyb",

@@ -24,10 +24,14 @@ import Metrics
 import ServiceLifecycle
 import Synchronization
 import SystemPackage
+import AsyncAlgorithms
+import MetricsTestKit
 
 @available(Configuration 1.0, *)
 private func withTestProvider<R>(
     allowMissing: Bool = false,
+    logger: Logger = .noop,
+    metrics: any MetricsFactory = NOOPMetricsHandler.instance,
     body: (
         ReloadingFileProvider<TestSnapshot>,
         InMemoryFileSystem,
@@ -42,10 +46,25 @@ private func withTestProvider<R>(
             allowMissing: allowMissing,
             pollInterval: .seconds(1),
             fileSystem: fileSystem,
-            logger: .noop,
-            metrics: NOOPMetricsHandler.instance
+            logger: logger,
+            metrics: metrics
         )
         return try await body(provider, fileSystem, filePath, originalTimestamp)
+    }
+}
+
+/// Waits for a reload operation to finish without initiating another file check.
+@available(Configuration 1.0, *)
+func waitForReloadLog(
+    _ message: String,
+    count: Int = 1,
+    in handler: CollectingLogHandler,
+    sourceLocation: SourceLocation = #_sourceLocation
+) async throws {
+    let deadline = ContinuousClock.now.advanced(by: .seconds(5))
+    while handler.currentEntries.filter({ $0.message == message }).count < count {
+        try #require(ContinuousClock.now < deadline, "Timed out waiting for \(message)", sourceLocation: sourceLocation)
+        try await Task.sleep(for: .milliseconds(1))
     }
 }
 
@@ -98,6 +117,45 @@ struct ReloadingFileProviderTests {
             // Check updated value
             let result2 = try provider.value(forKey: ["key1"], type: .string)
             #expect(try result2.value?.content.asString == "newValue1")
+        }
+    }
+
+    @available(Configuration 1.0, *)
+    @Test(arguments: [false, true])
+    func testSignalTriggerChecksForChanges(timestampChanged: Bool) async throws {
+        try await withTestProvider { provider, fileSystem, filePath, originalTimestamp in
+            fileSystem.update(
+                filePath: filePath,
+                timestamp: originalTimestamp.addingTimeInterval(timestampChanged ? 1 : 0),
+                contents: .file(contents: "key1=updated")
+            )
+            let triggers: [ReloadingFileProvider<TestSnapshot>.ReloadTrigger] = [.sighup]
+            try await provider.run(triggers: triggers.async)
+
+            let result = try provider.value(forKey: ["key1"], type: .string)
+            #expect(try result.value?.content.asString == (timestampChanged ? "updated" : "value1"))
+        }
+    }
+
+    @available(Configuration 1.0, *)
+    @Test func testSignalTriggersDoNotCountAsPollTicks() async throws {
+        let metrics = TestMetrics()
+        let logs = CollectingLogHandler()
+        try await withTestProvider(logger: Logger(label: "test", factory: { _ in logs }), metrics: metrics) {
+            provider,
+            fileSystem,
+            filePath,
+            _ in
+            fileSystem.remove(filePath: filePath)
+            let triggers: [ReloadingFileProvider<TestSnapshot>.ReloadTrigger] = [.sighup, .poll, .sighup, .poll]
+            try await provider.run(triggers: triggers.async)
+
+            let prefix = provider.providerName.lowercased()
+            #expect(try metrics.expectCounter("\(prefix)_poll_ticks_total").totalValue == 2)
+            #expect(try metrics.expectCounter("\(prefix)_poll_errors_total").totalValue == 2)
+            let tickNumbers = logs.currentEntries.filter { $0.message == "Poll tick starting" }
+                .compactMap { $0.metadata["\(provider.providerName).poll.tick.number"] }
+            #expect(tickNumbers == ["1", "2"])
         }
     }
 
@@ -231,6 +289,7 @@ struct ReloadingFileProviderTests {
             group.addTask {
                 try await provider.run()
             }
+            defer { group.cancelAll() }
             for _ in 1..<1000 {
                 let result2 = try provider.value(forKey: ["key1"], type: .string)
                 guard try result2.value?.content.asString == "newValue1" else {

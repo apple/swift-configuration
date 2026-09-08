@@ -26,6 +26,9 @@ public import Logging
 public import Metrics
 import AsyncAlgorithms
 import Synchronization
+#if !os(Windows) && !os(WASI)
+import UnixSignals
+#endif
 
 /// A configuration provider that reads configuration from a file on disk with automatic reloading capability.
 ///
@@ -64,6 +67,17 @@ import Synchronization
 ///
 /// The provider monitors the file by polling at the specified interval (default: 15 seconds)
 /// and notifies any active watchers when it detects changes.
+///
+/// On platforms that support Unix signals, the provider also listens for `SIGHUP` while
+/// `run()` is active. Sending `SIGHUP` to the process requests an immediate file-change
+/// check, without waiting for the next polling interval. The file is reloaded only if
+/// its modification timestamp or resolved path has changed. Polling continues alongside
+/// signal handling; on Windows and WASI, only polling is available.
+///
+/// Signal handling affects the whole process. Avoid installing a competing `SIGHUP`
+/// handler or configuring `SIGHUP` as a `ServiceGroup` shutdown signal. On Darwin platforms,
+/// the signal listener sets the process's `SIGHUP` disposition to `SIG_IGN` and does not
+/// restore the previous disposition when the provider stops.
 ///
 /// ## Configuration from a reader
 ///
@@ -681,35 +695,67 @@ extension ReloadingFileProvider: ConfigProvider {
 extension ReloadingFileProvider: Service {
     // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
     public func run() async throws {
-        logger.debug("File polling starting")
+        try Task.checkCancellation()
+        let pollTicks = AsyncTimerSequence(interval: pollInterval, clock: .continuous).map { _ in ReloadTrigger.poll }
+        #if !os(Windows) && !os(WASI)
+        let signals = await UnixSignalsSequence(trapping: .sighup)
+        logger.debug("Listening for SIGHUP")
+        let triggers = merge(pollTicks, signals.map { _ in ReloadTrigger.sighup })
+        #else
+        let triggers = pollTicks
+        #endif
+        try await run(triggers: triggers)
+    }
+
+    /// An event requesting a file-change check.
+    internal enum ReloadTrigger: Sendable {
+        case poll
+        case sighup
+    }
+
+    /// Processes reload requests until the sequence ends, the task is cancelled, or the service shuts down.
+    internal func run<Triggers: AsyncSequence & Sendable>(triggers: Triggers) async throws
+    where Triggers.Element == ReloadTrigger {
+        logger.debug("File monitoring starting")
         defer {
-            logger.debug("File polling stopping")
+            logger.debug("File monitoring stopping")
         }
 
         var counter = 1
-        for try await _ in AsyncTimerSequence(interval: pollInterval, clock: .continuous).cancelOnGracefulShutdown() {
-            defer {
-                counter += 1
-                metrics.pollTickCounter.increment(by: 1)
+        for try await trigger in triggers.cancelOnGracefulShutdown() {
+            try Task.checkCancellation()
+
+            var triggerLogger = logger
+            let operation: String
+            switch trigger {
+            case .poll:
+                operation = "Poll tick"
+                triggerLogger[metadataKey: "\(providerName).poll.tick.number"] = .stringConvertible(counter)
+            case .sighup:
+                operation = "SIGHUP check"
             }
 
-            var tickLogger = logger
-            tickLogger[metadataKey: "\(providerName).poll.tick.number"] = .stringConvertible(counter)
-            tickLogger.debug("Poll tick starting")
+            triggerLogger.debug("\(operation) starting")
             defer {
-                tickLogger.debug("Poll tick stopping")
+                if case .poll = trigger {
+                    counter += 1
+                    metrics.pollTickCounter.increment(by: 1)
+                }
+                triggerLogger.debug("\(operation) stopping")
             }
 
             do {
-                try await reloadIfNeeded(logger: tickLogger)
+                try await reloadIfNeeded(logger: triggerLogger)
             } catch {
-                tickLogger.debug(
-                    "Poll tick failed, will retry on next tick",
+                triggerLogger.debug(
+                    "\(operation) failed, will retry on next trigger",
                     metadata: [
                         "error": "\(error)"
                     ]
                 )
-                metrics.pollTickErrorCounter.increment(by: 1)
+                if case .poll = trigger {
+                    metrics.pollTickErrorCounter.increment(by: 1)
+                }
             }
         }
     }
