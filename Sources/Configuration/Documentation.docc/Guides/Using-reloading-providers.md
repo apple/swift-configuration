@@ -44,6 +44,18 @@ let host = config.string(
 )
 ```
 
+#### Reloading with SIGHUP
+
+On platforms that support Unix signals, a running ``ReloadingFileProvider`` also checks for file changes when the process receives `SIGHUP`:
+
+```bash
+kill -HUP <pid>  # ignore-unacceptable-language
+```
+
+Replace `<pid>` with your application's process ID. This requests an immediate check without waiting for the next poll interval. Polling continues, and the file is reloaded only if its modification timestamp or resolved path has changed.
+
+> Note: Windows and WASI support polling only. For signal-handler restrictions and Darwin-specific behavior, see ``ReloadingFileProvider``.
+
 #### Poll interval considerations
 
 Choose poll intervals based on how quickly you need to detect changes:

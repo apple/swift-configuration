@@ -53,7 +53,7 @@ private func withTestProvider<R>(
     }
 }
 
-/// Waits for a reload operation to finish without initiating another file check.
+/// Waits for a log entry without triggering another file check.
 @available(Configuration 1.0, *)
 func waitForReloadLog(
     _ message: String,
