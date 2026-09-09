@@ -66,8 +66,8 @@ jobs:
         with:
           persist-credentials: false
       - name: Run tests
-        # Unset workflow-level ENABLE_ALL_TRAITS (PR workflow) so Package.swift
-        # defaults and CI flags follow SPM trait flags only (apple/swift-configuration#29).
+        # Unset ENABLE_ALL_TRAITS if present so Package.swift defaults and CI
+        # flags follow SPM trait flags only (mirrors PR workflow; apple/swift-configuration#29).
         run: |
           unset ENABLE_ALL_TRAITS
           swift test --explicit-target-dependency-import-check error ${{ matrix.flags }}
