@@ -53,16 +53,22 @@ private func withTestProvider<R>(
     }
 }
 
-/// Waits for a log entry without triggering another file check.
+/// Waits until `message` has been logged `count` times.
+///
+/// Lets tests observe a reload without calling `fetchValue`, which would trigger one.
 @available(Configuration 1.0, *)
 func waitForReloadLog(
     _ message: String,
     count: Int = 1,
+    metadata: [String: String] = [:],
     in handler: CollectingLogHandler,
     sourceLocation: SourceLocation = #_sourceLocation
 ) async throws {
     let deadline = ContinuousClock.now.advanced(by: .seconds(5))
-    while handler.currentEntries.filter({ $0.message == message }).count < count {
+    func matches(_ entry: Entry) -> Bool {
+        entry.message == message && metadata.allSatisfy { entry.metadata[$0.key] == $0.value }
+    }
+    while handler.currentEntries.filter(matches).count < count {
         try #require(ContinuousClock.now < deadline, "Timed out waiting for \(message)", sourceLocation: sourceLocation)
         try await Task.sleep(for: .milliseconds(1))
     }
@@ -153,9 +159,43 @@ struct ReloadingFileProviderTests {
             let prefix = provider.providerName.lowercased()
             #expect(try metrics.expectCounter("\(prefix)_poll_ticks_total").totalValue == 2)
             #expect(try metrics.expectCounter("\(prefix)_poll_errors_total").totalValue == 2)
-            let tickNumbers = logs.currentEntries.filter { $0.message == "Poll tick starting" }
+            let tickNumbers = logs.currentEntries.filter { $0.message == "Reload check starting" }
                 .compactMap { $0.metadata["\(provider.providerName).poll.tick.number"] }
             #expect(tickNumbers == ["1", "2"])
+        }
+    }
+
+    @available(Configuration 1.0, *)
+    @Test func testRunReturnsWhenAlreadyCancelled() async throws {
+        try await withTestProvider { provider, _, _, _ in
+            let task = Task {
+                withUnsafeCurrentTask { $0?.cancel() }
+                try await provider.run()
+            }
+            try await task.value
+        }
+    }
+
+    @available(Configuration 1.0, *)
+    @Test func testCancellationWhileRunningDoesNotThrow() async throws {
+        try await withTestFileSystem { fileSystem, filePath, _ in
+            // Cancellation races with the delivery of poll ticks, so give it a few tries.
+            for _ in 0..<100 {
+                let provider = try await ReloadingFileProvider<TestSnapshot>(
+                    parsingOptions: .default,
+                    filePath: filePath,
+                    allowMissing: false,
+                    pollInterval: .microseconds(100),
+                    fileSystem: fileSystem,
+                    logger: .noop,
+                    metrics: NOOPMetricsHandler.instance
+                )
+                let serviceGroup = ServiceGroup(services: [provider], logger: .noop)
+                let task = Task { try await serviceGroup.run() }
+                try await Task.sleep(for: .milliseconds(1))
+                task.cancel()
+                try await task.value
+            }
         }
     }
 
@@ -289,7 +329,6 @@ struct ReloadingFileProviderTests {
             group.addTask {
                 try await provider.run()
             }
-            defer { group.cancelAll() }
             for _ in 1..<1000 {
                 let result2 = try provider.value(forKey: ["key1"], type: .string)
                 guard try result2.value?.content.asString == "newValue1" else {

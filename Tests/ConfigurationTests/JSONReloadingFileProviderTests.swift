@@ -48,20 +48,22 @@ struct JSONReloadingFileProviderTests {
             group.addTask { try await provider.run(triggers: triggers) }
             defer { group.cancelAll() }
 
+            // A broken file keeps the old values.
             fileSystem.update(
                 filePath: filePath,
                 timestamp: timestamp.addingTimeInterval(1),
                 contents: .file(contents: "{")
             )
             continuation.yield(.sighup)
-            try await waitForReloadLog("SIGHUP check stopping", in: logs)
+            try await waitForReloadLog("Reload check stopping", in: logs)
             let original = try provider.value(forKey: ["key"], type: .string)
             #expect(try original.value?.content.asString == "original")
-            #expect(logs.currentEntries.contains { $0.message == "SIGHUP check failed, will retry on next trigger" })
+            #expect(logs.currentEntries.contains { $0.message == "Reload check failed, will retry on next trigger" })
 
+            // Once the file is fixed, the next signal picks it up.
             fileSystem.update(
                 filePath: filePath,
-                timestamp: timestamp.addingTimeInterval(1),
+                timestamp: timestamp.addingTimeInterval(2),
                 contents: .file(contents: #"{"key":"updated"}"#)
             )
             continuation.yield(.sighup)

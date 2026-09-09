@@ -68,16 +68,15 @@ import UnixSignals
 /// The provider monitors the file by polling at the specified interval (default: 15 seconds)
 /// and notifies any active watchers when it detects changes.
 ///
-/// On platforms that support Unix signals, the provider also listens for `SIGHUP` while
-/// `run()` is active. Sending `SIGHUP` to the process requests an immediate file-change
-/// check, without waiting for the next polling interval. The file is reloaded only if
-/// its modification timestamp or resolved path has changed. Polling continues alongside
-/// signal handling; on Windows and WASI, only polling is available.
+/// On platforms with Unix signals, a running provider also checks the file whenever the
+/// process receives `SIGHUP`, so you don't have to wait for the next poll. Either way, the
+/// file is only reloaded if its modification timestamp or resolved path changed. Windows
+/// and WASI support polling only.
 ///
-/// Signal handling affects the whole process. Avoid installing a competing `SIGHUP`
-/// handler or configuring `SIGHUP` as a `ServiceGroup` shutdown signal. On Darwin platforms,
-/// the signal listener sets the process's `SIGHUP` disposition to `SIG_IGN` and does not
-/// restore the previous disposition when the provider stops.
+/// Signal handling is process-wide: while the provider runs, `SIGHUP` no longer terminates
+/// the process. Don't install another `SIGHUP` handler or use `SIGHUP` as a `ServiceGroup`
+/// shutdown signal in the same process. On Darwin, the provider sets the `SIGHUP` disposition
+/// to `SIG_IGN` and doesn't restore it when it stops.
 ///
 /// ## Configuration from a reader
 ///
@@ -693,27 +692,28 @@ extension ReloadingFileProvider: ConfigProvider {
 
 @available(Configuration 1.0, *)
 extension ReloadingFileProvider: Service {
-    // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
-    public func run() async throws {
-        try Task.checkCancellation()
-        let pollTicks = AsyncTimerSequence(interval: pollInterval, clock: .continuous).map { _ in ReloadTrigger.poll }
-        #if !os(Windows) && !os(WASI)
-        let signals = await UnixSignalsSequence(trapping: .sighup)
-        logger.debug("Listening for SIGHUP")
-        let triggers = merge(pollTicks, signals.map { _ in ReloadTrigger.sighup })
-        #else
-        let triggers = pollTicks
-        #endif
-        try await run(triggers: triggers)
-    }
 
-    /// An event requesting a file-change check.
-    internal enum ReloadTrigger: Sendable {
+    /// An event that asks the provider to check the file for changes.
+    internal enum ReloadTrigger: String, Sendable {
         case poll
         case sighup
     }
 
-    /// Processes reload requests until the sequence ends, the task is cancelled, or the service shuts down.
+    // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
+    public func run() async throws {
+        // Don't bother setting up the signal handler if we're already cancelled.
+        guard !Task.isCancelled else { return }
+        let pollTicks = AsyncTimerSequence(interval: pollInterval, clock: .continuous).map { _ in ReloadTrigger.poll }
+        #if !os(Windows) && !os(WASI)
+        let signals = await UnixSignalsSequence(trapping: .sighup)
+        logger.debug("Listening for SIGHUP")
+        try await run(triggers: merge(pollTicks, signals.map { _ in ReloadTrigger.sighup }))
+        #else
+        try await run(triggers: pollTicks)
+        #endif
+    }
+
+    /// Checks the file once per trigger until the sequence ends, the task is cancelled, or the service shuts down.
     internal func run<Triggers: AsyncSequence & Sendable>(triggers: Triggers) async throws
     where Triggers.Element == ReloadTrigger {
         logger.debug("File monitoring starting")
@@ -723,32 +723,25 @@ extension ReloadingFileProvider: Service {
 
         var counter = 1
         for try await trigger in triggers.cancelOnGracefulShutdown() {
-            try Task.checkCancellation()
-
-            var triggerLogger = logger
-            let operation: String
-            switch trigger {
-            case .poll:
-                operation = "Poll tick"
-                triggerLogger[metadataKey: "\(providerName).poll.tick.number"] = .stringConvertible(counter)
-            case .sighup:
-                operation = "SIGHUP check"
+            var checkLogger = logger
+            checkLogger[metadataKey: "\(providerName).trigger"] = .string(trigger.rawValue)
+            if case .poll = trigger {
+                checkLogger[metadataKey: "\(providerName).poll.tick.number"] = .stringConvertible(counter)
             }
-
-            triggerLogger.debug("\(operation) starting")
+            checkLogger.debug("Reload check starting")
             defer {
                 if case .poll = trigger {
                     counter += 1
                     metrics.pollTickCounter.increment(by: 1)
                 }
-                triggerLogger.debug("\(operation) stopping")
+                checkLogger.debug("Reload check stopping")
             }
 
             do {
-                try await reloadIfNeeded(logger: triggerLogger)
+                try await reloadIfNeeded(logger: checkLogger)
             } catch {
-                triggerLogger.debug(
-                    "\(operation) failed, will retry on next trigger",
+                checkLogger.debug(
+                    "Reload check failed, will retry on next trigger",
                     metadata: [
                         "error": "\(error)"
                     ]
