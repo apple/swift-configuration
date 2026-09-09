@@ -39,6 +39,46 @@ jobs:
       windows_nightly_next_arguments_override: "--enable-all-traits --explicit-target-dependency-import-check error"
       windows_nightly_main_arguments_override: "--enable-all-traits --explicit-target-dependency-import-check error"
 
+  traits-matrix:
+    name: Trait combinations (${{ matrix.name }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: no-traits
+            flags: "--disable-default-traits"
+          - name: default-traits
+            flags: ""
+          - name: all-traits
+            flags: "--enable-all-traits"
+          - name: only-Logging
+            flags: "--disable-default-traits --traits Logging"
+          - name: only-JSON
+            flags: "--disable-default-traits --traits JSON"
+          - name: only-Reloading
+            flags: "--disable-default-traits --traits Reloading"
+          - name: only-CommandLineArguments
+            flags: "--disable-default-traits --traits CommandLineArguments"
+          - name: only-YAML
+            flags: "--disable-default-traits --traits YAML"
+          - name: only-PropertyList
+            flags: "--disable-default-traits --traits PropertyList"
+    # Match generate_matrix.sh linux_6_3_container_image (latest Linux unit-test Swift).
+    container:
+      image: swift:6.3-noble
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - name: Run tests
+        # Unset workflow-level ENABLE_ALL_TRAITS (PR workflow) so Package.swift
+        # defaults and CI flags follow SPM trait flags only (apple/swift-configuration#29).
+        run: |
+          unset ENABLE_ALL_TRAITS
+          swift test --explicit-target-dependency-import-check error ${{ matrix.flags }}
+
   static-sdk:
     name: Static SDK
     # Workaround https://github.com/nektos/act/issues/1875
