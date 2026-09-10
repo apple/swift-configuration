@@ -46,15 +46,13 @@ let host = config.string(
 
 #### Reloading with SIGHUP
 
-On platforms with Unix signals, a running ``ReloadingFileProvider`` also checks the file when the process receives `SIGHUP`, without waiting for the next poll. If your application maintains a PID file, you can send the signal like this:
+On platforms with Unix signals, a running ``ReloadingFileProvider`` also checks the file when the process receives `SIGHUP`, without waiting for the next poll. For example, to signal processes named `my-server`:
 
 ```bash
-pkill -HUP -F /var/run/my-server.pid
+pkill -HUP -x my-server
 ```
 
-The path is only an example; Swift Configuration doesn't create a PID file for you. Polling continues as usual, and the file is only reloaded if its modification timestamp or resolved path changed.
-
-> Note: Windows and WASI support polling only. Signal handling affects the whole process; see ``ReloadingFileProvider`` for details.
+Polling continues as usual, and the file is only reloaded if its modification timestamp or resolved path changed.
 
 #### Poll interval considerations
 

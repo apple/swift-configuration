@@ -26,9 +26,7 @@ public import Logging
 public import Metrics
 import AsyncAlgorithms
 import Synchronization
-#if !os(Windows) && !os(WASI)
 import UnixSignals
-#endif
 
 /// A configuration provider that reads configuration from a file on disk with automatic reloading capability.
 ///
@@ -70,13 +68,7 @@ import UnixSignals
 ///
 /// On platforms with Unix signals, a running provider also checks the file whenever the
 /// process receives `SIGHUP`, so you don't have to wait for the next poll. Either way, the
-/// file is only reloaded if its modification timestamp or resolved path changed. Windows
-/// and WASI support polling only.
-///
-/// Signal handling is process-wide: while the provider runs, `SIGHUP` no longer terminates
-/// the process. Don't install another `SIGHUP` handler or use `SIGHUP` as a `ServiceGroup`
-/// shutdown signal in the same process. On Darwin, the provider sets the `SIGHUP` disposition
-/// to `SIG_IGN` and doesn't restore it when it stops.
+/// file is only reloaded if its modification timestamp or resolved path changed.
 ///
 /// ## Configuration from a reader
 ///
@@ -701,16 +693,11 @@ extension ReloadingFileProvider: Service {
 
     // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
     public func run() async throws {
-        // Don't bother setting up the signal handler if we're already cancelled.
         guard !Task.isCancelled else { return }
         let pollTicks = AsyncTimerSequence(interval: pollInterval, clock: .continuous).map { _ in ReloadTrigger.poll }
-        #if !os(Windows) && !os(WASI)
         let signals = await UnixSignalsSequence(trapping: .sighup)
         logger.debug("Listening for SIGHUP")
         try await run(triggers: merge(pollTicks, signals.map { _ in ReloadTrigger.sighup }))
-        #else
-        try await run(triggers: pollTicks)
-        #endif
     }
 
     /// Checks the file once per trigger until the sequence ends, the task is cancelled, or the service shuts down.
