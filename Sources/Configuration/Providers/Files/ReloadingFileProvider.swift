@@ -696,7 +696,6 @@ extension ReloadingFileProvider: Service {
         guard !Task.isCancelled else { return }
         let pollTicks = AsyncTimerSequence(interval: pollInterval, clock: .continuous).map { _ in ReloadTrigger.poll }
         let signals = await UnixSignalsSequence(trapping: .sighup)
-        logger.debug("Listening for SIGHUP")
         try await run(triggers: merge(pollTicks, signals.map { _ in ReloadTrigger.sighup }))
     }
 

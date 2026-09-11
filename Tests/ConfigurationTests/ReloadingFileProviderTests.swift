@@ -53,27 +53,6 @@ private func withTestProvider<R>(
     }
 }
 
-/// Waits until `message` has been logged `count` times.
-///
-/// Lets tests observe a reload without calling `fetchValue`, which would trigger one.
-@available(Configuration 1.0, *)
-func waitForReloadLog(
-    _ message: String,
-    count: Int = 1,
-    metadata: [String: String] = [:],
-    in handler: CollectingLogHandler,
-    sourceLocation: SourceLocation = #_sourceLocation
-) async throws {
-    let deadline = ContinuousClock.now.advanced(by: .seconds(5))
-    func matches(_ entry: Entry) -> Bool {
-        entry.message == message && metadata.allSatisfy { entry.metadata[$0.key] == $0.value }
-    }
-    while handler.currentEntries.filter(matches).count < count {
-        try #require(ContinuousClock.now < deadline, "Timed out waiting for \(message)", sourceLocation: sourceLocation)
-        try await Task.sleep(for: .milliseconds(1))
-    }
-}
-
 struct ReloadingFileProviderTests {
 
     @available(Configuration 1.0, *)
