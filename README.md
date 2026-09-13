@@ -94,7 +94,7 @@ To enable an additional trait on the package, update the package dependency:
 .package(
     url: "https://github.com/apple/swift-configuration",
     from: "1.0.0",
-+   traits: [.defaults, "YAML"]
++   traits: ["JSON", "YAML"]
 )
 ```
 
