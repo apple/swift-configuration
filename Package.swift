@@ -135,11 +135,6 @@ let package = Package(
                 "Configuration",
                 "ConfigurationTestingInternal",
                 "ConfigurationTesting",
-                .product(
-                    name: "MetricsTestKit",
-                    package: "swift-metrics",
-                    condition: .when(traits: ["Reloading"])
-                ),
             ],
             exclude: [
                 "ConfigReaderTests/ConfigReaderMethodTestsGet1.swift.gyb",

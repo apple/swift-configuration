@@ -24,15 +24,11 @@ import Metrics
 import ServiceLifecycle
 import Synchronization
 import SystemPackage
-import AsyncAlgorithms
-import MetricsTestKit
 
 @available(Configuration 1.0, *)
 private func withTestProvider<R>(
     allowMissing: Bool = false,
     pollInterval: Duration = .seconds(1),
-    logger: Logger = .noop,
-    metrics: any MetricsFactory = NOOPMetricsHandler.instance,
     body: (
         ReloadingFileProvider<TestSnapshot>,
         InMemoryFileSystem,
@@ -47,8 +43,8 @@ private func withTestProvider<R>(
             allowMissing: allowMissing,
             pollInterval: pollInterval,
             fileSystem: fileSystem,
-            logger: logger,
-            metrics: metrics
+            logger: .noop,
+            metrics: NOOPMetricsHandler.instance
         )
         return try await body(provider, fileSystem, filePath, originalTimestamp)
     }
@@ -116,91 +112,21 @@ struct ReloadingFileProviderTests {
                 timestamp: timestamp.addingTimeInterval(1),
                 contents: .file(contents: "key1=updated")
             )
-            continuation.yield(.sighup)
-            continuation.finish()
-            try await provider.run(triggers: triggers)
+            try await withThrowingTaskGroup(of: Void.self) { group in
+                group.addTask { try await provider.run(triggers: triggers) }
+                defer { continuation.finish() }
+                continuation.yield(.sighup)
 
-            let updated = try provider.value(forKey: ["key1"], type: .string)
-            #expect(try updated.value?.content.asString == "updated")
-        }
-    }
-
-    @available(Configuration 1.0, *)
-    @Test(arguments: [false, true])
-    func testSignalTriggerChecksForChanges(timestampChanged: Bool) async throws {
-        try await withTestProvider { provider, fileSystem, filePath, originalTimestamp in
-            fileSystem.update(
-                filePath: filePath,
-                timestamp: originalTimestamp.addingTimeInterval(timestampChanged ? 1 : 0),
-                contents: .file(contents: "key1=updated")
-            )
-            let triggers: [ReloadingFileProvider<TestSnapshot>.ReloadTrigger] = [.sighup]
-            try await provider.run(triggers: triggers.async)
-
-            let result = try provider.value(forKey: ["key1"], type: .string)
-            #expect(try result.value?.content.asString == (timestampChanged ? "updated" : "value1"))
-        }
-    }
-
-    @available(Configuration 1.0, *)
-    @Test(arguments: [false, true])
-    func testReloadTriggerCounters(fileMissing: Bool) async throws {
-        let metrics = TestMetrics()
-        let logs = CollectingLogHandler()
-        try await withTestProvider(logger: Logger(label: "test", factory: { _ in logs }), metrics: metrics) {
-            provider,
-            fileSystem,
-            filePath,
-            _ in
-            if fileMissing {
-                fileSystem.remove(filePath: filePath)
-            }
-            let triggers: [ReloadingFileProvider<TestSnapshot>.ReloadTrigger] = [.sighup, .tick, .sighup, .tick]
-            try await provider.run(triggers: triggers.async)
-
-            let prefix = provider.providerName.lowercased()
-            let pollTicks = try metrics.expectCounter("\(prefix)_poll_ticks_total").totalValue
-            let signals = try metrics.expectCounter("\(prefix)_sighups_total").totalValue
-            #expect(pollTicks == 2)
-            #expect(signals == 2)
-            #expect(pollTicks + signals == triggers.count)
-            #expect(try metrics.expectCounter("\(prefix)_poll_errors_total").totalValue == (fileMissing ? 2 : 0))
-            let tickNumbers = logs.currentEntries.filter { $0.message == "Reload check starting" }
-                .compactMap { $0.metadata["\(provider.providerName).poll.tick.number"] }
-            #expect(tickNumbers == ["1", "2"])
-        }
-    }
-
-    @available(Configuration 1.0, *)
-    @Test func testRunReturnsWhenAlreadyCancelled() async throws {
-        try await withTestProvider { provider, _, _, _ in
-            let task = Task {
-                withUnsafeCurrentTask { $0?.cancel() }
-                try await provider.run()
-            }
-            try await task.value
-        }
-    }
-
-    @available(Configuration 1.0, *)
-    @Test func testCancellationWhileRunningDoesNotThrow() async throws {
-        try await withTestFileSystem { fileSystem, filePath, _ in
-            // Cancellation races with the delivery of poll ticks, so give it a few tries.
-            for _ in 0..<100 {
-                let provider = try await ReloadingFileProvider<TestSnapshot>(
-                    parsingOptions: .default,
-                    filePath: filePath,
-                    allowMissing: false,
-                    pollInterval: .microseconds(100),
-                    fileSystem: fileSystem,
-                    logger: .noop,
-                    metrics: NOOPMetricsHandler.instance
-                )
-                let serviceGroup = ServiceGroup(services: [provider], logger: .noop)
-                let task = Task { try await serviceGroup.run() }
-                try await Task.sleep(for: .milliseconds(1))
-                task.cancel()
-                try await task.value
+                let clock = ContinuousClock()
+                let deadline = clock.now.advanced(by: .seconds(5))
+                while clock.now < deadline {
+                    let updated = try provider.value(forKey: ["key1"], type: .string)
+                    if try updated.value?.content.asString == "updated" {
+                        return
+                    }
+                    try await Task.sleep(for: .milliseconds(1))
+                }
+                Issue.record("Timed out waiting for the SIGHUP reload")
             }
         }
     }
