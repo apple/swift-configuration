@@ -687,14 +687,17 @@ extension ReloadingFileProvider: Service {
 
     /// An event that asks the provider to check the file for changes.
     internal enum ReloadTrigger: String, Sendable {
-        case poll
+        // A periodic timer ticked.
+        case tick
+
+        // The process received the SIGHUP signal.
         case sighup
     }
 
     // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
     public func run() async throws {
         guard !Task.isCancelled else { return }
-        let pollTicks = AsyncTimerSequence(interval: pollInterval, clock: .continuous).map { _ in ReloadTrigger.poll }
+        let pollTicks = AsyncTimerSequence(interval: pollInterval, clock: .continuous).map { _ in ReloadTrigger.tick }
         let signals = await UnixSignalsSequence(trapping: .sighup)
         try await run(triggers: merge(pollTicks, signals.map { _ in ReloadTrigger.sighup }))
     }
@@ -711,14 +714,17 @@ extension ReloadingFileProvider: Service {
         for try await trigger in triggers.cancelOnGracefulShutdown() {
             var checkLogger = logger
             checkLogger[metadataKey: "\(providerName).trigger"] = .string(trigger.rawValue)
-            if case .poll = trigger {
+            if case .tick = trigger {
                 checkLogger[metadataKey: "\(providerName).poll.tick.number"] = .stringConvertible(counter)
             }
             checkLogger.debug("Reload check starting")
             defer {
-                if case .poll = trigger {
+                switch trigger {
+                case .tick:
                     counter += 1
                     metrics.pollTickCounter.increment(by: 1)
+                case .sighup:
+                    metrics.sighupCounter.increment(by: 1)
                 }
                 checkLogger.debug("Reload check stopping")
             }
@@ -732,7 +738,7 @@ extension ReloadingFileProvider: Service {
                         "error": "\(error)"
                     ]
                 )
-                if case .poll = trigger {
+                if case .tick = trigger {
                     metrics.pollTickErrorCounter.increment(by: 1)
                 }
             }
