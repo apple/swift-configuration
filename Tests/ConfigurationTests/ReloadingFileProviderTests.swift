@@ -107,14 +107,14 @@ struct ReloadingFileProviderTests {
         try await withTestProvider(pollInterval: .seconds(3_600)) { provider, fileSystem, filePath, timestamp in
             let (triggers, continuation) = AsyncStream<ReloadingFileProvider<TestSnapshot>.ReloadTrigger>.makeStream()
 
-            fileSystem.update(
-                filePath: filePath,
-                timestamp: timestamp.addingTimeInterval(1),
-                contents: .file(contents: "key1=updated")
-            )
             try await withThrowingTaskGroup(of: Void.self) { group in
                 group.addTask { try await provider.run(triggers: triggers) }
                 defer { continuation.finish() }
+                fileSystem.update(
+                    filePath: filePath,
+                    timestamp: timestamp.addingTimeInterval(1),
+                    contents: .file(contents: "key1=updated")
+                )
                 continuation.yield(.sighup)
 
                 let clock = ContinuousClock()
