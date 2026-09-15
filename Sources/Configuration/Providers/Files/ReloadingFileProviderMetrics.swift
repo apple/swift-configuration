@@ -32,6 +32,12 @@ internal struct ReloadingFileProviderMetrics {
     /// during its polling cycle, regardless of whether a reload was needed.
     let pollTickCounter: Counter
 
+    /// Counter for SIGHUP-triggered checks.
+    ///
+    /// This counter increments each time the provider checks the file in response
+    /// to SIGHUP, regardless of whether a reload was needed.
+    let sighupCounter: Counter
+
     /// Counter for poll tick errors.
     ///
     /// This counter increments when timestamp checking fails due to file system
@@ -73,6 +79,7 @@ internal struct ReloadingFileProviderMetrics {
     init(factory: any MetricsFactory, providerName: String) {
         let prefix = providerName.lowercased()
         self.pollTickCounter = Counter(label: "\(prefix)_poll_ticks_total", factory: factory)
+        self.sighupCounter = Counter(label: "\(prefix)_sighups_total", factory: factory)
         self.pollTickErrorCounter = Counter(label: "\(prefix)_poll_errors_total", factory: factory)
         self.reloadCounter = Counter(label: "\(prefix)_reloads_total", factory: factory)
         self.reloadErrorCounter = Counter(label: "\(prefix)_reload_errors_total", factory: factory)
