@@ -47,8 +47,8 @@ for EXAMPLE_PACKAGE_PATH in $(find "${EXAMPLES_PACKAGE_PATH}" -maxdepth 2 -name 
 
     # There is no CLI to modify dependencies, revert to sed
     log "Re-overriding dependency in ${EXAMPLE_PACKAGE_NAME} to use ${PACKAGE_PATH}"
-    PBXPROJ_PATH=$(find $SHARED_EXAMPLE_HARNESS_PACKAGE_PATH -name "project.pbxproj" -type f -maxdepth 2)
-    sed -i '' "s|${ORIGINAL_LOCAL_DEPENDENCY_PATH}|${PACKAGE_PATH}|g" "$PBXPROJ_PATH"
+    XCPROJ_PATH=$(find $SHARED_EXAMPLE_HARNESS_PACKAGE_PATH -name "project.xcproj" -type f -maxdepth 2)
+    sed -i '' "s|${ORIGINAL_LOCAL_DEPENDENCY_PATH}|${PACKAGE_PATH}|g" "$XCPROJ_PATH"
 
     PROJECT_PATH=$(find $SHARED_EXAMPLE_HARNESS_PACKAGE_PATH -name "*.xcodeproj" -type d -maxdepth 1)
 
