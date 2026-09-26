@@ -219,6 +219,26 @@ struct EnvironmentVariablesProviderTests {
     }
 
     @available(Configuration 1.0, *)
+    @Test func parseEnvironmentFileEmptyValues() throws {
+        let values = EnvironmentFileParser.parsed(
+            #"""
+            EMPTY=
+            =invalid
+            NO_SEPARATOR
+            SET=value
+
+            """#
+        )
+        let expected = [
+            "EMPTY": "",
+            "SET": "value",
+        ]
+        #expect(values == expected)
+        #expect(EnvironmentFileParser.parsed("TRAILING_SPACE= ") == ["TRAILING_SPACE": ""])
+        #expect(EnvironmentFileParser.parsed("ONLY_SEPARATOR=") == ["ONLY_SEPARATOR": ""])
+    }
+
+    @available(Configuration 1.0, *)
     @Test func loadEnvironmentFile() async throws {
         let fileSystem = InMemoryFileSystem(files: [
             "/etc/.env": .file(

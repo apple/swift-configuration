@@ -74,7 +74,7 @@ struct EnvironmentFileParser {
             .compactMap { pair -> (String, String)? in
                 let components =
                     pair
-                    .split(separator: "=", maxSplits: 1)
+                    .split(separator: "=", maxSplits: 1, omittingEmptySubsequences: false)
                     .map { $0.trimmed() }
                 if components.count != 2 || components[0].isEmpty || components[0].utf8.first == UInt8(ascii: "#") {
                     return nil
