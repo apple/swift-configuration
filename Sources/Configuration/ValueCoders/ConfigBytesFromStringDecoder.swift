@@ -109,7 +109,9 @@ extension ConfigBytesFromHexStringDecoder: ConfigBytesFromStringDecoder {
         while index < value.endIndex {
             let nextIndex = value.index(index, offsetBy: 2)
             let byteString = value[index..<nextIndex]
-            guard let byte = UInt8(byteString, radix: 16) else {
+            guard byteString.allSatisfy({ $0.isHexDigit && $0.isASCII }),
+                let byte = UInt8(byteString, radix: 16)
+            else {
                 return nil
             }
             bytes.append(byte)
