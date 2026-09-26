@@ -258,30 +258,50 @@ public struct PropertyListSnapshot {
             }
             content = .bytes([UInt8](data))
         case .stringArray:
-            guard case .stringArray(let array) = value else {
+            switch value {
+            case .emptyArray:
+                content = .stringArray([])
+            case .stringArray(let array):
+                content = .stringArray(array)
+            default:
                 try throwMismatch()
             }
-            content = .stringArray(array)
         case .intArray:
-            guard case .numberArray(let array) = value else {
+            switch value {
+            case .emptyArray:
+                content = .intArray([])
+            case .numberArray(let array):
+                content = .intArray(try array.map(getIntIsh))
+            default:
                 try throwMismatch()
             }
-            content = .intArray(try array.map(getIntIsh))
         case .doubleArray:
-            guard case .numberArray(let array) = value else {
+            switch value {
+            case .emptyArray:
+                content = .doubleArray([])
+            case .numberArray(let array):
+                content = .doubleArray(try array.map(getDoubleIsh))
+            default:
                 try throwMismatch()
             }
-            content = .doubleArray(try array.map(getDoubleIsh))
         case .boolArray:
-            guard case .numberArray(let array) = value else {
+            switch value {
+            case .emptyArray:
+                content = .boolArray([])
+            case .numberArray(let array):
+                content = .boolArray(try array.map(getBoolIsh))
+            default:
                 try throwMismatch()
             }
-            content = .boolArray(try array.map(getBoolIsh))
         case .byteChunkArray:
-            guard case .dataArray(let array) = value else {
+            switch value {
+            case .emptyArray:
+                content = .byteChunkArray([])
+            case .dataArray(let array):
+                content = .byteChunkArray(array.map { [UInt8]($0) })
+            default:
                 try throwMismatch()
             }
-            content = .byteChunkArray(array.map { [UInt8]($0) })
         }
         return ConfigValue(content, isSecret: valueWrapper.isSecret)
     }
