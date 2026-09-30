@@ -14,16 +14,9 @@ echo "Running on Linux - proceeding with linkage test..."
 echo "Building linkage test package..."
 swift build --package-path Tests/LinkageTest
 
-# Check the architecture and build path
-ARCH=$(uname -m)
-if [[ "$ARCH" == "x86_64" ]]; then
-    BUILD_PATH="Tests/LinkageTest/.build/x86_64-unknown-linux-gnu/debug/configurationLinkageTest"
-elif [[ "$ARCH" == "aarch64" ]]; then
-    BUILD_PATH="Tests/LinkageTest/.build/aarch64-unknown-linux-gnu/debug/configurationLinkageTest"
-else
-    echo "Error: Unsupported architecture: $ARCH" >&2
-    exit 1
-fi
+# Ask SwiftPM for the build output directory, as its layout differs between build systems
+BIN_PATH=$(swift build --package-path Tests/LinkageTest --show-bin-path)
+BUILD_PATH="$BIN_PATH/configurationLinkageTest"
 
 # Verify the binary exists
 if [[ ! -f "$BUILD_PATH" ]]; then
