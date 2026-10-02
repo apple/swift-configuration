@@ -19,6 +19,9 @@ import FoundationEssentials
 #else
 import Foundation
 #endif
+#if Logging
+public import Logging
+#endif
 
 /// A configuration provider that reads from a file on disk using a configurable snapshot type.
 ///
@@ -62,6 +65,13 @@ public struct FileProvider<Snapshot: FileConfigSnapshot>: Sendable {
 
     /// A snapshot of the internal state.
     private let _snapshot: any ConfigSnapshot & CustomStringConvertible & CustomDebugStringConvertible
+
+    /// Whether the file was missing and, because `allowMissing` was `true`, the
+    /// provider started out empty.
+    ///
+    /// The stateless provider has no logger of its own; this is recorded so an
+    /// initializer that does have one can report the case once construction is done.
+    private let loadedFromMissingFile: Bool
 
     /// Creates a file provider that reads from the specified file path.
     ///
@@ -181,7 +191,7 @@ public struct FileProvider<Snapshot: FileConfigSnapshot>: Sendable {
         fileSystem: some CommonProviderFileSystem
     ) async throws {
         let fileContents = try await fileSystem.fileContents(atPath: filePath)
-        let providerName = "FileProvider<\(Snapshot.self)>"
+        let providerName = Self.snapshotProviderName
         /// Debug swift 6.2.3 compiler crashes if we shadow fileContents.
         /// See https://github.com/apple/swift-configuration/pull/151
         if fileContents != nil {
@@ -190,11 +200,18 @@ public struct FileProvider<Snapshot: FileConfigSnapshot>: Sendable {
                 providerName: providerName,
                 parsingOptions: parsingOptions
             )
+            self.loadedFromMissingFile = false
         } else if allowMissing {
             self._snapshot = EmptyFileConfigSnapshot(providerName: providerName)
+            self.loadedFromMissingFile = true
         } else {
             throw FileSystemError.fileNotFound(path: filePath)
         }
+    }
+
+    /// The name this provider reports in its snapshots and in log metadata.
+    private static var snapshotProviderName: String {
+        "FileProvider<\(Snapshot.self)>"
     }
 }
 
@@ -260,3 +277,87 @@ extension FileProvider: ConfigProvider {
         _snapshot
     }
 }
+
+#if Logging
+
+@available(Configuration 1.0, *)
+extension FileProvider {
+
+    /// Creates a file provider that reads from the specified file path, and logs
+    /// when a missing file is tolerated.
+    ///
+    /// Behaves exactly like ``init(snapshotType:parsingOptions:filePath:allowMissing:)``,
+    /// and additionally emits a debug log entry when the file is missing and
+    /// `allowMissing` is `true`. That is the one outcome that otherwise leaves no
+    /// trace, so a file that is absent by mistake reads the same as one that is
+    /// absent by design. A file that is present, or a missing file that throws,
+    /// logs nothing.
+    ///
+    /// ## Package traits
+    ///
+    /// This initializer is guarded by the `Logging` package trait.
+    ///
+    /// - Parameters:
+    ///   - snapshotType: The type of snapshot to create from the file contents.
+    ///   - parsingOptions: Options used by the snapshot to parse the file data.
+    ///   - filePath: The path to the configuration file to read.
+    ///   - allowMissing: A flag controlling how the provider handles a missing file.
+    ///     - When `false` (the default), if the file is missing or malformed, throws an error.
+    ///     - When `true`, if the file is missing, treats it as empty and logs that it did.
+    ///       Malformed files still throw an error.
+    ///   - logger: The logger a tolerated missing file is reported to.
+    /// - Throws: If snapshot creation fails or if the file is malformed. Whether an error is thrown
+    ///   when the file is missing is controlled by the `allowMissing` parameter.
+    public init(
+        snapshotType: Snapshot.Type = Snapshot.self,
+        parsingOptions: Snapshot.ParsingOptions = .default,
+        filePath: FilePath,
+        allowMissing: Bool = false,
+        logger: Logger
+    ) async throws {
+        try await self.init(
+            snapshotType: snapshotType,
+            parsingOptions: parsingOptions,
+            filePath: filePath,
+            allowMissing: allowMissing,
+            logger: logger,
+            fileSystem: LocalCommonProviderFileSystem()
+        )
+    }
+
+    /// Creates a file provider using a custom file system, and logs when a missing
+    /// file is tolerated.
+    ///
+    /// This internal initializer allows injecting a custom file system implementation,
+    /// primarily for testing purposes.
+    internal init(
+        snapshotType: Snapshot.Type = Snapshot.self,
+        parsingOptions: Snapshot.ParsingOptions = .default,
+        filePath: FilePath,
+        allowMissing: Bool,
+        logger: Logger,
+        fileSystem: some CommonProviderFileSystem
+    ) async throws {
+        try await self.init(
+            snapshotType: snapshotType,
+            parsingOptions: parsingOptions,
+            filePath: filePath,
+            allowMissing: allowMissing,
+            fileSystem: fileSystem
+        )
+        guard loadedFromMissingFile else {
+            return
+        }
+        // The same metadata keys ``ReloadingFileProvider`` uses, so the two
+        // providers read alike in a log.
+        var logger = logger
+        let providerName = Self.snapshotProviderName
+        logger[metadataKey: "\(providerName).filePath"] = .string(
+            filePath.lastComponent?.string ?? "<nil>"
+        )
+        logger[metadataKey: "\(providerName).allowMissing"] = "\(allowMissing)"
+        logger.debug("Initialized file provider from a missing file")
+    }
+}
+
+#endif
