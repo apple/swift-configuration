@@ -263,57 +263,65 @@ public struct JSONSnapshot {
             }
             content = .bytes(bytesValue)
         case .stringArray:
+            let innerValue: [String]
             switch value {
             case .emptyArray:
-                content = .stringArray([])
+                innerValue = []
             case .stringArray(let array):
-                content = .stringArray(array)
+                innerValue = array
             default:
                 try throwMismatch()
             }
+            content = .stringArray(innerValue)
         case .intArray:
+            let innerValue: [Int]
             switch value {
             case .emptyArray:
-                content = .intArray([])
+                innerValue = []
             case .numberArray(let array):
-                content = .intArray(try array.map(getIntIsh))
+                innerValue = try array.map(getIntIsh)
             default:
                 try throwMismatch()
             }
+            content = .intArray(innerValue)
         case .doubleArray:
+            let innerValue: [Double]
             switch value {
             case .emptyArray:
-                content = .doubleArray([])
+                innerValue = []
             case .numberArray(let array):
-                content = .doubleArray(try array.map(getDoubleIsh))
+                innerValue = try array.map(getDoubleIsh)
             default:
                 try throwMismatch()
             }
+            content = .doubleArray(innerValue)
         case .boolArray:
+            let innerValue: [Bool]
             switch value {
             case .emptyArray:
-                content = .boolArray([])
+                innerValue = []
             case .numberArray(let array):
-                content = .boolArray(try array.map(getBoolIsh))
+                innerValue = try array.map(getBoolIsh)
             default:
                 try throwMismatch()
             }
+            content = .boolArray(innerValue)
         case .byteChunkArray:
+            let innerValue: [[UInt8]]
             switch value {
             case .emptyArray:
-                content = .byteChunkArray([])
+                innerValue = []
             case .stringArray(let array):
-                content = .byteChunkArray(
-                    try array.map { stringValue in
-                        guard let bytesValue = bytesDecoder.decode(stringValue) else {
-                            try throwMismatch()
-                        }
-                        return bytesValue
+                innerValue = try array.map { stringValue in
+                    guard let bytesValue = bytesDecoder.decode(stringValue) else {
+                        try throwMismatch()
                     }
-                )
+                    return bytesValue
+                }
             default:
                 try throwMismatch()
             }
+            content = .byteChunkArray(innerValue)
         }
         return ConfigValue(content, isSecret: valueWrapper.isSecret)
     }
