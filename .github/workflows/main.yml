@@ -20,6 +20,7 @@ jobs:
       linux_6_1_enabled: false
       linux_6_2_arguments_override: "--explicit-target-dependency-import-check error"
       linux_6_3_arguments_override: "--explicit-target-dependency-import-check error"
+      linux_6_4_arguments_override: "--explicit-target-dependency-import-check error"
       linux_nightly_next_enabled: false
       linux_nightly_next_arguments_override: "--explicit-target-dependency-import-check error"
       linux_nightly_main_arguments_override: "--explicit-target-dependency-import-check error"
@@ -62,6 +63,7 @@ jobs:
       swift_6_1_enabled: false
       swift_6_2_enabled: true
       swift_6_3_enabled: true
+      swift_6_4_enabled: true
 
   release-builds:
     name: Release builds
@@ -98,6 +100,7 @@ jobs:
           MATRIX_LINUX_6_0_ENABLED: false
           MATRIX_LINUX_6_1_ENABLED: false
           MATRIX_LINUX_6_2_ENABLED: false
+          MATRIX_LINUX_6_3_ENABLED: false
           MATRIX_LINUX_NIGHTLY_NEXT_ENABLED: false
           MATRIX_LINUX_NIGHTLY_MAIN_ENABLED: false
 

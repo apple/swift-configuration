@@ -67,6 +67,28 @@ struct ConfigBytesFromStringDecoderTests {
     }
 
     @available(Configuration 1.0, *)
+    @Test func hexDecoderRejectsInvalidStrings() {
+        let decoder = ConfigBytesFromHexStringDecoder()
+
+        #expect(decoder.decode("4") == nil)
+        #expect(decoder.decode("486") == nil)
+
+        #expect(decoder.decode("+5") == nil)
+        #expect(decoder.decode("-0") == nil)
+        #expect(decoder.decode("+f") == nil)
+
+        #expect(decoder.decode("48+5") == nil)
+        #expect(decoder.decode("-048") == nil)
+
+        #expect(decoder.decode("zz") == nil)
+        #expect(decoder.decode("0x") == nil)
+        #expect(decoder.decode("48 ") == nil)
+        #expect(decoder.decode(" 48") == nil)
+
+        #expect(decoder.decode("\u{FF10}\u{FF15}") == nil)
+    }
+
+    @available(Configuration 1.0, *)
     @Test func hexStaticConvenienceMethod() {
         let decoder: any ConfigBytesFromStringDecoder = .hex
         // "Hello" in hex
