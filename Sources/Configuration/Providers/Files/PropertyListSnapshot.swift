@@ -267,7 +267,7 @@ public struct PropertyListSnapshot {
             default:
                 try throwMismatch()
             }
-            content = stringArray(innerValue)
+            content = .stringArray(innerValue)
         case .intArray:
             let innerValue: [Int]
             switch value {
@@ -278,7 +278,7 @@ public struct PropertyListSnapshot {
             default:
                 try throwMismatch()
             }
-            content = intArray(innerValue)
+            content = .intArray(innerValue)
         case .doubleArray:
             let innerValue: [Double]
             switch value {
@@ -289,7 +289,7 @@ public struct PropertyListSnapshot {
             default:
                 try throwMismatch()
             }
-            content = doubleArray(innerValue)
+            content = .doubleArray(innerValue)
         case .boolArray:
             let innerValue: [Bool]
             switch value {
@@ -300,7 +300,7 @@ public struct PropertyListSnapshot {
             default:
                 try throwMismatch()
             }
-            content = boolArray(innerValue)
+            content = .boolArray(innerValue)
         case .byteChunkArray:
             let innerValue: [[UInt8]]
             switch value {
@@ -311,7 +311,7 @@ public struct PropertyListSnapshot {
             default:
                 try throwMismatch()
             }
-            content = byteChunkArray(innerValue)
+            content = .byteChunkArray(innerValue)
         }
         return ConfigValue(content, isSecret: valueWrapper.isSecret)
     }
