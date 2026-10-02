@@ -26,6 +26,7 @@ public import Logging
 public import Metrics
 import AsyncAlgorithms
 import Synchronization
+import UnixSignals
 
 /// A configuration provider that reads configuration from a file on disk with automatic reloading capability.
 ///
@@ -64,6 +65,10 @@ import Synchronization
 ///
 /// The provider monitors the file by polling at the specified interval (default: 15 seconds)
 /// and notifies any active watchers when it detects changes.
+///
+/// On platforms with Unix signals, a running provider also checks the file whenever the
+/// process receives `SIGHUP`, so you don't have to wait for the next poll. Either way, the
+/// file is only reloaded if its modification timestamp or resolved path changed.
 ///
 /// ## Configuration from a reader
 ///
@@ -679,37 +684,63 @@ extension ReloadingFileProvider: ConfigProvider {
 
 @available(Configuration 1.0, *)
 extension ReloadingFileProvider: Service {
+
+    /// An event that asks the provider to check the file for changes.
+    internal enum ReloadTrigger: String, Sendable {
+        // A periodic timer ticked.
+        case tick
+
+        // The process received the SIGHUP signal.
+        case sighup
+    }
+
     // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
     public func run() async throws {
-        logger.debug("File polling starting")
+        guard !Task.isCancelled else { return }
+        let pollTicks = AsyncTimerSequence(interval: pollInterval, clock: .continuous).map { _ in ReloadTrigger.tick }
+        let signals = await UnixSignalsSequence(trapping: .sighup)
+        try await run(triggers: merge(pollTicks, signals.map { _ in ReloadTrigger.sighup }))
+    }
+
+    /// Checks the file once per trigger until the sequence ends, the task is cancelled, or the service shuts down.
+    internal func run<Triggers: AsyncSequence & Sendable>(triggers: Triggers) async throws
+    where Triggers.Element == ReloadTrigger {
+        logger.debug("File monitoring starting")
         defer {
-            logger.debug("File polling stopping")
+            logger.debug("File monitoring stopping")
         }
 
         var counter = 1
-        for try await _ in AsyncTimerSequence(interval: pollInterval, clock: .continuous).cancelOnGracefulShutdown() {
-            defer {
-                counter += 1
-                metrics.pollTickCounter.increment(by: 1)
+        for try await trigger in triggers.cancelOnGracefulShutdown() {
+            var checkLogger = logger
+            checkLogger[metadataKey: "\(providerName).trigger"] = .string(trigger.rawValue)
+            if case .tick = trigger {
+                checkLogger[metadataKey: "\(providerName).poll.tick.number"] = .stringConvertible(counter)
             }
-
-            var tickLogger = logger
-            tickLogger[metadataKey: "\(providerName).poll.tick.number"] = .stringConvertible(counter)
-            tickLogger.debug("Poll tick starting")
+            checkLogger.debug("Reload check starting")
             defer {
-                tickLogger.debug("Poll tick stopping")
+                switch trigger {
+                case .tick:
+                    counter += 1
+                    metrics.pollTickCounter.increment(by: 1)
+                case .sighup:
+                    metrics.sighupCounter.increment(by: 1)
+                }
+                checkLogger.debug("Reload check stopping")
             }
 
             do {
-                try await reloadIfNeeded(logger: tickLogger)
+                try await reloadIfNeeded(logger: checkLogger)
             } catch {
-                tickLogger.debug(
-                    "Poll tick failed, will retry on next tick",
+                checkLogger.debug(
+                    "Reload check failed, will retry on next trigger",
                     metadata: [
                         "error": "\(error)"
                     ]
                 )
-                metrics.pollTickErrorCounter.increment(by: 1)
+                if case .tick = trigger {
+                    metrics.pollTickErrorCounter.increment(by: 1)
+                }
             }
         }
     }

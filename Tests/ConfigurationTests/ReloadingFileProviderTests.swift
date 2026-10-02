@@ -28,6 +28,7 @@ import SystemPackage
 @available(Configuration 1.0, *)
 private func withTestProvider<R>(
     allowMissing: Bool = false,
+    pollInterval: Duration = .seconds(1),
     body: (
         ReloadingFileProvider<TestSnapshot>,
         InMemoryFileSystem,
@@ -40,7 +41,7 @@ private func withTestProvider<R>(
             parsingOptions: .default,
             filePath: filePath,
             allowMissing: allowMissing,
-            pollInterval: .seconds(1),
+            pollInterval: pollInterval,
             fileSystem: fileSystem,
             logger: .noop,
             metrics: NOOPMetricsHandler.instance
@@ -98,6 +99,35 @@ struct ReloadingFileProviderTests {
             // Check updated value
             let result2 = try provider.value(forKey: ["key1"], type: .string)
             #expect(try result2.value?.content.asString == "newValue1")
+        }
+    }
+
+    @available(Configuration 1.0, *)
+    @Test func signalTriggerReloadsFile() async throws {
+        try await withTestProvider(pollInterval: .seconds(3_600)) { provider, fileSystem, filePath, timestamp in
+            let (triggers, continuation) = AsyncStream<ReloadingFileProvider<TestSnapshot>.ReloadTrigger>.makeStream()
+
+            try await withThrowingTaskGroup(of: Void.self) { group in
+                group.addTask { try await provider.run(triggers: triggers) }
+                defer { continuation.finish() }
+                fileSystem.update(
+                    filePath: filePath,
+                    timestamp: timestamp.addingTimeInterval(1),
+                    contents: .file(contents: "key1=updated")
+                )
+                continuation.yield(.sighup)
+
+                let clock = ContinuousClock()
+                let deadline = clock.now.advanced(by: .seconds(5))
+                while clock.now < deadline {
+                    let updated = try provider.value(forKey: ["key1"], type: .string)
+                    if try updated.value?.content.asString == "updated" {
+                        return
+                    }
+                    try await Task.sleep(for: .milliseconds(1))
+                }
+                Issue.record("Timed out waiting for the SIGHUP reload")
+            }
         }
     }
 
