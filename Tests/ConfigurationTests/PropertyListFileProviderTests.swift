@@ -168,6 +168,34 @@ struct PropertyListFileProviderTests {
     }
 
     @available(Configuration 1.0, *)
+    @Test func emptyArray() async throws {
+        let contents = """
+            <?xml version="1.0" encoding="UTF-8"?>
+            <plist version="1.0"><dict>
+            <key>tags</key><array/>
+            </dict></plist>
+            """
+        let fileSystem = InMemoryFileSystem(files: [
+            "/etc/empty.plist": .file(timestamp: .now, contents: contents)
+        ])
+        let config = ConfigReader(
+            provider: try await FileProvider<PropertyListSnapshot>(
+                parsingOptions: .default,
+                filePath: "/etc/empty.plist",
+                allowMissing: false,
+                fileSystem: fileSystem
+            )
+        )
+        #expect(config.stringArray(forKey: "tags") == [])
+        #expect(config.intArray(forKey: "tags") == [])
+        #expect(config.doubleArray(forKey: "tags") == [])
+        #expect(config.boolArray(forKey: "tags") == [])
+        #expect(config.byteChunkArray(forKey: "tags") == [])
+        #expect(config.stringArray(forKey: "tags", default: ["default"]) == [])
+        #expect(config.string(forKey: "tags") == nil)
+    }
+
+    @available(Configuration 1.0, *)
     @Test func compat() async throws {
         let fileSystem = InMemoryFileSystem(files: [
             "/etc/config.plist": .file(timestamp: .now, contents: plistTestFileContents)
