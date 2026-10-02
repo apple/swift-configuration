@@ -4,11 +4,17 @@ Evolve from manual configuration reading to unified, production-ready configurat
 
 ## Overview
 
-Hand-rolled configuration works, but each value stays tied to the provider
-it was written for. Swift Configuration gives applications and libraries one
-reader to share, so operators choose where each value comes from.
-This guide walks through the migration incrementally, starting with a single
-value and building up to a testable, multi-source configuration.
+While handling configuration manually in your application can be sufficient as you start development,
+over time you might encounter some disadvantages of that approach. A major one is that every
+configuration value is tied to its data source: be it environment variables, JSON files, or hard-coded.
+
+Swift Configuration provides flexibility to libraries and applications by allowing you to read
+configuration using a single consistent ``ConfigReader`` API, and operators choose where 
+each value is defined, allowing them to move values between data sources without you needing
+to make any code changes.
+
+This guide walks you through the migration from manual configuration to Swift Configuration incrementally,
+starting with a single value and building up to a testable, multi-source configuration.
 
 > Tip: Starting a new project? Skip this guide and go straight to
 > <doc:Configuring-applications>.
@@ -132,10 +138,10 @@ values from the first snippet, used now only when nothing overrides them.
 ### Add a fallback hierarchy
 
 Right now you're reading from environment variables only. In practice, you
-want a JSON file for local development, environment variables for production,
+may want a JSON file for local development, environment variables for production,
 and maybe a directory of mounted secret files.
 
-Add more providers to the ``ConfigReader``. The first one that has a value
+Add more providers to the ``ConfigReader``. The first one that returns a value
 wins:
 
 ```swift
@@ -159,8 +165,13 @@ struct works in every environment:
 {
     "host": "localhost",
     "port": 9090,
-    "database": { "url": "postgres://localhost/todos_dev" },
-    "api": { "key": "dev-key", "timeout": 5.0 }
+    "database": {
+        "url": "postgres://localhost/todos_dev" 
+    },
+    "api": {
+        "key": "dev-key", 
+        "timeout": 5.0
+    }
 }
 ```
 
@@ -193,7 +204,7 @@ appropriate convention:
 
 Mark sensitive values with `isSecret` so the library redacts them in access
 logs. Both credentials qualify here, including the database URL, which
-usually carries a password:
+may contain a password:
 
 ```swift
 // AppConfiguration.swift
@@ -249,8 +260,8 @@ let config = ConfigReader(
 )
 ```
 
-``AccessLogger`` logs at `.debug` by default, which a stock swift-log
-bootstrap filters out, so this passes `.info` to make the output visible.
+``AccessLogger`` logs at `.debug` by default, which a stock Swift Log
+handler filters out, so this passes `.info` to make the output visible.
 
 > Warning: `isSecret` controls what the library prints. It doesn't protect the
 > `String` once you hold it, so `print(appConfig.apiKey)` still shows the key.
@@ -322,7 +333,7 @@ ordering dependencies. For more on testing against configuration, see
 Most of what an app configures belongs to the libraries it uses, so
 simplifying one means simplifying the other.
 The to-do app configures an HTTP client with `api.timeout`, but that
-configuration really belongs to the HTTP client library. When a library
+configuration really belongs to the HTTP client library. When the library
 accepts a ``ConfigReader`` directly, you can drop `requestTimeout` from
 `AppConfiguration` and let the library read its own configuration.
 
