@@ -1659,6 +1659,7 @@ extension ConfigReader {
             updatesHandler: updatesHandler
         )
     }
+<<<<<<< HEAD
 
     /// Watches for updates to an array of config values for the given config key, converting from integers.
     ///
@@ -1800,4 +1801,6 @@ extension ConfigReader {
     }
 
     % end
+=======
+>>>>>>> 1bf7b4a (chore: remove extra blank line)
 }
