@@ -105,7 +105,7 @@ public final class MutableInMemoryProvider: Sendable {
     ///
     /// This initializer takes a dictionary of absolute configuration keys mapped to
     /// their initial values. The provider can be modified after creation using
-    /// the ``setValue(_:forKey:)`` methods.
+    /// ``setValue(_:forKey:)``, ``setValues(_:)``, or ``withValues(_:)``.
     ///
     /// ```swift
     /// let key1 = AbsoluteConfigKey(["database", "host"], context: [:])
@@ -191,6 +191,99 @@ extension MutableInMemoryProvider {
             for (_, continuation) in continuations {
                 continuation.yield(snapshot)
             }
+        }
+    }
+
+    /// Updates the stored values for multiple configuration keys at once.
+    ///
+    /// This method atomically applies all the updates, so a snapshot never contains some
+    /// of the updates without the others. Watchers of a changed key receive its new value
+    /// once. If any value changed, snapshot watchers receive one snapshot that contains all
+    /// the updates. If a new value is the same as the existing value, no notification is
+    /// sent for that key. Keys not included in `values` keep their current values.
+    ///
+    /// ```swift
+    /// let provider = MutableInMemoryProvider(initialValues: [:])
+    ///
+    /// provider.setValues([
+    ///     "database.host": "db-a.example.com",
+    ///     "database.port": 5433,
+    ///     "database.timeout": nil, // Removes the value
+    /// ])
+    /// ```
+    ///
+    /// - Parameter values: A dictionary that maps configuration keys to their new values,
+    ///   or to `nil` to remove a value entirely.
+    public func setValues(_ values: [AbsoluteConfigKey: ConfigValue?]) {
+        withValues { storedValues in
+            for (key, value) in values {
+                storedValues[key] = value
+            }
+        }
+    }
+
+    /// Reads and updates the stored values in a single atomic operation.
+    ///
+    /// The body runs while the provider holds its lock, so no other reads or updates happen
+    /// until it finishes. It edits the stored values in place: if the body throws, the changes
+    /// it made before the error are kept. When the body returns or throws, watchers of changed
+    /// keys receive their new values, and snapshot watchers receive one snapshot that contains
+    /// all the changes.
+    ///
+    /// Don't call the provider, or a ``ConfigReader`` that reads from it, from inside the
+    /// body. The lock isn't recursive, so the call crashes or deadlocks.
+    ///
+    /// ```swift
+    /// provider.withValues { values in
+    ///     if values["database.host"] == "db-a.example.com" {
+    ///         values["database.host"] = "db-b.example.com"
+    ///         values["database.port"] = 6432
+    ///     }
+    /// }
+    /// ```
+    ///
+    /// - Parameter body: A closure that reads and modifies the stored values.
+    /// - Returns: The value that `body` returns.
+    /// - Throws: Rethrows any error that `body` throws.
+    public func withValues<Return: ~Copyable, Failure: Error>(
+        _ body: (inout [AbsoluteConfigKey: ConfigValue]) throws(Failure) -> Return
+    ) throws(Failure) -> Return {
+        var valueUpdatesToNotify: [(ConfigValue?, [UUID: AsyncStream<ConfigValue?>.Continuation])] = []
+        var snapshotContinuationsToNotify: ([UUID: AsyncStream<Snapshot>.Continuation], Snapshot)?
+        // Notify watchers outside the lock, also when the body throws.
+        defer {
+            for (value, continuations) in valueUpdatesToNotify {
+                for (_, continuation) in continuations {
+                    continuation.yield(value)
+                }
+            }
+            if let (continuations, snapshot) = snapshotContinuationsToNotify {
+                for (_, continuation) in continuations {
+                    continuation.yield(snapshot)
+                }
+            }
+        }
+        return try storage.withLock { storage throws(Failure) in
+            // Remember only what change detection needs. Holding the whole dictionary makes
+            // the body's first write copy it, so only do that when snapshot watchers need it.
+            var watchedValuesBefore: [(AbsoluteConfigKey, ConfigValue?)] = []
+            for (key, continuations) in storage.valueWatchers where !continuations.isEmpty {
+                watchedValuesBefore.append((key, storage.snapshot.values[key]))
+            }
+            let valuesBefore = storage.snapshotWatchers.isEmpty ? nil : storage.snapshot.values
+            // A body that throws keeps its changes, so collect them on that path too.
+            defer {
+                for (key, oldValue) in watchedValuesBefore {
+                    let newValue = storage.snapshot.values[key]
+                    if newValue != oldValue, let continuations = storage.valueWatchers[key] {
+                        valueUpdatesToNotify.append((newValue, continuations))
+                    }
+                }
+                if let valuesBefore, valuesBefore != storage.snapshot.values {
+                    snapshotContinuationsToNotify = (storage.snapshotWatchers, storage.snapshot)
+                }
+            }
+            return try body(&storage.snapshot.values)
         }
     }
 }

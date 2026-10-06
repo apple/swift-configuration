@@ -165,4 +165,157 @@ struct MutableInMemoryProviderTests {
             await #expect(secondValueFuture.value == false)
         }
     }
+
+    @available(Configuration 1.0, *)
+    @Test func batchMutatingGet() throws {
+        let provider = makeProvider()
+        let config = ConfigReader(provider: provider)
+
+        provider.setValues([
+            "string": "Bye",
+            "int": 43,
+            "bool": nil,
+        ])
+        #expect(config.string(forKey: "string") == "Bye")
+        #expect(config.int(forKey: "int") == 43)
+        #expect(config.bool(forKey: "bool") == nil)
+        #expect(config.double(forKey: "double") == 3.14)
+    }
+
+    @available(Configuration 1.0, *)
+    @Test func batchMutatingWatch() async throws {
+        let provider = makeProvider()
+        let config = ConfigReader(provider: provider)
+
+        let firstValueFuture = TestFuture<Bool??>(name: "firstValue")
+        let secondValueFuture = TestFuture<Bool??>(name: "secondValue")
+        await withThrowingTaskGroup(of: Void.self) { group in
+            group.addTask {
+                try await config.watchBool(forKey: "bool") { updates in
+                    var iterator = updates.makeAsyncIterator()
+                    firstValueFuture.fulfill(try await iterator.next())
+                    secondValueFuture.fulfill(try await iterator.next())
+                }
+            }
+            await #expect(firstValueFuture.value == true)
+            provider.setValues(["bool": false, "int": 43])
+            await #expect(secondValueFuture.value == false)
+        }
+    }
+
+    @available(Configuration 1.0, *)
+    @Test func batchMutatingWatchSnapshot() async throws {
+        let provider = makeProvider()
+        let config = ConfigReader(provider: provider)
+
+        let firstSnapshotConsumed = TestFuture<Void>(name: "firstSnapshotConsumed")
+        let secondStringFuture = TestFuture<String?>(name: "secondString")
+        let secondIntFuture = TestFuture<Int?>(name: "secondInt")
+        await withThrowingTaskGroup(of: Void.self) { group in
+            group.addTask {
+                try await config.watchSnapshot { updates in
+                    var iterator = updates.makeAsyncIterator()
+                    _ = try await iterator.next()
+                    firstSnapshotConsumed.fulfill(())
+                    let secondSnapshot = try await iterator.next()
+                    secondStringFuture.fulfill(secondSnapshot?.string(forKey: "string"))
+                    secondIntFuture.fulfill(secondSnapshot?.int(forKey: "int"))
+                }
+            }
+            _ = await firstSnapshotConsumed.value
+            provider.setValues(["string": "Bye", "int": 43])
+            await #expect(secondStringFuture.value == "Bye")
+            await #expect(secondIntFuture.value == 43)
+        }
+    }
+
+    @available(Configuration 1.0, *)
+    @Test func withValuesReadModifyWrite() async throws {
+        let provider = MutableInMemoryProvider(initialValues: ["count": 0])
+        let config = ConfigReader(provider: provider)
+
+        await withTaskGroup(of: Void.self) { group in
+            for _ in 0..<1000 {
+                group.addTask {
+                    provider.withValues { values in
+                        let count = (try? values["count"]?.content.asInt) ?? 0
+                        values["count"] = .init(.int(count + 1), isSecret: false)
+                    }
+                }
+            }
+        }
+        #expect(config.int(forKey: "count") == 1000)
+    }
+
+    @available(Configuration 1.0, *)
+    @Test func withValuesReturnsNonCopyableValue() {
+        let provider = makeProvider()
+
+        let count = provider.withValues { values in
+            NonCopyableCount(value: values.count)
+        }
+        #expect(count.value == 20)
+    }
+
+    @available(Configuration 1.0, *)
+    @Test func withValuesWatchSnapshot() async throws {
+        let provider = makeProvider()
+        let config = ConfigReader(provider: provider)
+
+        let firstSnapshotConsumed = TestFuture<Void>(name: "firstSnapshotConsumed")
+        let secondStringFuture = TestFuture<String?>(name: "secondString")
+        let secondIntFuture = TestFuture<Int?>(name: "secondInt")
+        await withThrowingTaskGroup(of: Void.self) { group in
+            group.addTask {
+                try await config.watchSnapshot { updates in
+                    var iterator = updates.makeAsyncIterator()
+                    _ = try await iterator.next()
+                    firstSnapshotConsumed.fulfill(())
+                    let secondSnapshot = try await iterator.next()
+                    secondStringFuture.fulfill(secondSnapshot?.string(forKey: "string"))
+                    secondIntFuture.fulfill(secondSnapshot?.int(forKey: "int"))
+                }
+            }
+            _ = await firstSnapshotConsumed.value
+            provider.withValues { values in
+                values["string"] = "Bye"
+                values["int"] = 43
+            }
+            await #expect(secondStringFuture.value == "Bye")
+            await #expect(secondIntFuture.value == 43)
+        }
+    }
+
+    @available(Configuration 1.0, *)
+    @Test func withValuesThrowingKeepsChanges() async throws {
+        struct TestError: Error {}
+        let provider = makeProvider()
+        let config = ConfigReader(provider: provider)
+
+        let firstValueFuture = TestFuture<Bool??>(name: "firstValue")
+        let secondValueFuture = TestFuture<Bool??>(name: "secondValue")
+        await withThrowingTaskGroup(of: Void.self) { group in
+            group.addTask {
+                try await config.watchBool(forKey: "bool") { updates in
+                    var iterator = updates.makeAsyncIterator()
+                    firstValueFuture.fulfill(try await iterator.next())
+                    secondValueFuture.fulfill(try await iterator.next())
+                }
+            }
+            await #expect(firstValueFuture.value == true)
+            #expect(throws: TestError.self) {
+                try provider.withValues { values in
+                    values["bool"] = false
+                    throw TestError()
+                }
+            }
+            await #expect(secondValueFuture.value == false)
+        }
+        #expect(config.bool(forKey: "bool") == false)
+    }
+}
+
+/// A value that can't be copied, to check that `withValues` can return one.
+private struct NonCopyableCount: ~Copyable {
+    var value: Int
 }
