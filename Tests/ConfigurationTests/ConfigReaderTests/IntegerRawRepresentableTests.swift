@@ -94,10 +94,60 @@ struct IntegerRawRepresentableTests {
         try #require(events.count == 2)
 
         for (event, key) in zip(events, ["wide", "wideArray"]) {
-            let error = #expect(throws: ConfigError.self) {
-                try event.result.get()
-            }
-            #expect(error == .configValueFailedToCast(name: key, type: "Int"))
+            #expect(event.conversionError as? ConfigError == .configValueFailedToCast(name: key, type: "Int"))
+            #expect(try event.result.get() == nil)
         }
+    }
+
+    /// A type whose `configInt` differs from its raw value, to tell which overload was used.
+    private enum DualCode: UInt8, ExpressibleByConfigInt, Equatable {
+        case one = 1
+        case two = 2
+
+        init?(configInt: Int) {
+            self.init(rawValue: UInt8(configInt / 10))
+        }
+
+        var configInt: Int { Int(rawValue) * 10 }
+
+        var description: String { "\(rawValue)" }
+    }
+
+    /// A type whose `configInt` differs from its raw value, to tell which overload was used.
+    private enum IntDualCode: Int, ExpressibleByConfigInt, Equatable {
+        case one = 1
+        case two = 2
+
+        init?(configInt: Int) {
+            self.init(rawValue: configInt / 10)
+        }
+
+        var configInt: Int { rawValue * 10 }
+
+        var description: String { "\(rawValue)" }
+    }
+
+    @available(Configuration 1.0, *)
+    @Test func expressibleByConfigIntIsPreferred() async throws {
+        let config = ConfigReader(
+            provider: InMemoryProvider(
+                values: [
+                    "scalar": ConfigValue(20, isSecret: false),
+                    "array": ConfigValue([10, 20], isSecret: false),
+                ]
+            )
+        )
+
+        #expect(config.int(forKey: "scalar", as: DualCode.self) == .two)
+        #expect(config.int(forKey: "missing", as: DualCode.self, default: .one) == .one)
+        #expect(try config.requiredInt(forKey: "scalar", as: DualCode.self) == .two)
+        #expect(config.intArray(forKey: "array", as: DualCode.self) == [.one, .two])
+        #expect(try await config.fetchInt(forKey: "scalar", as: DualCode.self) == .two)
+        #expect(config.int(forKey: "scalar", as: IntDualCode.self) == .two)
+        #expect(config.intArray(forKey: "array", as: IntDualCode.self) == [.one, .two])
+
+        let snapshot = config.snapshot()
+        #expect(snapshot.int(forKey: "scalar", as: DualCode.self) == .two)
+        #expect(snapshot.int(forKey: "scalar", as: IntDualCode.self) == .two)
     }
 }

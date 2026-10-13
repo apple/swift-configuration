@@ -518,7 +518,7 @@ extension ConfigSnapshotReader {
         _ int: Int,
         type: Value.Type,
         key: ConfigKey
-    ) throws -> Value where Value.RawValue: FixedWidthInteger {
+    ) throws -> Value where Value.RawValue: BinaryInteger {
         guard let rawValue = Value.RawValue(exactly: int),
             let typedValue = Value.init(rawValue: rawValue)
         else {
@@ -557,7 +557,7 @@ extension ConfigSnapshotReader {
     internal func uncast<Value: RawRepresentable>(
         _ value: Value,
         key: ConfigKey
-    ) throws -> ConfigContent where Value.RawValue: FixedWidthInteger {
+    ) throws -> ConfigContent where Value.RawValue: BinaryInteger {
         guard let int = Int(exactly: value.rawValue) else {
             throw ConfigError.configValueFailedToCast(name: keyPrefix.appending(key).description, type: "Int")
         }
@@ -574,7 +574,7 @@ extension ConfigSnapshotReader {
     internal func uncast<Value: RawRepresentable>(
         _ values: [Value],
         key: ConfigKey
-    ) throws -> ConfigContent where Value.RawValue: FixedWidthInteger {
+    ) throws -> ConfigContent where Value.RawValue: BinaryInteger {
         .intArray(
             try values.map { value in
                 guard let int = Int(exactly: value.rawValue) else {

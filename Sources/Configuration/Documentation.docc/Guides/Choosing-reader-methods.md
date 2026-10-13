@@ -303,7 +303,7 @@ This works with:
 
 **Integer-backed enums:**
 
-- Types that conform to `RawRepresentable` with a `FixedWidthInteger` raw value.
+- Types that conform to `RawRepresentable` with a `BinaryInteger` raw value.
   Conversion is exact, so values outside the raw type's range are rejected.
 
 **Custom types:**

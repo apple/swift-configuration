@@ -100,28 +100,46 @@ private func mergingIsSecret(
     )
 }
 
-/// Wraps an optional converted value for access reporting.
-///
-/// Wrapping is allowed to fail because a converted value can have a representation
-/// that `ConfigContent` can't store, such as a `UInt64` raw value above `Int.max`.
 @available(Configuration 1.0, *)
-private func accessResult<Value>(
-    _ value: (Value, Bool)?,
-    wrap: (Value) throws -> ConfigContent
-) -> Result<ConfigValue?, any Error> {
-    Result {
-        try value.map { ConfigValue(try wrap($0.0), isSecret: $0.1) }
-    }
-}
-
-/// Wraps a converted value for access reporting.
-@available(Configuration 1.0, *)
-private func accessResult<Value>(
-    _ value: (Value, Bool),
-    wrap: (Value) throws -> ConfigContent
-) -> Result<ConfigValue?, any Error> {
-    Result {
-        ConfigValue(try wrap(value.0), isSecret: value.1)
+extension AccessEvent {
+    /// Creates an access event from a converted value.
+    ///
+    /// Wrapping the converted value back into config content can fail when the value has no
+    /// `ConfigContent` representation, such as a default value of a `UInt64`-backed enum above
+    /// `Int.max`. In that case, the error is reported as the conversion error, and the result
+    /// contains no value.
+    ///
+    /// - Parameters:
+    ///   - metadata: Metadata describing the configuration access operation.
+    ///   - providerResults: The results from each configuration provider that was queried.
+    ///   - conversionError: An error that occurred when converting the raw config value.
+    ///   - convertedResult: The converted value and whether it's secret, or an error.
+    ///   - wrap: A closure to convert the typed value back to configuration content.
+    fileprivate init<Value>(
+        metadata: Metadata,
+        providerResults: [ProviderResult],
+        conversionError: (any Error)?,
+        convertedResult: Result<(Value, Bool)?, any Error>,
+        wrap: (Value) throws -> ConfigContent
+    ) {
+        var conversionError = conversionError
+        let result: Result<ConfigValue?, any Error> = convertedResult.map { value in
+            guard let value else {
+                return nil
+            }
+            do {
+                return ConfigValue(try wrap(value.0), isSecret: value.1)
+            } catch {
+                conversionError = conversionError ?? error
+                return nil
+            }
+        }
+        self.init(
+            metadata: metadata,
+            providerResults: providerResults,
+            conversionError: conversionError,
+            result: result
+        )
     }
 }
 
@@ -202,7 +220,8 @@ internal func valueFromReader<Value>(
                 ),
                 providerResults: providerResults,
                 conversionError: conversionError,
-                result: accessResult(finalValue, wrap: wrap)
+                convertedResult: .success(finalValue),
+                wrap: wrap
             )
         )
     }
@@ -278,7 +297,8 @@ internal func valueFromReader<Value>(
                 ),
                 providerResults: providerResults,
                 conversionError: conversionError,
-                result: accessResult(finalValue, wrap: wrap)
+                convertedResult: .success(finalValue),
+                wrap: wrap
             )
         )
     }
@@ -351,7 +371,8 @@ internal func requiredValueFromReader<Value>(
                 ),
                 providerResults: providerResults,
                 conversionError: conversionError,
-                result: finalResult.flatMap { accessResult($0, wrap: wrap) }
+                convertedResult: finalResult.map { $0 },
+                wrap: wrap
             )
         )
     }
@@ -520,7 +541,8 @@ extension ConfigReader {
                     ),
                     providerResults: providerResults,
                     conversionError: conversionError,
-                    result: finalResult.flatMap { accessResult($0, wrap: wrap) }
+                    convertedResult: finalResult.map { $0 },
+                    wrap: wrap
                 )
             )
         }
@@ -580,7 +602,8 @@ extension ConfigReader {
                     ),
                     providerResults: providerResults,
                     conversionError: conversionError,
-                    result: finalResult.flatMap { accessResult($0, wrap: wrap) }
+                    convertedResult: finalResult.map { $0 },
+                    wrap: wrap
                 )
             )
         }
@@ -638,7 +661,8 @@ extension ConfigReader {
                     ),
                     providerResults: providerResults,
                     conversionError: conversionError,
-                    result: finalResult.flatMap { accessResult($0, wrap: wrap) }
+                    convertedResult: finalResult.map { $0 },
+                    wrap: wrap
                 )
             )
         }
@@ -708,7 +732,8 @@ extension ConfigReader {
                                 ),
                                 providerResults: providerResults,
                                 conversionError: conversionError,
-                                result: accessResult(finalValue, wrap: wrap)
+                                convertedResult: .success(finalValue),
+                                wrap: wrap
                             )
                         )
                     }
@@ -785,7 +810,8 @@ extension ConfigReader {
                                 ),
                                 providerResults: providerResults,
                                 conversionError: conversionError,
-                                result: accessResult(finalValue, wrap: wrap)
+                                convertedResult: .success(finalValue),
+                                wrap: wrap
                             )
                         )
                     }
@@ -859,7 +885,8 @@ extension ConfigReader {
                                 ),
                                 providerResults: providerResults,
                                 conversionError: conversionError,
-                                result: finalResult.flatMap { accessResult($0, wrap: wrap) }
+                                convertedResult: finalResult.map { $0 },
+                                wrap: wrap
                             )
                         )
                     }
@@ -978,7 +1005,7 @@ extension ConfigReader {
         _ int: Int,
         type: Value.Type,
         key: ConfigKey
-    ) throws -> Value where Value.RawValue: FixedWidthInteger {
+    ) throws -> Value where Value.RawValue: BinaryInteger {
         guard let rawValue = Value.RawValue(exactly: int),
             let typedValue = Value(rawValue: rawValue)
         else {
@@ -1017,7 +1044,7 @@ extension ConfigReader {
     internal func uncast<Value: RawRepresentable>(
         _ value: Value,
         key: ConfigKey
-    ) throws -> ConfigContent where Value.RawValue: FixedWidthInteger {
+    ) throws -> ConfigContent where Value.RawValue: BinaryInteger {
         guard let int = Int(exactly: value.rawValue) else {
             throw ConfigError.configValueFailedToCast(name: keyPrefix.appending(key).description, type: "Int")
         }
@@ -1034,7 +1061,7 @@ extension ConfigReader {
     internal func uncast<Value: RawRepresentable>(
         _ values: [Value],
         key: ConfigKey
-    ) throws -> ConfigContent where Value.RawValue: FixedWidthInteger {
+    ) throws -> ConfigContent where Value.RawValue: BinaryInteger {
         .intArray(
             try values.map { value in
                 guard let int = Int(exactly: value.rawValue) else {

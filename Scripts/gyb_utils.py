@@ -54,13 +54,15 @@ int_convertible_types = [
     {
         "protocol": "ExpressibleByConfigInt",
         "whereClause": "",
+        "disfavored": False,
         "wrap": "uncast($0)",
         "testType": "TestIntConvertible",
         "testSuffix": "IntConvertible"
     },
     {
         "protocol": "RawRepresentable",
-        "whereClause": " where Value.RawValue: FixedWidthInteger",
+        "whereClause": " where Value.RawValue: BinaryInteger",
+        "disfavored": True,
         "wrap": "try uncast($0, key: key)",
         "testType": "TestIntEnum",
         "testSuffix": "IntEnum"

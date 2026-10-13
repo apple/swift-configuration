@@ -1695,13 +1695,14 @@ extension ConfigSnapshotReader {
     ///   - fileID: The file ID where this call originates. Used for access reporting.
     ///   - line: The line number where this call originates. Used for access reporting.
     /// - Returns: The value converted to the expected type if found and convertible, otherwise `nil`.
+    @_disfavoredOverload
     public func int<Value: RawRepresentable>(
         forKey key: ConfigKey,
         as type: Value.Type = Value.self,
         isSecret: Bool = false,
         fileID: String = #fileID,
         line: UInt = #line
-    ) -> Value? where Value.RawValue: FixedWidthInteger {
+    ) -> Value? where Value.RawValue: BinaryInteger {
         value(
             forKey: key,
             type: .int,
@@ -1731,6 +1732,7 @@ extension ConfigSnapshotReader {
     ///   - fileID: The file ID where this call originates. Used for access reporting.
     ///   - line: The line number where this call originates. Used for access reporting.
     /// - Returns: The config value if found and convertible, otherwise the default value.
+    @_disfavoredOverload
     public func int<Value: RawRepresentable>(
         forKey key: ConfigKey,
         as type: Value.Type = Value.self,
@@ -1738,7 +1740,7 @@ extension ConfigSnapshotReader {
         default defaultValue: Value,
         fileID: String = #fileID,
         line: UInt = #line
-    ) -> Value where Value.RawValue: FixedWidthInteger {
+    ) -> Value where Value.RawValue: BinaryInteger {
         value(
             forKey: key,
             type: .int,
@@ -1768,13 +1770,14 @@ extension ConfigSnapshotReader {
     ///   - line: The line number where this call originates. Used for access reporting.
     /// - Returns: The config value converted to the expected type.
     /// - Throws: An error if the value is missing or can't be converted to the expected type.
+    @_disfavoredOverload
     public func requiredInt<Value: RawRepresentable>(
         forKey key: ConfigKey,
         as type: Value.Type = Value.self,
         isSecret: Bool = false,
         fileID: String = #fileID,
         line: UInt = #line
-    ) throws -> Value where Value.RawValue: FixedWidthInteger {
+    ) throws -> Value where Value.RawValue: BinaryInteger {
         try requiredValue(
             forKey: key,
             type: .int,
@@ -1802,13 +1805,14 @@ extension ConfigSnapshotReader {
     ///   - fileID: The file ID where this call originates. Used for access reporting.
     ///   - line: The line number where this call originates. Used for access reporting.
     /// - Returns: An array of values converted to the expected type if found and convertible, otherwise `nil`.
+    @_disfavoredOverload
     public func intArray<Value: RawRepresentable>(
         forKey key: ConfigKey,
         as type: Value.Type = Value.self,
         isSecret: Bool = false,
         fileID: String = #fileID,
         line: UInt = #line
-    ) -> [Value]? where Value.RawValue: FixedWidthInteger {
+    ) -> [Value]? where Value.RawValue: BinaryInteger {
         value(
             forKey: key,
             type: .intArray,
@@ -1838,6 +1842,7 @@ extension ConfigSnapshotReader {
     ///   - fileID: The file ID where this call originates. Used for access reporting.
     ///   - line: The line number where this call originates. Used for access reporting.
     /// - Returns: The config array if found and convertible, otherwise the default array.
+    @_disfavoredOverload
     public func intArray<Value: RawRepresentable>(
         forKey key: ConfigKey,
         as type: Value.Type = Value.self,
@@ -1845,7 +1850,7 @@ extension ConfigSnapshotReader {
         default defaultValue: [Value],
         fileID: String = #fileID,
         line: UInt = #line
-    ) -> [Value] where Value.RawValue: FixedWidthInteger {
+    ) -> [Value] where Value.RawValue: BinaryInteger {
         value(
             forKey: key,
             type: .intArray,
@@ -1875,13 +1880,14 @@ extension ConfigSnapshotReader {
     ///   - line: The line number where this call originates. Used for access reporting.
     /// - Returns: The config array converted to the expected type.
     /// - Throws: An error if the value is missing or can't be converted to the expected type.
+    @_disfavoredOverload
     public func requiredIntArray<Value: RawRepresentable>(
         forKey key: ConfigKey,
         as type: Value.Type = Value.self,
         isSecret: Bool = false,
         fileID: String = #fileID,
         line: UInt = #line
-    ) throws -> [Value] where Value.RawValue: FixedWidthInteger {
+    ) throws -> [Value] where Value.RawValue: BinaryInteger {
         try requiredValue(
             forKey: key,
             type: .intArray,
