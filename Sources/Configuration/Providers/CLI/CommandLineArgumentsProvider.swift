@@ -21,7 +21,7 @@
 ///
 /// ## Package traits
 ///
-/// This type is guarded by the `CommandLineArgumentsSupport` package trait.
+/// This type is guarded by the `CommandLineArguments` package trait.
 ///
 /// ## Key formats
 ///
@@ -70,6 +70,11 @@
 ///     secretsSpecifier: .dynamic { key, _ in key.contains("--secret") }
 /// )
 /// ```
+///
+/// ## Using with Swift Argument Parser
+///
+/// This provider doesn't support subcommands, positional arguments, or generated help.
+/// To combine it with Swift Argument Parser, check out <doc:Integrating-with-swift-argument-parser>.
 @available(Configuration 1.0, *)
 public struct CommandLineArgumentsProvider {
 
