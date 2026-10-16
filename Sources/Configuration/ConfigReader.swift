@@ -347,6 +347,18 @@ extension ConfigReader {
     }
 }
 
+@available(Configuration 1.0, *)
+extension ConfigReader: CustomStringConvertible {
+    // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
+    public var description: String {
+        let providerNames = provider.storage.providers.map(\.providerName).joined(separator: ", ")
+        if let keyPrefix {
+            return "ConfigReader[keyPrefix: \(keyPrefix), providers: \(providerNames)]"
+        }
+        return "ConfigReader[providers: \(providerNames)]"
+    }
+}
+
 // MARK: - Internal conveniences
 
 @available(Configuration 1.0, *)
