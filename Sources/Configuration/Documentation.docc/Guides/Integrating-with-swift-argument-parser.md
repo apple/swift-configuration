@@ -8,7 +8,7 @@ Combine the commands and options of Swift Argument Parser with the provider hier
 
 Swift Argument Parser is the best choice when your tool reads its options directly, and you know all the options at compile time. It provides subcommands, generated help, input validation, and shell completion scripts.
 
-Swift Configuration is more dynamic. Your application and the libraries it depends on read configuration through a ``ConfigReader``, including keys that aren't known at compile time. The values can come from many sources, such as environment variables, files, and command line arguments.
+Swift Configuration is more dynamic. Your application and the libraries it depends on read configuration through a ``ConfigReader``, including keys that aren't known at compile time. The values can come from sources, such as environment variables, files, and command line arguments.
 
 ``CommandLineArgumentsProvider`` is a convenience provider for when command line arguments are just one of several configuration sources. It doesn't support subcommands, positional arguments, or generated help, so on its own it works best for tools with a single command, such as a server with an implicit `serve` command.
 
@@ -81,7 +81,7 @@ struct Serve: AsyncParsableCommand {
 ```
 
 > Important: ``CommandLineArgumentsProvider`` expects the program name as the first element of `arguments`, and skips it.
-> Insert a placeholder before the forwarded arguments, as the example shows, otherwise the provider ignores the first forwarded argument.
+> Insert a placeholder (such as "serve" above) before the forwarded arguments, as the example shows, otherwise the provider ignores the first forwarded argument.
 
 ### Choose an approach
 
