@@ -427,6 +427,7 @@ Any package can implement a ``ConfigProvider``, making the ecosystem extensible 
 ### Built-in providers
 - ``EnvironmentVariablesProvider``
 - ``CommandLineArgumentsProvider``
+- <doc:Integrating-with-swift-argument-parser>
 - ``FileProvider``
 - ``ReloadingFileProvider``
 - ``JSONSnapshot``
