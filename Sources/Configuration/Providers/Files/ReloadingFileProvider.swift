@@ -209,8 +209,9 @@ public final class ReloadingFileProvider<Snapshot: FileConfigSnapshot>: Sendable
             let timestamp = try await fileSystem.lastModifiedTimestamp(atPath: realPath),
             let data = try await fileSystem.fileContents(atPath: realPath)
         {
-            initialSnapshot = try snapshotType.init(
-                data: data.bytes,
+            initialSnapshot = try Self.makeSnapshot(
+                snapshotType: snapshotType,
+                data: data,
                 providerName: providerName,
                 parsingOptions: parsingOptions
             )
@@ -364,6 +365,35 @@ public final class ReloadingFileProvider<Snapshot: FileConfigSnapshot>: Sendable
         )
     }
 
+    /// Creates a snapshot from the contents of a file.
+    ///
+    /// Swift 6.2 emits invalid SIL when `data.bytes` is passed to a throwing call directly
+    /// in the initializer or in `reloadIfNeeded(logger:)`, which crashes compilers built with
+    /// assertions, so the snapshot is created in this separate function instead.
+    /// See https://github.com/swiftlang/swift/issues/85280.
+    ///
+    /// We can remove this when we stop supporting 6.2.
+    ///
+    /// - Parameters:
+    ///   - snapshotType: The type of snapshot to create from the file contents.
+    ///   - data: The file contents.
+    ///   - providerName: The human-readable name of the provider.
+    ///   - parsingOptions: Options used by the snapshot to parse the file data.
+    /// - Returns: The parsed snapshot.
+    /// - Throws: If snapshot creation fails.
+    private static func makeSnapshot(
+        snapshotType: Snapshot.Type,
+        data: Data,
+        providerName: String,
+        parsingOptions: Snapshot.ParsingOptions
+    ) throws -> AnySnapshot {
+        try snapshotType.init(
+            data: data.bytes,
+            providerName: providerName,
+            parsingOptions: parsingOptions
+        )
+    }
+
     /// Checks if the file has changed and reloads it if necessary.
     ///
     /// This method performs the core file monitoring logic by checking both the file's
@@ -435,8 +465,9 @@ public final class ReloadingFileProvider<Snapshot: FileConfigSnapshot>: Sendable
                 logger.debug("File removed half-way through a reload, not updating state")
                 return
             }
-            newSnapshot = try Snapshot.init(
-                data: data.bytes,
+            newSnapshot = try Self.makeSnapshot(
+                snapshotType: Snapshot.self,
+                data: data,
                 providerName: providerName,
                 parsingOptions: parsingOptions
             )
