@@ -223,6 +223,18 @@ public struct ConfigSnapshotReader: Sendable {
 }
 
 @available(Configuration 1.0, *)
+extension ConfigSnapshotReader: CustomStringConvertible {
+    // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
+    public var description: String {
+        let providerNames = snapshot.snapshots.map(\.providerName).joined(separator: ", ")
+        if let keyPrefix {
+            return "ConfigSnapshotReader[keyPrefix: \(keyPrefix), providers: \(providerNames)]"
+        }
+        return "ConfigSnapshotReader[providers: \(providerNames)]"
+    }
+}
+
+@available(Configuration 1.0, *)
 extension ConfigReader {
     /// Returns a snapshot of the current configuration state.
     ///
