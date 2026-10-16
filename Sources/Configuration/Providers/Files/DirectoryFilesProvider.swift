@@ -18,6 +18,9 @@ public import FoundationEssentials
 public import Foundation
 #endif
 public import SystemPackage
+#if Logging
+public import Logging
+#endif
 
 /// A configuration provider that reads values from individual files in a directory.
 ///
@@ -137,6 +140,13 @@ public struct DirectoryFilesProvider: Sendable {
     /// The underlying snapshot of the provider.
     private let _snapshot: Snapshot
 
+    /// Whether the directory was missing and, because `allowMissing` was `true`,
+    /// the provider started out empty.
+    ///
+    /// The stateless provider has no logger of its own; this is recorded so an
+    /// initializer that does have one can report the case once construction is done.
+    private let loadedFromMissingDirectory: Bool
+
     /// Creates a new provider that reads files from a directory.
     ///
     /// This initializer scans the specified directory and loads all regular files
@@ -194,7 +204,7 @@ public struct DirectoryFilesProvider: Sendable {
         secretsSpecifier: SecretsSpecifier<String, Data> = .all,
         arraySeparator: Character = ","
     ) async throws {
-        let fileValues = try await Self.loadDirectory(
+        let (fileValues, directoryWasMissing) = try await Self.loadDirectory(
             at: directoryPath,
             allowMissing: allowMissing,
             fileSystem: fileSystem,
@@ -204,6 +214,7 @@ public struct DirectoryFilesProvider: Sendable {
             fileValues: fileValues,
             arrayDecoder: DirectoryFilesValueArrayDecoder(separator: arraySeparator)
         )
+        self.loadedFromMissingDirectory = directoryWasMissing
     }
 
     /// Loads all files from a directory.
@@ -219,20 +230,24 @@ public struct DirectoryFilesProvider: Sendable {
     ///     - When `true`, if the directory is missing, treats it as empty.
     ///   - fileSystem: The file system implementation to use.
     ///   - secretsSpecifier: Specifies which values should be treated as secrets.
-    /// - Returns: A dictionary of file values keyed by file name.
+    /// - Returns: A dictionary of file values keyed by file name, and whether the
+    ///   directory was missing and tolerated because `allowMissing` was `true`.
     /// - Throws: If the directory doesn't exist or is unreadable, or any file is unreadable.
     private static func loadDirectory(
         at directoryPath: FilePath,
         allowMissing: Bool,
         fileSystem: some CommonProviderFileSystem,
         secretsSpecifier: SecretsSpecifier<String, Data>
-    ) async throws -> [String: FileValue] {
+    ) async throws -> (fileValues: [String: FileValue], directoryWasMissing: Bool) {
         let loadedFileNames = try await fileSystem.listFileNames(atPath: directoryPath)
         let fileNames: [String]
+        let directoryWasMissing: Bool
         if let loadedFileNames {
             fileNames = loadedFileNames
+            directoryWasMissing = false
         } else if allowMissing {
             fileNames = []
+            directoryWasMissing = true
         } else {
             throw FileSystemError.directoryNotFound(path: directoryPath)
         }
@@ -247,7 +262,7 @@ public struct DirectoryFilesProvider: Sendable {
             let isSecret = secretsSpecifier.isSecret(key: fileName, value: data)
             fileValues[fileName] = .init(data: data, isSecret: isSecret)
         }
-        return fileValues
+        return (fileValues, directoryWasMissing)
     }
 }
 
@@ -490,3 +505,84 @@ extension ConfigKeyEncoder where Self == DirectoryFileKeyEncoder {
         DirectoryFileKeyEncoder()
     }
 }
+
+#if Logging
+
+@available(Configuration 1.0, *)
+extension DirectoryFilesProvider {
+
+    /// Creates a new provider that reads files from a directory, and logs when a
+    /// missing directory is tolerated.
+    ///
+    /// Behaves exactly like ``init(directoryPath:allowMissing:secretsSpecifier:arraySeparator:)``,
+    /// and additionally emits a debug log entry when the directory is missing and
+    /// `allowMissing` is `true`. That is the one outcome that otherwise leaves no
+    /// trace, so a directory that is absent by mistake reads the same as one that
+    /// is absent by design. A directory that is present, or a missing directory
+    /// that throws, logs nothing.
+    ///
+    /// ## Package traits
+    ///
+    /// This initializer is guarded by the `Logging` package trait.
+    ///
+    /// - Parameters:
+    ///   - directoryPath: The file system path to the directory containing configuration files.
+    ///   - allowMissing: A flag controlling how the provider handles a missing directory.
+    ///     - When `false`, if the directory is missing, throws an error.
+    ///     - When `true`, if the directory is missing, treats it as empty and logs that it did.
+    ///   - secretsSpecifier: Specifies which values should be treated as secrets.
+    ///   - arraySeparator: The character used to separate elements in array values.
+    ///   - logger: The logger a tolerated missing directory is reported to.
+    /// - Throws: If the directory doesn't exist or is unreadable.
+    public init(
+        directoryPath: FilePath,
+        allowMissing: Bool = false,
+        secretsSpecifier: SecretsSpecifier<String, Data> = .all,
+        arraySeparator: Character = ",",
+        logger: Logger
+    ) async throws {
+        try await self.init(
+            directoryPath: directoryPath,
+            allowMissing: allowMissing,
+            logger: logger,
+            fileSystem: LocalCommonProviderFileSystem(),
+            secretsSpecifier: secretsSpecifier,
+            arraySeparator: arraySeparator
+        )
+    }
+
+    /// Creates a new provider that reads files from a directory using a custom file
+    /// system, and logs when a missing directory is tolerated.
+    ///
+    /// This internal initializer allows injecting a custom file system implementation,
+    /// primarily for testing purposes.
+    internal init(
+        directoryPath: FilePath,
+        allowMissing: Bool,
+        logger: Logger,
+        fileSystem: some CommonProviderFileSystem,
+        secretsSpecifier: SecretsSpecifier<String, Data> = .all,
+        arraySeparator: Character = ","
+    ) async throws {
+        try await self.init(
+            directoryPath: directoryPath,
+            allowMissing: allowMissing,
+            fileSystem: fileSystem,
+            secretsSpecifier: secretsSpecifier,
+            arraySeparator: arraySeparator
+        )
+        guard loadedFromMissingDirectory else {
+            return
+        }
+        // The same metadata shape ``ReloadingFileProvider`` uses, so the file-based
+        // providers read alike in a log.
+        var logger = logger
+        logger[metadataKey: "DirectoryFilesProvider.directoryPath"] = .string(
+            directoryPath.lastComponent?.string ?? "<nil>"
+        )
+        logger[metadataKey: "DirectoryFilesProvider.allowMissing"] = "\(allowMissing)"
+        logger.debug("Initialized directory files provider from a missing directory")
+    }
+}
+
+#endif
