@@ -195,7 +195,7 @@ struct MultiProviderTests {
 
         try await config.watchString(forKey: "value", default: "default") { updates in
             var iterator = updates.makeAsyncIterator()
-            let firstValue = try await iterator.next()
+            let firstValue = await iterator.next(isolation: #isolation)
             #expect(firstValue == "First")
             // Return immediately
         }
