@@ -12,6 +12,18 @@ We follow an open process and discuss development on GitHub issues, pull request
 
 Large features and changes go through a lightweight proposals process - to learn more, check out <doc:Proposals>.
 
+> Important: To ensure productive use of contributor and maintainer time and resources, contributors must first agree their proposed change with a maintainer in an issue. Pull requests opened without prior discussion may be closed without review. If there is no issue already tracking the problem or feature request, please file a new one using your own voice (see "AI tools" usage below).
+
+### AI tools
+
+Human discourse is an essential part of open source development. To encourage productive collaboration between contributors and maintainers, please refrain from using AI tools for the following:
+
+- Issues: titles, bodies, and comments.
+- Pull requests: titles, descriptions, and comments.
+- Proposals.
+
+Contributors who feel more comfortable writing in another language may use automated translation tools, but must include their original content in their preferred language.
+
 ### Repository structure
 
 #### Package organization

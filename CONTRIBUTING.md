@@ -5,6 +5,16 @@ your contribution to Apple and the community, and agree by submitting the patch
 that your contributions are licensed under the Apache 2.0 license (see
 `LICENSE.txt`).
 
+## AI tools
+
+Human discourse is an essential part of open source development. To encourage productive collaboration between contributors and maintainers, please refrain from using AI tools for the following:
+
+- Issues: titles, bodies, and comments.
+- Pull requests: titles, descriptions, and comments.
+- Proposals.
+
+Contributors who feel more comfortable writing in another language may use automated translation tools, but must include their original content in their preferred language.
+
 ## How to submit a bug report
 
 Please report any issues related to this library in the [swift-configuration](https://github.com/apple/swift-configuration/issues) repository.
@@ -48,6 +58,12 @@ My system has IPv6 disabled.
 ```
 
 ## Contributing a pull request
+
+> Important: To ensure productive use of contributor and maintainer time and resources, contributors must first agree their proposed change with a maintainer in an issue. Pull requests opened without prior discussion may be closed without review.
+
+If there is no issue already tracking the problem or feature request, please file a new one using your own voice (see "AI tools" usage above).
+
+Once an issue is assigned to you, follow these steps:
 
 1. Review the [Developing Swift Configuration](https://swiftpackageindex.com/apple/swift-configuration/documentation/configuration/development) documentation.
 2. Prepare your change, keeping in mind that a good patch is:

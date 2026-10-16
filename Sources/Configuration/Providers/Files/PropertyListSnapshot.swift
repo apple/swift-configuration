@@ -258,30 +258,60 @@ public struct PropertyListSnapshot {
             }
             content = .bytes([UInt8](data))
         case .stringArray:
-            guard case .stringArray(let array) = value else {
+            let innerValue: [String]
+            switch value {
+            case .emptyArray:
+                innerValue = []
+            case .stringArray(let array):
+                innerValue = array
+            default:
                 try throwMismatch()
             }
-            content = .stringArray(array)
+            content = .stringArray(innerValue)
         case .intArray:
-            guard case .numberArray(let array) = value else {
+            let innerValue: [Int]
+            switch value {
+            case .emptyArray:
+                innerValue = []
+            case .numberArray(let array):
+                innerValue = try array.map(getIntIsh)
+            default:
                 try throwMismatch()
             }
-            content = .intArray(try array.map(getIntIsh))
+            content = .intArray(innerValue)
         case .doubleArray:
-            guard case .numberArray(let array) = value else {
+            let innerValue: [Double]
+            switch value {
+            case .emptyArray:
+                innerValue = []
+            case .numberArray(let array):
+                innerValue = try array.map(getDoubleIsh)
+            default:
                 try throwMismatch()
             }
-            content = .doubleArray(try array.map(getDoubleIsh))
+            content = .doubleArray(innerValue)
         case .boolArray:
-            guard case .numberArray(let array) = value else {
+            let innerValue: [Bool]
+            switch value {
+            case .emptyArray:
+                innerValue = []
+            case .numberArray(let array):
+                innerValue = try array.map(getBoolIsh)
+            default:
                 try throwMismatch()
             }
-            content = .boolArray(try array.map(getBoolIsh))
+            content = .boolArray(innerValue)
         case .byteChunkArray:
-            guard case .dataArray(let array) = value else {
+            let innerValue: [[UInt8]]
+            switch value {
+            case .emptyArray:
+                innerValue = []
+            case .dataArray(let array):
+                innerValue = array.map { [UInt8]($0) }
+            default:
                 try throwMismatch()
             }
-            content = .byteChunkArray(array.map { [UInt8]($0) })
+            content = .byteChunkArray(innerValue)
         }
         return ConfigValue(content, isSecret: valueWrapper.isSecret)
     }

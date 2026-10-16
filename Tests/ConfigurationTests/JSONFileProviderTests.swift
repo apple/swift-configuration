@@ -134,6 +134,28 @@ struct JSONFileProviderTests {
     }
 
     @available(Configuration 1.0, *)
+    @Test func emptyArray() async throws {
+        let fileSystem = InMemoryFileSystem(files: [
+            "/etc/empty.json": .file(timestamp: .now, contents: #"{ "tags": [] }"#)
+        ])
+        let config = ConfigReader(
+            provider: try await FileProvider<JSONSnapshot>(
+                parsingOptions: .default,
+                filePath: "/etc/empty.json",
+                allowMissing: false,
+                fileSystem: fileSystem
+            )
+        )
+        #expect(config.stringArray(forKey: "tags") == [])
+        #expect(config.intArray(forKey: "tags") == [])
+        #expect(config.doubleArray(forKey: "tags") == [])
+        #expect(config.boolArray(forKey: "tags") == [])
+        #expect(config.byteChunkArray(forKey: "tags") == [])
+        #expect(config.stringArray(forKey: "tags", default: ["default"]) == [])
+        #expect(config.string(forKey: "tags") == nil)
+    }
+
+    @available(Configuration 1.0, *)
     @Test func compat() async throws {
         let fileSystem = InMemoryFileSystem(files: [
             "/etc/config.json": .file(timestamp: .now, contents: jsonTestFileContents)

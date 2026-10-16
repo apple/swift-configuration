@@ -44,6 +44,16 @@ let host = config.string(
 )
 ```
 
+#### Reloading with SIGHUP
+
+On platforms with Unix signals, a running ``ReloadingFileProvider`` also checks the file when the process receives `SIGHUP`, without waiting for the next poll. For example, to signal processes named `my-server`:
+
+```bash
+pkill -HUP -x my-server
+```
+
+Polling continues as usual, and the file is only reloaded if its modification timestamp or resolved path changed.
+
 #### Poll interval considerations
 
 Choose poll intervals based on how quickly you need to detect changes:
@@ -184,6 +194,7 @@ Every metric label starts with a prefix derived from the provider name, lowercas
 | Metric                         | Type    | Meaning                                                                                                                 |
 |--------------------------------|---------|-------------------------------------------------------------------------------------------------------------------------|
 | `<prefix>_poll_ticks_total`    | Counter | Increments on every polling-cycle timestamp check, whether or not a reload was needed.                                  |
+| `<prefix>_sighups_total`       | Counter | Increments on every SIGHUP-triggered file check, whether or not a reload was needed.                                     |
 | `<prefix>_poll_errors_total`   | Counter | Increments when the polling timestamp check fails (file-system error, permission issue, and so on).                     |
 | `<prefix>_reloads_total`       | Counter | Increments each time the provider successfully reloads and parses the configuration file after detecting a change.     |
 | `<prefix>_reload_errors_total` | Counter | Increments when a reload fails (parse error, file-system error, and so on).                                             |
