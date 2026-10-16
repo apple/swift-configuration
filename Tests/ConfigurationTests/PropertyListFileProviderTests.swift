@@ -218,12 +218,25 @@ struct PropertyListFileProviderTests {
         let plist = try PropertyListSerialization.propertyList(from: xmlData, format: nil)
         let binaryData = try PropertyListSerialization.data(fromPropertyList: plist, format: .binary, options: 0)
 
-        let provider = try PropertyListSnapshot(
-            data: binaryData.bytes,
-            providerName: "BinaryTestProvider",
+        let provider = try makeSnapshot(data: binaryData, providerName: "BinaryTestProvider")
+        #expect(provider.description == "BinaryTestProvider[20 values]")
+    }
+
+    /// Creates a snapshot from the provided data.
+    ///
+    /// Swift 6.2 emits invalid SIL when `data.bytes` of a local variable is passed to a throwing
+    /// call directly, which crashes compilers built with assertions, so the snapshot is created
+    /// in this separate function instead.
+    /// See https://github.com/swiftlang/swift/issues/85280.
+    ///
+    /// We can remove this when we stop supporting 6.2.
+    @available(Configuration 1.0, *)
+    private func makeSnapshot(data: Data, providerName: String) throws -> PropertyListSnapshot {
+        try PropertyListSnapshot(
+            data: data.bytes,
+            providerName: providerName,
             parsingOptions: .default
         )
-        #expect(provider.description == "BinaryTestProvider[20 values]")
     }
 }
 

@@ -221,11 +221,16 @@ Available traits:
 
 ### Supported platforms and minimum versions
 
-The library is supported on Apple platforms, Linux, and Android.
+The library is supported on Apple platforms, Linux, Windows, and Android.
 
-| Component     | macOS  | Android    | Linux | iOS    | tvOS   | watchOS | visionOS |
-| ------------- | -----  | -------    | ----- | ---    | ----   | ------- | -------- |
-| Configuration | ✅ 15+ | ✅ API 28+ | ✅    | ✅ 18+ | ✅ 18+ | ✅ 11+  | ✅ 2+    |
+- macOS 15+
+- iOS 18+
+- tvOS 18+
+- watchOS 11+
+- visionOS 2+
+- Linux
+- Windows
+- Android API 28+
 
 ### Key features
 

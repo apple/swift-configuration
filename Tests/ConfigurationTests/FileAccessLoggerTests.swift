@@ -22,13 +22,13 @@ struct FileAccessLoggerTests {
     @available(Configuration 1.0, *)
     @Test func test() throws {
 
-        let readString: String
+        // Use a swift-system pipe, as `FileHandle.fileDescriptor` is unavailable on Windows.
+        let (readEnd, writeEnd) = try FileDescriptor.pipe()
+        defer { try? readEnd.close() }
         do {
-            let pipe = Pipe()
-            let readHandle = pipe.fileHandleForReading
-            let writeHandle = pipe.fileHandleForWriting
-            let writeDescriptor = FileDescriptor(rawValue: writeHandle.fileDescriptor)
-            let logger = try FileAccessLogger(fileDescriptor: writeDescriptor, timeZone: .gmt)
+            // The logger takes ownership of the write end and closes it on deinit,
+            // at the end of this scope, so that reading below reaches end of file.
+            let logger = try FileAccessLogger(fileDescriptor: writeEnd, timeZone: .gmt)
             let now = Date(timeIntervalSince1970: 1_746_603_594)
 
             logger.report(
@@ -184,9 +184,16 @@ struct FileAccessLoggerTests {
                     result: .success(nil)  // simple get or default value
                 )
             )
-            try writeHandle.close()
-            readString = try readHandle.readToEnd().flatMap { String(decoding: $0, as: UTF8.self) } ?? ""
         }
+
+        var readBytes: [UInt8] = []
+        var buffer = [UInt8](repeating: 0, count: 4096)
+        while true {
+            let count = try buffer.withUnsafeMutableBytes { try readEnd.read(into: $0) }
+            if count == 0 { break }
+            readBytes.append(contentsOf: buffer[..<count])
+        }
+        let readString = String(decoding: readBytes, as: UTF8.self)
 
         #expect(
             readString == """
