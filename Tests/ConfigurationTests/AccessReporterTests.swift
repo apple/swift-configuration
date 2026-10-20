@@ -15,6 +15,7 @@
 @testable import Configuration
 import Testing
 import ConfigurationTestingInternal
+import Foundation
 
 struct AccessReporterTests {
     /// A boolean raw value where `false` is the only possible and valid value.
@@ -574,6 +575,40 @@ struct AccessReporterTests {
         }
         #expect(
             (unwrapError8 as? ConfigError) == .configValueFailedToCast(name: "log.level", type: "\(MockLogLevel.self)")
+        )
+    }
+
+    @available(Configuration 1.0, *)
+    @Test func printingEventDescription() throws {
+        let metadata = AccessEvent.Metadata(
+            accessKind: .get,
+            key: ["http", "secret"],
+            valueType: .string,
+            sourceLocation: .init(fileID: "MagicModule/MagicFile.swift", line: 24),
+            accessTimestamp: Date(timeIntervalSince1970: 1_746_603_594)
+        )
+        let secretEvent = AccessEvent(
+            metadata: metadata,
+            providerResults: [
+                .init(
+                    providerName: "MagicProvider",
+                    result: .success(.init(encodedKey: "http.secret", value: .init("s3cret", isSecret: true)))
+                )
+            ],
+            result: .success(.init("s3cret", isSecret: true))
+        )
+        #expect(
+            secretEvent.description
+                == #"✅ http.secret -> "<REDACTED>" - provided by MagicProvider / Get string from MagicModule/MagicFile.swift:24 at 2025-05-07T07:39:54.000Z"#
+        )
+        let failedEvent = AccessEvent(
+            metadata: metadata,
+            providerResults: [.init(providerName: "MagicProvider", result: .failure(TestProvider.TestError()))],
+            result: .failure(TestProvider.TestError())
+        )
+        #expect(
+            failedEvent.description
+                == #"❌ http.secret -> "<error>" - threw an error: TestError() / Get string from MagicModule/MagicFile.swift:24 at 2025-05-07T07:39:54.000Z"#
         )
     }
 }

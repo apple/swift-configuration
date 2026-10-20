@@ -64,4 +64,24 @@ struct ConfigSnapshotReaderTests {
         let scoped = snapshot.scoped(to: "http.client")
         #expect(scoped.string(forKey: "user-agent") == "Config/1.0 (Test)")
     }
+
+    @available(Configuration 1.0, *)
+    @Test func printingDescription() throws {
+        let config = ConfigReader(providers: [
+            InMemoryProvider(name: "first", values: ["http.client.user-agent": "Config/1.0 (Test)"]),
+            InMemoryProvider(name: "second", values: ["http.client.token": .init("s3cret", isSecret: true)]),
+        ])
+        let snapshot = config.snapshot()
+        #expect(
+            snapshot.description == "ConfigSnapshotReader[providers: InMemoryProvider[first], InMemoryProvider[second]]"
+        )
+        #expect(
+            snapshot.scoped(to: "http").scoped(to: "client").description
+                == "ConfigSnapshotReader[keyPrefix: http.client, providers: InMemoryProvider[first], InMemoryProvider[second]]"
+        )
+        #expect(
+            config.scoped(to: "http.client").snapshot().description
+                == "ConfigSnapshotReader[keyPrefix: http.client, providers: InMemoryProvider[first], InMemoryProvider[second]]"
+        )
+    }
 }

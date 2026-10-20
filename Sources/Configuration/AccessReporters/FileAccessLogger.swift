@@ -137,11 +137,7 @@ public final class FileAccessLogger: Sendable {
             throw error
         }
         self.fileDescriptor = .init(fd)
-        var formatStyle = Date.ISO8601FormatStyle.iso8601
-            .year().month().day().timeZone(separator: .omitted)
-            .time(includingFractionalSeconds: true).timeSeparator(.colon)
-        formatStyle.timeZone = timeZone
-        self.formatStyle = formatStyle
+        self.formatStyle = .accessEventSummary(timeZone: timeZone)
     }
 
     deinit {
@@ -198,96 +194,5 @@ extension FileAccessLogger {
     /// - Returns: A data representation of the rendered string.
     private func renderedEvent(_ event: AccessEvent) -> String.UTF8View {
         (event.renderedSummary(dateFormatStyle: formatStyle) + "\n").utf8
-    }
-}
-
-@available(Configuration 1.0, *)
-extension AccessEvent {
-    /// Returns a human-readable single line string summarizing the access event.
-    /// - Parameter dateFormatStyle: The format style used for rendering dates.
-    /// - Returns: The rendered string.
-    fileprivate func renderedSummary(dateFormatStyle: Date.ISO8601FormatStyle) -> String {
-        // Compute which provider actually supplied the final value, might be nil.
-        let resolvedProvider = providerResults.first(where: { providerResult in
-            switch providerResult.result {
-            case .success(let value) where value.value != nil:
-                return true
-            default:
-                return false
-            }
-        })
-
-        // ✅ foo.bar -> "value" - provided by EnvironmentVariablesProvider
-        // 🟡 foo.baz -> "defaultValue" - returned the default
-        // 🟡 foo.baz -> nil - no default provided
-        // ❌ foo.ban -> "defaultValue" / nil - EnvironmentVariablesProvider threw an error: ...
-
-        let emoji: String
-        let valueString: String
-        let statusString: String
-        switch result {
-        case .success(let maybeValue):
-            if let maybeValue {
-                valueString = maybeValue.isSecret ? "<REDACTED>" : maybeValue.content.renderedDescription
-            } else {
-                valueString = "<nil>"
-            }
-
-            if let resolvedProvider {
-                if let conversionError {
-                    statusString =
-                        "provided by \(resolvedProvider.providerName) but failed to convert: \(conversionError)"
-                    emoji = "🟡"
-                } else {
-                    statusString = "provided by \(resolvedProvider.providerName)"
-                    emoji = "✅"
-                }
-            } else if maybeValue != nil {
-                statusString = "all providers returned nil, got the default value"
-                emoji = "🟡"
-            } else {
-                statusString = "all providers returned nil"
-                emoji = "🟡"
-            }
-        case .failure(let error):
-            valueString = "<error>"
-            statusString = "threw an error: \(error)"
-            emoji = "❌"
-        }
-        let metadataString =
-            "\(metadata.accessKind.rawValue.capitalized) \(metadata.valueType) from \(metadata.sourceLocation) at \(metadata.accessTimestamp.formatted(dateFormatStyle))"
-        return "\(emoji) \(metadata.key.description) -> \"\(valueString)\" - \(statusString) / \(metadataString)"
-    }
-}
-
-@available(Configuration 1.0, *)
-extension ConfigContent {
-    /// Returns a string representation of the config value, formatting complex types appropriately.
-    ///
-    /// Assumes default encoding for bytes (base64) and arrays (comma-separated).
-    fileprivate var renderedDescription: String {
-        // TODO: Make this more correct by taking a bytesValueEncoder and arrayValueEncoder, rather than assuming the default.
-        switch self {
-        case .string(let string):
-            return string
-        case .int(let int):
-            return "\(int)"
-        case .double(let double):
-            return "\(double)"
-        case .bool(let bool):
-            return "\(bool)"
-        case .bytes(let bytes):
-            return Data(bytes).base64EncodedString()
-        case .stringArray(let array):
-            return array.joined(separator: ",")
-        case .intArray(let array):
-            return array.map(\.description).joined(separator: ",")
-        case .doubleArray(let array):
-            return array.map(\.description).joined(separator: ",")
-        case .boolArray(let array):
-            return array.map(\.description).joined(separator: ",")
-        case .byteChunkArray(let array):
-            return array.map { Data($0).base64EncodedString() }.joined(separator: ",")
-        }
     }
 }

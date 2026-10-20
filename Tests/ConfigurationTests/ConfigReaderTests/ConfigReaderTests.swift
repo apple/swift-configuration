@@ -50,6 +50,19 @@ struct ConfigReaderTests {
         #expect(config.double(forKey: ConfigKey("http.client.timeout", context: ["upstream": "example2.org"])) == 30.0)
     }
 
+    @available(Configuration 1.0, *)
+    @Test func printingDescription() throws {
+        let config = ConfigReader(providers: [
+            InMemoryProvider(name: "first", values: ["http.client.user-agent": "Config/1.0 (Test)"]),
+            InMemoryProvider(name: "second", values: ["http.client.token": .init("s3cret", isSecret: true)]),
+        ])
+        #expect(config.description == "ConfigReader[providers: InMemoryProvider[first], InMemoryProvider[second]]")
+        #expect(
+            config.scoped(to: "http").scoped(to: "client").description
+                == "ConfigReader[keyPrefix: http.client, providers: InMemoryProvider[first], InMemoryProvider[second]]"
+        )
+    }
+
     enum TestEnum: String, Equatable {
         case one
         case two
