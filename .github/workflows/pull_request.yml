@@ -13,7 +13,7 @@ env:
 jobs:
   soundness:
     name: Soundness
-    uses: swiftlang/github-workflows/.github/workflows/soundness.yml@0.0.15
+    uses: swiftlang/github-workflows/.github/workflows/soundness.yml@0.0.16
     with:
       license_header_check_project_name: "SwiftConfiguration"
 
@@ -56,7 +56,7 @@ jobs:
 
   android-sdk-testing:
     name: Android SDK with emulator testing
-    uses: swiftlang/github-workflows/.github/workflows/swift_package_test.yml@0.0.15
+    uses: swiftlang/github-workflows/.github/workflows/swift_package_test.yml@0.0.16
     with:
       enable_linux_checks: false
       enable_windows_checks: false
