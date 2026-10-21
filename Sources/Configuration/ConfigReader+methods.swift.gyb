@@ -359,19 +359,22 @@ extension ConfigReader {
     ///   - fileID: The file ID where this call originates. Used for access reporting.
     ///   - line: The line number where this call originates. Used for access reporting.
     /// - Returns: The value converted to the expected type if found and convertible, otherwise `nil`.
+    % if int_convertible_type["disfavored"]:
+    @_disfavoredOverload
+    % end
     public func int<Value: ${int_convertible_type["protocol"]}>(
         forKey key: ConfigKey,
         as type: Value.Type = Value.self,
         isSecret: Bool = false,
         fileID: String = #fileID,
         line: UInt = #line
-    ) -> Value? {
+    ) -> Value?${int_convertible_type["whereClause"]} {
         value(
             forKey: key,
             type: .int,
             isSecret: isSecret,
             unwrap: { try cast($0.asInt, type: Value.self, key: key) },
-            wrap: { uncast($0) },
+            wrap: { ${int_convertible_type["wrap"]} },
             fileID: fileID,
             line: line
         )
@@ -395,6 +398,9 @@ extension ConfigReader {
     ///   - fileID: The file ID where this call originates. Used for access reporting.
     ///   - line: The line number where this call originates. Used for access reporting.
     /// - Returns: The config value if found and convertible, otherwise the default value.
+    % if int_convertible_type["disfavored"]:
+    @_disfavoredOverload
+    % end
     public func int<Value: ${int_convertible_type["protocol"]}>(
         forKey key: ConfigKey,
         as type: Value.Type = Value.self,
@@ -402,14 +408,14 @@ extension ConfigReader {
         default defaultValue: Value,
         fileID: String = #fileID,
         line: UInt = #line
-    ) -> Value {
+    ) -> Value${int_convertible_type["whereClause"]} {
         value(
             forKey: key,
             type: .int,
             isSecret: isSecret,
             default: defaultValue,
             unwrap: { try cast($0.asInt, type: Value.self, key: key) },
-            wrap: { uncast($0) },
+            wrap: { ${int_convertible_type["wrap"]} },
             fileID: fileID,
             line: line
         )
@@ -432,19 +438,22 @@ extension ConfigReader {
     ///   - line: The line number where this call originates. Used for access reporting.
     /// - Returns: The config value converted to the expected type.
     /// - Throws: An error if the value is missing or can't be converted to the expected type.
+    % if int_convertible_type["disfavored"]:
+    @_disfavoredOverload
+    % end
     public func requiredInt<Value: ${int_convertible_type["protocol"]}>(
         forKey key: ConfigKey,
         as type: Value.Type = Value.self,
         isSecret: Bool = false,
         fileID: String = #fileID,
         line: UInt = #line
-    ) throws -> Value {
+    ) throws -> Value${int_convertible_type["whereClause"]} {
         try requiredValue(
             forKey: key,
             type: .int,
             isSecret: isSecret,
             unwrap: { try cast($0.asInt, type: Value.self, key: key) },
-            wrap: { uncast($0) },
+            wrap: { ${int_convertible_type["wrap"]} },
             fileID: fileID,
             line: line
         )
@@ -466,19 +475,22 @@ extension ConfigReader {
     ///   - fileID: The file ID where this call originates. Used for access reporting.
     ///   - line: The line number where this call originates. Used for access reporting.
     /// - Returns: An array of values converted to the expected type if found and convertible, otherwise `nil`.
+    % if int_convertible_type["disfavored"]:
+    @_disfavoredOverload
+    % end
     public func intArray<Value: ${int_convertible_type["protocol"]}>(
         forKey key: ConfigKey,
         as type: Value.Type = Value.self,
         isSecret: Bool = false,
         fileID: String = #fileID,
         line: UInt = #line
-    ) -> [Value]? {
+    ) -> [Value]?${int_convertible_type["whereClause"]} {
         value(
             forKey: key,
             type: .intArray,
             isSecret: isSecret,
             unwrap: { try $0.asIntArray.map { try cast($0, type: Value.self, key: key) } },
-            wrap: { uncast($0) },
+            wrap: { ${int_convertible_type["wrap"]} },
             fileID: fileID,
             line: line
         )
@@ -502,6 +514,9 @@ extension ConfigReader {
     ///   - fileID: The file ID where this call originates. Used for access reporting.
     ///   - line: The line number where this call originates. Used for access reporting.
     /// - Returns: The config array if found and convertible, otherwise the default array.
+    % if int_convertible_type["disfavored"]:
+    @_disfavoredOverload
+    % end
     public func intArray<Value: ${int_convertible_type["protocol"]}>(
         forKey key: ConfigKey,
         as type: Value.Type = Value.self,
@@ -509,14 +524,14 @@ extension ConfigReader {
         default defaultValue: [Value],
         fileID: String = #fileID,
         line: UInt = #line
-    ) -> [Value] {
+    ) -> [Value]${int_convertible_type["whereClause"]} {
         value(
             forKey: key,
             type: .intArray,
             isSecret: isSecret,
             default: defaultValue,
             unwrap: { try $0.asIntArray.map { try cast($0, type: Value.self, key: key) } },
-            wrap: { uncast($0) },
+            wrap: { ${int_convertible_type["wrap"]} },
             fileID: fileID,
             line: line
         )
@@ -539,19 +554,22 @@ extension ConfigReader {
     ///   - line: The line number where this call originates. Used for access reporting.
     /// - Returns: The config array converted to the expected type.
     /// - Throws: An error if the value is missing or can't be converted to the expected type.
+    % if int_convertible_type["disfavored"]:
+    @_disfavoredOverload
+    % end
     public func requiredIntArray<Value: ${int_convertible_type["protocol"]}>(
         forKey key: ConfigKey,
         as type: Value.Type = Value.self,
         isSecret: Bool = false,
         fileID: String = #fileID,
         line: UInt = #line
-    ) throws -> [Value] {
+    ) throws -> [Value]${int_convertible_type["whereClause"]} {
         try requiredValue(
             forKey: key,
             type: .intArray,
             isSecret: isSecret,
             unwrap: { try $0.asIntArray.map { try cast($0, type: Value.self, key: key) } },
-            wrap: { uncast($0) },
+            wrap: { ${int_convertible_type["wrap"]} },
             fileID: fileID,
             line: line
         )
@@ -903,19 +921,22 @@ extension ConfigReader {
     ///   - line: The line number where this call originates. Used for access reporting.
     /// - Returns: The value converted to the expected type if found and convertible, otherwise `nil`.
     /// - Throws: An error if the underlying provider throws or if the value can't be converted to the expected type.
+    % if int_convertible_type["disfavored"]:
+    @_disfavoredOverload
+    % end
     public func fetchInt<Value: ${int_convertible_type["protocol"]}>(
         forKey key: ConfigKey,
         as type: Value.Type = Value.self,
         isSecret: Bool = false,
         fileID: String = #fileID,
         line: UInt = #line
-    ) async throws -> Value? {
+    ) async throws -> Value?${int_convertible_type["whereClause"]} {
         try await fetchValue(
             forKey: key,
             type: .int,
             isSecret: isSecret,
             unwrap: { try cast($0.asInt, type: Value.self, key: key) },
-            wrap: { uncast($0) },
+            wrap: { ${int_convertible_type["wrap"]} },
             fileID: fileID,
             line: line
         )
@@ -939,6 +960,9 @@ extension ConfigReader {
     ///   - line: The line number where this call originates. Used for access reporting.
     /// - Returns: The config value if found and convertible, otherwise the default value.
     /// - Throws: An error if the underlying provider throws or if the value can't be converted to the expected type.
+    % if int_convertible_type["disfavored"]:
+    @_disfavoredOverload
+    % end
     public func fetchInt<Value: ${int_convertible_type["protocol"]}>(
         forKey key: ConfigKey,
         as type: Value.Type = Value.self,
@@ -946,14 +970,14 @@ extension ConfigReader {
         default defaultValue: Value,
         fileID: String = #fileID,
         line: UInt = #line
-    ) async throws -> Value {
+    ) async throws -> Value${int_convertible_type["whereClause"]} {
         try await fetchValue(
             forKey: key,
             type: .int,
             isSecret: isSecret,
             default: defaultValue,
             unwrap: { try cast($0.asInt, type: Value.self, key: key) },
-            wrap: { uncast($0) },
+            wrap: { ${int_convertible_type["wrap"]} },
             fileID: fileID,
             line: line
         )
@@ -976,19 +1000,22 @@ extension ConfigReader {
     ///   - line: The line number where this call originates. Used for access reporting.
     /// - Returns: The config value converted to the expected type.
     /// - Throws: An error if the underlying provider throws, the value is missing, or can't be converted to the expected type.
+    % if int_convertible_type["disfavored"]:
+    @_disfavoredOverload
+    % end
     public func fetchRequiredInt<Value: ${int_convertible_type["protocol"]}>(
         forKey key: ConfigKey,
         as type: Value.Type = Value.self,
         isSecret: Bool = false,
         fileID: String = #fileID,
         line: UInt = #line
-    ) async throws -> Value {
+    ) async throws -> Value${int_convertible_type["whereClause"]} {
         try await fetchRequiredValue(
             forKey: key,
             type: .int,
             isSecret: isSecret,
             unwrap: { try cast($0.asInt, type: Value.self, key: key) },
-            wrap: { uncast($0) },
+            wrap: { ${int_convertible_type["wrap"]} },
             fileID: fileID,
             line: line
         )
@@ -1011,19 +1038,22 @@ extension ConfigReader {
     ///   - line: The line number where this call originates. Used for access reporting.
     /// - Returns: An array of values converted to the expected type if found and convertible, otherwise `nil`.
     /// - Throws: An error if the underlying provider throws or if the value can't be converted to the expected type.
+    % if int_convertible_type["disfavored"]:
+    @_disfavoredOverload
+    % end
     public func fetchIntArray<Value: ${int_convertible_type["protocol"]}>(
         forKey key: ConfigKey,
         as type: Value.Type = Value.self,
         isSecret: Bool = false,
         fileID: String = #fileID,
         line: UInt = #line
-    ) async throws -> [Value]? {
+    ) async throws -> [Value]?${int_convertible_type["whereClause"]} {
         try await fetchValue(
             forKey: key,
             type: .intArray,
             isSecret: isSecret,
             unwrap: { try $0.asIntArray.map { try cast($0, type: Value.self, key: key) } },
-            wrap: { uncast($0) },
+            wrap: { ${int_convertible_type["wrap"]} },
             fileID: fileID,
             line: line
         )
@@ -1047,6 +1077,9 @@ extension ConfigReader {
     ///   - line: The line number where this call originates. Used for access reporting.
     /// - Returns: The config array if found and convertible, otherwise the default array.
     /// - Throws: An error if the underlying provider throws or if the value can't be converted to the expected type.
+    % if int_convertible_type["disfavored"]:
+    @_disfavoredOverload
+    % end
     public func fetchIntArray<Value: ${int_convertible_type["protocol"]}>(
         forKey key: ConfigKey,
         as type: Value.Type = Value.self,
@@ -1054,14 +1087,14 @@ extension ConfigReader {
         default defaultValue: [Value],
         fileID: String = #fileID,
         line: UInt = #line
-    ) async throws -> [Value] {
+    ) async throws -> [Value]${int_convertible_type["whereClause"]} {
         try await fetchValue(
             forKey: key,
             type: .intArray,
             isSecret: isSecret,
             default: defaultValue,
             unwrap: { try $0.asIntArray.map { try cast($0, type: Value.self, key: key) } },
-            wrap: { uncast($0) },
+            wrap: { ${int_convertible_type["wrap"]} },
             fileID: fileID,
             line: line
         )
@@ -1084,19 +1117,22 @@ extension ConfigReader {
     ///   - line: The line number where this call originates. Used for access reporting.
     /// - Returns: The config array converted to the expected type.
     /// - Throws: An error if the underlying provider throws, the value is missing, or can't be converted to the expected type.
+    % if int_convertible_type["disfavored"]:
+    @_disfavoredOverload
+    % end
     public func fetchRequiredIntArray<Value: ${int_convertible_type["protocol"]}>(
         forKey key: ConfigKey,
         as type: Value.Type = Value.self,
         isSecret: Bool = false,
         fileID: String = #fileID,
         line: UInt = #line
-    ) async throws -> [Value] {
+    ) async throws -> [Value]${int_convertible_type["whereClause"]} {
         try await fetchRequiredValue(
             forKey: key,
             type: .intArray,
             isSecret: isSecret,
             unwrap: { try $0.asIntArray.map { try cast($0, type: Value.self, key: key) } },
-            wrap: { uncast($0) },
+            wrap: { ${int_convertible_type["wrap"]} },
             fileID: fileID,
             line: line
         )
@@ -1549,6 +1585,9 @@ extension ConfigReader {
     ///     produces `nil` if the value is missing or can't be converted.
     /// - Returns: The result produced by the handler.
     /// - Throws: Rethrows any error thrown by the handler or the underlying watch operation.
+    % if int_convertible_type["disfavored"]:
+    @_disfavoredOverload
+    % end
     public func watchInt<Value: ${int_convertible_type["protocol"]} & Sendable, Return: ~Copyable>(
         forKey key: ConfigKey,
         as type: Value.Type = Value.self,
@@ -1556,13 +1595,13 @@ extension ConfigReader {
         fileID: String = #fileID,
         line: UInt = #line,
         updatesHandler: (_ updates: ConfigUpdatesAsyncSequence<Value?, Never>) async throws -> Return
-    ) async throws -> Return {
+    ) async throws -> Return${int_convertible_type["whereClause"]} {
         try await watchValue(
             forKey: key,
             type: .int,
             isSecret: isSecret,
             unwrap: { try cast($0.asInt, type: Value.self, key: key) },
-            wrap: { uncast($0) },
+            wrap: { ${int_convertible_type["wrap"]} },
             fileID: fileID,
             line: line,
             updatesHandler: updatesHandler
@@ -1594,6 +1633,9 @@ extension ConfigReader {
     ///     produces the default value if the provider returned a `nil` value or conversion failed.
     /// - Returns: The result produced by the handler.
     /// - Throws: Rethrows any error thrown by the handler or the underlying watch operation.
+    % if int_convertible_type["disfavored"]:
+    @_disfavoredOverload
+    % end
     public func watchInt<Value: ${int_convertible_type["protocol"]} & Sendable, Return: ~Copyable>(
         forKey key: ConfigKey,
         as type: Value.Type = Value.self,
@@ -1602,14 +1644,14 @@ extension ConfigReader {
         fileID: String = #fileID,
         line: UInt = #line,
         updatesHandler: (_ updates: ConfigUpdatesAsyncSequence<Value, Never>) async throws -> Return
-    ) async throws -> Return {
+    ) async throws -> Return${int_convertible_type["whereClause"]} {
         try await watchValue(
             forKey: key,
             type: .int,
             isSecret: isSecret,
             default: defaultValue,
             unwrap: { try cast($0.asInt, type: Value.self, key: key) },
-            wrap: { uncast($0) },
+            wrap: { ${int_convertible_type["wrap"]} },
             fileID: fileID,
             line: line,
             updatesHandler: updatesHandler
@@ -1640,6 +1682,9 @@ extension ConfigReader {
     ///     produces an error if the provider returned a `nil` value or if the value was of an incorrect type.
     /// - Returns: The result produced by the handler.
     /// - Throws: Rethrows any error thrown by the handler or the underlying watch operation.
+    % if int_convertible_type["disfavored"]:
+    @_disfavoredOverload
+    % end
     public func watchRequiredInt<Value: ${int_convertible_type["protocol"]} & Sendable, Return: ~Copyable>(
         forKey key: ConfigKey,
         as type: Value.Type = Value.self,
@@ -1647,13 +1692,13 @@ extension ConfigReader {
         fileID: String = #fileID,
         line: UInt = #line,
         updatesHandler: (_ updates: ConfigUpdatesAsyncSequence<Value, any Error>) async throws -> Return
-    ) async throws -> Return {
+    ) async throws -> Return${int_convertible_type["whereClause"]} {
         try await watchRequiredValue(
             forKey: key,
             type: .int,
             isSecret: isSecret,
             unwrap: { try cast($0.asInt, type: Value.self, key: key) },
-            wrap: { uncast($0) },
+            wrap: { ${int_convertible_type["wrap"]} },
             fileID: fileID,
             line: line,
             updatesHandler: updatesHandler
@@ -1688,6 +1733,9 @@ extension ConfigReader {
     ///     produces `nil` if the value is missing or can't be converted.
     /// - Returns: The result produced by the handler.
     /// - Throws: Rethrows any error thrown by the handler or the underlying watch operation.
+    % if int_convertible_type["disfavored"]:
+    @_disfavoredOverload
+    % end
     public func watchIntArray<Value: ${int_convertible_type["protocol"]} & Sendable, Return: ~Copyable>(
         forKey key: ConfigKey,
         as type: Value.Type = Value.self,
@@ -1695,13 +1743,13 @@ extension ConfigReader {
         fileID: String = #fileID,
         line: UInt = #line,
         updatesHandler: (_ updates: ConfigUpdatesAsyncSequence<[Value]?, Never>) async throws -> Return
-    ) async throws -> Return {
+    ) async throws -> Return${int_convertible_type["whereClause"]} {
         try await watchValue(
             forKey: key,
             type: .intArray,
             isSecret: isSecret,
             unwrap: { try $0.asIntArray.map { try cast($0, type: Value.self, key: key) } },
-            wrap: { uncast($0) },
+            wrap: { ${int_convertible_type["wrap"]} },
             fileID: fileID,
             line: line,
             updatesHandler: updatesHandler
@@ -1733,6 +1781,9 @@ extension ConfigReader {
     ///     produces the default value if the provider returned a `nil` value or conversion failed.
     /// - Returns: The result produced by the handler.
     /// - Throws: Rethrows any error thrown by the handler or the underlying watch operation.
+    % if int_convertible_type["disfavored"]:
+    @_disfavoredOverload
+    % end
     public func watchIntArray<Value: ${int_convertible_type["protocol"]} & Sendable, Return: ~Copyable>(
         forKey key: ConfigKey,
         as type: Value.Type = Value.self,
@@ -1741,14 +1792,14 @@ extension ConfigReader {
         fileID: String = #fileID,
         line: UInt = #line,
         updatesHandler: (_ updates: ConfigUpdatesAsyncSequence<[Value], Never>) async throws -> Return
-    ) async throws -> Return {
+    ) async throws -> Return${int_convertible_type["whereClause"]} {
         try await watchValue(
             forKey: key,
             type: .intArray,
             isSecret: isSecret,
             default: defaultValue,
             unwrap: { try $0.asIntArray.map { try cast($0, type: Value.self, key: key) } },
-            wrap: { uncast($0) },
+            wrap: { ${int_convertible_type["wrap"]} },
             fileID: fileID,
             line: line,
             updatesHandler: updatesHandler
@@ -1779,6 +1830,9 @@ extension ConfigReader {
     ///     produces an error if the provider returned a `nil` value or if the value was of an incorrect type.
     /// - Returns: The result produced by the handler.
     /// - Throws: Rethrows any error thrown by the handler or the underlying watch operation.
+    % if int_convertible_type["disfavored"]:
+    @_disfavoredOverload
+    % end
     public func watchRequiredIntArray<Value: ${int_convertible_type["protocol"]} & Sendable, Return: ~Copyable>(
         forKey key: ConfigKey,
         as type: Value.Type = Value.self,
@@ -1786,13 +1840,13 @@ extension ConfigReader {
         fileID: String = #fileID,
         line: UInt = #line,
         updatesHandler: (_ updates: ConfigUpdatesAsyncSequence<[Value], any Error>) async throws -> Return
-    ) async throws -> Return {
+    ) async throws -> Return${int_convertible_type["whereClause"]} {
         try await watchRequiredValue(
             forKey: key,
             type: .intArray,
             isSecret: isSecret,
             unwrap: { try $0.asIntArray.map { try cast($0, type: Value.self, key: key) } },
-            wrap: { uncast($0) },
+            wrap: { ${int_convertible_type["wrap"]} },
             fileID: fileID,
             line: line,
             updatesHandler: updatesHandler

@@ -28,6 +28,7 @@ struct ConfigReaderMethodTestsWatch4 {
 
     typealias Defaults = ConfigReaderTests.Defaults
     typealias TestIntEnum = ConfigReaderTests.TestIntEnum
+    typealias TestUInt8Enum = ConfigReaderTests.TestUInt8Enum
     typealias TestIntConvertible = ConfigReaderTests.TestIntConvertible
 
     @available(Configuration 1.0, *)
@@ -185,6 +186,79 @@ struct ConfigReaderMethodTestsWatch4 {
             // Required - failing
             await #expect(throws: TestProvider.TestError.self) {
                 try await config.watchRequiredInt(forKey: "failure", as: TestIntEnum.self, updatesHandler: awaitFirst)
+            }
+        }
+        do {
+            // Optional - success
+            #expect(
+                try await config.watchInt(forKey: "uint8Enum", as: TestUInt8Enum.self, updatesHandler: awaitFirst)
+                    == Defaults.uint8Enum
+            )
+
+            // Optional - missing
+            #expect(
+                try await config.watchInt(forKey: "absentUInt8Enum", as: TestUInt8Enum.self, updatesHandler: awaitFirst)
+                    == .some(nil)
+            )
+
+            // Optional - failing
+            #expect(
+                try await config.watchInt(forKey: "failure", as: TestUInt8Enum.self, updatesHandler: awaitFirst)
+                    == .some(nil)
+            )
+
+            // Defaulted - success
+            #expect(
+                try await config.watchInt(
+                    forKey: "uint8Enum",
+                    as: TestUInt8Enum.self,
+                    default: Defaults.otherUInt8Enum,
+                    updatesHandler: awaitFirst
+                ) == Defaults.uint8Enum
+            )
+
+            // Defaulted - missing
+            #expect(
+                try await config.watchInt(
+                    forKey: "absentUInt8Enum",
+                    as: TestUInt8Enum.self,
+                    default: Defaults.otherUInt8Enum,
+                    updatesHandler: awaitFirst
+                ) == Defaults.otherUInt8Enum
+            )
+
+            // Defaulted - failing
+            #expect(
+                try await config.watchInt(
+                    forKey: "failure",
+                    as: TestUInt8Enum.self,
+                    default: Defaults.otherUInt8Enum,
+                    updatesHandler: awaitFirst
+                ) == Defaults.otherUInt8Enum
+            )
+
+            // Required - success
+            #expect(
+                try await config.watchRequiredInt(
+                    forKey: "uint8Enum",
+                    as: TestUInt8Enum.self,
+                    updatesHandler: awaitFirst
+                ) == Defaults.uint8Enum
+            )
+
+            // Required - missing
+            let error1 = await #expect(throws: ConfigError.self) {
+                try await config.watchRequiredInt(
+                    forKey: "absentUInt8Enum",
+                    as: TestUInt8Enum.self,
+                    updatesHandler: awaitFirst
+                )
+            }
+            #expect(error1 == .missingRequiredConfigValue(AbsoluteConfigKey(["absentUInt8Enum"])))
+
+            // Required - failing
+            await #expect(throws: TestProvider.TestError.self) {
+                try await config.watchRequiredInt(forKey: "failure", as: TestUInt8Enum.self, updatesHandler: awaitFirst)
             }
         }
     }

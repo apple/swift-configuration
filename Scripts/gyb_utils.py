@@ -53,12 +53,34 @@ string_convertible_types = [
 int_convertible_types = [
     {
         "protocol": "ExpressibleByConfigInt",
+        "whereClause": "",
+        "disfavored": False,
+        "wrap": "uncast($0)",
         "testType": "TestIntConvertible",
         "testSuffix": "IntConvertible"
     },
     {
-        "protocol": "RawRepresentable<Int>",
+        "protocol": "RawRepresentable",
+        "whereClause": " where Value.RawValue: BinaryInteger",
+        "disfavored": True,
+        "wrap": "try uncast($0, key: key)",
         "testType": "TestIntEnum",
         "testSuffix": "IntEnum"
+    },
+]
+
+int_convertible_test_types = [
+    {
+        "testType": "TestIntConvertible",
+        "testSuffix": "IntConvertible"
+    },
+    {
+        "testType": "TestIntEnum",
+        "testSuffix": "IntEnum"
+    },
+    {
+        "testType": "TestUInt8Enum",
+        "testSuffix": "UInt8Enum",
+        "lowerTestSuffix": "uint8Enum"
     },
 ]
