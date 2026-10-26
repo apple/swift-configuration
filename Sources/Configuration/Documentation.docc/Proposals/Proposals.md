@@ -41,3 +41,4 @@ If you have any questions, ask in an issue on GitHub.
 - <doc:SCO-0003>
 - <doc:SCO-0004>
 - <doc:SCO-0005>
+- <doc:SCO-0006>
