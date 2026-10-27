@@ -66,6 +66,13 @@ struct InMemoryProviderTests {
     }
 
     @available(Configuration 1.0, *)
+    @Test func printingDescriptionWithoutName() throws {
+        let provider = InMemoryProvider(values: ["string": "Hello", "int": 42])
+        #expect(provider.description == "InMemoryProvider[2 values]")
+        #expect(provider.debugDescription == "InMemoryProvider[2 values: int=[int: 42], string=[string: Hello]]")
+    }
+
+    @available(Configuration 1.0, *)
     @Test func compat() async throws {
         try await ProviderCompatTest(provider: provider).runTest()
     }

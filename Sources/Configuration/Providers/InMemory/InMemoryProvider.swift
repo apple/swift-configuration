@@ -119,7 +119,7 @@ public struct InMemoryProvider: Sendable {
 extension InMemoryProvider: CustomStringConvertible {
     // swift-format-ignore: AllPublicDeclarationsHaveDocumentation
     public var description: String {
-        "InMemoryProvider[\(_snapshot.name.map { "\($0), " } ?? " ")\(_snapshot.values.count) values]"
+        "InMemoryProvider[\(_snapshot.name.map { "\($0), " } ?? "")\(_snapshot.values.count) values]"
     }
 }
 
@@ -132,7 +132,7 @@ extension InMemoryProvider: CustomDebugStringConvertible {
             .map { "\($0.key)=\($0.value)" }
             .joined(separator: ", ")
         return
-            "InMemoryProvider[\(_snapshot.name.map { "\($0), " } ?? " ")\(_snapshot.values.count) values: \(prettyValues)]"
+            "InMemoryProvider[\(_snapshot.name.map { "\($0), " } ?? "")\(_snapshot.values.count) values: \(prettyValues)]"
     }
 }
 

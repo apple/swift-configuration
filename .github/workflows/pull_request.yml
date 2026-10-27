@@ -13,7 +13,7 @@ env:
 jobs:
   soundness:
     name: Soundness
-    uses: swiftlang/github-workflows/.github/workflows/soundness.yml@0.0.15
+    uses: swiftlang/github-workflows/.github/workflows/soundness.yml@0.0.17
     with:
       license_header_check_project_name: "SwiftConfiguration"
 
@@ -31,12 +31,17 @@ jobs:
       linux_nightly_next_enabled: false
       linux_nightly_next_arguments_override: "--explicit-target-dependency-import-check error"
       linux_nightly_main_arguments_override: "--explicit-target-dependency-import-check error"
-      # Windows is disabled, blocked on Swift Service Lifecycle Windows support: https://github.com/swift-server/swift-service-lifecycle/issues/213
       windows_6_0_enabled: false
       windows_6_1_enabled: false
-      windows_nightly_next_enabled: false
-      windows_nightly_main_enabled: false
-      windows_6_1_arguments_override: "--enable-all-traits --explicit-target-dependency-import-check error"
+      windows_nightly_6_1_enabled: false
+      windows_6_2_enabled: true
+      windows_6_3_enabled: true
+      windows_6_4_enabled: true
+      windows_nightly_next_enabled: true
+      windows_nightly_main_enabled: true
+      windows_6_2_arguments_override: "--enable-all-traits --explicit-target-dependency-import-check error"
+      windows_6_3_arguments_override: "--enable-all-traits --explicit-target-dependency-import-check error"
+      windows_6_4_arguments_override: "--enable-all-traits --explicit-target-dependency-import-check error"
       windows_nightly_next_arguments_override: "--enable-all-traits --explicit-target-dependency-import-check error"
       windows_nightly_main_arguments_override: "--enable-all-traits --explicit-target-dependency-import-check error"
 
@@ -51,7 +56,7 @@ jobs:
 
   android-sdk-testing:
     name: Android SDK with emulator testing
-    uses: swiftlang/github-workflows/.github/workflows/swift_package_test.yml@0.0.15
+    uses: swiftlang/github-workflows/.github/workflows/swift_package_test.yml@0.0.17
     with:
       enable_linux_checks: false
       enable_windows_checks: false
@@ -83,8 +88,11 @@ jobs:
       linux_nightly_next_enabled: false
       windows_6_0_enabled: false
       windows_6_1_enabled: false
-      windows_nightly_next_enabled: false
-      windows_nightly_main_enabled: false
+      windows_6_2_enabled: true
+      windows_6_3_enabled: true
+      windows_6_4_enabled: true
+      windows_nightly_next_enabled: true
+      windows_nightly_main_enabled: true
 
   construct-traits-matrix:
     name: Construct traits matrix
