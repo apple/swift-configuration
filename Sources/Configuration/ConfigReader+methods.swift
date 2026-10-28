@@ -1265,6 +1265,7 @@ extension ConfigReader {
     ///   - fileID: The file ID where this call originates. Used for access reporting.
     ///   - line: The line number where this call originates. Used for access reporting.
     /// - Returns: The value converted to the expected type if found and convertible, otherwise `nil`.
+    @_disfavoredOverload
     public func string<Value: RawRepresentable<String>>(
         forKey key: ConfigKey,
         as type: Value.Type = Value.self,
@@ -1301,6 +1302,7 @@ extension ConfigReader {
     ///   - fileID: The file ID where this call originates. Used for access reporting.
     ///   - line: The line number where this call originates. Used for access reporting.
     /// - Returns: The config value if found and convertible, otherwise the default value.
+    @_disfavoredOverload
     public func string<Value: RawRepresentable<String>>(
         forKey key: ConfigKey,
         as type: Value.Type = Value.self,
@@ -1338,6 +1340,7 @@ extension ConfigReader {
     ///   - line: The line number where this call originates. Used for access reporting.
     /// - Returns: The config value converted to the expected type.
     /// - Throws: An error if the value is missing or can't be converted to the expected type.
+    @_disfavoredOverload
     public func requiredString<Value: RawRepresentable<String>>(
         forKey key: ConfigKey,
         as type: Value.Type = Value.self,
@@ -1372,6 +1375,7 @@ extension ConfigReader {
     ///   - fileID: The file ID where this call originates. Used for access reporting.
     ///   - line: The line number where this call originates. Used for access reporting.
     /// - Returns: An array of values converted to the expected type if found and convertible, otherwise `nil`.
+    @_disfavoredOverload
     public func stringArray<Value: RawRepresentable<String>>(
         forKey key: ConfigKey,
         as type: Value.Type = Value.self,
@@ -1408,6 +1412,7 @@ extension ConfigReader {
     ///   - fileID: The file ID where this call originates. Used for access reporting.
     ///   - line: The line number where this call originates. Used for access reporting.
     /// - Returns: The config array if found and convertible, otherwise the default array.
+    @_disfavoredOverload
     public func stringArray<Value: RawRepresentable<String>>(
         forKey key: ConfigKey,
         as type: Value.Type = Value.self,
@@ -1445,6 +1450,7 @@ extension ConfigReader {
     ///   - line: The line number where this call originates. Used for access reporting.
     /// - Returns: The config array converted to the expected type.
     /// - Throws: An error if the value is missing or can't be converted to the expected type.
+    @_disfavoredOverload
     public func requiredStringArray<Value: RawRepresentable<String>>(
         forKey key: ConfigKey,
         as type: Value.Type = Value.self,
@@ -1502,7 +1508,7 @@ extension ConfigReader {
     ///
     /// Use this method when you need a guaranteed non-nil result for integer-convertible types.
     /// If the configuration value is missing or can't be converted to the expected type,
-    /// the method returns the default value
+    /// the method returns the default value instead.
     ///
     /// ```swift
     /// let apiVersion = config.int(forKey: ["api", "version"], as: APIVersion.self, default: .version(1))
@@ -1708,7 +1714,7 @@ extension ConfigReader {
             type: .int,
             isSecret: isSecret,
             unwrap: { try cast($0.asInt, type: Value.self, key: key) },
-            wrap: { try uncast($0, key: key) },
+            wrap: { uncast($0) },
             fileID: fileID,
             line: line
         )
@@ -1718,7 +1724,7 @@ extension ConfigReader {
     ///
     /// Use this method when you need a guaranteed non-nil result for integer-convertible types.
     /// If the configuration value is missing or can't be converted to the expected type,
-    /// the method returns the default value
+    /// the method returns the default value instead.
     ///
     /// ```swift
     /// let apiVersion = config.int(forKey: ["api", "version"], as: APIVersion.self, default: .version(1))
@@ -1732,6 +1738,7 @@ extension ConfigReader {
     ///   - fileID: The file ID where this call originates. Used for access reporting.
     ///   - line: The line number where this call originates. Used for access reporting.
     /// - Returns: The config value if found and convertible, otherwise the default value.
+    /// - Precondition: The raw value of `defaultValue` must be representable as an `Int`.
     @_disfavoredOverload
     public func int<Value: RawRepresentable>(
         forKey key: ConfigKey,
@@ -1745,9 +1752,9 @@ extension ConfigReader {
             forKey: key,
             type: .int,
             isSecret: isSecret,
-            default: defaultValue,
+            default: checkedDefault(defaultValue, key: keyPrefix.appending(key), fileID: fileID, line: line),
             unwrap: { try cast($0.asInt, type: Value.self, key: key) },
-            wrap: { try uncast($0, key: key) },
+            wrap: { uncast($0) },
             fileID: fileID,
             line: line
         )
@@ -1783,7 +1790,7 @@ extension ConfigReader {
             type: .int,
             isSecret: isSecret,
             unwrap: { try cast($0.asInt, type: Value.self, key: key) },
-            wrap: { try uncast($0, key: key) },
+            wrap: { uncast($0) },
             fileID: fileID,
             line: line
         )
@@ -1818,7 +1825,7 @@ extension ConfigReader {
             type: .intArray,
             isSecret: isSecret,
             unwrap: { try $0.asIntArray.map { try cast($0, type: Value.self, key: key) } },
-            wrap: { try uncast($0, key: key) },
+            wrap: { uncast($0) },
             fileID: fileID,
             line: line
         )
@@ -1842,6 +1849,7 @@ extension ConfigReader {
     ///   - fileID: The file ID where this call originates. Used for access reporting.
     ///   - line: The line number where this call originates. Used for access reporting.
     /// - Returns: The config array if found and convertible, otherwise the default array.
+    /// - Precondition: The raw value of each element of `defaultValue` must be representable as an `Int`.
     @_disfavoredOverload
     public func intArray<Value: RawRepresentable>(
         forKey key: ConfigKey,
@@ -1855,9 +1863,9 @@ extension ConfigReader {
             forKey: key,
             type: .intArray,
             isSecret: isSecret,
-            default: defaultValue,
+            default: checkedDefault(defaultValue, key: keyPrefix.appending(key), fileID: fileID, line: line),
             unwrap: { try $0.asIntArray.map { try cast($0, type: Value.self, key: key) } },
-            wrap: { try uncast($0, key: key) },
+            wrap: { uncast($0) },
             fileID: fileID,
             line: line
         )
@@ -1893,7 +1901,7 @@ extension ConfigReader {
             type: .intArray,
             isSecret: isSecret,
             unwrap: { try $0.asIntArray.map { try cast($0, type: Value.self, key: key) } },
-            wrap: { try uncast($0, key: key) },
+            wrap: { uncast($0) },
             fileID: fileID,
             line: line
         )
@@ -3184,6 +3192,7 @@ extension ConfigReader {
     ///   - line: The line number where this call originates. Used for access reporting.
     /// - Returns: The value converted to the expected type if found and convertible, otherwise `nil`.
     /// - Throws: An error if the underlying provider throws or if the value can't be converted to the expected type.
+    @_disfavoredOverload
     public func fetchString<Value: RawRepresentable<String>>(
         forKey key: ConfigKey,
         as type: Value.Type = Value.self,
@@ -3220,6 +3229,7 @@ extension ConfigReader {
     ///   - line: The line number where this call originates. Used for access reporting.
     /// - Returns: The config value if found and convertible, otherwise the default value.
     /// - Throws: An error if the underlying provider throws or if the value can't be converted to the expected type.
+    @_disfavoredOverload
     public func fetchString<Value: RawRepresentable<String>>(
         forKey key: ConfigKey,
         as type: Value.Type = Value.self,
@@ -3257,6 +3267,7 @@ extension ConfigReader {
     ///   - line: The line number where this call originates. Used for access reporting.
     /// - Returns: The config value converted to the expected type.
     /// - Throws: An error if the underlying provider throws, the value is missing, or can't be converted to the expected type.
+    @_disfavoredOverload
     public func fetchRequiredString<Value: RawRepresentable<String>>(
         forKey key: ConfigKey,
         as type: Value.Type = Value.self,
@@ -3292,6 +3303,7 @@ extension ConfigReader {
     ///   - line: The line number where this call originates. Used for access reporting.
     /// - Returns: An array of values converted to the expected type if found and convertible, otherwise `nil`.
     /// - Throws: An error if the underlying provider throws or if the value can't be converted to the expected type.
+    @_disfavoredOverload
     public func fetchStringArray<Value: RawRepresentable<String>>(
         forKey key: ConfigKey,
         as type: Value.Type = Value.self,
@@ -3328,6 +3340,7 @@ extension ConfigReader {
     ///   - line: The line number where this call originates. Used for access reporting.
     /// - Returns: The config array if found and convertible, otherwise the default array.
     /// - Throws: An error if the underlying provider throws or if the value can't be converted to the expected type.
+    @_disfavoredOverload
     public func fetchStringArray<Value: RawRepresentable<String>>(
         forKey key: ConfigKey,
         as type: Value.Type = Value.self,
@@ -3365,6 +3378,7 @@ extension ConfigReader {
     ///   - line: The line number where this call originates. Used for access reporting.
     /// - Returns: The config array converted to the expected type.
     /// - Throws: An error if the underlying provider throws, the value is missing, or can't be converted to the expected type.
+    @_disfavoredOverload
     public func fetchRequiredStringArray<Value: RawRepresentable<String>>(
         forKey key: ConfigKey,
         as type: Value.Type = Value.self,
@@ -3629,7 +3643,7 @@ extension ConfigReader {
             type: .int,
             isSecret: isSecret,
             unwrap: { try cast($0.asInt, type: Value.self, key: key) },
-            wrap: { try uncast($0, key: key) },
+            wrap: { uncast($0) },
             fileID: fileID,
             line: line
         )
@@ -3653,6 +3667,7 @@ extension ConfigReader {
     ///   - line: The line number where this call originates. Used for access reporting.
     /// - Returns: The config value if found and convertible, otherwise the default value.
     /// - Throws: An error if the underlying provider throws or if the value can't be converted to the expected type.
+    /// - Precondition: The raw value of `defaultValue` must be representable as an `Int`.
     @_disfavoredOverload
     public func fetchInt<Value: RawRepresentable>(
         forKey key: ConfigKey,
@@ -3666,9 +3681,9 @@ extension ConfigReader {
             forKey: key,
             type: .int,
             isSecret: isSecret,
-            default: defaultValue,
+            default: checkedDefault(defaultValue, key: keyPrefix.appending(key), fileID: fileID, line: line),
             unwrap: { try cast($0.asInt, type: Value.self, key: key) },
-            wrap: { try uncast($0, key: key) },
+            wrap: { uncast($0) },
             fileID: fileID,
             line: line
         )
@@ -3704,7 +3719,7 @@ extension ConfigReader {
             type: .int,
             isSecret: isSecret,
             unwrap: { try cast($0.asInt, type: Value.self, key: key) },
-            wrap: { try uncast($0, key: key) },
+            wrap: { uncast($0) },
             fileID: fileID,
             line: line
         )
@@ -3740,7 +3755,7 @@ extension ConfigReader {
             type: .intArray,
             isSecret: isSecret,
             unwrap: { try $0.asIntArray.map { try cast($0, type: Value.self, key: key) } },
-            wrap: { try uncast($0, key: key) },
+            wrap: { uncast($0) },
             fileID: fileID,
             line: line
         )
@@ -3764,6 +3779,7 @@ extension ConfigReader {
     ///   - line: The line number where this call originates. Used for access reporting.
     /// - Returns: The config array if found and convertible, otherwise the default array.
     /// - Throws: An error if the underlying provider throws or if the value can't be converted to the expected type.
+    /// - Precondition: The raw value of each element of `defaultValue` must be representable as an `Int`.
     @_disfavoredOverload
     public func fetchIntArray<Value: RawRepresentable>(
         forKey key: ConfigKey,
@@ -3777,9 +3793,9 @@ extension ConfigReader {
             forKey: key,
             type: .intArray,
             isSecret: isSecret,
-            default: defaultValue,
+            default: checkedDefault(defaultValue, key: keyPrefix.appending(key), fileID: fileID, line: line),
             unwrap: { try $0.asIntArray.map { try cast($0, type: Value.self, key: key) } },
-            wrap: { try uncast($0, key: key) },
+            wrap: { uncast($0) },
             fileID: fileID,
             line: line
         )
@@ -3815,7 +3831,7 @@ extension ConfigReader {
             type: .intArray,
             isSecret: isSecret,
             unwrap: { try $0.asIntArray.map { try cast($0, type: Value.self, key: key) } },
-            wrap: { try uncast($0, key: key) },
+            wrap: { uncast($0) },
             fileID: fileID,
             line: line
         )
@@ -5459,6 +5475,7 @@ extension ConfigReader {
     ///     produces `nil` if the value is missing or can't be converted.
     /// - Returns: The result produced by the handler.
     /// - Throws: Rethrows any error thrown by the handler or the underlying watch operation.
+    @_disfavoredOverload
     public func watchString<Value: RawRepresentable<String> & Sendable, Return: ~Copyable>(
         forKey key: ConfigKey,
         as type: Value.Type = Value.self,
@@ -5504,6 +5521,7 @@ extension ConfigReader {
     ///     produces the default value if the provider returned a `nil` value or conversion failed.
     /// - Returns: The result produced by the handler.
     /// - Throws: Rethrows any error thrown by the handler or the underlying watch operation.
+    @_disfavoredOverload
     public func watchString<Value: RawRepresentable<String> & Sendable, Return: ~Copyable>(
         forKey key: ConfigKey,
         as type: Value.Type = Value.self,
@@ -5550,6 +5568,7 @@ extension ConfigReader {
     ///     produces an error if the provider returned a `nil` value or if the value was of an incorrect type.
     /// - Returns: The result produced by the handler.
     /// - Throws: Rethrows any error thrown by the handler or the underlying watch operation.
+    @_disfavoredOverload
     public func watchRequiredString<Value: RawRepresentable<String> & Sendable, Return: ~Copyable>(
         forKey key: ConfigKey,
         as type: Value.Type = Value.self,
@@ -5598,6 +5617,7 @@ extension ConfigReader {
     ///     produces `nil` if the value is missing or can't be converted.
     /// - Returns: The result produced by the handler.
     /// - Throws: Rethrows any error thrown by the handler or the underlying watch operation.
+    @_disfavoredOverload
     public func watchStringArray<Value: RawRepresentable<String> & Sendable, Return: ~Copyable>(
         forKey key: ConfigKey,
         as type: Value.Type = Value.self,
@@ -5643,6 +5663,7 @@ extension ConfigReader {
     ///     produces the default value if the provider returned a `nil` value or conversion failed.
     /// - Returns: The result produced by the handler.
     /// - Throws: Rethrows any error thrown by the handler or the underlying watch operation.
+    @_disfavoredOverload
     public func watchStringArray<Value: RawRepresentable<String> & Sendable, Return: ~Copyable>(
         forKey key: ConfigKey,
         as type: Value.Type = Value.self,
@@ -5689,6 +5710,7 @@ extension ConfigReader {
     ///     produces an error if the provider returned a `nil` value or if the value was of an incorrect type.
     /// - Returns: The result produced by the handler.
     /// - Throws: Rethrows any error thrown by the handler or the underlying watch operation.
+    @_disfavoredOverload
     public func watchRequiredStringArray<Value: RawRepresentable<String> & Sendable, Return: ~Copyable>(
         forKey key: ConfigKey,
         as type: Value.Type = Value.self,
@@ -6029,7 +6051,7 @@ extension ConfigReader {
             type: .int,
             isSecret: isSecret,
             unwrap: { try cast($0.asInt, type: Value.self, key: key) },
-            wrap: { try uncast($0, key: key) },
+            wrap: { uncast($0) },
             fileID: fileID,
             line: line,
             updatesHandler: updatesHandler
@@ -6061,6 +6083,7 @@ extension ConfigReader {
     ///     produces the default value if the provider returned a `nil` value or conversion failed.
     /// - Returns: The result produced by the handler.
     /// - Throws: Rethrows any error thrown by the handler or the underlying watch operation.
+    /// - Precondition: The raw value of `defaultValue` must be representable as an `Int`.
     @_disfavoredOverload
     public func watchInt<Value: RawRepresentable & Sendable, Return: ~Copyable>(
         forKey key: ConfigKey,
@@ -6075,9 +6098,9 @@ extension ConfigReader {
             forKey: key,
             type: .int,
             isSecret: isSecret,
-            default: defaultValue,
+            default: checkedDefault(defaultValue, key: keyPrefix.appending(key), fileID: fileID, line: line),
             unwrap: { try cast($0.asInt, type: Value.self, key: key) },
-            wrap: { try uncast($0, key: key) },
+            wrap: { uncast($0) },
             fileID: fileID,
             line: line,
             updatesHandler: updatesHandler
@@ -6122,7 +6145,7 @@ extension ConfigReader {
             type: .int,
             isSecret: isSecret,
             unwrap: { try cast($0.asInt, type: Value.self, key: key) },
-            wrap: { try uncast($0, key: key) },
+            wrap: { uncast($0) },
             fileID: fileID,
             line: line,
             updatesHandler: updatesHandler
@@ -6171,7 +6194,7 @@ extension ConfigReader {
             type: .intArray,
             isSecret: isSecret,
             unwrap: { try $0.asIntArray.map { try cast($0, type: Value.self, key: key) } },
-            wrap: { try uncast($0, key: key) },
+            wrap: { uncast($0) },
             fileID: fileID,
             line: line,
             updatesHandler: updatesHandler
@@ -6203,6 +6226,7 @@ extension ConfigReader {
     ///     produces the default value if the provider returned a `nil` value or conversion failed.
     /// - Returns: The result produced by the handler.
     /// - Throws: Rethrows any error thrown by the handler or the underlying watch operation.
+    /// - Precondition: The raw value of each element of `defaultValue` must be representable as an `Int`.
     @_disfavoredOverload
     public func watchIntArray<Value: RawRepresentable & Sendable, Return: ~Copyable>(
         forKey key: ConfigKey,
@@ -6217,9 +6241,9 @@ extension ConfigReader {
             forKey: key,
             type: .intArray,
             isSecret: isSecret,
-            default: defaultValue,
+            default: checkedDefault(defaultValue, key: keyPrefix.appending(key), fileID: fileID, line: line),
             unwrap: { try $0.asIntArray.map { try cast($0, type: Value.self, key: key) } },
-            wrap: { try uncast($0, key: key) },
+            wrap: { uncast($0) },
             fileID: fileID,
             line: line,
             updatesHandler: updatesHandler
@@ -6264,7 +6288,7 @@ extension ConfigReader {
             type: .intArray,
             isSecret: isSecret,
             unwrap: { try $0.asIntArray.map { try cast($0, type: Value.self, key: key) } },
-            wrap: { try uncast($0, key: key) },
+            wrap: { uncast($0) },
             fileID: fileID,
             line: line,
             updatesHandler: updatesHandler

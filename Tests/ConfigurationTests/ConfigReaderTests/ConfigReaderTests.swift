@@ -63,6 +63,42 @@ struct ConfigReaderTests {
         )
     }
 
+    /// A type whose config string differs from its raw value, to tell which overload was used.
+    enum DualStringEnum: String, ExpressibleByConfigString, Equatable {
+        case one
+        case two
+
+        init?(configString: String) {
+            self.init(rawValue: configString.lowercased())
+        }
+
+        var description: String { rawValue.uppercased() }
+    }
+
+    @available(Configuration 1.0, *)
+    @Test func expressibleByConfigStringIsPreferred() async throws {
+        let accessReporter = TestAccessReporter()
+        let config = ConfigReader(
+            provider: InMemoryProvider(
+                values: [
+                    "scalar": ConfigValue("TWO", isSecret: false),
+                    "array": ConfigValue(["ONE", "TWO"], isSecret: false),
+                ]
+            ),
+            accessReporter: accessReporter
+        )
+
+        #expect(config.string(forKey: "scalar", as: DualStringEnum.self) == .two)
+        #expect(try config.requiredString(forKey: "scalar", as: DualStringEnum.self) == .two)
+        #expect(config.stringArray(forKey: "array", as: DualStringEnum.self) == [.one, .two])
+        #expect(try await config.fetchString(forKey: "scalar", as: DualStringEnum.self) == .two)
+        #expect(config.snapshot().string(forKey: "scalar", as: DualStringEnum.self) == .two)
+
+        // The default is returned either way, but only the preferred overload reports it as its config string.
+        #expect(config.string(forKey: "missing", as: DualStringEnum.self, default: .one) == .one)
+        #expect(try accessReporter.events.last?.result.get()?.content == .string("ONE"))
+    }
+
     enum TestEnum: String, Equatable {
         case one
         case two

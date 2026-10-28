@@ -142,6 +142,9 @@ extension ConfigSnapshotReader {
     ///   - fileID: The file ID where this call originates. Used for access reporting.
     ///   - line: The line number where this call originates. Used for access reporting.
     /// - Returns: The value converted to the expected type if found and convertible, otherwise `nil`.
+    % if string_convertible_type["disfavored"]:
+    @_disfavoredOverload
+    % end
     public func string<Value: ${string_convertible_type["protocol"]}>(
         forKey key: ConfigKey,
         as type: Value.Type = Value.self,
@@ -178,6 +181,9 @@ extension ConfigSnapshotReader {
     ///   - fileID: The file ID where this call originates. Used for access reporting.
     ///   - line: The line number where this call originates. Used for access reporting.
     /// - Returns: The config value if found and convertible, otherwise the default value.
+    % if string_convertible_type["disfavored"]:
+    @_disfavoredOverload
+    % end
     public func string<Value: ${string_convertible_type["protocol"]}>(
         forKey key: ConfigKey,
         as type: Value.Type = Value.self,
@@ -215,6 +221,9 @@ extension ConfigSnapshotReader {
     ///   - line: The line number where this call originates. Used for access reporting.
     /// - Returns: The config value converted to the expected type.
     /// - Throws: An error if the value is missing or can't be converted to the expected type.
+    % if string_convertible_type["disfavored"]:
+    @_disfavoredOverload
+    % end
     public func requiredString<Value: ${string_convertible_type["protocol"]}>(
         forKey key: ConfigKey,
         as type: Value.Type = Value.self,
@@ -249,6 +258,9 @@ extension ConfigSnapshotReader {
     ///   - fileID: The file ID where this call originates. Used for access reporting.
     ///   - line: The line number where this call originates. Used for access reporting.
     /// - Returns: An array of values converted to the expected type if found and convertible, otherwise `nil`.
+    % if string_convertible_type["disfavored"]:
+    @_disfavoredOverload
+    % end
     public func stringArray<Value: ${string_convertible_type["protocol"]}>(
         forKey key: ConfigKey,
         as type: Value.Type = Value.self,
@@ -285,6 +297,9 @@ extension ConfigSnapshotReader {
     ///   - fileID: The file ID where this call originates. Used for access reporting.
     ///   - line: The line number where this call originates. Used for access reporting.
     /// - Returns: The config array if found and convertible, otherwise the default array.
+    % if string_convertible_type["disfavored"]:
+    @_disfavoredOverload
+    % end
     public func stringArray<Value: ${string_convertible_type["protocol"]}>(
         forKey key: ConfigKey,
         as type: Value.Type = Value.self,
@@ -322,6 +337,9 @@ extension ConfigSnapshotReader {
     ///   - line: The line number where this call originates. Used for access reporting.
     /// - Returns: The config array converted to the expected type.
     /// - Throws: An error if the value is missing or can't be converted to the expected type.
+    % if string_convertible_type["disfavored"]:
+    @_disfavoredOverload
+    % end
     public func requiredStringArray<Value: ${string_convertible_type["protocol"]}>(
         forKey key: ConfigKey,
         as type: Value.Type = Value.self,
@@ -374,7 +392,7 @@ extension ConfigSnapshotReader {
             type: .int,
             isSecret: isSecret,
             unwrap: { try cast($0.asInt, type: Value.self, key: key) },
-            wrap: { ${int_convertible_type["wrap"]} },
+            wrap: { uncast($0) },
             fileID: fileID,
             line: line
         )
@@ -398,6 +416,9 @@ extension ConfigSnapshotReader {
     ///   - fileID: The file ID where this call originates. Used for access reporting.
     ///   - line: The line number where this call originates. Used for access reporting.
     /// - Returns: The config value if found and convertible, otherwise the default value.
+    % if int_convertible_type["checksDefault"]:
+    /// - Precondition: The raw value of `defaultValue` must be representable as an `Int`.
+    % end
     % if int_convertible_type["disfavored"]:
     @_disfavoredOverload
     % end
@@ -413,9 +434,13 @@ extension ConfigSnapshotReader {
             forKey: key,
             type: .int,
             isSecret: isSecret,
+            % if int_convertible_type["checksDefault"]:
+            default: checkedDefault(defaultValue, key: keyPrefix.appending(key), fileID: fileID, line: line),
+            % else:
             default: defaultValue,
+            % end
             unwrap: { try cast($0.asInt, type: Value.self, key: key) },
-            wrap: { ${int_convertible_type["wrap"]} },
+            wrap: { uncast($0) },
             fileID: fileID,
             line: line
         )
@@ -453,7 +478,7 @@ extension ConfigSnapshotReader {
             type: .int,
             isSecret: isSecret,
             unwrap: { try cast($0.asInt, type: Value.self, key: key) },
-            wrap: { ${int_convertible_type["wrap"]} },
+            wrap: { uncast($0) },
             fileID: fileID,
             line: line
         )
@@ -490,7 +515,7 @@ extension ConfigSnapshotReader {
             type: .intArray,
             isSecret: isSecret,
             unwrap: { try $0.asIntArray.map { try cast($0, type: Value.self, key: key) } },
-            wrap: { ${int_convertible_type["wrap"]} },
+            wrap: { uncast($0) },
             fileID: fileID,
             line: line
         )
@@ -514,6 +539,9 @@ extension ConfigSnapshotReader {
     ///   - fileID: The file ID where this call originates. Used for access reporting.
     ///   - line: The line number where this call originates. Used for access reporting.
     /// - Returns: The config array if found and convertible, otherwise the default array.
+    % if int_convertible_type["checksDefault"]:
+    /// - Precondition: The raw value of each element of `defaultValue` must be representable as an `Int`.
+    % end
     % if int_convertible_type["disfavored"]:
     @_disfavoredOverload
     % end
@@ -529,9 +557,13 @@ extension ConfigSnapshotReader {
             forKey: key,
             type: .intArray,
             isSecret: isSecret,
+            % if int_convertible_type["checksDefault"]:
+            default: checkedDefault(defaultValue, key: keyPrefix.appending(key), fileID: fileID, line: line),
+            % else:
             default: defaultValue,
+            % end
             unwrap: { try $0.asIntArray.map { try cast($0, type: Value.self, key: key) } },
-            wrap: { ${int_convertible_type["wrap"]} },
+            wrap: { uncast($0) },
             fileID: fileID,
             line: line
         )
@@ -569,7 +601,7 @@ extension ConfigSnapshotReader {
             type: .intArray,
             isSecret: isSecret,
             unwrap: { try $0.asIntArray.map { try cast($0, type: Value.self, key: key) } },
-            wrap: { ${int_convertible_type["wrap"]} },
+            wrap: { uncast($0) },
             fileID: fileID,
             line: line
         )

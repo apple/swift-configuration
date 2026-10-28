@@ -107,17 +107,19 @@ import Foundation
 ///
 /// ### Automatic type conversion
 ///
-/// The library can automatically convert string or int configuration values to other types using the `as:` parameter.
+/// The library can automatically convert string or integer configuration values to other types using the `as:` parameter.
 /// This works with:
-/// - String-backed enums and enums backed by a fixed-width integer, through `RawRepresentable`.
+/// - String-backed enums and enums backed by a `BinaryInteger`, through `RawRepresentable`.
+///   Integer raw values must be representable as an `Int`, because providers return integer values as `Int`.
 /// - Types that you explicitly conform to ``ExpressibleByConfigString`` or ``ExpressibleByConfigInt``.
+///   These conformances take precedence over a `RawRepresentable` conformance on the same type.
 /// - Built-in types that already conform to ``ExpressibleByConfigString``:
 ///   - `SystemPackage.FilePath` - Converts from file paths.
 ///   - `Foundation.URL` - Converts from URL strings.
 ///   - `Foundation.UUID` - Converts from UUID strings.
 ///   - `Foundation.Date` - Converts from ISO8601 date strings.
 /// - Built-in types that already conform to ``ExpressibleByConfigInt``:
-/// - `Swift.Duration` - Converts from an integer value to a Duration measured in seconds.
+///   - `Swift.Duration` - Converts from an integer value to a duration measured in seconds.
 ///
 /// ```swift
 /// // Built-in type conversion

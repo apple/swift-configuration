@@ -256,6 +256,7 @@ This works with:
 **Custom types:**
 
 - Types that you explicitly conform to ``ExpressibleByConfigString``.
+  These conformances take precedence over a `RawRepresentable` conformance on the same type.
 
 ```swift
 // Built-in type conversion
@@ -305,10 +306,14 @@ This works with:
 
 - Types that conform to `RawRepresentable` with a `BinaryInteger` raw value.
   Conversion is exact, so values outside the raw type's range are rejected.
+  Because providers return integer values as `Int`, raw values must also be representable as an `Int`.
+  Passing a default value with a raw value outside that range, such as a `UInt64` above `Int.max`,
+  triggers a runtime error.
 
 **Custom types:**
 
 - Types that you explicitly conform to ``ExpressibleByConfigInt``.
+  These conformances take precedence over a `RawRepresentable` conformance on the same type.
 
 ```swift
 // Built-in type conversion

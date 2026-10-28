@@ -100,49 +100,6 @@ private func mergingIsSecret(
     )
 }
 
-@available(Configuration 1.0, *)
-extension AccessEvent {
-    /// Creates an access event from a converted value.
-    ///
-    /// Wrapping the converted value back into config content can fail when the value has no
-    /// `ConfigContent` representation, such as a default value of a `UInt64`-backed enum above
-    /// `Int.max`. In that case, the error is reported as the conversion error, and the result
-    /// contains no value.
-    ///
-    /// - Parameters:
-    ///   - metadata: Metadata describing the configuration access operation.
-    ///   - providerResults: The results from each configuration provider that was queried.
-    ///   - conversionError: An error that occurred when converting the raw config value.
-    ///   - convertedResult: The converted value and whether it's secret, or an error.
-    ///   - wrap: A closure to convert the typed value back to configuration content.
-    fileprivate init<Value>(
-        metadata: Metadata,
-        providerResults: [ProviderResult],
-        conversionError: (any Error)?,
-        convertedResult: Result<(Value, Bool)?, any Error>,
-        wrap: (Value) throws -> ConfigContent
-    ) {
-        var conversionError = conversionError
-        let result: Result<ConfigValue?, any Error> = convertedResult.map { value in
-            guard let value else {
-                return nil
-            }
-            do {
-                return ConfigValue(try wrap(value.0), isSecret: value.1)
-            } catch {
-                conversionError = conversionError ?? error
-                return nil
-            }
-        }
-        self.init(
-            metadata: metadata,
-            providerResults: providerResults,
-            conversionError: conversionError,
-            result: result
-        )
-    }
-}
-
 /// Retrieves a configuration value from a provider with full access tracking.
 ///
 /// This is the core implementation function that handles configuration value retrieval,
@@ -179,7 +136,7 @@ internal func valueFromReader<Value>(
     valueClosure: (AbsoluteConfigKey, ConfigType) -> ([AccessEvent.ProviderResult], Result<ConfigValue?, any Error>),
     accessReporter: (any AccessReporter)?,
     unwrap: (ConfigContent) throws -> Value,
-    wrap: (Value) throws -> ConfigContent,
+    wrap: (Value) -> ConfigContent,
     fileID: String,
     line: UInt
 ) -> Value? {
@@ -220,8 +177,7 @@ internal func valueFromReader<Value>(
                 ),
                 providerResults: providerResults,
                 conversionError: conversionError,
-                convertedResult: .success(finalValue),
-                wrap: wrap
+                result: .success(finalValue.flatMap { ConfigValue(wrap($0.0), isSecret: $0.1) })
             )
         )
     }
@@ -254,7 +210,7 @@ internal func valueFromReader<Value>(
     valueClosure: (AbsoluteConfigKey, ConfigType) -> ([AccessEvent.ProviderResult], Result<ConfigValue?, any Error>),
     accessReporter: (any AccessReporter)?,
     unwrap: (ConfigContent) throws -> Value,
-    wrap: (Value) throws -> ConfigContent,
+    wrap: (Value) -> ConfigContent,
     fileID: String,
     line: UInt
 ) -> Value {
@@ -297,8 +253,7 @@ internal func valueFromReader<Value>(
                 ),
                 providerResults: providerResults,
                 conversionError: conversionError,
-                convertedResult: .success(finalValue),
-                wrap: wrap
+                result: .success(ConfigValue(wrap(finalValue.0), isSecret: finalValue.1))
             )
         )
     }
@@ -331,7 +286,7 @@ internal func requiredValueFromReader<Value>(
     valueClosure: (AbsoluteConfigKey, ConfigType) -> ([AccessEvent.ProviderResult], Result<ConfigValue?, any Error>),
     accessReporter: (any AccessReporter)?,
     unwrap: (ConfigContent) throws -> Value,
-    wrap: (Value) throws -> ConfigContent,
+    wrap: (Value) -> ConfigContent,
     fileID: String,
     line: UInt
 ) throws -> Value {
@@ -371,12 +326,66 @@ internal func requiredValueFromReader<Value>(
                 ),
                 providerResults: providerResults,
                 conversionError: conversionError,
-                convertedResult: finalResult.map { $0 },
-                wrap: wrap
+                result: finalResult.map { ConfigValue(wrap($0.0), isSecret: $0.1) }
             )
         )
     }
     return try finalResult.get().0
+}
+
+/// Checks that the raw value of a default value is representable as an `Int`.
+///
+/// Config providers return integer values as `Int`, so the library supports only raw values
+/// representable as an `Int`. Reader methods that take a default value call this function
+/// to report a default outside that range as a programmer error.
+///
+/// - Parameters:
+///   - defaultValue: The default value to check.
+///   - key: The absolute config key, used in the failure message.
+///   - fileID: The file ID where the config access originates, used in the failure message.
+///   - line: The line number where the config access originates, used in the failure message.
+/// - Returns: The unchanged default value.
+/// - Precondition: The raw value of `defaultValue` must be representable as an `Int`.
+@available(Configuration 1.0, *)
+internal func checkedDefault<Value: RawRepresentable>(
+    _ defaultValue: Value,
+    key: AbsoluteConfigKey,
+    fileID: String,
+    line: UInt
+) -> Value where Value.RawValue: BinaryInteger {
+    // Use fatalError rather than precondition, so that release builds include the message.
+    guard Int(exactly: defaultValue.rawValue) != nil else {
+        fatalError(
+            "The default value for config key '\(key)' at \(fileID):\(line) has a raw value outside the range of Int."
+        )
+    }
+    return defaultValue
+}
+
+/// Checks that the raw value of each element of a default array is representable as an `Int`.
+///
+/// Config providers return integer values as `Int`, so the library supports only raw values
+/// representable as an `Int`. Reader methods that take a default array call this function
+/// to report a default outside that range as a programmer error.
+///
+/// - Parameters:
+///   - defaultValues: The default array to check.
+///   - key: The absolute config key, used in the failure message.
+///   - fileID: The file ID where the config access originates, used in the failure message.
+///   - line: The line number where the config access originates, used in the failure message.
+/// - Returns: The unchanged default array.
+/// - Precondition: The raw value of each element of `defaultValues` must be representable as an `Int`.
+@available(Configuration 1.0, *)
+internal func checkedDefault<Value: RawRepresentable>(
+    _ defaultValues: [Value],
+    key: AbsoluteConfigKey,
+    fileID: String,
+    line: UInt
+) -> [Value] where Value.RawValue: BinaryInteger {
+    for defaultValue in defaultValues {
+        _ = checkedDefault(defaultValue, key: key, fileID: fileID, line: line)
+    }
+    return defaultValues
 }
 
 @available(Configuration 1.0, *)
@@ -398,7 +407,7 @@ extension ConfigReader {
         type: ConfigType,
         isSecret: Bool,
         unwrap: (ConfigContent) throws -> Value,
-        wrap: (Value) throws -> ConfigContent,
+        wrap: (Value) -> ConfigContent,
         fileID: String,
         line: UInt
     ) -> Value? {
@@ -434,7 +443,7 @@ extension ConfigReader {
         isSecret: Bool,
         default defaultValue: Value,
         unwrap: (ConfigContent) throws -> Value,
-        wrap: (Value) throws -> ConfigContent,
+        wrap: (Value) -> ConfigContent,
         fileID: String,
         line: UInt
     ) -> Value {
@@ -470,7 +479,7 @@ extension ConfigReader {
         type: ConfigType,
         isSecret: Bool,
         unwrap: (ConfigContent) throws -> Value,
-        wrap: (Value) throws -> ConfigContent,
+        wrap: (Value) -> ConfigContent,
         fileID: String,
         line: UInt
     ) throws -> Value {
@@ -505,7 +514,7 @@ extension ConfigReader {
         type: ConfigType,
         isSecret: Bool,
         unwrap: (ConfigContent) throws -> Value,
-        wrap: (Value) throws -> ConfigContent,
+        wrap: (Value) -> ConfigContent,
         fileID: String,
         line: UInt
     ) async throws -> Value? {
@@ -541,8 +550,11 @@ extension ConfigReader {
                     ),
                     providerResults: providerResults,
                     conversionError: conversionError,
-                    convertedResult: finalResult.map { $0 },
-                    wrap: wrap
+                    result: finalResult.map { success in
+                        success.flatMap {
+                            ConfigValue(wrap($0.0), isSecret: $0.1)
+                        }
+                    }
                 )
             )
         }
@@ -568,7 +580,7 @@ extension ConfigReader {
         isSecret: Bool,
         default defaultValue: Value,
         unwrap: (ConfigContent) throws -> Value,
-        wrap: (Value) throws -> ConfigContent,
+        wrap: (Value) -> ConfigContent,
         fileID: String,
         line: UInt
     ) async throws -> Value {
@@ -602,8 +614,7 @@ extension ConfigReader {
                     ),
                     providerResults: providerResults,
                     conversionError: conversionError,
-                    convertedResult: finalResult.map { $0 },
-                    wrap: wrap
+                    result: finalResult.map { ConfigValue(wrap($0.0), isSecret: $0.1) }
                 )
             )
         }
@@ -627,7 +638,7 @@ extension ConfigReader {
         type: ConfigType,
         isSecret: Bool,
         unwrap: (ConfigContent) throws -> Value,
-        wrap: (Value) throws -> ConfigContent,
+        wrap: (Value) -> ConfigContent,
         fileID: String,
         line: UInt
     ) async throws -> Value {
@@ -661,8 +672,7 @@ extension ConfigReader {
                     ),
                     providerResults: providerResults,
                     conversionError: conversionError,
-                    convertedResult: finalResult.map { $0 },
-                    wrap: wrap
+                    result: finalResult.map { ConfigValue(wrap($0.0), isSecret: $0.1) }
                 )
             )
         }
@@ -687,7 +697,7 @@ extension ConfigReader {
         type: ConfigType,
         isSecret: Bool,
         unwrap: @Sendable @escaping (ConfigContent) throws -> Value,
-        wrap: @Sendable @escaping (Value) throws -> ConfigContent,
+        wrap: @Sendable @escaping (Value) -> ConfigContent,
         fileID: String,
         line: UInt,
         updatesHandler: (ConfigUpdatesAsyncSequence<Value?, Never>) async throws -> Return
@@ -732,8 +742,9 @@ extension ConfigReader {
                                 ),
                                 providerResults: providerResults,
                                 conversionError: conversionError,
-                                convertedResult: .success(finalValue),
-                                wrap: wrap
+                                result: .success(
+                                    finalValue.map { ConfigValue(wrap($0.0), isSecret: $0.1) }
+                                )
                             )
                         )
                     }
@@ -763,7 +774,7 @@ extension ConfigReader {
         isSecret: Bool,
         default defaultValue: Value,
         unwrap: @Sendable @escaping (ConfigContent) throws -> Value,
-        wrap: @Sendable @escaping (Value) throws -> ConfigContent,
+        wrap: @Sendable @escaping (Value) -> ConfigContent,
         fileID: String,
         line: UInt,
         updatesHandler: (ConfigUpdatesAsyncSequence<Value, Never>) async throws -> Return
@@ -810,8 +821,7 @@ extension ConfigReader {
                                 ),
                                 providerResults: providerResults,
                                 conversionError: conversionError,
-                                convertedResult: .success(finalValue),
-                                wrap: wrap
+                                result: .success(ConfigValue(wrap(finalValue.0), isSecret: finalValue.1))
                             )
                         )
                     }
@@ -840,7 +850,7 @@ extension ConfigReader {
         type: ConfigType,
         isSecret: Bool,
         unwrap: @Sendable @escaping (ConfigContent) throws -> Value,
-        wrap: @Sendable @escaping (Value) throws -> ConfigContent,
+        wrap: @Sendable @escaping (Value) -> ConfigContent,
         fileID: String,
         line: UInt,
         updatesHandler: (ConfigUpdatesAsyncSequence<Value, any Error>) async throws -> Return
@@ -885,8 +895,7 @@ extension ConfigReader {
                                 ),
                                 providerResults: providerResults,
                                 conversionError: conversionError,
-                                convertedResult: finalResult.map { $0 },
-                                wrap: wrap
+                                result: finalResult.map { ConfigValue(wrap($0.0), isSecret: $0.1) }
                             )
                         )
                     }
@@ -1005,7 +1014,7 @@ extension ConfigReader {
         _ int: Int,
         type: Value.Type,
         key: ConfigKey
-    ) throws -> Value where Value.RawValue: BinaryInteger {
+    ) throws(ConfigError) -> Value where Value.RawValue: BinaryInteger {
         guard let rawValue = Value.RawValue(exactly: int),
             let typedValue = Value(rawValue: rawValue)
         else {
@@ -1036,42 +1045,27 @@ extension ConfigReader {
 
     /// Converts a raw representable type with an integer raw value into raw config content.
     ///
-    /// - Parameters:
-    ///   - value: The typed value with an integer raw value.
-    ///   - key: The config key for error context.
+    /// Values read from a provider always have a raw value representable as an `Int`,
+    /// and reader methods check default values with `checkedDefault(_:key:fileID:line:)`.
+    ///
+    /// - Parameter value: The typed value with an integer raw value.
     /// - Returns: The wrapped config content as an int.
-    /// - Throws: A `ConfigError` if the raw value can't be represented as an `Int`.
     internal func uncast<Value: RawRepresentable>(
-        _ value: Value,
-        key: ConfigKey
-    ) throws -> ConfigContent where Value.RawValue: BinaryInteger {
-        guard let int = Int(exactly: value.rawValue) else {
-            throw ConfigError.configValueFailedToCast(name: keyPrefix.appending(key).description, type: "Int")
-        }
-        return .int(int)
+        _ value: Value
+    ) -> ConfigContent where Value.RawValue: BinaryInteger {
+        .int(Int(value.rawValue))
     }
 
     /// Converts an array of raw representable types with integer raw values into raw config content.
     ///
-    /// - Parameters:
-    ///   - values: The array of typed values with integer raw values to convert.
-    ///   - key: The config key for error context.
+    /// Values read from a provider always have a raw value representable as an `Int`,
+    /// and reader methods check default values with `checkedDefault(_:key:fileID:line:)`.
+    ///
+    /// - Parameter values: The array of typed values with integer raw values to convert.
     /// - Returns: The wrapped config content as an int array.
-    /// - Throws: A `ConfigError` if a raw value can't be represented as an `Int`.
     internal func uncast<Value: RawRepresentable>(
-        _ values: [Value],
-        key: ConfigKey
-    ) throws -> ConfigContent where Value.RawValue: BinaryInteger {
-        .intArray(
-            try values.map { value in
-                guard let int = Int(exactly: value.rawValue) else {
-                    throw ConfigError.configValueFailedToCast(
-                        name: keyPrefix.appending(key).description,
-                        type: "Int"
-                    )
-                }
-                return int
-            }
-        )
+        _ values: [Value]
+    ) -> ConfigContent where Value.RawValue: BinaryInteger {
+        .intArray(values.map { Int($0.rawValue) })
     }
 }

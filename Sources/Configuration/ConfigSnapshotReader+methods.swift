@@ -1265,6 +1265,7 @@ extension ConfigSnapshotReader {
     ///   - fileID: The file ID where this call originates. Used for access reporting.
     ///   - line: The line number where this call originates. Used for access reporting.
     /// - Returns: The value converted to the expected type if found and convertible, otherwise `nil`.
+    @_disfavoredOverload
     public func string<Value: RawRepresentable<String>>(
         forKey key: ConfigKey,
         as type: Value.Type = Value.self,
@@ -1301,6 +1302,7 @@ extension ConfigSnapshotReader {
     ///   - fileID: The file ID where this call originates. Used for access reporting.
     ///   - line: The line number where this call originates. Used for access reporting.
     /// - Returns: The config value if found and convertible, otherwise the default value.
+    @_disfavoredOverload
     public func string<Value: RawRepresentable<String>>(
         forKey key: ConfigKey,
         as type: Value.Type = Value.self,
@@ -1338,6 +1340,7 @@ extension ConfigSnapshotReader {
     ///   - line: The line number where this call originates. Used for access reporting.
     /// - Returns: The config value converted to the expected type.
     /// - Throws: An error if the value is missing or can't be converted to the expected type.
+    @_disfavoredOverload
     public func requiredString<Value: RawRepresentable<String>>(
         forKey key: ConfigKey,
         as type: Value.Type = Value.self,
@@ -1372,6 +1375,7 @@ extension ConfigSnapshotReader {
     ///   - fileID: The file ID where this call originates. Used for access reporting.
     ///   - line: The line number where this call originates. Used for access reporting.
     /// - Returns: An array of values converted to the expected type if found and convertible, otherwise `nil`.
+    @_disfavoredOverload
     public func stringArray<Value: RawRepresentable<String>>(
         forKey key: ConfigKey,
         as type: Value.Type = Value.self,
@@ -1408,6 +1412,7 @@ extension ConfigSnapshotReader {
     ///   - fileID: The file ID where this call originates. Used for access reporting.
     ///   - line: The line number where this call originates. Used for access reporting.
     /// - Returns: The config array if found and convertible, otherwise the default array.
+    @_disfavoredOverload
     public func stringArray<Value: RawRepresentable<String>>(
         forKey key: ConfigKey,
         as type: Value.Type = Value.self,
@@ -1445,6 +1450,7 @@ extension ConfigSnapshotReader {
     ///   - line: The line number where this call originates. Used for access reporting.
     /// - Returns: The config array converted to the expected type.
     /// - Throws: An error if the value is missing or can't be converted to the expected type.
+    @_disfavoredOverload
     public func requiredStringArray<Value: RawRepresentable<String>>(
         forKey key: ConfigKey,
         as type: Value.Type = Value.self,
@@ -1708,7 +1714,7 @@ extension ConfigSnapshotReader {
             type: .int,
             isSecret: isSecret,
             unwrap: { try cast($0.asInt, type: Value.self, key: key) },
-            wrap: { try uncast($0, key: key) },
+            wrap: { uncast($0) },
             fileID: fileID,
             line: line
         )
@@ -1732,6 +1738,7 @@ extension ConfigSnapshotReader {
     ///   - fileID: The file ID where this call originates. Used for access reporting.
     ///   - line: The line number where this call originates. Used for access reporting.
     /// - Returns: The config value if found and convertible, otherwise the default value.
+    /// - Precondition: The raw value of `defaultValue` must be representable as an `Int`.
     @_disfavoredOverload
     public func int<Value: RawRepresentable>(
         forKey key: ConfigKey,
@@ -1745,9 +1752,9 @@ extension ConfigSnapshotReader {
             forKey: key,
             type: .int,
             isSecret: isSecret,
-            default: defaultValue,
+            default: checkedDefault(defaultValue, key: keyPrefix.appending(key), fileID: fileID, line: line),
             unwrap: { try cast($0.asInt, type: Value.self, key: key) },
-            wrap: { try uncast($0, key: key) },
+            wrap: { uncast($0) },
             fileID: fileID,
             line: line
         )
@@ -1783,7 +1790,7 @@ extension ConfigSnapshotReader {
             type: .int,
             isSecret: isSecret,
             unwrap: { try cast($0.asInt, type: Value.self, key: key) },
-            wrap: { try uncast($0, key: key) },
+            wrap: { uncast($0) },
             fileID: fileID,
             line: line
         )
@@ -1818,7 +1825,7 @@ extension ConfigSnapshotReader {
             type: .intArray,
             isSecret: isSecret,
             unwrap: { try $0.asIntArray.map { try cast($0, type: Value.self, key: key) } },
-            wrap: { try uncast($0, key: key) },
+            wrap: { uncast($0) },
             fileID: fileID,
             line: line
         )
@@ -1842,6 +1849,7 @@ extension ConfigSnapshotReader {
     ///   - fileID: The file ID where this call originates. Used for access reporting.
     ///   - line: The line number where this call originates. Used for access reporting.
     /// - Returns: The config array if found and convertible, otherwise the default array.
+    /// - Precondition: The raw value of each element of `defaultValue` must be representable as an `Int`.
     @_disfavoredOverload
     public func intArray<Value: RawRepresentable>(
         forKey key: ConfigKey,
@@ -1855,9 +1863,9 @@ extension ConfigSnapshotReader {
             forKey: key,
             type: .intArray,
             isSecret: isSecret,
-            default: defaultValue,
+            default: checkedDefault(defaultValue, key: keyPrefix.appending(key), fileID: fileID, line: line),
             unwrap: { try $0.asIntArray.map { try cast($0, type: Value.self, key: key) } },
-            wrap: { try uncast($0, key: key) },
+            wrap: { uncast($0) },
             fileID: fileID,
             line: line
         )
@@ -1893,7 +1901,7 @@ extension ConfigSnapshotReader {
             type: .intArray,
             isSecret: isSecret,
             unwrap: { try $0.asIntArray.map { try cast($0, type: Value.self, key: key) } },
-            wrap: { try uncast($0, key: key) },
+            wrap: { uncast($0) },
             fileID: fileID,
             line: line
         )

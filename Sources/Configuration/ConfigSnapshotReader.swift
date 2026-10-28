@@ -79,15 +79,19 @@ import Synchronization
 ///
 /// ### Automatic type conversion
 ///
-/// String configuration values can be automatically converted to other types using the `as:` parameter.
+/// The library can automatically convert string or integer configuration values to other types using the `as:` parameter.
 /// This works with:
-/// - String-backed enum types, as they conform to `RawRepresentable<String>`.
-/// - Types that you explicitly conform to ``ExpressibleByConfigString``.
+/// - String-backed enums and enums backed by a `BinaryInteger`, through `RawRepresentable`.
+///   Integer raw values must be representable as an `Int`, because providers return integer values as `Int`.
+/// - Types that you explicitly conform to ``ExpressibleByConfigString`` or ``ExpressibleByConfigInt``.
+///   These conformances take precedence over a `RawRepresentable` conformance on the same type.
 /// - Built-in types that already conform to ``ExpressibleByConfigString``:
 ///   - `SystemPackage.FilePath` - Converts from file paths.
 ///   - `Foundation.URL` - Converts from URL strings.
 ///   - `Foundation.UUID` - Converts from UUID strings.
 ///   - `Foundation.Date` - Converts from ISO8601 date strings.
+/// - Built-in types that already conform to ``ExpressibleByConfigInt``:
+///   - `Swift.Duration` - Converts from an integer value to a duration measured in seconds.
 ///
 /// ```swift
 /// // Built-in type conversion
@@ -331,7 +335,7 @@ extension ConfigSnapshotReader {
         type: ConfigType,
         isSecret: Bool,
         unwrap: (ConfigContent) throws -> Value,
-        wrap: (Value) throws -> ConfigContent,
+        wrap: (Value) -> ConfigContent,
         fileID: String,
         line: UInt
     ) -> Value? {
@@ -367,7 +371,7 @@ extension ConfigSnapshotReader {
         isSecret: Bool,
         default defaultValue: Value,
         unwrap: (ConfigContent) throws -> Value,
-        wrap: (Value) throws -> ConfigContent,
+        wrap: (Value) -> ConfigContent,
         fileID: String,
         line: UInt
     ) -> Value {
@@ -403,7 +407,7 @@ extension ConfigSnapshotReader {
         type: ConfigType,
         isSecret: Bool,
         unwrap: (ConfigContent) throws -> Value,
-        wrap: (Value) throws -> ConfigContent,
+        wrap: (Value) -> ConfigContent,
         fileID: String,
         line: UInt
     ) throws -> Value {
@@ -530,7 +534,7 @@ extension ConfigSnapshotReader {
         _ int: Int,
         type: Value.Type,
         key: ConfigKey
-    ) throws -> Value where Value.RawValue: BinaryInteger {
+    ) throws(ConfigError) -> Value where Value.RawValue: BinaryInteger {
         guard let rawValue = Value.RawValue(exactly: int),
             let typedValue = Value.init(rawValue: rawValue)
         else {
@@ -561,42 +565,27 @@ extension ConfigSnapshotReader {
 
     /// Converts a `RawRepresentable` value with an integer raw value to content.
     ///
-    /// - Parameters:
-    ///   - value: The value to convert.
-    ///   - key: The config key for error context.
+    /// Values read from a provider always have a raw value representable as an `Int`,
+    /// and reader methods check default values with `checkedDefault(_:key:fileID:line:)`.
+    ///
+    /// - Parameter value: The value to convert.
     /// - Returns: The config content.
-    /// - Throws: A `ConfigError` if the raw value can't be represented as an `Int`.
     internal func uncast<Value: RawRepresentable>(
-        _ value: Value,
-        key: ConfigKey
-    ) throws -> ConfigContent where Value.RawValue: BinaryInteger {
-        guard let int = Int(exactly: value.rawValue) else {
-            throw ConfigError.configValueFailedToCast(name: keyPrefix.appending(key).description, type: "Int")
-        }
-        return .int(int)
+        _ value: Value
+    ) -> ConfigContent where Value.RawValue: BinaryInteger {
+        .int(Int(value.rawValue))
     }
 
     /// Converts an array of `RawRepresentable` values with integer raw values to content.
     ///
-    /// - Parameters:
-    ///   - values: The values to convert.
-    ///   - key: The config key for error context.
+    /// Values read from a provider always have a raw value representable as an `Int`,
+    /// and reader methods check default values with `checkedDefault(_:key:fileID:line:)`.
+    ///
+    /// - Parameter values: The values to convert.
     /// - Returns: The config content.
-    /// - Throws: A `ConfigError` if a raw value can't be represented as an `Int`.
     internal func uncast<Value: RawRepresentable>(
-        _ values: [Value],
-        key: ConfigKey
-    ) throws -> ConfigContent where Value.RawValue: BinaryInteger {
-        .intArray(
-            try values.map { value in
-                guard let int = Int(exactly: value.rawValue) else {
-                    throw ConfigError.configValueFailedToCast(
-                        name: keyPrefix.appending(key).description,
-                        type: "Int"
-                    )
-                }
-                return int
-            }
-        )
+        _ values: [Value]
+    ) -> ConfigContent where Value.RawValue: BinaryInteger {
+        .intArray(values.map { Int($0.rawValue) })
     }
 }

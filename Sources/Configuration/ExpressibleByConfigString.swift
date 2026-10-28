@@ -28,6 +28,9 @@ public import SystemPackage
 /// > ``ExpressibleByConfigString``, as the same conversions work for types
 /// > that conform to `RawRepresentable` with a `String` raw value automatically.
 ///
+/// If a type conforms to both ``ExpressibleByConfigString`` and `RawRepresentable` with a `String` raw value,
+/// reader methods convert it using ``init(configString:)`` and `description` instead of its raw value.
+///
 /// ## Custom types
 ///
 /// For other custom types, conform to the protocol ``ExpressibleByConfigString`` by providing a failable initializer
