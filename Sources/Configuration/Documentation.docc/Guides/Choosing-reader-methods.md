@@ -256,6 +256,7 @@ This works with:
 **Custom types:**
 
 - Types that you explicitly conform to ``ExpressibleByConfigString``.
+  These conformances take precedence over a `RawRepresentable` conformance on the same type.
 
 ```swift
 // Built-in type conversion
@@ -301,20 +302,25 @@ This works with:
 
 - `Swift.Duration`: Converts from an integer value to a duration measured in seconds.
 
-**Int-backed enums:**
+**Integer-backed enums:**
 
-- Types that conform to `RawRepresentable<Int>`.
+- Types that conform to `RawRepresentable` with a `BinaryInteger` raw value.
+  Conversion is exact, so values outside the raw type's range are rejected.
+  Because providers return integer values as `Int`, raw values must also be representable as an `Int`.
+  Passing a default value with a raw value outside that range, such as a `UInt64` above `Int.max`,
+  triggers a runtime error.
 
 **Custom types:**
 
 - Types that you explicitly conform to ``ExpressibleByConfigInt``.
+  These conformances take precedence over a `RawRepresentable` conformance on the same type.
 
 ```swift
 // Built-in type conversion
 let timeout = config.int(forKey: "api.timeout", as: Duration.self)
 
-// Int-backed enum conversion (RawRepresentable<Int>)
-enum LogLevel: Int {
+// Integer-backed enum conversion
+enum LogLevel: UInt8 {
     case error = 1
     case warning = 2
 }

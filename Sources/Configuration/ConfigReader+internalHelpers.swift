@@ -333,6 +333,61 @@ internal func requiredValueFromReader<Value>(
     return try finalResult.get().0
 }
 
+/// Checks that the raw value of a default value is representable as an `Int`.
+///
+/// Config providers return integer values as `Int`, so the library supports only raw values
+/// representable as an `Int`. Reader methods that take a default value call this function
+/// to report a default outside that range as a programmer error.
+///
+/// - Parameters:
+///   - defaultValue: The default value to check.
+///   - key: The absolute config key, used in the failure message.
+///   - fileID: The file ID where the config access originates, used in the failure message.
+///   - line: The line number where the config access originates, used in the failure message.
+/// - Returns: The unchanged default value.
+/// - Precondition: The raw value of `defaultValue` must be representable as an `Int`.
+@available(Configuration 1.0, *)
+internal func checkedDefault<Value: RawRepresentable>(
+    _ defaultValue: Value,
+    key: AbsoluteConfigKey,
+    fileID: String,
+    line: UInt
+) -> Value where Value.RawValue: BinaryInteger {
+    // Use fatalError rather than precondition, so that release builds include the message.
+    guard Int(exactly: defaultValue.rawValue) != nil else {
+        fatalError(
+            "The default value for config key '\(key)' at \(fileID):\(line) has a raw value outside the range of Int."
+        )
+    }
+    return defaultValue
+}
+
+/// Checks that the raw value of each element of a default array is representable as an `Int`.
+///
+/// Config providers return integer values as `Int`, so the library supports only raw values
+/// representable as an `Int`. Reader methods that take a default array call this function
+/// to report a default outside that range as a programmer error.
+///
+/// - Parameters:
+///   - defaultValues: The default array to check.
+///   - key: The absolute config key, used in the failure message.
+///   - fileID: The file ID where the config access originates, used in the failure message.
+///   - line: The line number where the config access originates, used in the failure message.
+/// - Returns: The unchanged default array.
+/// - Precondition: The raw value of each element of `defaultValues` must be representable as an `Int`.
+@available(Configuration 1.0, *)
+internal func checkedDefault<Value: RawRepresentable>(
+    _ defaultValues: [Value],
+    key: AbsoluteConfigKey,
+    fileID: String,
+    line: UInt
+) -> [Value] where Value.RawValue: BinaryInteger {
+    for defaultValue in defaultValues {
+        _ = checkedDefault(defaultValue, key: key, fileID: fileID, line: line)
+    }
+    return defaultValues
+}
+
 @available(Configuration 1.0, *)
 extension ConfigReader {
 
@@ -947,7 +1002,7 @@ extension ConfigReader {
         return typedValue
     }
 
-    /// Casts an integer into a raw representable type.
+    /// Casts an integer into a raw representable type with an integer raw value.
     ///
     /// - Parameters:
     ///   - int: The integer to cast.
@@ -955,12 +1010,14 @@ extension ConfigReader {
     ///   - key: The config key for error context.
     /// - Throws: A `ConfigError` if conversion fails.
     /// - Returns: The typed value.
-    internal func cast<Value: RawRepresentable<Int>>(
+    internal func cast<Value: RawRepresentable>(
         _ int: Int,
         type: Value.Type,
         key: ConfigKey
-    ) throws -> Value {
-        guard let typedValue = Value(rawValue: int) else {
+    ) throws(ConfigError) -> Value where Value.RawValue: BinaryInteger {
+        guard let rawValue = Value.RawValue(exactly: int),
+            let typedValue = Value(rawValue: rawValue)
+        else {
             throw ConfigError.configValueFailedToCast(name: keyPrefix.appending(key).description, type: "\(type)")
         }
         return typedValue
@@ -986,23 +1043,29 @@ extension ConfigReader {
         .intArray(values.map(\.configInt))
     }
 
-    /// Converts a raw representable type into raw config content.
+    /// Converts a raw representable type with an integer raw value into raw config content.
     ///
-    /// - Parameter value: The typed value with an int raw value.
+    /// Values read from a provider always have a raw value representable as an `Int`,
+    /// and reader methods check default values with `checkedDefault(_:key:fileID:line:)`.
+    ///
+    /// - Parameter value: The typed value with an integer raw value.
     /// - Returns: The wrapped config content as an int.
-    internal func uncast<Value: RawRepresentable<Int>>(
+    internal func uncast<Value: RawRepresentable>(
         _ value: Value
-    ) -> ConfigContent {
-        .int(value.rawValue)
+    ) -> ConfigContent where Value.RawValue: BinaryInteger {
+        .int(Int(value.rawValue))
     }
 
-    /// Converts an array of raw representable types into raw config content.
+    /// Converts an array of raw representable types with integer raw values into raw config content.
     ///
-    /// - Parameter values: The array of typed values with int raw values to convert.
+    /// Values read from a provider always have a raw value representable as an `Int`,
+    /// and reader methods check default values with `checkedDefault(_:key:fileID:line:)`.
+    ///
+    /// - Parameter values: The array of typed values with integer raw values to convert.
     /// - Returns: The wrapped config content as an int array.
-    internal func uncast<Value: RawRepresentable<Int>>(
+    internal func uncast<Value: RawRepresentable>(
         _ values: [Value]
-    ) -> ConfigContent {
-        .intArray(values.map(\.rawValue))
+    ) -> ConfigContent where Value.RawValue: BinaryInteger {
+        .intArray(values.map { Int($0.rawValue) })
     }
 }

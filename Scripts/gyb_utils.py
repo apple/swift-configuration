@@ -40,11 +40,13 @@ def lower_first(s):
 string_convertible_types = [
     {
         "protocol": "ExpressibleByConfigString",
+        "disfavored": False,
         "testType": "TestStringConvertible",
         "testSuffix": "StringConvertible"
     },
     {
         "protocol": "RawRepresentable<String>",
+        "disfavored": True,
         "testType": "TestEnum",
         "testSuffix": "StringEnum"
     },
@@ -53,12 +55,30 @@ string_convertible_types = [
 int_convertible_types = [
     {
         "protocol": "ExpressibleByConfigInt",
+        "whereClause": "",
+        "disfavored": False,
+        "checksDefault": False
+    },
+    {
+        "protocol": "RawRepresentable",
+        "whereClause": " where Value.RawValue: BinaryInteger",
+        "disfavored": True,
+        "checksDefault": True
+    },
+]
+
+int_convertible_test_types = [
+    {
         "testType": "TestIntConvertible",
         "testSuffix": "IntConvertible"
     },
     {
-        "protocol": "RawRepresentable<Int>",
         "testType": "TestIntEnum",
         "testSuffix": "IntEnum"
+    },
+    {
+        "testType": "TestUInt8Enum",
+        "testSuffix": "UInt8Enum",
+        "lowerTestSuffix": "uint8Enum"
     },
 ]

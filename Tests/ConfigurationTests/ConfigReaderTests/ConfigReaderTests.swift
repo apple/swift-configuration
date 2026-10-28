@@ -63,6 +63,42 @@ struct ConfigReaderTests {
         )
     }
 
+    /// A type whose config string differs from its raw value, to tell which overload was used.
+    enum DualStringEnum: String, ExpressibleByConfigString, Equatable {
+        case one
+        case two
+
+        init?(configString: String) {
+            self.init(rawValue: configString.lowercased())
+        }
+
+        var description: String { rawValue.uppercased() }
+    }
+
+    @available(Configuration 1.0, *)
+    @Test func expressibleByConfigStringIsPreferred() async throws {
+        let accessReporter = TestAccessReporter()
+        let config = ConfigReader(
+            provider: InMemoryProvider(
+                values: [
+                    "scalar": ConfigValue("TWO", isSecret: false),
+                    "array": ConfigValue(["ONE", "TWO"], isSecret: false),
+                ]
+            ),
+            accessReporter: accessReporter
+        )
+
+        #expect(config.string(forKey: "scalar", as: DualStringEnum.self) == .two)
+        #expect(try config.requiredString(forKey: "scalar", as: DualStringEnum.self) == .two)
+        #expect(config.stringArray(forKey: "array", as: DualStringEnum.self) == [.one, .two])
+        #expect(try await config.fetchString(forKey: "scalar", as: DualStringEnum.self) == .two)
+        #expect(config.snapshot().string(forKey: "scalar", as: DualStringEnum.self) == .two)
+
+        // The default is returned either way, but only the preferred overload reports it as its config string.
+        #expect(config.string(forKey: "missing", as: DualStringEnum.self, default: .one) == .one)
+        #expect(try accessReporter.events.last?.result.get()?.content == .string("ONE"))
+    }
+
     enum TestEnum: String, Equatable {
         case one
         case two
@@ -90,6 +126,11 @@ struct ConfigReaderTests {
     }
 
     enum TestIntEnum: Int, Equatable {
+        case zero
+        case one
+    }
+
+    enum TestUInt8Enum: UInt8, Equatable {
         case zero
         case one
     }
@@ -142,10 +183,14 @@ struct ConfigReaderTests {
         static var otherStringConvertibleArray: [TestStringConvertible] { [.hello, .world, .hello] }
         static var intEnum: TestIntEnum { .zero }
         static var otherIntEnum: TestIntEnum { .one }
+        static var uint8Enum: TestUInt8Enum { .zero }
+        static var otherUInt8Enum: TestUInt8Enum { .one }
         static var intConvertible: TestIntConvertible { .zero }
         static var otherIntConvertible: TestIntConvertible { .zero }
         static var intEnumArray: [TestIntEnum] { [.zero, .one] }
         static var otherIntEnumArray: [TestIntEnum] { [.zero, .one, .zero] }
+        static var uint8EnumArray: [TestUInt8Enum] { [.zero, .one] }
+        static var otherUInt8EnumArray: [TestUInt8Enum] { [.zero, .one, .zero] }
         static var intConvertibleArray: [TestIntConvertible] { [.zero, .one] }
         static var otherIntConvertibleArray: [TestIntConvertible] { [.zero, .one, .zero] }
     }
@@ -171,8 +216,12 @@ struct ConfigReaderTests {
                 ConfigValue(Defaults.stringConvertibleArray.map(\.description), isSecret: false)
             ),
             "intEnum": .success(ConfigValue(Defaults.intEnum.rawValue, isSecret: false)),
+            "uint8Enum": .success(ConfigValue(Int(Defaults.uint8Enum.rawValue), isSecret: false)),
             "intConvertible": .success(ConfigValue(Defaults.intConvertible.configInt, isSecret: false)),
             "intEnumArray": .success(ConfigValue(Defaults.intEnumArray.map(\.rawValue), isSecret: false)),
+            "uint8EnumArray": .success(
+                ConfigValue(Defaults.uint8EnumArray.map { Int($0.rawValue) }, isSecret: false)
+            ),
             "intConvertibleArray": .success(
                 ConfigValue(Defaults.intConvertibleArray.map(\.configInt), isSecret: false)
             ),

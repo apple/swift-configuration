@@ -19,7 +19,12 @@
 ///
 /// > Tip: If your type is an integer-based enum, you don't need to explicitly conform it to
 /// > ``ExpressibleByConfigInt``, as the same conversions work for types
-/// > that conform to `RawRepresentable` with an `Int` raw value automatically.
+/// > that conform to `RawRepresentable` with a `BinaryInteger` raw value automatically.
+/// > Conversion is exact, so configuration values outside the raw type's range aren't accepted.
+/// > Because providers return integer values as `Int`, raw values must also be representable as an `Int`.
+///
+/// If a type conforms to both ``ExpressibleByConfigInt`` and `RawRepresentable` with a `BinaryInteger` raw value,
+/// reader methods convert it using ``init(configInt:)`` and ``configInt`` instead of its raw value.
 ///
 /// ## Custom types
 ///
