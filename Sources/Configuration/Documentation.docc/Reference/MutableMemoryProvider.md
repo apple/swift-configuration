@@ -9,3 +9,5 @@
 ### Updating values in a mutable in-memory provider
 
 - ``setValue(_:forKey:)``
+- ``setValues(_:)``
+- ``withValues(_:)``
