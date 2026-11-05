@@ -109,6 +109,44 @@ provider.setValue("debug", forKey: "logging.level")
 provider.setValue("info", forKey: "logging.level") 
 ```
 
+#### Updating multiple values at once
+
+To change several values in one step, use ``MutableInMemoryProvider/setValues(_:)``:
+
+```swift
+provider.setValues([
+    "database.host": "db-a.example.com",
+    "database.port": 5433,
+    "database.timeout": nil, // Removes the value
+])
+```
+
+Keys you don't include keep their current values. If you build the dictionary in code, assign `.some(nil)` to remove a value, because assigning `nil` with the subscript removes the key from the dictionary instead:
+
+```swift
+var updates: [AbsoluteConfigKey: ConfigValue?] = [:]
+updates["database.port"] = 5433
+
+// Don't: this removes the key from `updates`, so the provider keeps the current value.
+updates["database.timeout"] = nil
+
+// Do: this keeps the key with a `nil` value, so the provider removes the value.
+updates["database.timeout"] = .some(nil)
+
+provider.setValues(updates)
+```
+
+To read values and update them in the same step, use ``MutableInMemoryProvider/withValues(_:)``:
+
+```swift
+provider.withValues { values in
+    if values["database.host"] == "db-a.example.com" {
+        values["database.host"] = "db-b.example.com"
+        values["database.port"] = 6432
+    }
+}
+```
+
 #### Watching for changes
 
 Use the provider's async sequence to watch for configuration changes:
@@ -172,10 +210,9 @@ Use ``MutableInMemoryProvider`` to bridge configuration from other systems:
 class ConfigurationBridge {
     private let provider = MutableInMemoryProvider()
     
-    func updateFromExternalSystem(_ values: [String: ConfigValue]) {
-        for (key, value) in values {
-            provider.setValue(value, forKey: key)
-        }
+    // The external system sends its full configuration, so replace all values.
+    func updateFromExternalSystem(_ values: [AbsoluteConfigKey: ConfigValue]) {
+        provider.withValues { $0 = values }
     }
 }
 ```

@@ -521,7 +521,7 @@ public final class ReloadingFileProvider<Snapshot: FileConfigSnapshot>: Sendable
                     metrics.fileSize.record(newFileSize)
                     metrics.watcherCount.record(storage.totalWatcherCount)
 
-                    // Collect watchers to potentially notify outside the lock
+                    // Collect watchers to potentially notify
                     let valueWatchers = storage.valueWatchers.compactMap {
                         (key, watchers) -> (
                             AbsoluteConfigKey,
@@ -552,6 +552,17 @@ public final class ReloadingFileProvider<Snapshot: FileConfigSnapshot>: Sendable
                     }
 
                     let snapshotWatchers = (newSnapshot, Array(storage.snapshotWatchers.values))
+
+                    // Notify watchers while holding the lock, so they receive changes in the order
+                    // they were made
+                    for (_, valueUpdate, watchers) in valueWatchers {
+                        for watcher in watchers {
+                            watcher.yield(valueUpdate)
+                        }
+                    }
+                    for watcher in snapshotWatchers.1 {
+                        watcher.yield(snapshotWatchers.0)
+                    }
                     return (valueWatchers, snapshotWatchers)
                 })
         else {
@@ -559,23 +570,10 @@ public final class ReloadingFileProvider<Snapshot: FileConfigSnapshot>: Sendable
             return
         }
 
-        // Notify watchers outside the lock
         let totalWatchers = valueWatchersToNotify.map { $0.2.count }.reduce(0, +) + snapshotWatchersToNotify.1.count
         guard totalWatchers > 0 else {
             logger.debug("No watchers to notify")
             return
-        }
-
-        // Notify value watchers
-        for (_, valueUpdate, watchers) in valueWatchersToNotify {
-            for watcher in watchers {
-                watcher.yield(valueUpdate)
-            }
-        }
-
-        // Notify snapshot watchers
-        for watcher in snapshotWatchersToNotify.1 {
-            watcher.yield(snapshotWatchersToNotify.0)
         }
 
         logger.debug(
@@ -661,23 +659,29 @@ extension ReloadingFileProvider: ConfigProvider {
             .makeStream(bufferingPolicy: .bufferingNewest(1))
         let id = UUID()
 
-        // Add watcher and get initial value
-        let initialValue: Result<LookupResult, any Error> = storage.withLock { storage in
+        // Add watcher and send initial value while holding the lock, so a reload can't send
+        // a newer value first
+        storage.withLock { storage in
             storage.valueWatchers[key, default: [:]][id] = continuation
             metrics.watcherCount.record(storage.totalWatcherCount)
-            return .init {
-                try storage.snapshot.value(forKey: key, type: type)
-            }
+            continuation.yield(
+                Result {
+                    try storage.snapshot.value(forKey: key, type: type)
+                }
+            )
         }
         defer {
             storage.withLock { storage in
-                storage.valueWatchers[key, default: [:]][id] = nil
+                storage.valueWatchers[key]?[id] = nil
+                // Drop the key once its last watcher is gone, so that the watchers don't keep
+                // growing with every key ever watched
+                if storage.valueWatchers[key]?.isEmpty == true {
+                    storage.valueWatchers[key] = nil
+                }
                 metrics.watcherCount.record(storage.totalWatcherCount)
             }
         }
 
-        // Send initial value
-        continuation.yield(initialValue)
         return try await updatesHandler(.init(stream))
     }
 
@@ -693,11 +697,12 @@ extension ReloadingFileProvider: ConfigProvider {
         let (stream, continuation) = AsyncStream<AnySnapshot>.makeStream(bufferingPolicy: .bufferingNewest(1))
         let id = UUID()
 
-        // Add watcher and get initial snapshot
-        let initialSnapshot = storage.withLock { storage in
+        // Add watcher and send initial snapshot while holding the lock, so a reload can't send
+        // a newer snapshot first
+        storage.withLock { storage in
             storage.snapshotWatchers[id] = continuation
             metrics.watcherCount.record(storage.totalWatcherCount)
-            return storage.snapshot
+            continuation.yield(storage.snapshot)
         }
         defer {
             // Clean up watcher
@@ -707,8 +712,6 @@ extension ReloadingFileProvider: ConfigProvider {
             }
         }
 
-        // Send initial snapshot
-        continuation.yield(initialSnapshot)
         return try await updatesHandler(.init(stream.map { $0 }))
     }
 }

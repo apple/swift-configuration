@@ -123,7 +123,7 @@ extension KeyMappingProvider: ConfigProvider {
                 ConfigUpdatesAsyncSequence(
                     sequence
                         .map { snapshot in
-                            MappedKeySnapshot(mapKey: self.mapKey, upstream: self.upstream.snapshot())
+                            MappedKeySnapshot(mapKey: self.mapKey, upstream: snapshot)
                         }
                 )
             )
