@@ -285,7 +285,8 @@ public final class RemoteConfigProvider: ConfigProvider {
     private func refreshCache() async throws {
         // 1. Call fetchChangedSnapshot with the current etag.
         // 2a. If unchanged, return.
-        // 2b. If fetchChangedSnapshot returns a changed snapshot, notify all active watchers.
+        // 2b. If fetchChangedSnapshot returns a changed snapshot, store it and notify all active
+        //     watchers while holding the lock, so they receive changes in the order they were made.
     }
 
     public func value(forKey key: AbsoluteConfigKey, type: ConfigType) throws -> LookupResult {
@@ -307,10 +308,11 @@ public final class RemoteConfigProvider: ConfigProvider {
             .makeStream(bufferingPolicy: .bufferingNewest(1))
         let id = UUID()
         
-        // Register the watcher and get the initial value.
-        let initialValue: Result<LookupResult, any Error> = storage.withLock { storage in
+        // Register the watcher and emit the initial value while holding the lock,
+        // so a refresh can't emit a newer value first.
+        storage.withLock { storage in
             storage.valueWatchers[key, default: [:]][id] = continuation
-            return Result { try lookupValue(key, type: type, in: storage.values) }
+            continuation.yield(Result { try lookupValue(key, type: type, in: storage.values) })
         }
         
         // Clean up when the handler completes.
@@ -320,8 +322,6 @@ public final class RemoteConfigProvider: ConfigProvider {
             }
         }
         
-        // Emit the initial value immediately.
-        continuation.yield(initialValue)
         return try await updatesHandler(ConfigUpdatesAsyncSequence(stream))
     }
 

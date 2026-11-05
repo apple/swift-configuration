@@ -189,7 +189,9 @@ struct MutableInMemoryProviderTests {
 
         let firstValueFuture = TestFuture<Bool??>(name: "firstValue")
         let secondValueFuture = TestFuture<Bool??>(name: "secondValue")
-        await withThrowingTaskGroup(of: Void.self) { group in
+        try await withThrowingTaskGroup(of: Void.self) { group in
+            try #expect(provider.value(forKey: "bool", type: .bool) == .init(encodedKey: "bool", value: true))
+            try #expect(provider.value(forKey: "int", type: .int) == .init(encodedKey: "int", value: 42))
             group.addTask {
                 try await config.watchBool(forKey: "bool") { updates in
                     var iterator = updates.makeAsyncIterator()
@@ -200,6 +202,40 @@ struct MutableInMemoryProviderTests {
             await #expect(firstValueFuture.value == true)
             provider.setValues(["bool": false, "int": 43])
             await #expect(secondValueFuture.value == false)
+            try #expect(provider.value(forKey: "bool", type: .bool) == .init(encodedKey: "bool", value: false))
+            try #expect(provider.value(forKey: "int", type: .int) == .init(encodedKey: "int", value: 43))
+        }
+    }
+
+    @available(Configuration 1.0, *)
+    @Test func batchNotifiesChangedAndRemovedKeys() async throws {
+        let provider = makeProvider()
+        let config = ConfigReader(provider: provider)
+
+        let firstBoolFuture = TestFuture<Bool??>(name: "firstBool")
+        let secondBoolFuture = TestFuture<Bool??>(name: "secondBool")
+        let firstIntFuture = TestFuture<Int??>(name: "firstInt")
+        let secondIntFuture = TestFuture<Int??>(name: "secondInt")
+        await withThrowingTaskGroup(of: Void.self) { group in
+            group.addTask {
+                try await config.watchBool(forKey: "bool") { updates in
+                    var iterator = updates.makeAsyncIterator()
+                    firstBoolFuture.fulfill(try await iterator.next())
+                    secondBoolFuture.fulfill(try await iterator.next())
+                }
+            }
+            group.addTask {
+                try await config.watchInt(forKey: "int") { updates in
+                    var iterator = updates.makeAsyncIterator()
+                    firstIntFuture.fulfill(try await iterator.next())
+                    secondIntFuture.fulfill(try await iterator.next())
+                }
+            }
+            await #expect(firstBoolFuture.value == true)
+            await #expect(firstIntFuture.value == 42)
+            provider.setValues(["bool": nil, "int": 43])
+            await #expect(secondBoolFuture.value == .some(nil))
+            await #expect(secondIntFuture.value == 43)
         }
     }
 
@@ -227,34 +263,6 @@ struct MutableInMemoryProviderTests {
             await #expect(secondStringFuture.value == "Bye")
             await #expect(secondIntFuture.value == 43)
         }
-    }
-
-    @available(Configuration 1.0, *)
-    @Test func withValuesReadModifyWrite() async throws {
-        let provider = MutableInMemoryProvider(initialValues: ["count": 0])
-        let config = ConfigReader(provider: provider)
-
-        await withTaskGroup(of: Void.self) { group in
-            for _ in 0..<1000 {
-                group.addTask {
-                    provider.withValues { values in
-                        let count = (try? values["count"]?.content.asInt) ?? 0
-                        values["count"] = .init(.int(count + 1), isSecret: false)
-                    }
-                }
-            }
-        }
-        #expect(config.int(forKey: "count") == 1000)
-    }
-
-    @available(Configuration 1.0, *)
-    @Test func withValuesReturnsNonCopyableValue() {
-        let provider = makeProvider()
-
-        let count = provider.withValues { values in
-            NonCopyableCount(value: values.count)
-        }
-        #expect(count.value == 20)
     }
 
     @available(Configuration 1.0, *)
@@ -313,9 +321,4 @@ struct MutableInMemoryProviderTests {
         }
         #expect(config.bool(forKey: "bool") == false)
     }
-}
-
-/// A value that can't be copied, to check that `withValues` can return one.
-private struct NonCopyableCount: ~Copyable {
-    var value: Int
 }

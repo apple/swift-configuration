@@ -89,7 +89,7 @@ The ``MutableInMemoryProvider`` allows you to modify configuration values at run
 #### Basic usage
 
 ```swift
-let provider = MutableInMemoryProvider(initialValues: [:])
+let provider = MutableInMemoryProvider()
 provider.setValue("localhost", forKey: "database.host")
 provider.setValue(5432, forKey: "database.port")
 
@@ -117,10 +117,26 @@ To change several values in one step, use ``MutableInMemoryProvider/setValues(_:
 provider.setValues([
     "database.host": "db-a.example.com",
     "database.port": 5433,
+    "database.timeout": nil, // Removes the value
 ])
 ```
 
-To read values and update them in the same step, use ``MutableInMemoryProvider/withValues(_:)``. The closure runs while the provider is locked, so read the values it receives rather than calling the provider:
+Keys you don't include keep their current values. If you build the dictionary in code, assign `.some(nil)` to remove a value, because assigning `nil` with the subscript removes the key from the dictionary instead:
+
+```swift
+var updates: [AbsoluteConfigKey: ConfigValue?] = [:]
+updates["database.port"] = 5433
+
+// Don't: this removes the key from `updates`, so the provider keeps the current value.
+updates["database.timeout"] = nil
+
+// Do: this keeps the key with a `nil` value, so the provider removes the value.
+updates["database.timeout"] = .some(nil)
+
+provider.setValues(updates)
+```
+
+To read values and update them in the same step, use ``MutableInMemoryProvider/withValues(_:)``:
 
 ```swift
 provider.withValues { values in
@@ -130,8 +146,6 @@ provider.withValues { values in
     }
 }
 ```
-
-To see related values change together, read them from one snapshot, or watch snapshots.
 
 #### Watching for changes
 
@@ -194,7 +208,7 @@ Use ``MutableInMemoryProvider`` to bridge configuration from other systems:
 
 ```swift
 class ConfigurationBridge {
-    private let provider = MutableInMemoryProvider(initialValues: [:])
+    private let provider = MutableInMemoryProvider()
     
     // The external system sends its full configuration, so replace all values.
     func updateFromExternalSystem(_ values: [AbsoluteConfigKey: ConfigValue]) {

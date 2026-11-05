@@ -132,6 +132,35 @@ struct KeyMappingProviderTests {
     }
 
     @available(Configuration 1.0, *)
+    @Test func watchSnapshotMapsReceivedSnapshot() async throws {
+        // The upstream's current snapshot differs from the one it emits, so the test can tell
+        // which one the mapper used.
+        let upstream = DivergingSnapshotProvider(
+            watchedValues: InMemoryProvider(values: ["app.foo": "watched"]),
+            currentValues: InMemoryProvider(values: ["app.foo": "current"])
+        )
+        let mapper = KeyMappingProvider(upstream: upstream) { key in
+            switch key {
+            case ["foo"]:
+                return ["app", "foo"]
+            default:
+                return key
+            }
+        }
+
+        var receivedSnapshots: [any ConfigSnapshot] = []
+        try await mapper.watchSnapshot { sequence in
+            for try await snapshot in sequence {
+                receivedSnapshots.append(snapshot)
+                break
+            }
+        }
+        #expect(receivedSnapshots.count == 1)
+        let result = try receivedSnapshots[0].value(forKey: ["foo"], type: .string)
+        #expect(try result.value?.content.asString == "watched")
+    }
+
+    @available(Configuration 1.0, *)
     @Test func providerName() {
         let upstream = InMemoryProvider(name: "test-upstream", values: [:])
         let mapper = KeyMappingProvider(upstream: upstream) { key in key }
@@ -179,5 +208,46 @@ struct KeyMappingProviderTests {
         // Use a passtrhough mapper so the compat test can find the expected values
         let mapper = KeyMappingProvider(upstream: upstream) { $0 }
         try await ProviderCompatTest(provider: mapper).runTest()
+    }
+}
+
+/// An upstream provider whose watched snapshot differs from its current snapshot.
+@available(Configuration 1.0, *)
+private struct DivergingSnapshotProvider: ConfigProvider {
+
+    /// The provider whose snapshot `watchSnapshot` emits.
+    var watchedValues: InMemoryProvider
+
+    /// The provider that answers every other call, including `snapshot()`.
+    var currentValues: InMemoryProvider
+
+    var providerName: String { "DivergingSnapshotProvider" }
+
+    func value(forKey key: AbsoluteConfigKey, type: ConfigType) throws -> LookupResult {
+        try currentValues.value(forKey: key, type: type)
+    }
+
+    func fetchValue(forKey key: AbsoluteConfigKey, type: ConfigType) async throws -> LookupResult {
+        try await currentValues.fetchValue(forKey: key, type: type)
+    }
+
+    func watchValue<Return: ~Copyable>(
+        forKey key: AbsoluteConfigKey,
+        type: ConfigType,
+        updatesHandler: (
+            _ updates: ConfigUpdatesAsyncSequence<Result<LookupResult, any Error>, Never>
+        ) async throws -> Return
+    ) async throws -> Return {
+        try await currentValues.watchValue(forKey: key, type: type, updatesHandler: updatesHandler)
+    }
+
+    func snapshot() -> any ConfigSnapshot {
+        currentValues.snapshot()
+    }
+
+    func watchSnapshot<Return: ~Copyable>(
+        updatesHandler: (_ updates: ConfigUpdatesAsyncSequence<any ConfigSnapshot, Never>) async throws -> Return
+    ) async throws -> Return {
+        try await watchedValues.watchSnapshot(updatesHandler: updatesHandler)
     }
 }

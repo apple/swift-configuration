@@ -128,7 +128,7 @@ public final class MutableInMemoryProvider: Sendable {
     ///   - initialValues: A dictionary mapping absolute configuration keys to their initial values.
     public init(
         name: String? = nil,
-        initialValues: [AbsoluteConfigKey: ConfigValue]
+        initialValues: [AbsoluteConfigKey: ConfigValue] = [:]
     ) {
         self.name = name
         self.storage = .init(
@@ -149,12 +149,12 @@ extension MutableInMemoryProvider {
 
     /// Updates the stored value for the specified configuration key.
     ///
-    /// This method atomically updates the value and notifies all active watchers
+    /// This method atomically updates the value, then notifies all active watchers
     /// of the change. If the new value is the same as the existing value, no
     /// notification is sent.
     ///
     /// ```swift
-    /// let provider = MutableInMemoryProvider(initialValues: [:])
+    /// let provider = MutableInMemoryProvider()
     /// let key = AbsoluteConfigKey(["api", "enabled"], context: [:])
     ///
     /// // Set a new value
@@ -168,28 +168,20 @@ extension MutableInMemoryProvider {
     ///   - value: The new configuration value, or `nil` to remove the value entirely.
     ///   - key: The absolute configuration key to update.
     public func setValue(_ value: ConfigValue?, forKey key: AbsoluteConfigKey) {
-        var valueContinuationsToNotify: [UUID: AsyncStream<ConfigValue?>.Continuation]?
-        var snapshotContinuationsToNotify: ([UUID: AsyncStream<Snapshot>.Continuation], Snapshot)?
         storage.withLock { storage in
             let oldValue = storage.snapshot.values[key]
             guard oldValue != value else {
                 return
             }
             storage.snapshot.values[key] = value
-            valueContinuationsToNotify = storage.valueWatchers[key]
-            let snapshotWatchers = storage.snapshotWatchers
-            if !snapshotWatchers.isEmpty {
-                snapshotContinuationsToNotify = (snapshotWatchers, storage.snapshot)
+            // Notify watchers while holding the lock, so they receive changes in the order they were made.
+            if let valueContinuations = storage.valueWatchers[key] {
+                for (_, continuation) in valueContinuations {
+                    continuation.yield(value)
+                }
             }
-        }
-        if let valueContinuationsToNotify {
-            for (_, continuation) in valueContinuationsToNotify {
-                continuation.yield(value)
-            }
-        }
-        if let (continuations, snapshot) = snapshotContinuationsToNotify {
-            for (_, continuation) in continuations {
-                continuation.yield(snapshot)
+            for (_, continuation) in storage.snapshotWatchers {
+                continuation.yield(storage.snapshot)
             }
         }
     }
@@ -200,24 +192,71 @@ extension MutableInMemoryProvider {
     /// of the updates without the others. Watchers of a changed key receive its new value
     /// once. If any value changed, snapshot watchers receive one snapshot that contains all
     /// the updates. If a new value is the same as the existing value, no notification is
-    /// sent for that key. Keys not included in `values` keep their current values.
+    /// sent for that key.
+    ///
+    /// Keys not included in `values` keep their current values.
     ///
     /// ```swift
-    /// let provider = MutableInMemoryProvider(initialValues: [:])
+    /// let provider = MutableInMemoryProvider(initialValues: [
+    ///     "database.timeout": 15,
+    ///     "database.replicationStrategy": "sameRegion"
+    /// ])
     ///
     /// provider.setValues([
     ///     "database.host": "db-a.example.com",
     ///     "database.port": 5433,
     ///     "database.timeout": nil, // Removes the value
     /// ])
+    ///
+    /// // Values are now:
+    /// // "database.host": "db-a.example.com",
+    /// // "database.port": 5433,
+    /// // "database.replicationStrategy": "sameRegion"
     /// ```
+    ///
+    /// If you build `values` in code, assigning `nil` with the subscript removes the key from
+    /// the dictionary, so the provider keeps that key's current value. To remove a value, assign
+    /// `.some(nil)` instead:
+    ///
+    /// ```swift
+    /// var updates: [AbsoluteConfigKey: ConfigValue?] = [:]
+    /// updates["database.port"] = 5433
+    ///
+    /// // Don't: this removes the key from `updates`, so the provider keeps the current value.
+    /// updates["database.timeout"] = nil
+    ///
+    /// // Do: this keeps the key with a `nil` value, so the provider removes the value.
+    /// updates["database.timeout"] = .some(nil)
+    ///
+    /// provider.setValues(updates)
+    /// ```
+    ///
+    /// Alternatively, make the changes in ``withValues(_:)``, where assigning `nil` removes the value.
     ///
     /// - Parameter values: A dictionary that maps configuration keys to their new values,
     ///   or to `nil` to remove a value entirely.
     public func setValues(_ values: [AbsoluteConfigKey: ConfigValue?]) {
-        withValues { storedValues in
-            for (key, value) in values {
-                storedValues[key] = value
+        storage.withLock { storage in
+            // Only touch the keys in `values`, and skip the ones that don't change, so the cost
+            // depends on the number of updates rather than on the number of stored values.
+            var changedValues: [(AbsoluteConfigKey, ConfigValue?)] = []
+            for (key, value) in values where storage.snapshot.values[key] != value {
+                storage.snapshot.values[key] = value
+                changedValues.append((key, value))
+            }
+            guard !changedValues.isEmpty else {
+                return
+            }
+            // Notify watchers while holding the lock, so they receive changes in the order they were made.
+            for (key, value) in changedValues {
+                if let valueContinuations = storage.valueWatchers[key] {
+                    for (_, continuation) in valueContinuations {
+                        continuation.yield(value)
+                    }
+                }
+            }
+            for (_, continuation) in storage.snapshotWatchers {
+                continuation.yield(storage.snapshot)
             }
         }
     }
@@ -227,8 +266,8 @@ extension MutableInMemoryProvider {
     /// The body runs while the provider holds its lock, so no other reads or updates happen
     /// until it finishes. It edits the stored values in place: if the body throws, the changes
     /// it made before the error are kept. When the body returns or throws, watchers of changed
-    /// keys receive their new values, and snapshot watchers receive one snapshot that contains
-    /// all the changes.
+    /// keys receive their new values. If any value changed, snapshot watchers receive one
+    /// snapshot that contains all the changes.
     ///
     /// Don't call the provider, or a ``ConfigReader`` that reads from it, from inside the
     /// body. The lock isn't recursive, so the call crashes or deadlocks.
@@ -248,22 +287,7 @@ extension MutableInMemoryProvider {
     public func withValues<Return: ~Copyable, Failure: Error>(
         _ body: (inout [AbsoluteConfigKey: ConfigValue]) throws(Failure) -> Return
     ) throws(Failure) -> Return {
-        var valueUpdatesToNotify: [(ConfigValue?, [UUID: AsyncStream<ConfigValue?>.Continuation])] = []
-        var snapshotContinuationsToNotify: ([UUID: AsyncStream<Snapshot>.Continuation], Snapshot)?
-        // Notify watchers outside the lock, also when the body throws.
-        defer {
-            for (value, continuations) in valueUpdatesToNotify {
-                for (_, continuation) in continuations {
-                    continuation.yield(value)
-                }
-            }
-            if let (continuations, snapshot) = snapshotContinuationsToNotify {
-                for (_, continuation) in continuations {
-                    continuation.yield(snapshot)
-                }
-            }
-        }
-        return try storage.withLock { storage throws(Failure) in
+        try storage.withLock { storage throws(Failure) in
             // Remember only what change detection needs. Holding the whole dictionary makes
             // the body's first write copy it, so only do that when snapshot watchers need it.
             var watchedValuesBefore: [(AbsoluteConfigKey, ConfigValue?)] = []
@@ -271,16 +295,21 @@ extension MutableInMemoryProvider {
                 watchedValuesBefore.append((key, storage.snapshot.values[key]))
             }
             let valuesBefore = storage.snapshotWatchers.isEmpty ? nil : storage.snapshot.values
-            // A body that throws keeps its changes, so collect them on that path too.
+            // Notify watchers while holding the lock, so they receive changes in the order they
+            // were made. A body that throws keeps its changes, so notify on that path too.
             defer {
                 for (key, oldValue) in watchedValuesBefore {
                     let newValue = storage.snapshot.values[key]
                     if newValue != oldValue, let continuations = storage.valueWatchers[key] {
-                        valueUpdatesToNotify.append((newValue, continuations))
+                        for (_, continuation) in continuations {
+                            continuation.yield(newValue)
+                        }
                     }
                 }
                 if let valuesBefore, valuesBefore != storage.snapshot.values {
-                    snapshotContinuationsToNotify = (storage.snapshotWatchers, storage.snapshot)
+                    for (_, continuation) in storage.snapshotWatchers {
+                        continuation.yield(storage.snapshot)
+                    }
                 }
             }
             return try body(&storage.snapshot.values)
@@ -352,6 +381,11 @@ extension MutableInMemoryProvider {
     private func removeValueContinuation(id: UUID, forKey key: AbsoluteConfigKey) {
         storage.withLock { storage in
             storage.valueWatchers[key]?[id] = nil
+            // Drop the key once its last watcher is gone, so that the watchers don't keep
+            // growing with every key ever watched.
+            if storage.valueWatchers[key]?.isEmpty == true {
+                storage.valueWatchers[key] = nil
+            }
         }
     }
 
