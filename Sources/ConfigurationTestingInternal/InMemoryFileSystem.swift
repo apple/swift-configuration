@@ -129,18 +129,11 @@ extension InMemoryFileSystem: CommonProviderFileSystem {
     }
 
     func fileContents(atPath filePath: FilePath) async throws -> Data? {
-        guard
-            let data = files.withLock({ files -> FileInfo? in
-                files[filePath]
-            })
-        else {
-            return nil
-        }
-        switch data.data {
-        case .file(let data):
+        files.withLock { files in
+            guard case .file(let data) = files[Self.resolvingSymlinks(in: filePath, files: files)]?.data else {
+                return nil
+            }
             return data
-        case .symlink(let target):
-            return try await fileContents(atPath: target)
         }
     }
 
@@ -159,5 +152,24 @@ extension InMemoryFileSystem: CommonProviderFileSystem {
         return try files.withLock { files in
             try locked_resolveSymlinks(at: filePath, files: &files)
         }
+    }
+
+    /// Resolves the symlinks in every component of a path, like a real file system does.
+    ///
+    /// For example, in a Kubernetes secret volume, each file is a symlink into the `..data`
+    /// directory, which is itself a symlink. Symlink targets must be absolute paths.
+    /// - Parameters:
+    ///   - filePath: The path to resolve.
+    ///   - files: The files in the file system.
+    /// - Returns: The path without symlinks.
+    private static func resolvingSymlinks(in filePath: FilePath, files: [FilePath: FileInfo]) -> FilePath {
+        var resolvedPath = FilePath(root: filePath.root)
+        for component in filePath.components {
+            resolvedPath.append(component)
+            if case .symlink(let target) = files[resolvedPath]?.data {
+                resolvedPath = resolvingSymlinks(in: target, files: files)
+            }
+        }
+        return resolvedPath
     }
 }
