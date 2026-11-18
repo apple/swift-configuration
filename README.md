@@ -88,7 +88,7 @@ For more, check out the full [documentation](https://swiftpackageindex.com/apple
 
 ## Package traits
 
-This package offers additional integrations you can enable using [package traits](https://docs.swift.org/swiftpm/documentation/packagemanagerdocs/addingdependencies#Packages-with-Traits).
+This package offers additional integrations you can enable using [package traits](https://docs.swift.org/latest/documentation/packagemanagerdocs/addingdependencies/#Packages-with-Traits).
 To enable an additional trait on the package, update the package dependency:
 
 ```diff
