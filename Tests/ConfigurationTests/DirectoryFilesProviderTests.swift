@@ -132,4 +132,32 @@ struct DirectoryFilesProviderTests {
             fileSystem: fileSystem
         )
     }
+
+    @available(Configuration 1.0, *)
+    @Test func kubernetesSecretVolume() async throws {
+        // Kubernetes writes the files to a hidden, timestamped directory, points a `..data` symlink
+        // at it, and exposes each file through a symlink into `..data`.
+        let timestamp = Date(timeIntervalSince1970: 1_750_688_537)
+        let fileSystem = InMemoryFileSystem(files: [
+            "/test/..2000_01_30_00_00_00.000000000/database-password": .file(
+                timestamp: timestamp,
+                contents: "secretpass123"
+            ),
+            "/test/..data": .init(
+                lastModifiedTimestamp: timestamp,
+                data: .symlink("/test/..2000_01_30_00_00_00.000000000")
+            ),
+            "/test/database-password": .init(
+                lastModifiedTimestamp: timestamp,
+                data: .symlink("/test/..data/database-password")
+            ),
+        ])
+        let provider = try await DirectoryFilesProvider(
+            directoryPath: "/test",
+            allowMissing: false,
+            fileSystem: fileSystem
+        )
+        let config = ConfigReader(provider: provider)
+        #expect(config.string(forKey: "database.password") == "secretpass123")
+    }
 }
