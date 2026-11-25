@@ -140,8 +140,9 @@ public struct DirectoryFilesProvider: Sendable {
     /// Creates a new provider that reads files from a directory.
     ///
     /// This initializer scans the specified directory and loads all regular files
-    /// as configuration values. Subdirectories are not traversed. Hidden files
-    /// (starting with a dot) are skipped.
+    /// as configuration values, following symlinks, such as the ones in a Kubernetes
+    /// secret volume. Subdirectories are not traversed. Hidden files (starting with
+    /// a dot) are skipped.
     ///
     /// ```swift
     /// // Load configuration from a directory

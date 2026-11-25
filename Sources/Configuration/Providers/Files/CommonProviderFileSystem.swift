@@ -157,10 +157,12 @@ extension LocalCommonProviderFileSystem: CommonProviderFileSystem {
             .contentsOfDirectory(atPath: directoryPath.string)
             .filter { !$0.hasPrefix(".") }
             .compactMap { (fileName) -> String? in
-                // Skip non-regular files (directories, symlinks, etc.)
-                let attributes =
-                    try fileManager
-                    .attributesOfItem(atPath: directoryPath.appending(fileName).string)
+                // Follow symlinks, so that files in a Kubernetes secret volume are included,
+                // then skip anything that isn't a regular file, such as a directory or a broken symlink.
+                let resolvedPath = URL(filePath: directoryPath.appending(fileName).string)
+                    .resolvingSymlinksInPath()
+                    .path(percentEncoded: false)
+                let attributes = try fileManager.attributesOfItem(atPath: resolvedPath)
                 guard let type = (attributes[.type] as? FileAttributeType), type == FileAttributeType.typeRegular else {
                     return nil
                 }
